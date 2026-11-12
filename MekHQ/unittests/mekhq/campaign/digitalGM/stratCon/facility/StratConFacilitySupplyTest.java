@@ -831,4 +831,69 @@ class StratConFacilitySupplyTest {
             assertEquals(FacilityCondition.INTACT, supplied.getCondition());
         }
     }
+
+    @Nested
+    class SupplyStatusTests {
+        @Test
+        void anEnemyCommandCenterIsASupplySource() {
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.CommandCenter);
+
+            assertTrue(StratConFacilitySupply.isSupplySource(track, roadEnd));
+        }
+
+        @Test
+        void aPlayerSupplyDepotIsNotASupplySource() {
+            place(roadEnd, ForceAlignment.Player, FacilityType.SupplyDepot);
+
+            assertFalse(StratConFacilitySupply.isSupplySource(track, roadEnd));
+        }
+
+        @Test
+        void aNeutralFacilityIsNotASupplySourceEvenIfItsTypeWouldBe() {
+            place(roadEnd, ForceAlignment.Third, FacilityType.CommandCenter);
+
+            assertFalse(StratConFacilitySupply.isSupplySource(track, roadEnd));
+        }
+
+        @Test
+        void anEmptyHexIsNotASupplySource() {
+            assertFalse(StratConFacilitySupply.isSupplySource(track, roadEnd));
+        }
+
+        @Test
+        void aSupplySourceShowsAsSourceRatherThanConnected() {
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.CommandCenter);
+            checkSupply();
+
+            assertEquals(StratConFacilitySupply.SupplyStatus.SOURCE,
+                  StratConFacilitySupply.getSupplyStatus(track, roadEnd));
+        }
+
+        @Test
+        void aFacilityOnTheSupplyLinesShowsAsConnected() {
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
+            checkSupply();
+
+            assertEquals(StratConFacilitySupply.SupplyStatus.CONNECTED,
+                  StratConFacilitySupply.getSupplyStatus(track, roadEnd));
+        }
+
+        @Test
+        void aCutOffSourceShowsAsCut() {
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.CommandCenter);
+            track.getCutOffFacilities().add(roadEnd);
+
+            assertEquals(StratConFacilitySupply.SupplyStatus.CUT,
+                  StratConFacilitySupply.getSupplyStatus(track, roadEnd));
+        }
+
+        @Test
+        void aSectorWithoutRoadsShowsNoSupplyStatus() {
+            track.getRoads().clear();
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.CommandCenter);
+
+            assertEquals(StratConFacilitySupply.SupplyStatus.NONE,
+                  StratConFacilitySupply.getSupplyStatus(track, roadEnd));
+        }
+    }
 }

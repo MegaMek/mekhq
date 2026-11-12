@@ -39,15 +39,7 @@ import static mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignm
 
 import java.io.PrintWriter;
 import java.text.ParseException;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.Hashtable;
-import java.util.LinkedHashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.UUID;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import jakarta.annotation.Nullable;
@@ -750,6 +742,72 @@ public class AtBDynamicScenario extends AtBScenario {
         }
 
         super.loadFieldsFromXmlNode(wn, version, campaign);
+    }
+
+    @Override
+    protected void afterLoadFromXml(final Version version) {
+        super.afterLoadFromXml(version);
+        if (version.isLowerThan(new Version("0.51.02"))) {
+            restoreFixedTimeLimitsFromTemplate();
+        }
+    }
+
+    /**
+     * Older versions overwrote every objective's time limit with the 6-turn default when the scenario was finalized,
+     * including objectives whose template gives a fixed time limit. This puts the template's fixed time limit back on
+     * any such objective that was left at the default.
+     *
+     * <p>Each scenario objective is matched to an unused template objective with the same criterion, amount and
+     * at most/at least direction.</p>
+     *
+     * <p>This is a one-time repair for saves written before the fix, so it only runs for those saves. An objective
+     * left at exactly 6 turns can't be told apart from one a GM deliberately set to 6, so running it on every load
+     * would undo such edits.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void restoreFixedTimeLimitsFromTemplate() {
+        final int overwrittenTimeLimit = 6;
+        ScenarioTemplate scenarioTemplate = getTemplate();
+        if (scenarioTemplate == null) {
+            return;
+        }
+
+        List<ScenarioObjective> unmatchedTemplateObjectives = new ArrayList<>(scenarioTemplate.scenarioObjectives);
+        for (ScenarioObjective scenarioObjective : getScenarioObjectives()) {
+            if ((scenarioObjective == null) ||
+                      (scenarioObjective.getTimeLimitType() != ScenarioObjective.TimeLimitType.Fixed)) {
+                continue;
+            }
+
+            ScenarioObjective matchingTemplateObjective = null;
+            for (ScenarioObjective templateObjective : unmatchedTemplateObjectives) {
+                if ((templateObjective != null) &&
+                          (templateObjective.getTimeLimitType() == ScenarioObjective.TimeLimitType.Fixed) &&
+                          (templateObjective.getObjectiveCriterion() == scenarioObjective.getObjectiveCriterion()) &&
+                          (templateObjective.getPercentage() == scenarioObjective.getPercentage()) &&
+                          Objects.equals(templateObjective.getFixedAmount(), scenarioObjective.getFixedAmount()) &&
+                          (templateObjective.isTimeLimitAtMost() == scenarioObjective.isTimeLimitAtMost())) {
+                    matchingTemplateObjective = templateObjective;
+                    break;
+                }
+            }
+
+            if (matchingTemplateObjective == null) {
+                continue;
+            }
+            unmatchedTemplateObjectives.remove(matchingTemplateObjective);
+
+            Integer templateTimeLimit = matchingTemplateObjective.getTimeLimit();
+            Integer scenarioTimeLimit = scenarioObjective.getTimeLimit();
+            if ((templateTimeLimit != null) && (scenarioTimeLimit != null) &&
+                      (scenarioTimeLimit == overwrittenTimeLimit) && (templateTimeLimit != overwrittenTimeLimit)) {
+                logger.info("Restoring fixed time limit of {} turns (was {}) on an objective in scenario {}",
+                      templateTimeLimit, scenarioTimeLimit, getName());
+                scenarioObjective.setTimeLimit(templateTimeLimit);
+            }
+        }
     }
 
     /**

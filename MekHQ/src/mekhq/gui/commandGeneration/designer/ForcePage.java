@@ -37,6 +37,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.gui.commandGeneration.designer.DesignerUi.*;
 
 import java.awt.*;
+import java.awt.event.HierarchyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.text.NumberFormat;
@@ -47,28 +48,30 @@ import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.function.Consumer;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 
 import jakarta.annotation.Nullable;
 import megamek.SuiteOptions;
 import megamek.client.ratgenerator.CrewDescriptor;
-import megamek.client.ratgenerator.FactionRecord;
 import megamek.client.ratgenerator.ForceDescriptor;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.Picker;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.PickerChoice;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.TransportShare;
+import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.common.units.Entity;
 import megamek.common.units.EntityWeightClass;
-import megamek.common.universe.FactionTag;
+import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.universe.Factions;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
@@ -85,6 +88,7 @@ import mekhq.gui.commandGeneration.contents.ForceGeneratorTab;
  * readout on the right sums the command up and shows the unit selected on the board.</p>
  */
 public final class ForcePage {
+    private static final MMLogger LOGGER = MMLogger.create(ForcePage.class);
     private static final int RAIL_WIDTH = 300;
     private static final int READOUT_WIDTH = 400;
     // The readout's text column: its width less its padding and scroll bar.
@@ -113,17 +117,19 @@ public final class ForcePage {
     private final Map<Picker, HudChoice<Object>> pickers = new EnumMap<>(Picker.class);
     private final Map<Picker, JComponent> pickerRows = new EnumMap<>(Picker.class);
     private final Map<TransportShare, HudStepper> transport = new EnumMap<>(TransportShare.class);
-    private final JLabel yearLabel = muted("");
     private HudCheckBox fighterComplement;
     private HudCheckBox detachments;
     private HudCheckBox commandLance;
-    private JLabel formationMixLink;
     private boolean railRefreshPending;
 
     // Board
     private final JPanel boardRows = column();
     private final JLabel boardMeta = muted("");
     private final Set<ForceDescriptor> collapsed = Collections.newSetFromMap(new IdentityHashMap<>());
+    /** Restyles each board row for whether it is selected, so a click moves the highlight without a rebuild. */
+    private final Map<ForceDescriptor, Consumer<Boolean>> rowSelectionStylers = new IdentityHashMap<>();
+    /** Whether the model changed while the board was off screen, so it must be rebuilt when next shown. */
+    private boolean boardStale;
     private @Nullable ForceDescriptor selected;
     private boolean boardRefreshPending;
 
@@ -155,6 +161,13 @@ public final class ForcePage {
             view.addSelectionListener(this::scheduleRailRefresh);
         }
         engine.addModelChangeListener(this::scheduleBoardRefresh);
+        // A board left stale while another page was on show is rebuilt as it comes back into view.
+        root.addHierarchyListener(event -> {
+            if (((event.getChangeFlags() & HierarchyEvent.SHOWING_CHANGED) != 0) && root.isShowing()
+                      && boardStale) {
+                scheduleBoardRefresh();
+            }
+        });
         refreshRail();
         refreshBoard();
     }
@@ -177,8 +190,7 @@ public final class ForcePage {
     // region Rail
 
     private JComponent buildRail() {
-        HudChoice<Object> faction = picker(Picker.FACTION, 0);
-        HudChoice<Object> subFaction = picker(Picker.SUB_FACTION, 0);
+        // No faction or command pickers: the command is always generated for the campaign's own faction.
         HudChoice<Object> formation = picker(Picker.FORMATION, 5);
         HudChoice<Object> rating = picker(Picker.RATING, 6);
         HudChoice<Object> experience = picker(Picker.EXPERIENCE, 5);
@@ -189,8 +201,6 @@ public final class ForcePage {
         HudChoice<Object> infantryClass = picker(Picker.INFANTRY_CLASS, 0);
         HudChoice<Object> flags = picker(Picker.FLAGS, 0);
 
-        pickerRows.put(Picker.FACTION, field(text("Designer.force.faction"), faction));
-        pickerRows.put(Picker.SUB_FACTION, field(text("Designer.force.subFaction"), subFaction));
         pickerRows.put(Picker.FORMATION, field(text("Designer.force.formation"), formation));
         pickerRows.put(Picker.RATING, field(text("Designer.force.rating"), rating));
         pickerRows.put(Picker.EXPERIENCE, field(text("Designer.force.experience"), experience));
@@ -208,13 +218,6 @@ public final class ForcePage {
                 view.setDetachmentsSelected(detachments.isSelected());
             }
         });
-        formationMixLink = Hud.link("", () -> {
-            ForceGeneratorOptionsView view = engine.getOptionsView();
-            if (view != null) {
-                view.openFormationMixEditor();
-            }
-        });
-        formationMixLink.setToolTipText(text("Designer.force.formationMix.tooltip"));
 
         for (TransportShare share : TransportShare.values()) {
             HudStepper stepper = new HudStepper(0, (share == TransportShare.CARGO) ? 500 : 200, 10,
@@ -257,15 +260,15 @@ public final class ForcePage {
         }
 
         JPanel rail = stack(
-              section(text("Designer.force.section.who"), null,
-                    pickerRows.get(Picker.FACTION), pickerRows.get(Picker.SUB_FACTION), yearLabel),
-              section(text("Designer.force.section.size"), null, pickerRows.get(Picker.FORMATION)),
-              section(text("Designer.force.section.quality"), null,
-                    pickerRows.get(Picker.RATING), pickerRows.get(Picker.EXPERIENCE)),
               section(text("Designer.force.section.shape"), null,
                     pickerRows.get(Picker.UNIT_TYPE), pickerRows.get(Picker.WEIGHT_CLASS),
-                    pickerRows.get(Picker.INFANTRY_CLASS), pickerRows.get(Picker.FLAGS),
-                    commandLance, detachments, formationMixLink),
+                    pickerRows.get(Picker.INFANTRY_CLASS), pickerRows.get(Picker.FLAGS)),
+              section(text("Designer.force.section.size"), null, pickerRows.get(Picker.FORMATION),
+                    // The rail's width less its padding and the note's own.
+                    note(text("Designer.force.formation.recommended"), ACCENT, RAIL_WIDTH - 100),
+                    commandLance, detachments),
+              section(text("Designer.force.section.quality"), null,
+                    pickerRows.get(Picker.RATING), pickerRows.get(Picker.EXPERIENCE)),
               section(text("Designer.force.section.transport"), null, transportGrid, fighterComplement));
         padded(rail, 12, 14, 18, 14);
         JComponent scroll = scroll(rail, SURFACE_DEEP);
@@ -309,22 +312,16 @@ public final class ForcePage {
             List<HudChoice.Choice<Object>> choices = new ArrayList<>();
             Object selection = view.getPickerSelection(picker);
             for (PickerChoice choice : view.getPickerChoices(picker)) {
-                // The aggregate and placeholder factions - All Clans, Inner Sphere, Periphery and the like - are
-                // not commands anyone founds. The one already selected is kept, so the picker never shows a blank.
-                if (isSpecialFaction(choice.value()) && (choice.value() != selection)) {
-                    continue;
-                }
                 choices.add(new HudChoice.Choice<>(choice.value(), choice.label()));
             }
             entry.getValue().setChoices(choices, selection);
             boolean worthShowing = switch (picker) {
                 // A list with nothing but its blank entry offers no choice.
-                case SUB_FACTION, FLAGS -> choices.size() > 1;
+                case FLAGS -> choices.size() > 1;
                 default -> true;
             };
             pickerRows.get(picker).setVisible(view.isPickerAvailable(picker) && worthShowing);
         }
-        yearLabel.setText(formatted("Designer.force.year", view.getCurrentYear()));
         for (Map.Entry<TransportShare, HudStepper> entry : transport.entrySet()) {
             entry.getValue().setValue((int) Math.round(view.getTransportPercent(entry.getKey())));
         }
@@ -332,26 +329,8 @@ public final class ForcePage {
         fighterComplement.setSelected(view.isFighterComplementSelected());
         detachments.setSelected(view.isDetachmentsSelected());
         commandLance.setSelected(engine.isGenerateCompanyCommandLance());
-        String request = view.getFormationMixRequest();
-        formationMixLink.setText((request == null) ? text("Designer.force.formationMix.none")
-              : formatted("Designer.force.formationMix.request", request));
         root.revalidate();
         root.repaint();
-    }
-
-    /**
-     * @param value a picker value
-     *
-     * @return {@code true} if the value is a faction tagged {@link FactionTag#SPECIAL}, such as All Clans
-     */
-    private static boolean isSpecialFaction(@Nullable Object value) {
-        if (!(value instanceof FactionRecord record)) {
-            return false;
-        }
-        // Factions.getFaction never answers null, so membership is checked against the key list first.
-        Factions factions = Factions.getInstance();
-        return factions.getFactionList().contains(record.getKey())
-              && factions.getFaction(record.getKey()).is(FactionTag.SPECIAL);
     }
 
     // endregion Rail
@@ -393,6 +372,17 @@ public final class ForcePage {
     }
 
     private void scheduleBoardRefresh() {
+        // Off screen the board is only marked stale. What changes the model while another page is on show is the
+        // People page's naming choices, which alter the board's names and not the totals the tiles read, and
+        // rebuilding a large command's board there made every such click lag.
+        if (!root.isShowing()) {
+            boardStale = true;
+            // The totals are still brought up to date, cheaply, in case a roll finished after the player moved on.
+            if (updateSummary()) {
+                onSummaryChanged.run();
+            }
+            return;
+        }
         if (boardRefreshPending) {
             return;
         }
@@ -405,10 +395,13 @@ public final class ForcePage {
 
     /** Rebuilds the board, the readout and the summary from the rolled command. */
     void refreshBoard() {
+        long start = System.nanoTime();
+        boardStale = false;
         ForceDescriptor modelRoot = engine.getGeneratedForce();
-        summary = ForceSummary.of(modelRoot, campaign.getCampaignOptions(), cache);
+        updateSummary();
 
         boardRows.removeAll();
+        rowSelectionStylers.clear();
         if (modelRoot == null) {
             selected = null;
             JLabel empty = Hud.notice(wrapHtml(text("Designer.force.board.empty"), 420));
@@ -425,7 +418,26 @@ public final class ForcePage {
         boardRows.revalidate();
         boardRows.repaint();
         refreshReadout();
+        LOGGER.debug("[CommandDesigner][Perf] board rebuilt: {} row(s), {} unit(s) in {}ms",
+              rowSelectionStylers.size(), summary.getRolledUnits(), (System.nanoTime() - start) / 1_000_000);
         onSummaryChanged.run();
+    }
+
+    /**
+     * Recounts the rolled command, keeping the current summary when the units are the same ones.
+     *
+     * @return {@code true} if the summary changed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean updateSummary() {
+        ForceSummary recounted = ForceSummary.of(engine.getGeneratedForce(), campaign.getCampaignOptions(), cache);
+        if ((recounted == summary) || recounted.hasSameUnits(summary)) {
+            return false;
+        }
+        summary = recounted;
+        return true;
     }
 
     private static List<ForceDescriptor> childrenOf(ForceDescriptor node) {
@@ -485,7 +497,9 @@ public final class ForcePage {
 
         JPanel row = new JPanel(new BorderLayout(scaleForGUI(10), 0));
         row.setOpaque(true);
-        row.setBackground((node == selected) ? SURFACE : GROUND);
+        Consumer<Boolean> styler = isSelected -> row.setBackground(isSelected ? SURFACE : GROUND);
+        styler.accept(node == selected);
+        rowSelectionStylers.put(node, styler);
         row.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(scaleForGUI(1), 0, 0, 0, DIVIDER),
               BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(indentFor(depth)), scaleForGUI(5),
@@ -505,7 +519,9 @@ public final class ForcePage {
                 if (!collapsed.remove(node)) {
                     collapsed.add(node);
                 }
-                select(node);
+                // Folding changes which rows exist, so this one redraws the board rather than moving the highlight.
+                selected = node;
+                scheduleBoardRefresh();
             }
         });
         return row;
@@ -557,20 +573,14 @@ public final class ForcePage {
         figures.add(figure(formatNumber(cache.battleValue(entity)), text("Designer.force.bv"), included));
         figures.add(figure(formatNumber(Math.round(entity.getWeight())), text("Designer.force.tons"), included));
 
-        boolean isSelected = node == selected;
         JPanel row = new JPanel(new BorderLayout(scaleForGUI(10), 0));
         row.setOpaque(true);
-        row.setBackground(isSelected ? SURFACE : GROUND);
-        // The selection bar sits at the row's indent, beside the unit it marks.
-        row.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
-              BorderFactory.createCompoundBorder(
-                    BorderFactory.createEmptyBorder(0, scaleForGUI(depth * BOARD_INDENT), 0, 0),
-                    BorderFactory.createCompoundBorder(
-                          BorderFactory.createMatteBorder(0, scaleForGUI(isSelected ? 3 : 0), 0, 0, ACCENT),
-                          BorderFactory.createEmptyBorder(scaleForGUI(7),
-                                scaleForGUI(BOARD_ROW_PADDING - (isSelected ? 3 : 0)), scaleForGUI(7),
-                                scaleForGUI(14))))));
+        Consumer<Boolean> styler = isSelected -> {
+            row.setBackground(isSelected ? SURFACE : GROUND);
+            row.setBorder(unitRowBorder(depth, isSelected));
+        };
+        styler.accept(node == selected);
+        rowSelectionStylers.put(node, styler);
         row.add(ring(node, included, isCommander), BorderLayout.WEST);
         row.add(text, BorderLayout.CENTER);
         row.add(figures, BorderLayout.EAST);
@@ -584,6 +594,25 @@ public final class ForcePage {
             }
         });
         return row;
+    }
+
+    /**
+     * The border of a unit row. The selection bar sits at the row's indent, beside the unit it marks, and takes its
+     * width out of the padding so a row does not shift when it is selected.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static Border unitRowBorder(int depth, boolean isSelected) {
+        return BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
+              BorderFactory.createCompoundBorder(
+                    BorderFactory.createEmptyBorder(0, scaleForGUI(depth * BOARD_INDENT), 0, 0),
+                    BorderFactory.createCompoundBorder(
+                          BorderFactory.createMatteBorder(0, scaleForGUI(isSelected ? 3 : 0), 0, 0, ACCENT),
+                          BorderFactory.createEmptyBorder(scaleForGUI(7),
+                                scaleForGUI(BOARD_ROW_PADDING - (isSelected ? 3 : 0)), scaleForGUI(7),
+                                scaleForGUI(14)))));
     }
 
     private static String pilotLine(CrewDescriptor pilot) {
@@ -644,11 +673,28 @@ public final class ForcePage {
         engine.modelChanged();
     }
 
+    /**
+     * Selects a row. Only the highlight and the readout change, so the two rows involved are restyled in place: a
+     * full rebuild of a regiment's board on every click was most of the time a click took.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
     private void select(ForceDescriptor node) {
+        ForceDescriptor previous = selected;
         selected = node;
-        // Selecting a formation points the formation mix at it, so its editor offers that formation's options.
-        engine.setFormationMixContext((node.getEntity() == null) ? node : null);
-        scheduleBoardRefresh();
+        Consumer<Boolean> previousStyler = (previous == null) ? null : rowSelectionStylers.get(previous);
+        Consumer<Boolean> styler = rowSelectionStylers.get(node);
+        if (styler == null) {
+            scheduleBoardRefresh();
+            return;
+        }
+        if ((previousStyler != null) && (previous != node)) {
+            previousStyler.accept(false);
+        }
+        styler.accept(true);
+        refreshReadout();
+        boardRows.repaint();
     }
 
     // endregion Board
@@ -726,6 +772,8 @@ public final class ForcePage {
                   : "Designer.force.include")), false, true);
             ForceDescriptor node = selected;
             toggle.addActionListener(event -> toggleIncluded(node));
+            HudButton viewReadout = new HudButton(upper(text("Designer.force.viewReadout")), false, true);
+            viewReadout.addActionListener(event -> showReadout(entity));
             addRows(detail,
                   title(entity.getShortName()),
                   keyValue(text("Designer.force.readout.role"),
@@ -737,6 +785,7 @@ public final class ForcePage {
                   keyValue(text("Designer.force.readout.bv"), formatNumber(cache.battleValue(entity))),
                   keyValue(text("Designer.force.readout.price"),
                         cache.price(entity, campaign.getCampaignOptions()).toAmountAndSymbolString()),
+                  viewReadout,
                   toggle);
         } else {
             Tally tally = new Tally();
@@ -755,6 +804,31 @@ public final class ForcePage {
         totals.revalidate();
         detail.revalidate();
         root.repaint();
+    }
+
+    /**
+     * Opens the unit's technical readout over the designer. It is modal so it stays usable above the modal Command
+     * Generator.
+     *
+     * @param entity the unit to show
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void showReadout(Entity entity) {
+        new EntityReadoutDialog(owningFrame(), true, entity).setVisible(true);
+    }
+
+    /** @return the frame the designer's window belongs to, or {@code null} when it has none */
+    private @Nullable JFrame owningFrame() {
+        Window window = SwingUtilities.getWindowAncestor(root);
+        while (window != null) {
+            if (window instanceof JFrame frame) {
+                return frame;
+            }
+            window = window.getOwner();
+        }
+        return null;
     }
 
     private static JComponent title(String text) {

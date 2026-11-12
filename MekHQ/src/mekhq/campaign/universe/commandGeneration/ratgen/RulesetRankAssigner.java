@@ -88,8 +88,10 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
  *
  * <p>Non-officer combat crew get an enlisted Sergeant rank (E12 IS, E4 Clan/CS); support staff get
  * a Corporal-equivalent (E8 IS, E4 Clan/CS) matching the legacy generator's convention. The rank system
- * the player chose in Campaign Options maps the integer index to the display name; the campaign's
- * faction picks the IS or Clan/CS slot layout.</p>
+ * the player chose in Campaign Options decides everything about ranks: it names the slots, and its
+ * {@link RankFamily} picks the Inner Sphere, Clan or ComStar slot layout. A formation from another family -
+ * a Star under an Inner Sphere rank system, say - is ranked as the nearest formation of the rank system's own
+ * family no larger than it.</p>
  *
  * <p>Gated on {@link CommandGenerationOptions#isAutomaticallyAssignRanks()}.</p>
  */
@@ -99,6 +101,36 @@ public final class RulesetRankAssigner {
 
     private RulesetRankAssigner() {
         // utility class
+    }
+
+    /** The code of the shipped Clan rank system. */
+    private static final String CLAN_RANK_SYSTEM_CODE = "CLAN";
+
+    /**
+     * The slot layout a rank system follows. Rank systems do not say which they use, so it is read from the system
+     * itself: the Clan system by its code, the ComStar and Word of Blake systems by their ROM branch designations,
+     * and every other system, custom ones included, as Inner Sphere.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    enum RankFamily {
+        INNER_SPHERE, CLAN, COMSTAR;
+
+        /**
+         * @param rankSystem the rank system chosen in Campaign Options, or {@code null}
+         *
+         * @return the slot layout it follows; Inner Sphere when there is none
+         */
+        static RankFamily of(@Nullable RankSystem rankSystem) {
+            if (rankSystem == null) {
+                return INNER_SPHERE;
+            }
+            if (CLAN_RANK_SYSTEM_CODE.equals(rankSystem.getCode())) {
+                return CLAN;
+            }
+            return rankSystem.isUseROMDesignation() ? COMSTAR : INNER_SPHERE;
+        }
     }
 
     /**
@@ -185,32 +217,21 @@ public final class RulesetRankAssigner {
             return Result.none();
         }
 
-        // Campaign Options is the single source of truth for ranks: the campaign's faction picks the rank-slot
-        // layout below, and the campaign's rank system names the slots.
+        // The rank system the player chose in Campaign Options is the single source of truth for ranks: its family
+        // picks the rank-slot layout, and it names the slots. Everyone ranked below is put on it, so the whole
+        // command reads its ranks from one table and the generator never overrides the player's choice. The
+        // faction still decides the formations and whether a post needs a Bloodname, but not the ranks.
         Faction faction = campaign.getPlayerForce().getFaction();
-        LOGGER.info("[CompanyGen][RankAssign][Faction] campaign faction={} (isClan={} isComStarOrWoB={} isMercenary={})",
-              faction == null ? "null" : faction.getShortName(),
-              faction != null && faction.isClan(),
-              faction != null && faction.isComStarOrWoB(),
-              faction != null && faction.isMercenary());
-
-        int enlistedRank = enlistedRankForFaction(faction);
-        int supportRank = supportRankForFaction(faction);
-        LOGGER.info("[CompanyGen][RankAssign][Faction] rank-index policy: enlistedRank={} supportRank={} (Clan/CS path={}, IS path={})",
-              enlistedRank, supportRank,
-              faction != null && (faction.isClan() || faction.isComStarOrWoB()),
-              faction == null || (!faction.isClan() && !faction.isComStarOrWoB()));
-
-        // The Person's rank-name lookup uses its OWN rank system. Everyone we rank below is put on the
-        // rank system the player chose in Campaign Options, so the whole command reads its ranks from
-        // one table and the generator never overrides the player's choice.
         RankSystem targetRankSystem = campaign.getPlayerForce().getRankSystem();
+        RankFamily rankFamily = RankFamily.of(targetRankSystem);
+        int enlistedRank = enlistedRankFor(rankFamily);
+        int supportRank = supportRankFor(rankFamily);
         RankValidator rankValidator = new RankValidator();
 
-        LOGGER.info("[CompanyGen][RankAssign] START faction={} rankSystem={} enlistedRank={} supportRank={} root='{}' guidedLevels={} engineCommanders={} thread={}",
+        LOGGER.info("[CompanyGen][RankAssign] START faction={} rankSystem={} rankFamily={} enlistedRank={} supportRank={} root='{}' guidedLevels={} engineCommanders={} thread={}",
               faction.getShortName(),
               targetRankSystem == null ? "null" : targetRankSystem.getCode(),
-              enlistedRank, supportRank, root.getName(), guidance.levels().size(),
+              rankFamily, enlistedRank, supportRank, root.getName(), guidance.levels().size(),
               guidance.engineCommanders().size(), Thread.currentThread().getName());
 
         // Pass 1: walk the tree top-down. Each formation promotes its commander before its sub-formations
@@ -225,7 +246,7 @@ public final class RulesetRankAssigner {
         int[] officerCount = { 0 };
         Selection selection = Selection.from(campaign, options, faction.isClan());
         Pass pass = new Pass(campaign, selection, guidance, promoted, officers, officerCount, targetRankSystem,
-              rankValidator);
+              rankFamily, rankValidator);
         Person rootCommander = walk(pass, root, rootLevel, true);
         int officersAssigned = officerCount[0];
         long pass1Ms = (System.nanoTime() - pass1Start) / 1_000_000;
@@ -327,7 +348,7 @@ public final class RulesetRankAssigner {
     /** Everything one rank pass carries through the walk. */
     private record Pass(Campaign campaign, Selection selection, Guidance guidance, Set<Person> promoted,
           Map<Person, FormationLevel> officers, int[] officerCount, RankSystem targetRankSystem,
-          RankValidator rankValidator) {
+          RankFamily rankFamily, RankValidator rankValidator) {
     }
 
     /**
@@ -429,7 +450,7 @@ public final class RulesetRankAssigner {
     private static Person promoteCommander(Pass pass, Formation formation, @Nullable FormationLevel level,
           @Nullable Comparator<Person> bestFirst, int positionInParent) {
         int rankIndex = rankIndexFor(pass.campaign(), formation, level, pass.selection().isClanCommand(),
-              positionInParent);
+              positionInParent, pass.rankFamily());
         if (rankIndex < 0) {
             LOGGER.info("[CompanyGen][RankAssign][Pass1]   formation '{}' (level={}) -> no rank mapping, skip",
                   formation.getName(), level);
@@ -597,31 +618,104 @@ public final class RulesetRankAssigner {
     private static final int POINTS_IN_A_STAR = 5;
 
     /**
-     * The rank index for a formation's commander, on the Clan table (Sarna, Clans: Ranks and Organization): a
-     * Point's leader is a Point Commander, a Star's a Star Commander, a Nova's (a Mek Star and an Elemental Star)
-     * a Nova Commander, a Binary's or Trinary's a Star Captain, a Supernova's (Novas paired) a Nova Captain, a
-     * Cluster's a Star Colonel, a Galaxy's a Galaxy Commander. Other families take the level's slot as it is.
+     * The rank index for a formation's commander, in the slot layout of the rank system the campaign uses. On the
+     * Clan table (Sarna, Clans: Ranks and Organization) a Point's leader is a Point Commander, a Star's a Star
+     * Commander, a Nova's (a Mek Star and an Elemental Star) a Nova Commander, a Binary's or Trinary's a Star
+     * Captain, a Supernova's (Novas paired) a Nova Captain, a Cluster's a Star Colonel, a Galaxy's a Galaxy
+     * Commander. A formation from another family is first translated with {@link #levelInFamily}.
      *
      * @param campaign         the campaign, to read the formation's units
      * @param formation        the formation
      * @param level            its level, or {@code null} when unknown
-     * @param isClanCommand    {@code true} when the command is a Clan one, so a Point's leader is ranked
+     * @param isClanCommand    {@code true} when the command is a Clan one, so it is organised in Points
      * @param positionInParent the formation's place among its parent's sub-formations, from zero
+     * @param rankFamily       the slot layout of the rank system the campaign uses
      *
      * @return the rank index, or {@code -1} when the level has no officer slot
      */
     static int rankIndexFor(Campaign campaign, Formation formation, @Nullable FormationLevel level,
-          boolean isClanCommand, int positionInParent) {
-        if ((level == FormationLevel.TEAM) && isClanCommand) {
-            return pointRankIndex(positionInParent);
+          boolean isClanCommand, int positionInParent, RankFamily rankFamily) {
+        if (rankFamily == RankFamily.CLAN) {
+            if ((level == FormationLevel.TEAM) && isClanCommand) {
+                return pointRankIndex(positionInParent);
+            }
+            if ((level == FormationLevel.STAR_OR_NOVA) && isNova(unitTypesIn(campaign, formation))) {
+                return Rank.RWO_MAX + 3;   // Nova Commander
+            }
+            if ((level == FormationLevel.BINARY_OR_TRINARY) && holdsANova(campaign, formation)) {
+                return Rank.RWO_MAX + 5;   // Nova Captain, for a Supernova
+            }
         }
-        if ((level == FormationLevel.STAR_OR_NOVA) && isNova(unitTypesIn(campaign, formation))) {
-            return Rank.RWO_MAX + 3;   // Nova Commander
+        return rankIndexForLevel(levelInFamily(level, rankFamily));
+    }
+
+    /**
+     * Roughly how many units a formation of each level commands, on one scale for every family, so a formation can
+     * be matched to its nearest counterpart in another: a Lance, a Star and a Level II sit on the first rung, a
+     * Company, a Binary or Trinary and a Level III on the second, and so on up.
+     *
+     * @return the level's rung, or {@code 0} for a level with no officer of its own
+     */
+    private static int sizeRung(FormationLevel level) {
+        return switch (level) {
+            case LANCE, STAR_OR_NOVA, LEVEL_II_OR_CHOIR -> 1;
+            case COMPANY, BINARY_OR_TRINARY, LEVEL_III -> 2;
+            case BATTALION, LEVEL_IV -> 3;
+            case REGIMENT, CLUSTER -> 4;
+            case BRIGADE, GALAXY, LEVEL_V -> 5;
+            case DIVISION -> 6;
+            case CORPS -> 7;
+            case ARMY, LEVEL_VI -> 8;
+            case ARMY_GROUP, TOUMAN -> 9;
+            default -> 0;
+        };
+    }
+
+    /** @return the family whose ladder a level belongs to, or {@code null} for a level on no family's ladder */
+    private static @Nullable RankFamily familyOf(FormationLevel level) {
+        return switch (level) {
+            case LANCE, COMPANY, BATTALION, REGIMENT, BRIGADE, DIVISION, CORPS, ARMY, ARMY_GROUP ->
+                  RankFamily.INNER_SPHERE;
+            case STAR_OR_NOVA, BINARY_OR_TRINARY, CLUSTER, GALAXY, TOUMAN -> RankFamily.CLAN;
+            case LEVEL_II_OR_CHOIR, LEVEL_III, LEVEL_IV, LEVEL_V, LEVEL_VI -> RankFamily.COMSTAR;
+            default -> null;
+        };
+    }
+
+    /**
+     * Translates a formation level into the rank system's family, so a Clan Star under an Inner Sphere rank system
+     * is ranked as a Lance and an Inner Sphere Company under the Clan rank system as a Binary. Where the family has
+     * no formation of that size, the largest smaller one stands in: a Battalion under the Clan rank system is ranked
+     * as a Binary rather than a Cluster.
+     *
+     * @param level      the formation's level, or {@code null}
+     * @param rankFamily the slot layout of the rank system the campaign uses
+     *
+     * @return the matching level in that family; the level unchanged when it already belongs to it, has no officer
+     *       of its own, or has no counterpart
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable FormationLevel levelInFamily(@Nullable FormationLevel level, RankFamily rankFamily) {
+        if (level == null) {
+            return null;
         }
-        if ((level == FormationLevel.BINARY_OR_TRINARY) && holdsANova(campaign, formation)) {
-            return Rank.RWO_MAX + 5;   // Nova Captain, for a Supernova
+        RankFamily levelFamily = familyOf(level);
+        int rung = sizeRung(level);
+        if ((levelFamily == null) || (levelFamily == rankFamily) || (rung == 0)) {
+            return level;
         }
-        return rankIndexForLevel(level);
+        FormationLevel nearest = null;
+        int nearestRung = 0;
+        for (FormationLevel candidate : FormationLevel.values()) {
+            int candidateRung = sizeRung(candidate);
+            if ((familyOf(candidate) == rankFamily) && (candidateRung <= rung) && (candidateRung > nearestRung)) {
+                nearest = candidate;
+                nearestRung = candidateRung;
+            }
+        }
+        return (nearest == null) ? level : nearest;
     }
 
     /**
@@ -703,15 +797,10 @@ public final class RulesetRankAssigner {
                   ships.size());
             return 0;
         }
-        Faction faction = campaign.getPlayerForce().getFaction();
-        if (faction == null) {
-            LOGGER.warn("[CompanyGen][RankAssign][LateShips] {} ship(s) left unranked: the campaign has no faction",
-                  ships.size());
-            return 0;
-        }
-        int enlistedRank = enlistedRankForFaction(faction);
-        int supportRank = supportRankForFaction(faction);
         RankSystem targetRankSystem = campaign.getPlayerForce().getRankSystem();
+        RankFamily rankFamily = RankFamily.of(targetRankSystem);
+        int enlistedRank = enlistedRankFor(rankFamily);
+        int supportRank = supportRankFor(rankFamily);
         RankValidator rankValidator = new RankValidator();
 
         int ranked = 0;
@@ -828,23 +917,20 @@ public final class RulesetRankAssigner {
 
     /**
      * Returns the enlisted rank index for non-officer combat crew, matching the legacy generator's
-     * convention: Sergeant-equivalent for Inner Sphere / Periphery (E12), lower index for Clan and
-     * ComStar / WoB rank systems (E4).
+     * convention: Sergeant-equivalent for Inner Sphere / Periphery rank systems (E12), lower index for
+     * the Clan and ComStar / WoB rank systems (E4).
      */
-    private static int enlistedRankForFaction(Faction faction) {
-        return (faction.isComStarOrWoB() || faction.isClan()) ? 4 : 12;
+    private static int enlistedRankFor(RankFamily rankFamily) {
+        return (rankFamily == RankFamily.INNER_SPHERE) ? 12 : 4;
     }
 
     /**
      * Returns the rank index for support personnel (techs, doctors, admins). Mirrors the legacy
-     * generator's {@code generateSupportPerson} switch: Corporal-equivalent for IS / Periphery,
-     * lower index for Clan / ComStar / WoB.
-     *
-     * <p>Package-private so {@code SupportPersonnelGenerator} can share the same faction-to-rank
-     * mapping when it creates fresh techs, doctors, admins, astechs, and medics.</p>
+     * generator's {@code generateSupportPerson} switch: Corporal-equivalent for Inner Sphere / Periphery
+     * rank systems, lower index for the Clan and ComStar / WoB rank systems.
      */
-    static int supportRankForFaction(Faction faction) {
-        return (faction != null && (faction.isComStarOrWoB() || faction.isClan())) ? 4 : 8;
+    static int supportRankFor(RankFamily rankFamily) {
+        return (rankFamily == RankFamily.INNER_SPHERE) ? 8 : 4;
     }
 
     // Rank indices, using the bands fixed by Rank: enlisted 0-20, warrant 21-30, officer 31-50. The
@@ -882,21 +968,21 @@ public final class RulesetRankAssigner {
      * <p>Sparse rank systems are handled by the caller, which walks down from the requested index
      * until it finds a rank that profession actually names.</p>
      *
-     * <p>Clan and ComStar/WoB keep a single flat index rather than this ladder. For the Clans that
+     * <p>The Clan and ComStar/WoB rank systems keep a single flat index rather than this ladder. For the Clans that
      * index now resolves to real names - the rank system gives technicians, medics and administrators
      * their own columns, so one index reads as Technician, Doctor or Administrator according to the
      * holder's profession, and the rung above it carries the department heads. ComStar and WoB still
      * borrow the warrior column and remain outstanding work.</p>
      *
-     * @param role    the support role being generated
-     * @param skill   the skill level that person was generated at
-     * @param faction the faction the command is being generated for
+     * @param role       the support role being generated
+     * @param skill      the skill level that person was generated at
+     * @param rankFamily the slot layout of the rank system the campaign uses
      *
      * @return the preferred rank index
      */
-    static int supportRankFor(PersonnelRole role, SkillLevel skill, Faction faction) {
-        if ((faction != null) && (faction.isComStarOrWoB() || faction.isClan())) {
-            return supportRankForFaction(faction);
+    static int supportRankFor(PersonnelRole role, SkillLevel skill, RankFamily rankFamily) {
+        if (rankFamily != RankFamily.INNER_SPHERE) {
+            return supportRankFor(rankFamily);
         }
         if (role == PersonnelRole.ADMINISTRATOR) {
             return RANK_CORPORAL;

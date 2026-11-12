@@ -60,7 +60,8 @@ public class CamOpsStrictSalvage extends AbstractSalvage {
      * {@inheritDoc}
      *
      * <p>The assigned salvage teams recover the wrecks, which the player works through in the recovery presenter.
-     * Their techs then risk accidents (if risky salvage is enabled), and spend the time the recovery took.</p>
+     * Their techs then risk accidents (if risky salvage is enabled; fewer if they worked carefully), and spend the
+     * time the recovery took.</p>
      *
      * <p>There is nothing to recover if no teams or techs were assigned, or if the player doesn't control the
      * battlefield.</p>
@@ -79,10 +80,11 @@ public class CamOpsStrictSalvage extends AbstractSalvage {
               recoveryPresenter);
         int recoveredCount = (session == null) ? 0 : session.getRecoveredCount();
         int usedMinutes = (session == null) ? 0 : session.getUsedMinutes();
+        boolean isCarefulSalvage = (session != null) && session.isCarefulSalvage();
 
         List<UUID> techUUIDs = scenario.getSalvageTechs();
         if (campaign.getCampaignOptions().get(CampaignOption.IS_USE_RISKY_SALVAGE)) {
-            CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, techUUIDs, recoveredCount);
+            CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, techUUIDs, recoveredCount, isCarefulSalvage);
         }
 
         CamOpsSalvageUtilities.depleteTechMinutes(campaign, techUUIDs, usedMinutes);

@@ -40,6 +40,8 @@ import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.never;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
@@ -51,6 +53,7 @@ import java.util.List;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
@@ -199,6 +202,7 @@ public class ContractUtilitiesTest {
         Planet homeWorld;
         Planet contractWorld;
         Campaign campaign;
+        CampaignOptions campaignOptions;
         AbstractContract contract;
         AbstractLocation location;
 
@@ -210,6 +214,8 @@ public class ContractUtilitiesTest {
             when(homeWorld.getTimeToPlanet(contractWorld, 1.0)).thenReturn(3.5);
 
             campaign = mock(Campaign.class);
+            campaignOptions = mock(CampaignOptions.class);
+            when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
             when(campaign.getLocalDate()).thenReturn(LocalDate.of(3025, 1, 1));
             when(campaign.calculateJumpPath(system, system)).thenAnswer(invocation -> {
                 JumpPath jumpPath = new JumpPath();
@@ -236,6 +242,58 @@ public class ContractUtilitiesTest {
             assertTrue(jumpPath.isInSystemTransfer());
             assertEquals(4, ContractUtilities.getTravelDays(campaign, contract, location, false,
                   mock(FactionStandings.class)), "Travel time should be the 3.5 day transfer, rounded up");
+        }
+
+        @Test
+        void aForceInboundToTheTargetWorldOnlyHasTheRestOfThatLegToFly() {
+            // Both the system's primary world and the contract world sit 20 days from the jump point. A naive single
+            // system estimate would price this as the flight back out to the jump point plus the whole leg in again.
+            when(system.getTimeToJumpPoint(1.0)).thenReturn(20.0);
+            when(contractWorld.getTimeToJumpPoint(1.0)).thenReturn(20.0);
+            when(location.isOnPlanet()).thenReturn(false);
+            when(location.getTransitTime()).thenReturn(5.0);
+            when(location.getPercentageTransit()).thenReturn(0.75);
+
+            assertEquals(5, ContractUtilities.getTravelDays(campaign, contract, location, false,
+                  mock(FactionStandings.class)), "A quarter of the 20 day inbound leg remains");
+        }
+
+        @Test
+        void theRemainingInboundLegIsMeasuredToTheContractWorld() {
+            // The force's own course is measured against the primary world; the contract world is further out
+            when(system.getTimeToJumpPoint(1.0)).thenReturn(20.0);
+            when(contractWorld.getTimeToJumpPoint(1.0)).thenReturn(30.0);
+            when(location.isOnPlanet()).thenReturn(false);
+            when(location.getTransitTime()).thenReturn(10.0);
+            when(location.getPercentageTransit()).thenReturn(0.5);
+
+            assertEquals(15, ContractUtilities.getTravelDays(campaign, contract, location, false,
+                  mock(FactionStandings.class)));
+        }
+
+        @Test
+        void aForceAlreadyOnTheTargetWorldHasNoJourneyLeft() {
+            when(system.getTimeToJumpPoint(1.0)).thenReturn(20.0);
+            when(contractWorld.getTimeToJumpPoint(1.0)).thenReturn(20.0);
+            when(location.isOnPlanet()).thenReturn(true);
+            when(location.getPlanet()).thenReturn(contractWorld);
+
+            assertEquals(0, ContractUtilities.getTravelDays(campaign, contract, location, false,
+                  mock(FactionStandings.class)));
+        }
+
+        @Test
+        void commandCircuitAccessIsJudgedByTheStandingFaction() {
+            when(campaignOptions.isUseFactionStandingCommandCircuitSafe()).thenReturn(true);
+            when(contract.getEmployerFactionCode()).thenReturn("FS");
+            when(contract.getStandingEmployerFactionCode()).thenReturn("WOB");
+            when(location.isOnPlanet()).thenReturn(true);
+            FactionStandings factionStandings = mock(FactionStandings.class);
+
+            ContractUtilities.getTravelDays(campaign, contract, location, false, factionStandings);
+
+            verify(factionStandings).getRegardForFaction("WOB", true);
+            verify(factionStandings, never()).getRegardForFaction("FS", true);
         }
 
         @Test
