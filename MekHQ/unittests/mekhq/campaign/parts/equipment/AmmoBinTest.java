@@ -1818,10 +1818,12 @@ public class AmmoBinTest {
             Campaign mockCampaign = fabricationCampaign(finances);
 
             AmmoBin ammoBin = fullBinOnAUnit(mockCampaign, ammoType);
-            ammoBin.setFabricating(true);
 
             AmmoType loaded = ammoType;
             for (int swap = 0; swap < 4; swap++) {
+                // A successful fabrication clears the flag, so each swap must be flagged for fabrication anew.
+                ammoBin.setFabricating(true);
+
                 AmmoType manufactured = (loaded == ammoType) ? otherAmmoType : ammoType;
                 ammoBin.changeMunition(manufactured);
 
