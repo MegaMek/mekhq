@@ -1017,15 +1017,54 @@ public class ForceHumanResources {
      */
     public void releaseSurplusBlobCrewForRole(Campaign campaign, PersonnelRole role) {
         for (Unit unit : campaign.getUnits()) {
-            int currentTemp = unit.getTempCrewByPersonnelRole(role);
-            if (currentTemp > 0) {
-                int excess = Math.max(0, -getRoleSpecificNeeds(unit, role));
-                if (excess > 0) {
-                    unit.setTempCrew(role, currentTemp - excess);
-                }
-            }
+            returnSurplusTempCrewToPool(unit, role);
         }
         emptyTempCrewPoolForRole(campaign, role);
+    }
+
+    /**
+     * Takes surplus temp crew off every unit, in every role, and returns them to the campaign pool.
+     *
+     * <p>A unit has surplus temp crew when its real crew and temp crew together hold more seats than it has, for
+     * example after an injured crew member was covered by a temp and has since recovered. Left alone, the unit stays
+     * over-crewed and {@link Unit#isFullyCrewed()} reports it as not fully crewed. The pool itself is unchanged, so
+     * the returned temp crew are simply free for other units; whether surplus pool members are released is left to
+     * the pool's own fill and release settings.</p>
+     *
+     * @param campaign the campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void returnSurplusTempCrewToPool(Campaign campaign) {
+        for (Unit unit : campaign.getUnits()) {
+            for (PersonnelRole role : unit.getTempCrewRoles()) {
+                returnSurplusTempCrewToPool(unit, role);
+            }
+        }
+    }
+
+    /**
+     * Takes any temp crew of the given role that the unit has no seats for off the unit. The removed temp crew stay in
+     * the campaign pool.
+     *
+     * @param unit the unit
+     * @param role the temp crew role
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void returnSurplusTempCrewToPool(Unit unit, PersonnelRole role) {
+        int currentTemp = unit.getTempCrewByPersonnelRole(role);
+        if (currentTemp <= 0) {
+            return;
+        }
+
+        // Real crew alone can exceed the seats; never take away more temp crew than the unit has
+        int excess = Math.min(currentTemp, max(0, -getRoleSpecificNeeds(unit, role)));
+        if (excess > 0) {
+            unit.setTempCrew(role, currentTemp - excess);
+        }
     }
 
     public NewPersonnelMarket getNewPersonnelMarket() {

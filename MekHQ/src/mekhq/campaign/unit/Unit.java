@@ -163,6 +163,7 @@ import mekhq.campaign.parts.protomeks.ProtoMekSensor;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
@@ -8273,31 +8274,48 @@ public class Unit implements ITechnology, ILocatable {
         return drivers.stream().filter(person -> entity instanceof Infantry).collect(Collectors.toList());
     }
 
+    /**
+     * Returns the real crew aboard this unit whose personnel status is {@link PersonnelStatus#ACTIVE}: drivers,
+     * gunners (unless they share the driver list), vessel crew, navigator and tech officer.
+     *
+     * <p>Injured crew still count. They hold their seats, so leaving them out made the unit look short-crewed and let
+     * temp crew be added on top of them.</p>
+     *
+     * @return the active crew of this unit
+     */
     public List<Person> getActiveCrew() {
         List<Person> crew = new ArrayList<>();
-        for (Person p : drivers) {
-            if ((p.getTotalInjurySeverity() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
-                continue;
-            }
-            crew.add(p);
-        }
+        addIfActive(crew, drivers);
 
         if (!usesSoloPilot() && !usesSoldiers()) {
-            for (Person p : gunners) {
-                if ((p.getTotalInjurySeverity() > 0) && ((entity instanceof Tank) || (entity instanceof Infantry))) {
-                    continue;
-                }
-                crew.add(p);
-            }
+            addIfActive(crew, gunners);
         }
-        crew.addAll(vesselCrew);
+        addIfActive(crew, vesselCrew);
         if (navigator != null) {
-            crew.add(navigator);
+            addIfActive(crew, List.of(navigator));
         }
         if (techOfficer != null) {
-            crew.add(techOfficer);
+            addIfActive(crew, List.of(techOfficer));
         }
         return crew;
+    }
+
+    /**
+     * Adds every person in {@code candidates} whose personnel status is {@link PersonnelStatus#ACTIVE} to
+     * {@code crew}.
+     *
+     * @param crew       the list being built
+     * @param candidates the people to check
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void addIfActive(List<Person> crew, Collection<Person> candidates) {
+        for (Person person : candidates) {
+            if (person.getStatus().isActive()) {
+                crew.add(person);
+            }
+        }
     }
 
     public int getTempCrewByPersonnelRole(PersonnelRole personnelRole) {
@@ -9836,26 +9854,43 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     public boolean canSalvage(boolean isInSpace) {
+        return isEquippedToSalvage(isInSpace) && isFullyCrewed();
+    }
+
+    /**
+     * Checks whether this unit has what it needs to salvage in the given environment, leaving its crew aside: the
+     * entity must be able to perform salvage operations there, and a unit other than a 'Mek also needs cargo space, a
+     * naval tug adaptor (in space) or the means to tow (on the ground).
+     *
+     * <p>{@link #canSalvage(boolean)} also requires the unit to be fully crewed.</p>
+     *
+     * @param isInSpace {@code true} if the salvage operation takes place in space
+     *
+     * @return {@code true} if the unit is equipped to salvage in this environment
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isEquippedToSalvage(boolean isInSpace) {
         if (entity == null) {
             return false;
         }
 
-        boolean canSalvage = isInSpace ?
-                                   entity.canPerformSpaceSalvageOperations() :
-                                   entity.canPerformGroundSalvageOperations();
-        if (!canSalvage) {
+        boolean canPerformSalvage = isInSpace ?
+                                          entity.canPerformSpaceSalvageOperations() :
+                                          entity.canPerformGroundSalvageOperations();
+        if (!canPerformSalvage) {
             return false;
         }
 
-        boolean isMek = entity instanceof Mek;
-        if (!isMek) {
-            boolean hasCargoCapacity = getCargoCapacityForSalvage() > 0;
-            boolean hasNavalTugAdaptor = isInSpace && CamOpsSalvageUtilities.hasNavalTug(entity);
-            boolean isTowCapable = !isInSpace && CamOpsSalvageUtilities.isTowCapable(entity);
-            canSalvage = hasCargoCapacity || hasNavalTugAdaptor || isTowCapable;
+        if (entity instanceof Mek) {
+            return true;
         }
 
-        return canSalvage && isFullyCrewed();
+        boolean hasCargoCapacity = getCargoCapacityForSalvage() > 0;
+        boolean hasNavalTugAdaptor = isInSpace && CamOpsSalvageUtilities.hasNavalTug(entity);
+        boolean isTowCapable = !isInSpace && CamOpsSalvageUtilities.isTowCapable(entity);
+        return hasCargoCapacity || hasNavalTugAdaptor || isTowCapable;
     }
 
     /**

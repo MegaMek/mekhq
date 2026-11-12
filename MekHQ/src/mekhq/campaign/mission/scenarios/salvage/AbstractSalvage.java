@@ -163,6 +163,24 @@ public abstract class AbstractSalvage {
     }
 
     /**
+     * Checks whether a unit has what it needs to salvage in the current environment, leaving its crew aside.
+     *
+     * <p>A unit that is equipped to salvage but fails {@link #canSalvage(Unit, boolean)} is held back only by its
+     * crew. By default, this is {@link Unit#isEquippedToSalvage(boolean)}.</p>
+     *
+     * @param unit      the unit to check
+     * @param isInSpace {@code true} if the salvage operation takes place in space
+     *
+     * @return {@code true} if the unit is equipped to salvage in this environment
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isEquippedToSalvage(Unit unit, boolean isInSpace) {
+        return unit.isEquippedToSalvage(isInSpace);
+    }
+
+    /**
      * Checks whether a unit is able to take part in a salvage operation.
      *
      * <p>The unit must:</p>

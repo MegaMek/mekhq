@@ -993,7 +993,10 @@ public class SalvageOperationPlanner extends JDialog {
             return text("unit.canSalvage");
         }
         if (!rules.canSalvage(unit, draft.isInSpace())) {
-            return text("unit.cannotSalvage");
+            // Equipped for this environment but still unable to salvage means the crew is the problem
+            return rules.isEquippedToSalvage(unit, draft.isInSpace()) ?
+                         text("unit.notFullyCrewed") :
+                         text("unit.cannotSalvage");
         }
         if (unit.isSalvage() || !unit.isRepairable()) {
             return text("unit.unrepairable");

@@ -39,15 +39,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
-import static org.mockito.Mockito.doAnswer;
-import static org.mockito.Mockito.doNothing;
-import static org.mockito.Mockito.doReturn;
-import static org.mockito.Mockito.eq;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.spy;
-import static org.mockito.Mockito.times;
-import static org.mockito.Mockito.verify;
-import static org.mockito.Mockito.when;
+import static org.mockito.Mockito.*;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.util.List;
@@ -62,6 +54,7 @@ import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import org.junit.jupiter.api.BeforeAll;
@@ -269,6 +262,7 @@ public class UnitPersonTest {
         // Create the driver
         UUID id = UUID.randomUUID();
         Person mockDriver = mock(Person.class);
+        lenient().when(mockDriver.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(mockDriver.getId()).thenReturn(id);
         when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockDriver);
         when(mockDriver.getUnit()).thenReturn(unit);
@@ -328,6 +322,7 @@ public class UnitPersonTest {
         // Create the gunner
         UUID id = UUID.randomUUID();
         Person mockGunner = mock(Person.class);
+        lenient().when(mockGunner.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(mockGunner.getId()).thenReturn(id);
         when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockGunner);
         when(mockGunner.getUnit()).thenReturn(unit);
@@ -387,6 +382,7 @@ public class UnitPersonTest {
         // Create the vessel crew
         UUID id = UUID.randomUUID();
         Person mockVesselCrew = mock(Person.class);
+        lenient().when(mockVesselCrew.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(mockVesselCrew.getId()).thenReturn(id);
         when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockVesselCrew);
         when(mockVesselCrew.getUnit()).thenReturn(unit);
@@ -435,6 +431,7 @@ public class UnitPersonTest {
         // Create the tech officer
         UUID id = UUID.randomUUID();
         Person mockTechOfficer = mock(Person.class);
+        lenient().when(mockTechOfficer.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(mockTechOfficer.getId()).thenReturn(id);
         when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockTechOfficer);
         when(mockTechOfficer.getUnit()).thenReturn(unit);
@@ -493,6 +490,7 @@ public class UnitPersonTest {
         // Create the navigator
         UUID id = UUID.randomUUID();
         Person mockNavigator = mock(Person.class);
+        lenient().when(mockNavigator.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(mockNavigator.getId()).thenReturn(id);
         when(mockCampaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(mockNavigator);
         when(mockNavigator.getUnit()).thenReturn(unit);

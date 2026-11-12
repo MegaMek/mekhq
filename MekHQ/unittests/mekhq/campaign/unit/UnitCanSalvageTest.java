@@ -47,7 +47,7 @@ import megamek.common.units.Tank;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests for {@link Unit#canSalvage(boolean)}, which decides whether a unit can take part in CamOps salvage
+ * Tests for {@link Unit#canSalvage(boolean)} and {@link Unit#isEquippedToSalvage(boolean)}, which decide whether a unit can take part in CamOps salvage
  * operations.
  *
  * @author Illiani
@@ -93,6 +93,16 @@ class UnitCanSalvageTest {
     @Test
     void vehicleThatIsNotFullyCrewedCannotSalvage() {
         assertFalse(unit(tank(false), 10.0, false).canSalvage(false));
+    }
+
+    @Test
+    void vehicleThatIsNotFullyCrewedIsStillEquippedToSalvage() {
+        assertTrue(unit(tank(false), 10.0, false).isEquippedToSalvage(false));
+    }
+
+    @Test
+    void trailerWithoutCargoIsNotEquippedToSalvage() {
+        assertFalse(unit(tank(true), 0.0, true).isEquippedToSalvage(false));
     }
 
     @Test
