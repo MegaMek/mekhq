@@ -1375,6 +1375,21 @@ public enum ProstheticType {
         return prostheticType == CLONE;
     }
 
+    /**
+     * Checks whether healing injuries at the location this surgery treats takes the prosthetic penalty.
+     *
+     * <p>Cloned limbs are biological replacements, and cosmetic surgery and fracture repair fit nothing artificial,
+     * so none of them incur the penalty.</p>
+     *
+     * @return {@code true} if this surgery leaves an artificial part that makes healing harder
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean incursProstheticHealingPenalty() {
+        return !isClonedLimb() && this != COSMETIC_SURGERY && this != FRACTURE_REPAIR;
+    }
+
     public boolean isElectiveImplant() {
         return this == ELECTIVE_MYOMER_ARM ||
                      this == ELECTIVE_MYOMER_HAND ||

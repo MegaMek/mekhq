@@ -49,6 +49,7 @@ import java.time.LocalDate;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.universe.Faction;
@@ -124,6 +125,7 @@ class ClanHomeworldsExclusionTest {
     private static Campaign mockCampaign(LocalDate currentDate, int travelDays) {
         Campaign campaign = mock(Campaign.class);
         when(campaign.getLocalDate()).thenReturn(currentDate);
+        when(campaign.getCampaignOptions()).thenReturn(mock(CampaignOptions.class));
 
         PlayerForce playerForce = mock(PlayerForce.class);
         when(playerForce.isOverridingCommandCircuitRequirements()).thenReturn(false);

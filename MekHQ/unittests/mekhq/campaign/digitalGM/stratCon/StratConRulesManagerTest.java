@@ -710,7 +710,6 @@ class StratConRulesManagerTest {
         StratConTrackState track = mock(StratConTrackState.class);
         when(campaignState.getTracks()).thenReturn(List.of(track));
         when(campaignState.getContract()).thenReturn(contract);
-        when(track.getDeploymentTime()).thenReturn(1);
 
         StratConCoords coords = new StratConCoords(2, 3);
         int forceID = 7;

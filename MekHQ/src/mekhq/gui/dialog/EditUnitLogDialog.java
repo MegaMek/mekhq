@@ -91,7 +91,14 @@ public class EditUnitLogDialog extends JDialog {
     private void initComponents() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("EditUnitLogDialog");
-        setTitle(getFormattedText("editUnitLog.dialog.title", unit.getName()));
+        String titleKey = switch (logType) {
+            case UNIT_LOG -> "editUnitLog.dialog.title.unit";
+            case KILL_LOG -> "editUnitLog.dialog.title.kill";
+            case CREW_LOG -> "editUnitLog.dialog.title.crew";
+            case DEPLOYMENT_LOG -> "editUnitLog.dialog.title.deployment";
+            case REPAIR_LOG -> "editUnitLog.dialog.title.repair";
+        };
+        setTitle(getFormattedText(titleKey, unit.getName()));
         getContentPane().setLayout(new BorderLayout());
 
         EditUnitLogControl editUnitLogControl = new EditUnitLogControl(frame, unit, today, logType);

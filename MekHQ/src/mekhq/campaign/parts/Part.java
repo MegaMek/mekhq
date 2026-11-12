@@ -1121,6 +1121,44 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         return !(isOmniPodded() && isSalvaging());
     }
 
+    /**
+     * @return {@code true} if the Weapon Specialist ability applies to work on this part: weapons and physical
+     *       weapons
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isWeaponSpecialistWork() {
+        return (IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON) ||
+                     (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON);
+    }
+
+    /**
+     * @return {@code true} if the Armor Specialist ability applies to work on this part: any armor
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isArmorSpecialistWork() {
+        return IPartWork.findCorrectRepairType(this).isArmour();
+    }
+
+    /**
+     * @return {@code true} if the Internal Specialist ability applies to work on this part: actuators, electronics,
+     *       engines, gyros and locations
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isInternalSpecialistWork() {
+        return (IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR) ||
+                     (IPartWork.findCorrectMRMSType(this) == PartRepairType.ELECTRONICS) ||
+                     (IPartWork.findCorrectMRMSType(this) == PartRepairType.ENGINE) ||
+                     (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO) ||
+                     (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION) ||
+                     (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION);
+    }
+
     @Override
     public TargetRoll getAllMods(final @Nullable Person tech) {
         int difficulty = getDifficulty();
@@ -1175,23 +1213,17 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
         if (tech != null) {
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST) &&
-                      ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
+                      isWeaponSpecialistWork()) {
                 mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.weaponSpecialist"));
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST) &&
-                      IPartWork.findCorrectRepairType(this).isArmour()) {
+                      isArmorSpecialistWork()) {
                 mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.armorSpecialist"));
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST) &&
-                      ((IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.ELECTRONICS) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.ENGINE) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
+                      isInternalSpecialistWork()) {
                 mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.internalSpecialist"));
             }
 
@@ -1233,23 +1265,17 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
         if (getUnit().getTech() != null) {
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST) &&
-                      ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
+                      isWeaponSpecialistWork()) {
                 mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.weaponSpecialist"));
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST) &&
-                      IPartWork.findCorrectRepairType(this).isArmour()) {
+                      isArmorSpecialistWork()) {
                 mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.armorSpecialist"));
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST) &&
-                      ((IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.ELECTRONICS) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.ENGINE) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
+                      isInternalSpecialistWork()) {
                 mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.internalSpecialist"));
             }
 

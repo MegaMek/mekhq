@@ -205,7 +205,6 @@ public final class ReviewPage {
     private void refreshSteps(ForceSummary rolled) {
         steps.removeAll();
         int hires = people.getEstimatedSupportHires();
-        boolean finances = logistics.isProcessFinances();
         boolean simulation = people.isRunStartingSimulation();
         int number = 1;
         addRows(steps,
@@ -227,11 +226,8 @@ public final class ReviewPage {
                     formatted("Designer.review.step.flags.what", people.getEstimatedReserve()),
                     text("Designer.review.step.flags.tag"), true),
               step(number++, text("Designer.review.step.cash"),
-                    finances ? (logistics.isRandomizeStartingCash()
-                          ? formatted("Designer.review.step.cash.random", logistics.getDiceCount())
-                          : formatted("Designer.review.step.cash.months", logistics.getStartingCashMonths()))
-                          : text("Designer.review.step.cash.off"),
-                    text(finances ? "Designer.review.step.cash.tag" : "Designer.review.step.skipped"), finances),
+                    formatted("Designer.review.step.cash.months", logistics.getStartingCashMonths()),
+                    text("Designer.review.step.cash.tag"), true),
               step(number, text("Designer.review.step.history"),
                     simulation ? formatted("Designer.review.step.history.what", people.getSimulationYears())
                           : text("Designer.review.step.history.off"),
@@ -255,10 +251,6 @@ public final class ReviewPage {
         if (rolled.hasRoll() && !liftRolled.getAsBoolean()) {
             found.add(new Issue(text("Designer.review.issue.lift"), text("Designer.review.issue.lift.detail"),
                   AMBER, DesignerPage.FORCE));
-        }
-        if (!logistics.isProcessFinances()) {
-            found.add(new Issue(text("Designer.review.issue.finances"),
-                  text("Designer.review.issue.finances.detail"), ACCENT, DesignerPage.LOGISTICS));
         }
         if (settingsChangedSinceRoll.getAsBoolean()) {
             found.add(new Issue(text("Designer.review.issue.changed"), text("Designer.review.issue.changed.detail"),
