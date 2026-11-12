@@ -80,7 +80,7 @@ class ChaosContractBanditCasteTest {
 
     @Test
     void mercenaryForcesAreNotGovernments() {
-        assertFalse(ChaosContractMarketAvailability.isGovernmentFaction(faction("MERC", FactionTag.MERCENARY)));
+        assertFalse(ChaosContractMarketAvailability.isGovernmentFaction(faction("MERC", FactionTag.MERC)));
     }
 
     @Test
