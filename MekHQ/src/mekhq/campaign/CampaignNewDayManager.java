@@ -113,6 +113,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
@@ -513,6 +514,10 @@ public class CampaignNewDayManager {
         }
 
         campaign.getPlayerForce().getHumanResources().resetAsTechMinutes(campaign.getCampaignOptions());
+
+        // Formations whose StratCon deployment ends today come home before the hangar is processed. Salvage from their
+        // battle arrives today too, and New Day Mass Repair must see their damaged units alongside it.
+        StratConGMs.processForceReturns(campaign);
 
         processNewDayUnits();
 

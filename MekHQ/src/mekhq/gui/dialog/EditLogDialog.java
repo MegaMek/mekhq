@@ -95,7 +95,14 @@ public class EditLogDialog extends JDialog {
     private void initComponents() {
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setName("EditLogDialog");
-        setTitle(getFormattedText("editLog.dialog.title", person.getFullTitle()));
+        String titleKey = switch (logType) {
+            case PERSONAL_LOG -> "editLog.dialog.title.personal";
+            case MEDICAL_LOG -> "editLog.dialog.title.medical";
+            case PATIENT_LOG -> "editLog.dialog.title.patient";
+            case ASSIGNMENT_LOG -> "editLog.dialog.title.assignment";
+            case PERFORMANCE_LOG -> "editLog.dialog.title.performance";
+        };
+        setTitle(getFormattedText(titleKey, person.getFullTitle()));
         getContentPane().setLayout(new BorderLayout());
 
         EditLogControl editLogControl = new EditLogControl(frame, person, today, logType);

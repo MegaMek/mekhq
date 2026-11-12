@@ -154,6 +154,7 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.TechSpecialization;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.universe.Faction;
@@ -2102,9 +2103,11 @@ public class PersonViewPanel extends JScrollablePanel {
         // A senior post sits beside the role because it is a different fact about the person: the role
         // is the job they do, the post is the position they hold within the command.
         String appointmentTitles = person.getSeniorAppointmentTitles();
+        String roleWithSpecialization = person.getRoleDesc()
+                                              + TechSpecialization.describeAsRoleSuffix(person, campaign);
         String roleAndAppointment = appointmentTitles.isEmpty()
-              ? person.getRoleDesc()
-              : person.getRoleDesc() + " - " + appointmentTitles;
+              ? roleWithSpecialization
+              : roleWithSpecialization + " - " + appointmentTitles;
         lblType.setText(String.format(resourceMap.getString("format.italicNoWrap"), roleAndAppointment));
         lblType.getAccessibleContext().setAccessibleName("Role: " + roleAndAppointment);
         gridBagConstraints = new GridBagConstraints();
