@@ -558,10 +558,12 @@ class MothballC3StateTest {
     private Unit unit(boolean isMaster, boolean isSlave) {
         int entityId = nextEntityId++;
         String c3Uuid = "uuid-" + entityId;
+        // Build the entity first: creating and stubbing it inside thenReturn(...) would interleave stubbing calls
+        Entity entity = entity(c3Uuid, entityId, isMaster, isSlave);
         Unit unit = mock(Unit.class);
         UUID unitId = UUID.randomUUID();
         when(unit.getId()).thenReturn(unitId);
-        when(unit.getEntity()).thenReturn(entity(c3Uuid, entityId, isMaster, isSlave));
+        when(unit.getEntity()).thenReturn(entity);
         when(unit.getFormationId()).thenReturn(IN_FORMATION);
         when(campaign.getUnit(unitId)).thenReturn(unit);
         allUnits.add(unit);
