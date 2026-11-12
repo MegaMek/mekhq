@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.mission.contract.contractGeneration;
 
-import static java.lang.Math.ceil;
 import static mekhq.campaign.mission.utilities.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -48,7 +47,6 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -63,6 +61,7 @@ import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.contract.utilities.MHQMorale;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.universe.Faction;
@@ -71,7 +70,6 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.enums.HiringHallLevel;
-import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 public abstract class AbstractContractGeneration {
@@ -191,13 +189,10 @@ public abstract class AbstractContractGeneration {
         determineSchedule(campaign,
               useVariableContractLength,
               currentDate,
-              currentLocation.getCurrentSystem(),
-              targetPlanet,
+              currentLocation,
               factionStandings,
               overridingCommandCircuitRequirements,
               isGM,
-              targetSystem,
-              employerData.factionCode(),
               chaosObjectiveType,
               contract);
 
@@ -528,7 +523,7 @@ public abstract class AbstractContractGeneration {
 
     /**
      * Determines a contract's start date from the travel time to its target, the way generation does: the player
-     * journeys from their current system to the contract's target world and the contract begins on arrival. The
+     * journeys from their current location to the contract's target world and the contract begins on arrival. The
      * computed jump path is cached on the contract as a side effect, exactly as generation does. Exposed as public so
      * the GM contract editor's "Automatic" start date follows the same rule.
      *
@@ -536,32 +531,35 @@ public abstract class AbstractContractGeneration {
      */
     public static LocalDate determineStartDate(Campaign campaign, AbstractContract contract) {
         PlayerForce playerForce = campaign.getPlayerForce();
-        return determineStartDate(campaign, campaign.getLocalDate(), campaign.getCurrentSystem(),
-              contract.getTargetSystem(), contract.getTargetPlanet(), playerForce.getFactionStandings(),
-              playerForce.isOverridingCommandCircuitRequirements(), campaign.isGM(),
-              contract.getEmployerFactionCode(), contract);
+        return determineStartDate(campaign, campaign.getLocalDate(),
+              playerForce.getForceDetachment().getCurrentLocation(), playerForce.getFactionStandings(),
+              playerForce.isOverridingCommandCircuitRequirements(), campaign.isGM(), contract);
     }
 
+    /**
+     * Determines a contract's start date as the day the force at {@code currentLocation} should reach the contract's
+     * target world. The estimate is the same one used when the contract is accepted and when its ETA is re-checked
+     * each day ({@link ContractUtilities#getTravelDays}), so the three never disagree: it starts from where the force
+     * actually is (mid-transit, or already in the target system), and judges Command Circuit access by the faction
+     * whose standing the contract answers to - for a false flag operation, the real sponsor rather than the front.
+     *
+     * <p>The contract's target and employer must already be set. A freshly plotted jump path is cached on the
+     * contract as a side effect.</p>
+     */
     private static LocalDate determineStartDate(Campaign campaign, LocalDate currentDate,
-          @Nullable PlanetarySystem currentSystem, @Nullable PlanetarySystem targetSystem,
-          @Nullable Planet targetPlanet, FactionStandings factionStandings,
-          boolean overridingCommandCircuitRequirements, boolean isGM, String employerFactionCode,
-          AbstractContract contract) {
-        if (currentSystem == null || targetSystem == null) {
+          @Nullable AbstractLocation currentLocation, FactionStandings factionStandings,
+          boolean overridingCommandCircuitRequirements, boolean isGM, AbstractContract contract) {
+        if ((currentLocation == null) || (currentLocation.getCurrentSystem() == null)
+                  || (contract.getTargetSystem() == null)) {
             // No route to measure - the contract begins immediately.
             return currentDate;
         }
 
-        // Jump Path, terminating at the specific target planet so the journey time ends at the world the contract is
-        // fought over rather than the system's primary world.
-        JumpPath jumpPath = campaign.calculateJumpPath(currentSystem, targetSystem);
-        jumpPath.setTargetPlanet(targetPlanet);
-        contract.setCachedJumpPath(jumpPath);
-
-        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(overridingCommandCircuitRequirements,
-              isGM, factionStandings, employerFactionCode);
-        int journeyTimeInDays = (int) ceil(jumpPath.getTotalTime(currentDate, 0, isUseCommandCircuit,
-              campaign.getJumpDriveProfile()));
+        // Always plot afresh: the target may just have been chosen (generation) or changed (GM editor), and the
+        // cached path is only re-plotted when its origin or target world no longer match.
+        contract.setCachedJumpPath(null);
+        int journeyTimeInDays = ContractUtilities.getTravelDays(campaign, currentDate, contract, currentLocation,
+              overridingCommandCircuitRequirements, isGM, factionStandings);
         return currentDate.plusDays(journeyTimeInDays);
     }
 
@@ -695,13 +693,13 @@ public abstract class AbstractContractGeneration {
     }
 
     private static void determineSchedule(Campaign campaign, boolean useVariableContractLength, LocalDate currentDate,
-          PlanetarySystem currentSystem, Planet targetPlanet, FactionStandings factionStandings,
-          boolean overridingCommandCircuitRequirements, boolean isGM, PlanetarySystem targetSystem,
-          String employerFactionCode, ChaosObjectiveType objectiveType, ChaosContract contract) {
-        // Contract schedule - the player journeys from their current system to the target world, arriving on the
+          AbstractLocation currentLocation, FactionStandings factionStandings,
+          boolean overridingCommandCircuitRequirements, boolean isGM, ChaosObjectiveType objectiveType,
+          ChaosContract contract) {
+        // Contract schedule - the player journeys from their current location to the target world, arriving on the
         // start date (this also caches the jump path on the contract).
-        LocalDate startDate = determineStartDate(campaign, currentDate, currentSystem, targetSystem, targetPlanet,
-              factionStandings, overridingCommandCircuitRequirements, isGM, employerFactionCode, contract);
+        LocalDate startDate = determineStartDate(campaign, currentDate, currentLocation, factionStandings,
+              overridingCommandCircuitRequirements, isGM, contract);
 
         int monthsLength = objectiveType.calculateLength(useVariableContractLength);
         LocalDate endDate = startDate.plusMonths(monthsLength);

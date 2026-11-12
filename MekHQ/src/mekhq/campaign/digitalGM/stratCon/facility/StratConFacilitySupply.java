@@ -120,6 +120,48 @@ public final class StratConFacilitySupply {
     }
 
     /**
+     * Where a facility stands on its side's supply lines, for the screens that show it. Each screen maps it to its own
+     * text.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public enum SupplyStatus {
+        /** The sector has no roads, so no supply lines: there is nothing to show. */
+        NONE,
+        /** The facility's route to a source is blocked, or it has none. */
+        CUT,
+        /** The facility is a source of its side's supply, so it is never cut off. */
+        SOURCE,
+        /** The facility's route reaches a source unblocked. */
+        CONNECTED
+    }
+
+    /**
+     * @param track  the sector
+     * @param coords a facility's hex
+     *
+     * @return the facility's standing on its side's supply lines: {@link SupplyStatus#NONE} in a sector with no roads,
+     *       which has no supply lines; otherwise cut off, a source of its side's supply, or connected, in that order.
+     *       Does not check whether supply lines are in use; see {@link #isSupplyLinesActive}.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static SupplyStatus getSupplyStatus(StratConTrackState track, StratConCoords coords) {
+        if (track.getRoads().isEmpty()) {
+            return SupplyStatus.NONE;
+        }
+        if (isCutOff(track, coords)) {
+            return SupplyStatus.CUT;
+        }
+        if (isSupplySource(track, coords)) {
+            return SupplyStatus.SOURCE;
+        }
+        return SupplyStatus.CONNECTED;
+    }
+
+    /**
      * @param campaign the current campaign
      *
      * @return {@code true} if supply lines are in use: the "Supply Lines" option is on, sectors are laid out by the
@@ -147,6 +189,24 @@ public final class StratConFacilitySupply {
         return (facilityType == FacilityType.CommandCenter)
                      || (facilityType == FacilityType.BaseOfOperations)
                      || (facilityType == FacilityType.SpacePort);
+    }
+
+    /**
+     * @param track  the sector
+     * @param coords a hex in it
+     *
+     * @return {@code true} if a facility in the hex is a source of its side's supply. Its side's supply starts there,
+     *       so it is never cut off: interdicting the routes near it starves only the facilities beyond the cut.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isSupplySource(StratConTrackState track, StratConCoords coords) {
+        StratConFacility facility = track.getFacility(coords);
+        return (facility != null)
+                     && (isOnSide(facility, true) || isOnSide(facility, false))
+                     && !facility.isDefinitionMissing()
+                     && isSupplySource(facility.getFacilityType());
     }
 
     /**

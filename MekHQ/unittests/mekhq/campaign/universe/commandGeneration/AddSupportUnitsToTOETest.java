@@ -302,6 +302,66 @@ class AddSupportUnitsToTOETest {
         assertEquals(FormationLevel.COMPANY, recovery.getFormationLevel(), "six vehicles in two lances is a company");
     }
 
+    @Test
+    void arrangeIntoLances_convoyLancesUnderAStandardParent() {
+        // A Logistics company split into lances is a Standard formation holding Convoys, not a Convoy holding Convoys.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation logistics = groupWithVehicles(campaign, "Logistics", 8);
+        logistics.setFormationType(FormationType.CONVOY, true);
+
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, logistics, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.CONVOY);
+
+        assertTrue(logistics.isFormationType(FormationType.STANDARD), "the parent becomes a Standard formation");
+        assertEquals(2, logistics.getSubFormations().size());
+        for (Formation lance : logistics.getSubFormations()) {
+            assertTrue(lance.isFormationType(FormationType.CONVOY), lance.getName() + " is a Convoy");
+        }
+    }
+
+    @Test
+    void arrangeIntoLances_keepsTheLancesTypeWhenAskedAgainWithTheStandardParentsType() {
+        // Support Command re-lances by passing each formation's own type, which for a split Logistics company is
+        // now Standard; its lances must stay Convoys.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation logistics = groupWithVehicles(campaign, "Logistics", 8);
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, logistics, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.CONVOY);
+
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, logistics, 4, AddSupportUnitsToTOETest::lanceName,
+              logistics.getFormationType());
+
+        assertTrue(logistics.isFormationType(FormationType.STANDARD));
+        for (Formation lance : logistics.getSubFormations()) {
+            assertTrue(lance.isFormationType(FormationType.CONVOY), lance.getName() + " is still a Convoy");
+        }
+    }
+
+    @Test
+    void arrangeIntoLances_leavesASupportParentAlone() {
+        // Support formations may hold Support formations, so a Medical company keeps its type.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation medical = groupWithVehicles(campaign, "Medical", 8);
+        medical.setFormationType(FormationType.SUPPORT, true);
+
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, medical, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.SUPPORT);
+
+        assertTrue(medical.isFormationType(FormationType.SUPPORT));
+    }
+
+    @Test
+    void arrangeIntoLances_aSingleLanceWorthStaysTheConvoy() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation logistics = groupWithVehicles(campaign, "Logistics", 4);
+        logistics.setFormationType(FormationType.CONVOY, true);
+
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, logistics, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.CONVOY);
+
+        assertTrue(logistics.isFormationType(FormationType.CONVOY), "a formation of one lance is itself the convoy");
+    }
+
     private static String lanceName(int position) {
         return "Lance " + position;
     }
