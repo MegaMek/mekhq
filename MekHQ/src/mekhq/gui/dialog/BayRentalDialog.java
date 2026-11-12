@@ -39,7 +39,6 @@ import java.util.List;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 
@@ -47,6 +46,8 @@ public class BayRentalDialog extends ImmersiveDialogSimple {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.FacilityRentals";
 
     private static final int DIALOG_CONFIRM_OPTION = 1;
+    private static final int DIALOG_FREE_GM_OPTION = 2;
+    private static final int DIALOG_IGNORE_OPTION = 1;
 
     /**
      * Checks if the user confirmed the rental.
@@ -55,6 +56,17 @@ public class BayRentalDialog extends ImmersiveDialogSimple {
      */
     public boolean wasConfirmed() {
         return this.getDialogChoice() == DIALOG_CONFIRM_OPTION;
+    }
+
+    /**
+     * Checks if the user chose the GM option to change site without paying the rental fee.
+     *
+     * <p>This option is always offered, regardless of whether GM mode is enabled.</p>
+     *
+     * @return {@code true} if the user chose to waive the rental fee
+     */
+    public boolean wasFeeWaived() {
+        return wasResponseSelected() && this.getDialogChoice() == DIALOG_FREE_GM_OPTION;
     }
 
     public BayRentalDialog(Campaign campaign, Money rentalCost) {
@@ -81,14 +93,15 @@ public class BayRentalDialog extends ImmersiveDialogSimple {
     }
 
     /**
-     * Provides the labeled buttons for the dialog (Cancel and Confirm).
+     * Provides the labeled buttons for the dialog (Cancel, Confirm, and Free (GM)).
      *
      * @return a list of button/tooltip pairs for dialog actions
      */
     private static List<String> getButtons() {
         return List.of(
               getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.button.cancel"),
-              getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.button.confirm")
+              getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.button.confirm"),
+              getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.button.freeGm")
         );
     }
 
@@ -96,7 +109,19 @@ public class BayRentalDialog extends ImmersiveDialogSimple {
         return getFormattedTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.outOfCharacter.bay");
     }
 
-    public static void showNoFacilitiesAvailableDialog(Campaign campaign) {
+    /**
+     * Informs the player that bay rentals are unavailable (because the force is not planetside, or is on a contract
+     * that does not allow rentals) and lets them choose whether to proceed anyway.
+     *
+     * <p>The player is offered two options: <b>Confirm</b>, which acknowledges the notice and leaves the rental
+     * blocked, and <b>Ignore (GM)</b>, which bypasses the restriction. The Ignore option is always shown, regardless
+     * of whether GM mode is enabled. Closing the dialog from the window frame is treated as Confirm.</p>
+     *
+     * @param campaign the current campaign
+     *
+     * @return {@code true} if the player chose to ignore the restriction; {@code false} otherwise
+     */
+    public static boolean showNoFacilitiesAvailableDialog(Campaign campaign) {
         boolean isInSpace = !campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet();
 
         String message;
@@ -106,6 +131,12 @@ public class BayRentalDialog extends ImmersiveDialogSimple {
             message = getTextAt(RESOURCE_BUNDLE, "UnitBayRental.wrongContractType");
         }
 
-        new ImmersiveDialogNotification(campaign, message, true);
+        List<String> buttons = List.of(
+              getTextAt(RESOURCE_BUNDLE, "ContractStartRentalDialog.button.confirm"),
+              getTextAt(RESOURCE_BUNDLE, "UnitBayRental.button.ignoreGm")
+        );
+
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign, null, message, buttons, null);
+        return dialog.wasResponseSelected() && dialog.getDialogChoice() == DIALOG_IGNORE_OPTION;
     }
 }
