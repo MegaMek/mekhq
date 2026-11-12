@@ -272,6 +272,11 @@ public class EasyBugReport {
             return;
         }
 
+        // The startup header can roll out of mekhq.log in a long session, so it is written again now, before the log
+        // is copied. The version, OS, Java and hardware details then always reach the maintainer in the log itself.
+        LOGGER.info("Bug report: packaging. System information now:\n{}",
+              BugReportBundle.asCurrentState(MekHQ.getUnderlyingInformation()));
+
         // Now package campaign + logs into the user-chosen archive
         try {
             // Text logs always go to LOGS_PATH (mmconf/log4j2.xml); the combat and auto-resolve reports follow the
