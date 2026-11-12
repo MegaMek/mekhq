@@ -1642,15 +1642,15 @@ public class ContractEditorDialog extends JDialog {
 
     // region Batchall
 
-    /** Whether the player's batchall acceptance is editable: an accepted contract fought against a Clan enemy. */
+    /** Whether the player's batchall acceptance is editable: an accepted contract fought against an enemy that performs Batchalls. */
     private boolean batchallEditable() {
         return contract.getStatus() != null && isEnemyClan();
     }
 
-    /** Whether the enemy faction currently selected in the combo is a Clan. */
+    /** Whether the enemy faction currently selected in the combo performs Batchalls (a Clan, but not the Bandit Caste). */
     private boolean isEnemyClan() {
         Faction faction = factionOf(enemyFactionCombo);
-        return faction != null && faction.isClan();
+        return faction != null && faction.performsBatchalls();
     }
 
     /** Enables the batchall checkbox only when it is editable, with a note saying why when it is not. */

@@ -46,6 +46,7 @@ import megamek.common.universe.BloodnameTransfer;
 import megamek.common.universe.Bloodnames2;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.enums.Phenotype;
+import mekhq.campaign.universe.Faction;
 
 /**
  * @author Neoancient
@@ -253,6 +254,10 @@ public class Bloodname {
     }
 
     public static @Nullable Bloodname randomBloodname(String factionCode, Phenotype phenotype, int year) {
+        // The Bandit Caste has no Bloodnames, so there is nothing to look up (and nothing to log as an error)
+        if (Faction.BANDIT_CASTE_FACTION_CODE.equals(factionCode)) {
+            return null;
+        }
         return randomBloodname(Clan.getClan(factionCode), phenotype, year);
     }
 

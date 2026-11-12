@@ -1370,8 +1370,10 @@ public class CampaignNewDayManager {
                 Faction enemyFaction = contract.getEnemyFaction();
                 String enemyFactionCode = contract.getEnemyFactionCode();
 
+                // Clans always declare Batchalls against pirates and bandits, so the Faction Standing restriction only
+                // applies to everyone else
                 boolean allowBatchalls = true;
-                if (campaignOptions.isUseFactionStandingBatchallRestrictionsSafe()) {
+                if (!faction.isPirateOrBanditCaste() && campaignOptions.isUseFactionStandingBatchallRestrictionsSafe()) {
                     double regard = campaign.getPlayerForce()
                                           .getFactionStandings()
                                           .getRegardForFaction(enemyFactionCode, true);
