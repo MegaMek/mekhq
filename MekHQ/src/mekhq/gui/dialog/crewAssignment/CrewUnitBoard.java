@@ -57,10 +57,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Reason;
-import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StageResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
-import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTech;
-import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TechStageResult;
 import mekhq.campaign.unit.crewAssignment.CrewSeat;
 import mekhq.campaign.unit.crewAssignment.SeatEligibility;
 import mekhq.campaign.unit.crewAssignment.SeatType;
@@ -75,11 +72,11 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
  * The right-hand panel of the {@link CrewAssignmentDialog}'s Assign and Techs pages: one card per unit, beside the list
  * of people. On the Assign page a card lists the unit's tech and every seat; on the Techs page, only its tech.
  *
- * <p>Units are never selected. Each seat and tech slot has its own button, which assigns the people selected in the
- * list to that slot on that unit, so the player always chooses who goes where. Where some of them cannot take a slot,
- * the card says why. Everyone aboard has a mark that takes them out again, and a full seat offers to replace whoever
- * holds it. Above the cards are the unit search and filters, and the actions that work on every unit shown at once:
- * auto-fill, temporary crew, and spreading the selected people over the units, previewed before it is staged.</p>
+ * <p>Units are never selected, and only one person is at a time. Each seat and tech slot has its own button, which
+ * assigns the person selected in the list to that slot on that unit, so the player always chooses who goes where.
+ * Where they cannot take a slot, the card says why. Everyone aboard has a mark that takes them out again, and a full
+ * seat offers to replace whoever holds it. Above the cards are the unit search and filters, and the actions that work
+ * on every unit shown at once: auto-fill and temporary crew.</p>
  *
  * <p>Only the first cards are built, with a link to build more, so a location with hundreds of units stays quick.</p>
  *
@@ -95,19 +92,15 @@ final class CrewUnitBoard extends JPanel {
     private static final int CARD_STEP = 40;
     /** How many of a seat's crew a closed card names before it says "+N more". */
     private static final int CLOSED_CARD_NAMES = 3;
-    /** How many of the selected people the top of the panel names before it says "and N more". */
-    private static final int BASKET_NAMES = 2;
-    /** How many placements the spread preview lists before it says "and N more". */
-    private static final int SPREAD_LINES = 8;
 
     /** What the board asks the dialog to do. */
     interface Actions {
         void searchUnits(String text);
 
-        /** Assigns the selected people, first selected first, to one seat on one unit. */
+        /** Assigns the selected person to one seat on one unit. */
         void assignToSeat(Unit unit, SeatType seat);
 
-        /** Makes the first selected tech who can take the unit on its tech, replacing any it has. */
+        /** Makes the selected tech the unit's tech, replacing any it has. */
         void assignTech(Unit unit);
 
         void removeFromUnit(Person person);
@@ -126,15 +119,6 @@ final class CrewUnitBoard extends JPanel {
         void fillTempCrewOnShown();
 
         void removeTempCrewOnShown();
-
-        /** Shows, or hides, where spreading the selected people over the units shown would put them. */
-        void toggleSpreadPreview();
-
-        /** Stages what the spread preview shows. */
-        void spreadSelected();
-
-        /** Makes the selection exactly these people, for example those a slot turned away. */
-        void selectOnly(List<Person> people);
 
         /** Puts one person in the seat another holds, taking that other person out of the unit. */
         void replaceOccupant(Person newcomer, Person occupant);
@@ -309,35 +293,22 @@ final class CrewUnitBoard extends JPanel {
 
     private void buildBasket() {
         basket.removeAll();
-        List<Person> people = List.copyOf(state.selectedPeople);
+        Person person = state.selectedPeople.isEmpty() ? null : state.selectedPeople.iterator().next();
 
         JPanel top = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         top.add(Hud.eyebrow(text("board.assigning")), BorderLayout.WEST);
-        if (!people.isEmpty()) {
+        if (person != null) {
             top.add(Hud.link(text("people.clear"), actions::clearSelection), BorderLayout.EAST);
         }
         basket.add(leftAligned(top));
 
-        JLabel title = new JLabel(people.isEmpty() ? text("board.none") :
-                                        getFormattedTextAt(RESOURCE_BUNDLE, "board.count", people.size()));
+        JLabel title = new JLabel((person == null) ? text("board.none") : person.getFullTitle());
         title.setForeground(ACCENT_BRIGHT);
         title.setFont(hudFont(Font.BOLD, 1.05f, 0.02f));
         basket.add(leftAligned(title));
-
-        String hint;
-        if (people.isEmpty()) {
-            hint = text(isTechsPage() ? "board.none.hint.techs" : "board.none.hint");
-        } else {
-            List<String> names = new ArrayList<>();
-            for (Person person : people.subList(0, Math.min(BASKET_NAMES, people.size()))) {
-                names.add(person.getFullTitle());
-            }
-            hint = String.join(", ", names);
-            if (people.size() > BASKET_NAMES) {
-                hint = getFormattedTextAt(RESOURCE_BUNDLE, "board.moreNames", hint, people.size() - BASKET_NAMES);
-            }
-        }
-        basket.add(leftAligned(Hud.hint(hint)));
+        basket.add(leftAligned(Hud.hint((person == null) ?
+                                              text(isTechsPage() ? "board.none.hint.techs" : "board.none.hint") :
+                                              person.getPrimaryRole().getLabel(false))));
     }
 
     private void buildBulk() {
@@ -430,17 +401,7 @@ final class CrewUnitBoard extends JPanel {
             row.add(bulkButton(text("board.removeTempCrew"), "board.removeTempCrew.shown.toolTipText", hasTemp,
                   actions::removeTempCrewOnShown));
         }
-        int selectedCount = state.selectedPeople.size();
-        row.add(bulkButton((selectedCount == 0) ? text("board.spread") :
-                                 getFormattedTextAt(RESOURCE_BUNDLE, "board.spread.count", selectedCount),
-              techsOnly ? "board.spread.techs.toolTipText" : "board.spread.toolTipText", selectedCount > 0,
-              actions::toggleSpreadPreview));
         bulk.add(leftAligned(row));
-
-        if (state.isSpreadPreview && (selectedCount > 0)) {
-            bulk.add(Box.createVerticalStrut(scaleForGUI(6)));
-            bulk.add(leftAligned(spreadPreview(plan, techsOnly)));
-        }
     }
 
     private static HudButton bulkButton(String label, String toolTipKey, boolean isArmed, Runnable onClick) {
@@ -449,80 +410,6 @@ final class CrewUnitBoard extends JPanel {
         button.setToolTipText(text(toolTipKey));
         button.addActionListener(event -> onClick.run());
         return button;
-    }
-
-    /**
-     * Where spreading the selected people over the units shown would put each of them, worked out from the plan
-     * without changing it, with a button to stage exactly that.
-     */
-    private JComponent spreadPreview(AssignmentPlan plan, boolean techsOnly) {
-        List<Person> people = List.copyOf(state.selectedPeople);
-        List<Unit> units = new ArrayList<>(shown.size());
-        for (UnitEntry entry : shown) {
-            units.add(entry.unit());
-        }
-
-        List<String> lines = new ArrayList<>();
-        String leftOver = null;
-        if (techsOnly) {
-            TechStageResult result = plan.previewStageTechs(people, units);
-            for (StagedTech change : result.staged()) {
-                Person tech = change.toTech();
-                lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "board.spread.techLine",
-                      (tech == null) ? "" : tech.getFullTitle(), change.unit().getName()));
-            }
-            if (!result.leftOver().isEmpty()) {
-                leftOver = getFormattedTextAt(RESOURCE_BUNDLE, "board.spread.unitsLeft", result.leftOver().size());
-            }
-        } else {
-            StageResult result = plan.previewStage(people, units);
-            for (StagedAssignment change : result.staged()) {
-                Unit unit = change.toUnit();
-                if ((unit != null) && (change.toSeat() != null)) {
-                    lines.add(getFormattedTextAt(RESOURCE_BUNDLE, "board.spread.line",
-                          change.person().getFullTitle(), unit.getName(),
-                          CrewRowRenderers.seatLabel(unit, change.toSeat())));
-                }
-            }
-            if (!result.leftOver().isEmpty()) {
-                leftOver = getFormattedTextAt(RESOURCE_BUNDLE, "board.spread.peopleLeft", result.leftOver().size());
-            }
-        }
-
-        JPanel box = column();
-        box.setOpaque(true);
-        box.setBackground(SURFACE);
-        box.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(BORDER, scaleForGUI(1)),
-              BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(10), scaleForGUI(8), scaleForGUI(10))));
-        box.add(leftAligned(Hud.eyebrow(text(techsOnly ? "board.spread.title.techs" : "board.spread.title"))));
-        box.add(Box.createVerticalStrut(scaleForGUI(4)));
-        if (lines.isEmpty()) {
-            box.add(leftAligned(colored(text(techsOnly ? "board.spread.none.techs" : "board.spread.none"), AMBER)));
-        }
-        for (String line : lines.subList(0, Math.min(SPREAD_LINES, lines.size()))) {
-            box.add(leftAligned(Hud.hint(line)));
-        }
-        if (lines.size() > SPREAD_LINES) {
-            box.add(leftAligned(Hud.hint(getFormattedTextAt(RESOURCE_BUNDLE, "board.spread.more",
-                  lines.size() - SPREAD_LINES))));
-        }
-        if (leftOver != null) {
-            box.add(leftAligned(colored(leftOver, AMBER)));
-        }
-        box.add(Box.createVerticalStrut(scaleForGUI(6)));
-
-        JPanel buttons = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-        HudButton stage = new HudButton(getFormattedTextAt(RESOURCE_BUNDLE, "board.spread.stage", lines.size())
-                                              .toUpperCase(Locale.ROOT), true, true);
-        stage.setArmed(!lines.isEmpty());
-        stage.addActionListener(event -> actions.spreadSelected());
-        HudButton cancel = new HudButton(text("board.spread.cancel").toUpperCase(Locale.ROOT), false, true);
-        cancel.addActionListener(event -> actions.toggleSpreadPreview());
-        buttons.add(stage);
-        buttons.add(Box.createHorizontalStrut(scaleForGUI(8)));
-        buttons.add(cancel);
-        box.add(leftAligned(buttons));
-        return box;
     }
 
     // endregion Selection and bulk actions
@@ -617,14 +504,14 @@ final class CrewUnitBoard extends JPanel {
         card.add(Box.createVerticalStrut(scaleForGUI(6)));
 
         if (SeatEligibility.takesTech(unit)) {
-            addTechLines(card, unit, plan, selected, isOpen);
+            addTechLine(card, unit, plan, selected);
             card.add(Box.createVerticalStrut(scaleForGUI(4)));
         }
         if (techsOnly) {
             return card;
         }
         for (CrewCoverage.SeatCoverage seatCoverage : coverage.seats()) {
-            addSeatLines(card, unit, plan, seatCoverage, selected, isOpen);
+            addSeatLine(card, unit, plan, seatCoverage, selected, isOpen);
             JComponent crew = crewLine(unit, plan, seatCoverage, arrivals, selected, isOpen);
             if (crew != null) {
                 card.add(leftAligned(crew));
@@ -661,10 +548,10 @@ final class CrewUnitBoard extends JPanel {
     }
 
     /**
-     * Adds the unit's tech once the plan is applied, a mark to remove them, and a button to assign a selected tech.
-     * An open card also says why any other selected tech cannot take the unit.
+     * Adds the unit's tech once the plan is applied, a mark to remove them, and a button to make the selected person
+     * its tech, or the reason they cannot be.
      */
-    private void addTechLines(JPanel card, Unit unit, AssignmentPlan plan, List<Person> selected, boolean isOpen) {
+    private void addTechLine(JPanel card, Unit unit, AssignmentPlan plan, List<Person> selected) {
         Person tech = plan.plannedTechOf(unit);
         JPanel left = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, 0, scaleForGUI(1)));
         left.add(Hud.eyebrow(text("board.tech")));
@@ -680,122 +567,59 @@ final class CrewUnitBoard extends JPanel {
                   tech.getFullTitle()), () -> actions.removeTech(unit)));
         }
 
-        // The first selected tech who can take the unit on is the one the button assigns; people who are not techs
-        // at all are passed over without comment, as they were selected for a seat
-        Person candidate = null;
-        Map<Reason, List<Person>> cannot = new EnumMap<>(Reason.class);
-        for (Person person : selected) {
-            if (!person.isTech()) {
-                continue;
-            }
+        JPanel right = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        // Someone who is not a tech at all was selected for a seat, so the tech line says nothing about them
+        Person person = selected.isEmpty() ? null : selected.get(0);
+        if ((person != null) && person.isTech()) {
             Reason reason = plan.whyNotTech(person, unit);
             if (reason == null) {
-                if (candidate == null) {
-                    candidate = person;
-                }
+                right.add(assignButton(getFormattedTextAt(RESOURCE_BUNDLE, (tech == null) ? "board.assignTech" :
+                                                                                 "board.replaceTech",
+                      person.getFullName(), plan.techMinutesNeeded(person, unit)), () -> actions.assignTech(unit)));
             } else if (reason != Reason.ALREADY_ABOARD) {
-                cannot.computeIfAbsent(reason, key -> new ArrayList<>()).add(person);
+                right.add(Hud.hint(CrewRowRenderers.reasonText(reason)));
             }
-        }
-        JPanel right = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        if (candidate != null) {
-            right.add(assignButton(getFormattedTextAt(RESOURCE_BUNDLE, (tech == null) ? "board.assignTech" :
-                                                                             "board.replaceTech",
-                  candidate.getFullName(), plan.techMinutesNeeded(candidate, unit)), () -> actions.assignTech(unit)));
-        } else if (!cannot.isEmpty() && !isOpen) {
-            right.add(Hud.hint(shortReason(cannot)));
         }
 
         JPanel line = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         line.add(left, BorderLayout.CENTER);
         line.add(right, BorderLayout.EAST);
         card.add(leftAligned(line));
-        if (isOpen) {
-            addReasonLines(card, cannot);
-        }
     }
 
     /**
-     * Adds a seat's name and how full it is, with a button to assign the selected people who can take it. An open
-     * card also says why the rest cannot.
+     * Adds a seat's name and how full it is, with a button to assign the selected person to it, or the reason they
+     * cannot take it.
      */
-    private void addSeatLines(JPanel card, Unit unit, AssignmentPlan plan, CrewCoverage.SeatCoverage seatCoverage,
+    private void addSeatLine(JPanel card, Unit unit, AssignmentPlan plan, CrewCoverage.SeatCoverage seatCoverage,
           List<Person> selected, boolean isOpen) {
         CrewSeat seat = seatCoverage.seat();
         SeatType type = seat.type();
         String seatName = CrewRowRenderers.seatLabel(unit, type);
-        int open = plan.openSeats(unit, type);
-
-        // People are assigned in the order they were selected, so the first who can take the seat gets it
-        int eligible = 0;
-        Person first = null;
-        Map<Reason, List<Person>> cannot = new EnumMap<>(Reason.class);
-        for (Person person : selected) {
-            Reason reason = plan.whyNotSeat(person, unit, type);
-            if (reason == null) {
-                eligible++;
-                if (first == null) {
-                    first = person;
-                }
-            } else if (reason != Reason.ALREADY_ABOARD) {
-                cannot.computeIfAbsent(reason, key -> new ArrayList<>()).add(person);
-            }
-        }
 
         JPanel right = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        int placing = Math.min(eligible, Math.max(0, open));
-        if ((placing == 1) && (first != null)) {
-            right.add(assignButton(getFormattedTextAt(RESOURCE_BUNDLE, "board.assign.one", first.getFullName()),
-                  () -> actions.assignToSeat(unit, type)));
-        } else if (placing > 1) {
-            right.add(assignButton(getFormattedTextAt(RESOURCE_BUNDLE, "board.assign.many", placing),
-                  () -> actions.assignToSeat(unit, type)));
-        } else if (!cannot.isEmpty() && !isOpen && (open > 0)) {
-            // A closed card only explains a seat that has room; a full seat needs no explanation on every card
-            right.add(Hud.hint(shortReason(cannot)));
+        Person person = selected.isEmpty() ? null : selected.get(0);
+        if (person != null) {
+            Reason reason = plan.whyNotSeat(person, unit, type);
+            if (reason == null) {
+                right.add(assignButton(getFormattedTextAt(RESOURCE_BUNDLE, "board.assign.one", person.getFullName()),
+                      () -> actions.assignToSeat(unit, type)));
+            } else if ((reason != Reason.ALREADY_ABOARD) && ((reason != Reason.SEAT_FULL) || isOpen)) {
+                // A full seat is plain from its count, so only an open card spells that out
+                right.add(Hud.hint(CrewRowRenderers.reasonText(reason)));
+            }
         }
 
         JPanel line = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         line.add(Hud.eyebrow(seatName + "  " + seatCoverage.real() + "/" + seat.capacity()), BorderLayout.WEST);
         line.add(right, BorderLayout.EAST);
         card.add(leftAligned(line));
-        if (isOpen) {
-            addReasonLines(card, cannot);
-        }
-    }
-
-    /** @return the reason that turns away the most of the selected people, as a short line for a closed card */
-    private static String shortReason(Map<Reason, List<Person>> cannot) {
-        Reason most = null;
-        int size = 0;
-        for (Map.Entry<Reason, List<Person>> entry : cannot.entrySet()) {
-            if (entry.getValue().size() > size) {
-                most = entry.getKey();
-                size = entry.getValue().size();
-            }
-        }
-        return (most == null) ? "" : CrewRowRenderers.reasonText(most);
-    }
-
-    /** Adds one line per reason: how many of the selected people it turns away, and a link that selects only them. */
-    private void addReasonLines(JPanel card, Map<Reason, List<Person>> cannot) {
-        for (Map.Entry<Reason, List<Person>> entry : cannot.entrySet()) {
-            List<Person> people = List.copyOf(entry.getValue());
-            JPanel line = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
-            line.add(colored(getFormattedTextAt(RESOURCE_BUNDLE, "board.cannot.line", people.size(),
-                  CrewRowRenderers.reasonText(entry.getKey())), AMBER));
-            line.add(Box.createHorizontalStrut(scaleForGUI(10)));
-            JLabel select = Hud.link(text("board.cannot.select"), () -> actions.selectOnly(people));
-            select.setToolTipText(text("board.cannot.select.toolTipText"));
-            line.add(select);
-            card.add(leftAligned(line));
-        }
     }
 
     /**
      * Who will hold a seat once the plan is applied: those staying, then those arriving, then its temporary crew and
      * the places still open. A closed card names only the first few people. While the seat is full, each person in it
-     * can be replaced by the first selected person who could take the seat.
+     * can be replaced by the selected person, if they could take the seat.
      *
      * @return the line, or {@code null} if there is nothing to say about the seat
      */

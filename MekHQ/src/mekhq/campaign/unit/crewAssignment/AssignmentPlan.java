@@ -1103,7 +1103,7 @@ public class AssignmentPlan {
 
     // endregion Changing temporary crew
 
-    // region Explaining, replacing and previewing
+    // region Explaining and replacing
 
     /**
      * Why a person cannot be staged into a seat right now. This is {@code null} exactly when {@link #canStage} is
@@ -1233,50 +1233,7 @@ public class AssignmentPlan {
         return (change == null) ? currentSeatOf(person) : change.toSeat();
     }
 
-    /**
-     * Works out what {@link #stage(List, List)} would stage, without staging it or adding to the history.
-     *
-     * @param people the people, in the order they should be seated
-     * @param units  the units, in the order they should be filled
-     *
-     * @return what would be staged, and who would be left over
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public StageResult previewStage(final List<Person> people, final List<Unit> units) {
-        final List<Runnable> reverts = new ArrayList<>();
-        final StageResult result = stage(people, units, reverts);
-        runBack(reverts);
-        return result;
-    }
-
-    /**
-     * Works out what {@link #stageTechs(List, List)} would stage, without staging it or adding to the history.
-     *
-     * @param techs the techs, in the order they should be given units
-     * @param units the units, in the order they should be given techs
-     *
-     * @return what would be staged, and the units that would be left without a tech
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public TechStageResult previewStageTechs(final List<Person> techs, final List<Unit> units) {
-        final List<Runnable> reverts = new ArrayList<>();
-        final TechStageResult result = stageTechs(techs, units, reverts);
-        runBack(reverts);
-        return result;
-    }
-
-    /** Applies a step's reverts, last first, as {@link #undo} does. */
-    private static void runBack(final List<Runnable> reverts) {
-        for (int i = reverts.size() - 1; i >= 0; i--) {
-            reverts.get(i).run();
-        }
-    }
-
-    // endregion Explaining, replacing and previewing
+    // endregion Explaining and replacing
 
     // region History
 

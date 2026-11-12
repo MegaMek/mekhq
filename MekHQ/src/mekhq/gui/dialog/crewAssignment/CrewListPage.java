@@ -41,7 +41,6 @@ import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
-import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -276,25 +275,6 @@ final class CrewListPage<T> extends JPanel {
         links.forEach(countLinks::add);
         countLinks.revalidate();
         countLinks.repaint();
-    }
-
-    /**
-     * Makes Ctrl+A (Cmd+A on a Mac) in the list select every row shown, as it would in any list.
-     *
-     * @param onSelectAll called when the player presses the shortcut
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    void setSelectAll(Runnable onSelectAll) {
-        list.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_A,
-              Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()), "selectAllRows");
-        list.getActionMap().put("selectAllRows", new AbstractAction() {
-            @Override
-            public void actionPerformed(ActionEvent event) {
-                onSelectAll.run();
-            }
-        });
     }
 
     /** Puts text in the search field without the player typing it, for example to clear it. */

@@ -44,7 +44,6 @@ import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.util.*;
-import java.util.function.Function;
 import javax.swing.*;
 
 import jakarta.annotation.Nullable;
@@ -65,7 +64,6 @@ import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Problem;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StageResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
-import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTech;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTempCrew;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TechStageResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TempCrewResult;
@@ -87,14 +85,13 @@ import mekhq.gui.model.LocationFilterItem;
  * the interstellar map.
  *
  * <p>The Assign page shows the location's people on the left and a card per unit on the right, each filtered from the
- * side rail and its own search field. The player ticks people, then presses the button on the seat or tech slot of the
- * unit they should go to, so who goes where is always the player's choice; a mark beside anyone aboard takes them out
- * again, and a full seat offers to replace whoever holds it. The Techs page is the same layout for maintenance alone:
- * the techs, with the time each has left, beside the units and who maintains them. Auto-fill, temporary crew and
- * spreading the selected people over the units, previewed first, work on every unit shown at once. Nothing changes
- * until the player commits:
- * assignments are staged in an {@link AssignmentPlan}, shown on the Review page, can be undone a step at a time, and
- * are applied by {@link CrewAssignmentService}.</p>
+ * side rail and its own search field. The player selects one person, then presses the button on the seat or tech slot
+ * of the unit they should go to, so who goes where is always the player's choice; a mark beside anyone aboard takes
+ * them out again, and a full seat offers to replace whoever holds it. The Techs page is the same layout for
+ * maintenance alone: the techs, with the time each has left, beside the units and who maintains them. Auto-fill and
+ * temporary crew work on every unit shown at once. Nothing changes until the player commits: assignments are staged
+ * in an {@link AssignmentPlan}, shown on the Review page, can be undone a step at a time, and are applied by
+ * {@link CrewAssignmentService}.</p>
  *
  * <p>The dialog is modal, so the campaign cannot change under a staged plan.</p>
  *
@@ -118,7 +115,6 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     private String message = "";
     private boolean isWarning;
     private boolean closeRequested;
-    private int lastPersonIndex = -1;
     /** The page with a list and cards the player was last on, which is where a link on the Review page goes back to. */
     private CrewAssignmentPage lastWorkPage = CrewAssignmentPage.ASSIGN;
     /** The units that pass the filters, in the order their cards are listed; the bulk actions work on these. */
@@ -189,13 +185,13 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     // region Opening
 
     /**
-     * Opens the dialog for the location of the given units or people. People are opened already selected, ready to be
-     * assigned; units are opened as the only cards listed, until the player clears that filter.
+     * Opens the dialog for the location of the given units or people. The first of the people is opened already
+     * selected, ready to be assigned; units are opened as the only cards listed, until the player clears that filter.
      *
      * @param frame    the main window
      * @param campaign the campaign
      * @param units    the units to list, possibly none, for every unit that needs crew
-     * @param people   people to select, possibly none
+     * @param people   people to open for, possibly none; the first one at this location is selected
      *
      * @author Illiani
      * @since 0.51.01
@@ -236,7 +232,6 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         }, new CrewRowRenderers.PersonRow(plan, state.selectedPeople::contains, this::isTechsPage),
               PERSON_ROW_HEIGHT,
               this::onPersonRow);
-        peoplePage.setSelectAll(this::selectShownPeople);
         // A click on a Review row does nothing by itself; its links open the unit or person it names
         reviewPage = new CrewListPage<>(null, text -> {}, new CrewRowRenderers.ReviewRow(plan), REVIEW_ROW_HEIGHT,
               (item, index, isRange) -> {});
@@ -309,9 +304,11 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     }
 
     private void preselect(Collection<Unit> units, Collection<Person> people) {
+        // Only one person is ever selected, so of several the first one listed here is
         for (Person person : people) {
             if (data.entryFor(person) != null) {
                 state.selectedPeople.add(person);
+                break;
             }
         }
         for (Unit unit : units) {
@@ -323,9 +320,6 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             // Opened for these units: list only them, however well they are crewed, with the first one's card open
             state.unitStatus = UnitStatus.ALL;
             state.openUnit = state.pinnedUnits.iterator().next();
-        } else if (state.selectedPeople.size() == 1) {
-            // Opened for one person: list only the units with a seat they could take
-            state.seatsForPerson = state.selectedPeople.iterator().next();
         }
     }
 
@@ -584,42 +578,6 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             chip.setActive(true);
             chips.add(chip);
         }
-        // With one person selected, the cards can be narrowed to where that person could go
-        Person only = (state.selectedPeople.size() == 1) ? state.selectedPeople.iterator().next() : null;
-        if ((only != null) && (state.seatsForPerson == null) && (state.unitsForTech == null)) {
-            if (!isTechsPage()) {
-                chips.add(new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "units.seatsFor.offer",
-                      only.getFullTitle()), () -> {
-                    state.seatsForPerson = only;
-                    refresh();
-                }));
-            }
-            if (only.isTech()) {
-                chips.add(new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "units.forTech.offer",
-                      only.getFullTitle()), () -> {
-                    state.unitsForTech = only;
-                    refresh();
-                }));
-            }
-        }
-        if ((state.seatsForPerson != null) && !isTechsPage()) {
-            HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "units.seatsFor",
-                  state.seatsForPerson.getFullTitle()), () -> {
-                state.seatsForPerson = null;
-                refresh();
-            });
-            chip.setActive(true);
-            chips.add(chip);
-        }
-        if (state.unitsForTech != null) {
-            HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "units.forTech",
-                  state.unitsForTech.getFullTitle()), () -> {
-                state.unitsForTech = null;
-                refresh();
-            });
-            chip.setActive(true);
-            chips.add(chip);
-        }
         board.refresh(state, data, shown, chips);
     }
 
@@ -694,7 +652,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
                                                                       "personnel.count", shown.size(),
               state.selectedPeople.size()));
         List<JComponent> links = new ArrayList<>();
-        // Taking the selected people out of their units and off the units they maintain
+        // Taking the selected person out of their unit and off the units they maintain
         boolean anyPlaced = state.selectedPeople.stream()
                                   .anyMatch(person -> plan.canUnassign(person)
                                                             || !plan.plannedTechUnits(person).isEmpty());
@@ -703,8 +661,6 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             unassign.setToolTipText(getTextAt(RESOURCE_BUNDLE, "people.unassign.toolTipText"));
             links.add(unassign);
         }
-        links.add(Hud.link(getFormattedTextAt(RESOURCE_BUNDLE, "people.selectAll", shown.size()),
-              this::selectShownPeople));
         if (!state.selectedPeople.isEmpty()) {
             links.add(Hud.link(getTextAt(RESOURCE_BUNDLE, "people.clear"), this::clearSelection));
         }
@@ -891,36 +847,15 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
 
     // region Rows and links
 
+    /** A click selects one person, in place of anyone selected before; a click on the selected person clears it. */
     private void onPersonRow(PersonEntry entry, int index, boolean isRange) {
-        List<PersonEntry> rows = peoplePage.rows();
-        toggle(rows, entry, index, isRange, lastPersonIndex, PersonEntry::person, state.selectedPeople);
-        if (!isRange) {
-            lastPersonIndex = index;
+        Person person = entry.person();
+        boolean wasSelected = state.selectedPeople.contains(person);
+        state.selectedPeople.clear();
+        if (!wasSelected) {
+            state.selectedPeople.add(person);
         }
         refresh();
-    }
-
-    /** Adds everyone the list shows to the selection. */
-    private void selectShownPeople() {
-        for (PersonEntry entry : peoplePage.rows()) {
-            state.selectedPeople.add(entry.person());
-        }
-        refresh();
-    }
-
-    /** A click toggles one row; a shift-click selects every row from the last one clicked. */
-    private static <R, V> void toggle(List<R> rows, R row, int index, boolean isRange, int lastIndex,
-          Function<R, V> valueOf, Collection<V> selection) {
-        if (isRange && (lastIndex >= 0) && (lastIndex < rows.size())) {
-            for (int i = Math.min(index, lastIndex); i <= Math.max(index, lastIndex); i++) {
-                selection.add(valueOf.apply(rows.get(i)));
-            }
-        } else {
-            V value = valueOf.apply(row);
-            if (!selection.remove(value)) {
-                selection.add(value);
-            }
-        }
     }
 
     private void openLink(Object link) {
@@ -979,18 +914,14 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
 
     /**
      * Moves to a page. Going between the Assign and Techs pages starts the filters that mean something different on
-     * each of them over, so a role filter from one page cannot quietly empty the other; the people
-     * ticked stay ticked. Coming back from the Review page changes nothing.
+     * each of them over, so a role filter from one page cannot quietly empty the other; whoever is selected stays
+     * selected. Coming back from the Review page changes nothing.
      */
     private void enterPage(CrewAssignmentPage page) {
         if (page.isWorkPage() && (page != lastWorkPage)) {
             state.assignment = CrewAssignmentState.defaultAssignment(page);
             state.role = null;
-            state.seatsForPerson = null;
-            state.unitsForTech = null;
             state.targetTech = false;
-            state.isSpreadPreview = false;
-            lastPersonIndex = -1;
             lastWorkPage = page;
         }
         state.page = page;
@@ -1007,7 +938,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     @Override
     public void assignToSeat(Unit unit, SeatType seat) {
         AssignmentPlan plan = data.plan();
-        // In the order they were selected, so the first selected are the first seated; one step of history
+        // Only one person is ever selected; the list form is what the plan takes
         List<Person> candidates = new ArrayList<>();
         for (Person person : state.selectedPeople) {
             if (!unit.equals(plan.plannedUnitOf(person))) {
@@ -1027,17 +958,10 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         if (placed.isEmpty()) {
             setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.seatRefused", seatName, unit.getName()), true);
         } else {
-            // Those placed are done; anyone left stays selected, ready for the next seat or unit
+            // Once seated they are done with, so the selection is cleared for the next person
             placed.forEach(state.selectedPeople::remove);
-            if (placed.contains(state.seatsForPerson)) {
-                state.seatsForPerson = null;
-            }
-            int left = state.selectedPeople.size();
-            setMessage((left == 0) ?
-                             getFormattedTextAt(RESOURCE_BUNDLE, "message.seatStaged", placed.size(), seatName,
-                                   unit.getName()) :
-                             getFormattedTextAt(RESOURCE_BUNDLE, "message.seatStagedSome", placed.size(), seatName,
-                                   unit.getName(), left), false);
+            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.seatStaged", placed.get(0).getFullTitle(),
+                  seatName, unit.getName()), false);
         }
         refresh();
     }
@@ -1046,7 +970,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     public void assignTech(Unit unit) {
         AssignmentPlan plan = data.plan();
         Person current = plan.plannedTechOf(unit);
-        // The first selected tech who can take the unit on; they stay selected, as a tech can take several units
+        // The selected tech stays selected afterwards, as a tech can take several units
         for (Person person : List.copyOf(state.selectedPeople)) {
             if (person.isTech() && !person.equals(current) && plan.stageTech(person, unit)) {
                 setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.techStaged", person.getFullTitle(),
@@ -1123,22 +1047,11 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     }
 
     @Override
-    public void selectOnly(List<Person> people) {
-        state.selectedPeople.clear();
-        state.selectedPeople.addAll(people);
-        lastPersonIndex = -1;
-        refresh();
-    }
-
-    @Override
     public void replaceOccupant(Person newcomer, Person occupant) {
         AssignmentPlan plan = data.plan();
         Unit unit = plan.plannedUnitOf(occupant);
         if ((unit != null) && plan.stageReplacement(newcomer, occupant)) {
             state.selectedPeople.remove(newcomer);
-            if (newcomer.equals(state.seatsForPerson)) {
-                state.seatsForPerson = null;
-            }
             setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.replaced", occupant.getFullTitle(),
                   newcomer.getFullTitle(), unit.getName()), false);
         } else {
@@ -1148,51 +1061,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     }
 
     @Override
-    public void toggleSpreadPreview() {
-        state.isSpreadPreview = !state.isSpreadPreview;
-        refresh();
-    }
-
-    @Override
-    public void spreadSelected() {
-        AssignmentPlan plan = data.plan();
-        // In the order they were selected, over the units in the order their cards are listed: what the preview showed
-        List<Person> people = List.copyOf(state.selectedPeople);
-        if (isTechsPage()) {
-            TechStageResult result = plan.stageTechs(people, shownUnitList());
-            if (result.staged().isEmpty()) {
-                setMessage(getTextAt(RESOURCE_BUNDLE, "message.spreadNone"), true);
-            } else {
-                // A tech given a unit is done with; one given none stays selected
-                for (StagedTech change : result.staged()) {
-                    state.selectedPeople.remove(change.toTech());
-                }
-                if (result.leftOver().isEmpty()) {
-                    reportStaged(result.staged().size(), 0);
-                } else {
-                    setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.techsLeftOver",
-                          result.staged().size(), result.leftOver().size()), true);
-                }
-            }
-        } else {
-            StageResult result = plan.stage(people, shownUnitList());
-            if (result.leftOver().size() == people.size()) {
-                setMessage(getTextAt(RESOURCE_BUNDLE, "message.spreadNone"), true);
-            } else {
-                state.selectedPeople.retainAll(result.leftOver());
-                state.seatsForPerson = null;
-                reportStaged(people.size() - result.leftOver().size(), result.leftOver().size());
-            }
-        }
-        state.isSpreadPreview = false;
-        refresh();
-    }
-
-    @Override
     public void clearSelection() {
-        state.isSpreadPreview = false;
         state.selectedPeople.clear();
-        lastPersonIndex = -1;
         refresh();
     }
 
@@ -1209,7 +1079,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         refresh();
     }
 
-    /** Takes the selected people out of their units and off every unit they maintain. */
+    /** Takes the selected person out of their unit and off every unit they maintain. */
     private void unassignSelectedPeople() {
         int staged = data.plan().unassignEverything(sortedSelectedPeople());
         setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.unassigned", staged), staged == 0);
@@ -1282,8 +1152,6 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             state.techStatus = TechStatus.ALL;
             state.unitType = null;
             state.formation = null;
-            state.seatsForPerson = null;
-            state.unitsForTech = null;
             state.pinnedUnits.clear();
             state.unitQuery = "";
             board.setSearchText("");
@@ -1383,16 +1251,12 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         data = new CrewAssignmentData(campaign, location);
         state.selectedPeople.clear();
         state.openUnit = null;
-        state.seatsForPerson = null;
-        state.unitsForTech = null;
         state.targetTech = false;
-        state.isSpreadPreview = false;
         state.unitType = null;
         state.formation = null;
         state.role = null;
         state.condition = Condition.ANY;
         state.familiarity = FamiliarityBand.ANY;
-        lastPersonIndex = -1;
         shownUnits = List.of();
         board.resetCards();
         // The row renderers hold the plan they draw from, so they are given the new one

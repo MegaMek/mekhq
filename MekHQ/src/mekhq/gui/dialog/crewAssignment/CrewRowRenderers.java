@@ -294,7 +294,8 @@ final class CrewRowRenderers {
         private final JLabel skill = label(SKILL_FONT, TEXT);
 
         PersonRow(AssignmentPlan plan, Predicate<Person> isSelected, BooleanSupplier isTechView) {
-            super(true);
+            // No tick box: one person is selected at a time, shown by the row's accent bar and lighter background
+            super(false);
             this.plan = plan;
             this.isSelected = isSelected;
             this.isTechView = isTechView;

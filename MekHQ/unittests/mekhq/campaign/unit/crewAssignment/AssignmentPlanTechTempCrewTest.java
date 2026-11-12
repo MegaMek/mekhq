@@ -223,21 +223,6 @@ class AssignmentPlanTechTempCrewTest {
     }
 
     @Test
-    void aTechPreviewStagesNothingAndLeavesNoHistory() {
-        Person tech = fixture.tech("Tech", 150);
-        List<Unit> units = List.of(mek("A").unit, mek("B").unit, mek("C").unit);
-
-        TechStageResult preview = plan.previewStageTechs(List.of(tech), units);
-
-        assertEquals(2, preview.staged().size());
-        assertEquals(List.of(units.get(2)), preview.leftOver());
-        assertTrue(plan.isEmpty());
-        assertFalse(plan.canUndo());
-        assertEquals(0, plan.plannedTechMinutes(tech));
-        assertNull(plan.plannedTechOf(units.get(0)));
-    }
-
-    @Test
     void selfCrewedUnitsTakeNoTech() {
         Person tech = fixture.tech("Tech", 480);
         Unit dropShip = mek("DropShip").unit;

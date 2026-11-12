@@ -301,34 +301,6 @@ class AssignmentPlanTest {
     }
 
     @Test
-    void aPreviewStagesNothingAndLeavesNoHistory() {
-        Unit unit = platoon("Platoon", 2);
-        List<Person> people = soldiers(3);
-
-        StageResult preview = plan.previewStage(people, List.of(unit));
-
-        assertEquals(2, preview.staged().size());
-        assertEquals(List.of(people.get(2)), preview.leftOver());
-        assertTrue(plan.isEmpty());
-        assertFalse(plan.canUndo());
-        assertEquals(2, plan.openSeats(unit, SeatType.SOLDIER));
-        assertNull(plan.plannedUnitOf(people.get(0)));
-    }
-
-    @Test
-    void aPreviewMatchesWhatStagingThenDoes() {
-        Unit first = platoon("First", 1);
-        Unit second = platoon("Second", 2);
-        List<Person> people = soldiers(3);
-
-        StageResult preview = plan.previewStage(people, List.of(first, second));
-        StageResult staged = plan.stage(people, List.of(first, second));
-
-        assertEquals(preview.staged(), staged.staged());
-        assertEquals(preview.leftOver(), staged.leftOver());
-    }
-
-    @Test
     void changesKeepTheOrderTheyWereStaged() {
         Unit unit = platoon("Platoon", 3);
         List<Person> people = soldiers(3);

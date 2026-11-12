@@ -49,9 +49,9 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
 
 /**
  * What the player has chosen in the {@link CrewAssignmentDialog}: the filters on its list of people and on its unit
- * cards, the people selected, and the unit whose card is open. The selection is kept here rather than in the list, so
- * it survives filtering. Units are never selected: the player assigns the selected people by pressing a button on the
- * seat or tech slot of the unit they should go to.
+ * cards, the one person selected, and the unit whose card is open. The selection is kept here rather than in the list,
+ * so it survives filtering. Units are never selected: the player assigns the selected person by pressing a button on
+ * the seat or tech slot of the unit they should go to.
  *
  * <p>The filter rules are here too, as plain methods, so the pages only show their results.</p>
  *
@@ -187,17 +187,11 @@ final class CrewAssignmentState {
     @Nullable String unitType;
     @Nullable String formation;
     String unitQuery = "";
-    /** When set, the unit cards show only units with a seat this person could take. */
-    @Nullable Person seatsForPerson;
-    /** When set, the unit cards show only units this tech could take on, or already maintains. */
-    @Nullable Person unitsForTech;
     /** When not empty, only these units are listed: the ones the dialog was opened for. */
     final Set<Unit> pinnedUnits = new LinkedHashSet<>();
     /** The Techs page's own status filter, in place of {@link #unitStatus}. */
     TechStatus techStatus = TechStatus.NEEDS_TECH;
     TechSort techSort = TechSort.BEST;
-    /** {@code true} while the panel shows where "spread the selected over the units shown" would put everyone. */
-    boolean isSpreadPreview;
 
     // People list
     Assignment assignment = Assignment.UNASSIGNED;
@@ -207,7 +201,7 @@ final class CrewAssignmentState {
     FamiliarityBand familiarity = FamiliarityBand.ANY;
     String peopleQuery = "";
 
-    /** The selected people, in the order they were selected; the first selected are the first assigned. */
+    /** The selected person: the dialog only ever puts one person in here, or none. */
     final Set<Person> selectedPeople = new LinkedHashSet<>();
 
     /** The seat auto-fill fills on the units shown, or {@code null} to pick the first one with room. */
@@ -235,15 +229,6 @@ final class CrewAssignmentState {
             return false;
         }
         if (!pinnedUnits.isEmpty() && !pinnedUnits.contains(unit)) {
-            return false;
-        }
-        // Seats are not shown on the Techs page, so a seat filter left over from the Assign page does not apply
-        if ((page != CrewAssignmentPage.TECHS) && (seatsForPerson != null)
-                  && (plan.seatFor(seatsForPerson, unit) == null)) {
-            return false;
-        }
-        if ((unitsForTech != null) && !unitsForTech.equals(plan.plannedTechOf(unit))
-                  && !plan.canStageTech(unitsForTech, unit)) {
             return false;
         }
 
