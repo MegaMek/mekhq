@@ -103,6 +103,7 @@ import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.AtmosphericTaint;
+import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.planetaryConditions.Wind;
 import megamek.common.units.*;
 import megamek.common.universe.FactionTag;
@@ -2572,6 +2573,32 @@ public class AtBDynamicScenarioFactory {
         }
 
         return crewedPlatoon;
+    }
+
+    /**
+     * Last line of defense that makes sure a conventional infantry platoon is dressed for the battlefield it is about
+     * to be deployed onto.
+     *
+     * <p>Platoons are dressed when they are generated, but that kit does not reliably survive until the battle
+     * starts. A scenario's bot forces are saved as MUL data, which records only the kit's effects (such as the
+     * encumbering flag) and not the kit itself. Reloading the campaign therefore leaves an enemy platoon that was
+     * issued a snow suit with no kit at all, and MegaMek kills such a platoon the moment it deploys into extreme
+     * temperatures. Rather than trust that every earlier step dressed the platoon and kept it dressed, this is run
+     * against the conditions MegaMek will actually apply, immediately before the unit is sent to the game.</p>
+     *
+     * <p>Platoons that already wear a kit are left alone, as are all other unit types.</p>
+     *
+     * @param entity     the unit about to be deployed
+     * @param conditions the planetary conditions the game will use
+     */
+    public static void ensureInfantryProtection(Entity entity, PlanetaryConditions conditions) {
+        if (!(entity instanceof ConvInfantry platoon) || (platoon.getArmorKit() != null)) {
+            return;
+        }
+
+        boolean isLowPressure = conditions.getAtmosphere().isLighterThan(THIN);
+        boolean isPoisonous = !conditions.getAtmosphericTaint().isBreathable();
+        changeInfantryKit(platoon, isLowPressure, isPoisonous, conditions.getTemperature());
     }
 
     /**

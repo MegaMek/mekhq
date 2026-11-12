@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
 import megamek.common.game.Game;
 import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.AtmosphericTaint;
@@ -176,6 +177,59 @@ class InfantryEnvironmentalKitTest {
 
         assertEquals(ConvInfantry.MOUNTAIN_TROOPS | ConvInfantry.XCT, platoon.getSpecializations(),
               "the platoon should gain XCT without losing its mountain troops specialization");
+    }
+
+    /** Extreme cold (below -30) and extreme heat (above 50), as MegaMek defines them. */
+    static List<Arguments> extremeTemperatures() {
+        return List.of(Arguments.of(-40), Arguments.of(-31), Arguments.of(51), Arguments.of(56));
+    }
+
+    @ParameterizedTest(name = "{0} degrees C")
+    @MethodSource("extremeTemperatures")
+    @DisplayName("A platoon that lost its kit on reload is re-dressed before deployment")
+    void kitlessInfantryAreDressedForExtremeTemperatureBeforeDeployment(int temperature) {
+        // A scenario's bot forces are saved as MUL data, which keeps a kit's flags but not the kit itself. A platoon
+        // that was handed a snow suit or heat suit comes back from a save with no kit, which MegaMek treats as
+        // unprotected. This is the state of the platoon the player sees die in the Wolf Brigade report.
+        PlanetaryConditions conditions = new PlanetaryConditions();
+        conditions.setTemperature(temperature);
+        ConvInfantry platoon = new ConvInfantry();
+
+        assertNotNull(conditions.whyDoomed(platoon, new Game()),
+              "a platoon with no kit should be doomed at " + temperature + " degrees C");
+
+        AtBDynamicScenarioFactory.ensureInfantryProtection(platoon, conditions);
+
+        String reasonDoomed = conditions.whyDoomed(platoon, new Game());
+        assertNull(reasonDoomed,
+              "the platoon should survive deployment at " + temperature + " degrees C, but MegaMek still dooms it: " +
+                    reasonDoomed);
+    }
+
+    @Test
+    @DisplayName("Infantry already wearing a kit are not re-dressed before deployment")
+    void dressedInfantryAreLeftAloneBeforeDeployment() {
+        PlanetaryConditions conditions = new PlanetaryConditions();
+        conditions.setTemperature(MILD_TEMPERATURE);
+        ConvInfantry platoon = new ConvInfantry();
+        platoon.setArmorKit(MiscType.createSnowSuitInfArmor());
+        EquipmentType kitBefore = platoon.getArmorKit();
+
+        AtBDynamicScenarioFactory.ensureInfantryProtection(platoon, conditions);
+
+        assertEquals(kitBefore, platoon.getArmorKit(), "an existing kit should not be replaced");
+    }
+
+    @Test
+    @DisplayName("Infantry are not dressed before deployment when the weather is mild")
+    void infantryAreNotDressedInMildWeatherBeforeDeployment() {
+        PlanetaryConditions conditions = new PlanetaryConditions();
+        conditions.setTemperature(MILD_TEMPERATURE);
+        ConvInfantry platoon = new ConvInfantry();
+
+        AtBDynamicScenarioFactory.ensureInfantryProtection(platoon, conditions);
+
+        assertNull(platoon.getArmorKit(), "mild weather in breathable air should not issue a kit");
     }
 
     private static AtBDynamicScenario createScenario(AtmosphericTaint atmosphericTaint, Atmosphere atmosphere) {
