@@ -98,11 +98,11 @@ class CrewAssignmentStateFamiliarityTest {
     }
 
     @Test
-    void chassisComesFromTheOpenUnitCard() {
+    void chassisComesFromTheSelectedUnit() {
         CrewAssignmentState state = new CrewAssignmentState();
         assertNull(state.familiarityChassis());
 
-        state.openUnit = unitWithChassis("Locust");
+        state.selectedUnit = unitWithChassis("Locust");
         assertEquals("Locust", state.familiarityChassis());
     }
 }

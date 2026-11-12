@@ -49,9 +49,9 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
 
 /**
  * What the player has chosen in the {@link CrewAssignmentDialog}: the filters on its list of people and on its unit
- * cards, the one person selected, and the unit whose card is open. The selection is kept here rather than in the list,
- * so it survives filtering. Units are never selected: the player assigns the selected person by pressing a button on
- * the seat or tech slot of the unit they should go to.
+ * cards, and the one person and the one unit selected. The selection is kept here rather than in the lists, so it
+ * survives filtering. Selecting a unit only highlights its card and sets what the Familiarity filter measures against:
+ * the player assigns the selected person by pressing a button on the seat or tech slot of the unit they should go to.
  *
  * <p>The filter rules are here too, as plain methods, so the pages only show their results.</p>
  *
@@ -209,8 +209,11 @@ final class CrewAssignmentState {
     /** {@code true} when auto-fill gives techs to the units shown instead of filling a seat. */
     boolean targetTech;
 
-    /** The unit whose card is open, showing its whole crew and its extra actions; {@code null} for none. */
-    @Nullable Unit openUnit;
+    /**
+     * The selected unit, or {@code null} for none. Selecting a unit assigns nothing: its card is highlighted and shows
+     * its whole crew and its extra actions, and the Familiarity filter measures against its chassis.
+     */
+    @Nullable Unit selectedUnit;
 
     // region Filters
 
@@ -492,8 +495,8 @@ final class CrewAssignmentState {
     }
 
     /**
-     * The unit whose chassis the familiarity filter measures against: the unit whose card is open. With no card open,
-     * there is no one chassis to measure.
+     * The unit whose chassis the familiarity filter measures against: the selected unit. With no unit selected, there
+     * is no one chassis to measure.
      *
      * @return the unit, or {@code null} to measure each person's best familiarity with any chassis
      *
@@ -501,7 +504,7 @@ final class CrewAssignmentState {
      * @since 0.51.01
      */
     @Nullable Unit familiarityUnit() {
-        return openUnit;
+        return selectedUnit;
     }
 
     /**

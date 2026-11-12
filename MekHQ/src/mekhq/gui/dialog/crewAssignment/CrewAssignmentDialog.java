@@ -80,6 +80,7 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.*;
 import mekhq.gui.model.LocationFilterItem;
 import mekhq.gui.view.PersonViewPanel;
+import mekhq.gui.view.UnitViewPanel;
 
 /**
  * The crew assignment dialog: assign people and techs to one location's units, in a heads-up display in the style of
@@ -320,7 +321,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         if (!state.pinnedUnits.isEmpty()) {
             // Opened for these units: list only them, however well they are crewed, with the first one's card open
             state.unitStatus = UnitStatus.ALL;
-            state.openUnit = state.pinnedUnits.iterator().next();
+            state.selectedUnit = state.pinnedUnits.iterator().next();
         }
     }
 
@@ -926,6 +927,10 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             lastWorkPage = page;
         }
         state.page = page;
+        if (page == CrewAssignmentPage.TECHS) {
+            // The Techs page lists only techs, so someone else selected on the Assign page is let go
+            state.selectedPeople.removeIf(person -> !person.isTech());
+        }
     }
 
     @Override
@@ -971,9 +976,10 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     public void assignTech(Unit unit) {
         AssignmentPlan plan = data.plan();
         Person current = plan.plannedTechOf(unit);
-        // The selected tech stays selected afterwards, as a tech can take several units
+        // Once given the unit they are deselected, as someone seated is
         for (Person person : List.copyOf(state.selectedPeople)) {
             if (person.isTech() && !person.equals(current) && plan.stageTech(person, unit)) {
+                state.selectedPeople.remove(person);
                 setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.techStaged", person.getFullTitle(),
                       unit.getName()), false);
                 refresh();
@@ -1133,11 +1139,11 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
 
     @Override
     public void toggleUnit(Unit unit) {
-        state.openUnit = unit.equals(state.openUnit) ? null : unit;
+        state.selectedUnit = unit.equals(state.selectedUnit) ? null : unit;
         refresh();
     }
 
-    /** Shows a unit's card, open, clearing the unit filters if they hide it. */
+    /** Shows a unit's card, selected, clearing the unit filters if they hide it. */
     private void openUnit(Unit unit) {
         UnitEntry entry = data.entryFor(unit);
         if (entry == null) {
@@ -1157,7 +1163,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             state.unitQuery = "";
             board.setSearchText("");
         }
-        state.openUnit = unit;
+        state.selectedUnit = unit;
         refresh();
         board.reveal(unit);
     }
@@ -1187,12 +1193,24 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
 
     @Override
     public void viewPerson(Person person) {
-        // Read-only, and modal over this dialog, so the staged plan cannot change while it is open
-        JDialog view = new JDialog(this, person.getFullTitle(), true);
-        JScrollPane scroll = new JScrollPane(new PersonViewPanel(person, campaign, campaign.getGUI()),
-              ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        showRecord(person.getFullTitle(), new PersonViewPanel(person, campaign, campaign.getGUI()));
+    }
+
+    @Override
+    public void viewUnit(Unit unit) {
+        showRecord(unit.getName(), new UnitViewPanel(unit, campaign));
+    }
+
+    /**
+     * Shows a person's or unit's record in a window of its own. It is read-only, and modal over this dialog, so the
+     * staged plan cannot change while it is open; it shows the campaign as it is, not the staged changes.
+     */
+    private void showRecord(String title, JComponent record) {
+        JDialog view = new JDialog(this, title, true);
+        JScrollPane scroll = new JScrollPane(record, ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED,
+              ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
         scroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
-        JButton close = new JButton(getTextAt(RESOURCE_BUNDLE, "personView.close"));
+        JButton close = new JButton(getTextAt(RESOURCE_BUNDLE, "recordView.close"));
         close.addActionListener(event -> view.dispose());
         JPanel buttons = new JPanel();
         buttons.add(close);
@@ -1274,7 +1292,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     private void reload() {
         data = new CrewAssignmentData(campaign, location);
         state.selectedPeople.clear();
-        state.openUnit = null;
+        state.selectedUnit = null;
         state.targetTech = false;
         state.unitType = null;
         state.formation = null;

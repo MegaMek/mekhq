@@ -39,9 +39,12 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Cursor;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.Rectangle;
+import java.awt.event.MouseAdapter;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.EnumMap;
 import java.util.HashMap;
@@ -72,11 +75,12 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
  * The right-hand panel of the {@link CrewAssignmentDialog}'s Assign and Techs pages: one card per unit, beside the list
  * of people. On the Assign page a card lists the unit's tech and every seat; on the Techs page, only its tech.
  *
- * <p>Units are never selected, and only one person is at a time. Each seat and tech slot has its own button, which
- * assigns the person selected in the list to that slot on that unit, so the player always chooses who goes where.
- * Where they cannot take a slot, the card says why. Everyone aboard has a mark that takes them out again, and a full
- * seat offers to replace whoever holds it. Above the cards are the unit search and filters, and the actions that work
- * on every unit shown at once: auto-fill and temporary crew.</p>
+ * <p>One person and one unit can be selected at a time. Selecting a unit assigns nothing: it highlights the card,
+ * which then shows its whole crew and extra actions, and sets the unit the Familiarity filter measures against. Each
+ * seat and tech slot has its own button, which assigns the person selected in the list to that slot on that unit, so
+ * the player always chooses who goes where. Where they cannot take a slot, the card says why. Everyone aboard has a
+ * mark that takes them out again, and a full seat offers to replace whoever holds it. Above the cards are the unit
+ * search and filters, and the actions that work on every unit shown at once: auto-fill and temporary crew.</p>
  *
  * <p>Only the first cards are built, with a link to build more, so a location with hundreds of units stays quick.</p>
  *
@@ -127,13 +131,16 @@ final class CrewUnitBoard extends JPanel {
 
         void chooseTargetTech();
 
-        /** Opens a unit's card, or closes it if it is the open one. */
+        /** Selects a unit, or deselects it if it is the selected one. */
         void toggleUnit(Unit unit);
 
         void openPerson(Person person);
 
         /** Opens the person's full record, as the Personnel tab shows it, in a window of its own. */
         void viewPerson(Person person);
+
+        /** Opens the unit's full record, as the Hangar tab shows it, in a window of its own. */
+        void viewUnit(Unit unit);
 
         void clearSelection();
     }
@@ -403,7 +410,8 @@ final class CrewUnitBoard extends JPanel {
             autoFillText = getFormattedTextAt(RESOURCE_BUNDLE, state.targetTech ? "board.autoFill.techs" :
                                                                      "board.autoFill.count", wanted);
         }
-        row.add(bulkButton(autoFillText, "board.autoFill.toolTipText", wanted > 0, actions::autoFill));
+        row.add(bulkButton(autoFillText, techsOnly ? "board.autoFill.techs.toolTipText" : "board.autoFill.toolTipText",
+              wanted > 0, actions::autoFill));
         if (!techsOnly) {
             row.add(bulkButton(text("board.fillTempCrew"), "board.fillTempCrew.toolTipText", canFillTemp,
                   actions::fillTempCrewOnShown));
@@ -473,7 +481,7 @@ final class CrewUnitBoard extends JPanel {
     private JComponent card(UnitEntry entry, AssignmentPlan plan, List<StagedAssignment> arrivals,
           List<Person> selected) {
         Unit unit = entry.unit();
-        boolean isOpen = unit.equals(state.openUnit);
+        boolean isOpen = unit.equals(state.selectedUnit);
         boolean techsOnly = isTechsPage();
         CrewCoverage.UnitCoverage coverage = CrewCoverage.of(unit, plan);
 
@@ -481,13 +489,23 @@ final class CrewUnitBoard extends JPanel {
         card.setOpaque(true);
         Color background = isOpen ? SURFACE : SURFACE_DEEP;
         card.setBackground(background);
-        // A hairline under every card, and an accent bar on the left of the open one
+        // A hairline under every card, and an accent bar on the left of the selected one, as a selected person has
         card.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
               BorderFactory.createCompoundBorder(
                     BorderFactory.createMatteBorder(0, scaleForGUI(2), 0, 0, isOpen ? ACCENT : background),
                     BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(10), scaleForGUI(8),
                           scaleForGUI(12)))));
+        // A click anywhere on the card that is not a link or a button selects the unit, or deselects it
+        card.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        card.addMouseListener(new MouseAdapter() {
+            @Override
+            public void mouseReleased(MouseEvent event) {
+                if (SwingUtilities.isLeftMouseButton(event) && card.contains(event.getPoint())) {
+                    actions.toggleUnit(unit);
+                }
+            }
+        });
 
         HudRing ring = new HudRing();
         if (techsOnly) {
@@ -505,15 +523,20 @@ final class CrewUnitBoard extends JPanel {
         identity.add(name);
         JPanel header = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         header.add(identity, BorderLayout.CENTER);
-        header.add(colored(entry.damageName(), CrewRowRenderers.damageColor(entry.damageState())),
-              BorderLayout.EAST);
+        JLabel view = Hud.link(text("board.viewUnit"), () -> actions.viewUnit(unit));
+        view.setToolTipText(text("board.viewUnit.toolTipText"));
+        JPanel status = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+        status.add(colored(entry.damageName(), CrewRowRenderers.damageColor(entry.damageState())));
+        status.add(Box.createHorizontalStrut(scaleForGUI(12)));
+        status.add(view);
+        header.add(status, BorderLayout.EAST);
         card.add(leftAligned(header));
         card.add(leftAligned(Hud.hint(entry.formationName().isEmpty() ? entry.typeName() :
                                             entry.typeName() + "  ·  " + entry.formationName())));
         card.add(Box.createVerticalStrut(scaleForGUI(6)));
 
         if (SeatEligibility.takesTech(unit)) {
-            addTechLine(card, unit, plan, selected);
+            addTechLines(card, unit, plan, selected);
             card.add(Box.createVerticalStrut(scaleForGUI(4)));
         }
         if (techsOnly) {
@@ -557,43 +580,57 @@ final class CrewUnitBoard extends JPanel {
     }
 
     /**
-     * Adds the unit's tech once the plan is applied, a mark to remove them, and a button to make the selected person
-     * its tech, or the reason they cannot be.
+     * Adds the unit's tech slot, laid out as a seat is: its name and how full it is, with a button to make the
+     * selected person the tech or the reason they cannot be, and under it who holds the slot, or that it is open.
      */
-    private void addTechLine(JPanel card, Unit unit, AssignmentPlan plan, List<Person> selected) {
+    private void addTechLines(JPanel card, Unit unit, AssignmentPlan plan, List<Person> selected) {
         Person tech = plan.plannedTechOf(unit);
-        JPanel left = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, 0, scaleForGUI(1)));
-        left.add(Hud.eyebrow(text("board.tech")));
-        left.add(Box.createHorizontalStrut(scaleForGUI(10)));
-        if (tech == null) {
-            left.add(colored(text("board.noTech"), AMBER));
-        } else {
-            boolean isStaged = plan.techChangeFor(unit) != null;
-            left.add(Hud.link(isStaged ? getFormattedTextAt(RESOURCE_BUNDLE, "board.staged", tech.getFullTitle()) :
-                                    tech.getFullTitle(), () -> actions.openPerson(tech)));
-            left.add(Box.createHorizontalStrut(scaleForGUI(6)));
-            left.add(removeMark(getFormattedTextAt(RESOURCE_BUNDLE, "board.removeTech.toolTipText",
-                  tech.getFullTitle()), () -> actions.removeTech(unit)));
-        }
+        Person person = selected.isEmpty() ? null : selected.get(0);
+        Reason reason = (person == null) ? null : plan.whyNotTech(person, unit);
+        boolean canTake = (person != null) && (reason == null);
 
         JPanel right = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        // Someone who is not a tech at all was selected for a seat, so the tech line says nothing about them
-        Person person = selected.isEmpty() ? null : selected.get(0);
-        if ((person != null) && person.isTech()) {
-            Reason reason = plan.whyNotTech(person, unit);
-            if (reason == null) {
-                right.add(assignButton(getFormattedTextAt(RESOURCE_BUNDLE, (tech == null) ? "board.assignTech" :
-                                                                                 "board.replaceTech",
-                      person.getFullName(), plan.techMinutesNeeded(person, unit)), () -> actions.assignTech(unit)));
-            } else if (reason != Reason.ALREADY_ABOARD) {
-                right.add(Hud.hint(CrewRowRenderers.reasonText(reason)));
-            }
+        if (canTake && (tech == null)) {
+            HudButton assign = assignButton(getFormattedTextAt(RESOURCE_BUNDLE, "board.assign.one",
+                  person.getFullName()), () -> actions.assignTech(unit));
+            assign.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "board.assignTech.toolTipText",
+                  plan.techMinutesNeeded(person, unit)));
+            right.add(assign);
+        } else if ((reason != null) && (reason != Reason.ALREADY_ABOARD) && (person.isTech() || isTechsPage())) {
+            // On the Assign page, someone who is not a tech at all was selected for a seat, so nothing is said here
+            right.add(Hud.hint((reason == Reason.NOT_QUALIFIED) ? text("board.tech.notQualified") :
+                                     CrewRowRenderers.reasonText(reason)));
         }
-
         JPanel line = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
-        line.add(left, BorderLayout.CENTER);
+        line.add(Hud.eyebrow(text("board.tech") + "  " + ((tech == null) ? 0 : 1) + "/1"), BorderLayout.WEST);
         line.add(right, BorderLayout.EAST);
         card.add(leftAligned(line));
+
+        JPanel holder = wrap(10);
+        if (tech == null) {
+            int minutes = ((person != null) && person.isTech()) ? plan.techMinutesNeeded(person, unit) :
+                                unit.getMaintenanceTime();
+            holder.add(colored(getFormattedTextAt(RESOURCE_BUNDLE, "board.tech.open", minutes), AMBER));
+        } else {
+            JPanel occupant = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
+            boolean isStaged = plan.techChangeFor(unit) != null;
+            String title = tech.getFullTitle();
+            occupant.add(Hud.link(isStaged ? getFormattedTextAt(RESOURCE_BUNDLE, "board.staged", title) : title,
+                  () -> actions.openPerson(tech)));
+            occupant.add(Box.createHorizontalStrut(scaleForGUI(5)));
+            occupant.add(removeMark(getFormattedTextAt(RESOURCE_BUNDLE, "board.removeTech.toolTipText", title),
+                  () -> actions.removeTech(unit)));
+            if (canTake) {
+                // As a full seat does: the selected person can take the place of whoever holds it
+                occupant.add(Box.createHorizontalStrut(scaleForGUI(6)));
+                JLabel replace = Hud.link(text("board.replace"), () -> actions.assignTech(unit));
+                replace.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "board.replaceTech.toolTipText", title,
+                      person.getFullTitle(), plan.techMinutesNeeded(person, unit)));
+                occupant.add(replace);
+            }
+            holder.add(occupant);
+        }
+        card.add(leftAligned(holder));
     }
 
     /**
