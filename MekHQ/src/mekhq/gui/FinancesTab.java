@@ -42,6 +42,8 @@ import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.GridLayout;
+import java.awt.event.MouseWheelEvent;
+import java.awt.geom.Point2D;
 import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
@@ -88,11 +90,14 @@ import mekhq.gui.sorter.DateStringComparator;
 import mekhq.gui.sorter.FormattedNumberSorter;
 import org.jfree.chart.ChartFactory;
 import org.jfree.chart.ChartPanel;
+import org.jfree.chart.ChartRenderingInfo;
 import org.jfree.chart.JFreeChart;
 import org.jfree.chart.axis.DateAxis;
 import org.jfree.chart.plot.CategoryPlot;
 import org.jfree.chart.plot.Plot;
+import org.jfree.chart.plot.PlotRenderingInfo;
 import org.jfree.chart.plot.XYPlot;
+import org.jfree.chart.plot.Zoomable;
 import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.ui.RectangleEdge;
@@ -131,6 +136,9 @@ public final class FinancesTab extends CampaignGuiTab {
         super(gui, name);
     }
     //endregion Constructors
+
+    /** How much one notch of a mouse wheel zooms a chart by (0.10 = 10%), matching JFreeChart's default. */
+    private static final double CHART_WHEEL_ZOOM_STEP = 0.10;
 
     private enum GraphType {
         BALANCE_AMOUNT, MONTHLY_FINANCES, NETWORTH_OVER_TIME
@@ -377,8 +385,55 @@ public final class FinancesTab extends CampaignGuiTab {
         }
         ChartPanel panel = new ChartPanel(chart, false);
         panel.setFillZoomRectangle(true);
-        panel.setMouseWheelEnabled(true);
+        // JFreeChart's built-in wheel handler only looks at getWheelRotation(), which is 0 for the fine-grained events
+        // trackpads send, and it treats 0 as "zoom out". That makes zooming in impossible on a trackpad, so we use our
+        // own handler instead.
+        panel.setMouseWheelEnabled(false);
+        panel.addMouseWheelListener(event -> handleChartMouseWheel(panel, event));
         return panel;
+    }
+
+    /**
+     * Zooms a chart in or out around the mouse pointer in response to mouse-wheel or trackpad scrolling.
+     *
+     * <p>Unlike JFreeChart's default handler, this uses {@link MouseWheelEvent#getPreciseWheelRotation()} so that the
+     * small fractional scrolls produced by trackpads zoom in the correct direction and in proportion to how far the
+     * user scrolled. Scrolling up/away zooms in; scrolling down/towards zooms out.</p>
+     *
+     * @param panel the chart panel that received the event
+     * @param event the mouse-wheel event
+     */
+    private static void handleChartMouseWheel(ChartPanel panel, MouseWheelEvent event) {
+        double rotation = event.getPreciseWheelRotation();
+        if (rotation == 0.0 || panel.getChart() == null) {
+            return;
+        }
+
+        if (!(panel.getChart().getPlot() instanceof Zoomable zoomable)) {
+            return;
+        }
+
+        ChartRenderingInfo renderingInfo = panel.getChartRenderingInfo();
+        PlotRenderingInfo plotInfo = renderingInfo.getPlotInfo();
+        Point2D point = panel.translateScreenToJava2D(event.getPoint());
+        if (!plotInfo.getDataArea().contains(point)) {
+            return;
+        }
+
+        // Positive rotation (scrolling down/towards the user) gives a factor above 1 (zoom out), negative rotation
+        // gives a factor below 1 (zoom in). Scaling by the precise rotation keeps trackpad zooming smooth.
+        double zoomFactor = Math.pow(1.0 + CHART_WHEEL_ZOOM_STEP, rotation);
+
+        Plot plot = (Plot) zoomable;
+        boolean notifyState = plot.isNotify();
+        plot.setNotify(false);
+        if (panel.isDomainZoomable()) {
+            zoomable.zoomDomainAxes(zoomFactor, plotInfo, point, true);
+        }
+        if (panel.isRangeZoomable()) {
+            zoomable.zoomRangeAxes(zoomFactor, plotInfo, point, true);
+        }
+        plot.setNotify(notifyState);
     }
 
     private JFreeChart createAmountChart(XYDataset dataset) {
