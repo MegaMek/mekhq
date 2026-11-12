@@ -32,6 +32,8 @@
  */
 package mekhq.gui;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridBagConstraints;
@@ -530,8 +532,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
         btnMRMSInstantAll.addActionListener(evt -> {
             MRMSService.mrmsAllUnits(getCampaign());
             JOptionPane.showMessageDialog(getCampaignGui().getFrame(),
-                  "Mass Repair/Salvage complete.",
-                  "Complete",
+                  getTextAt("mekhq.resources.CampaignGUI", "CommandCenterTab.button.mrms.report"),
+                  getTextAt("mekhq.resources.CampaignGUI", "CommandCenterTab.button.mrms.title"),
                   JOptionPane.INFORMATION_MESSAGE);
         });
         return btnMRMSInstantAll;

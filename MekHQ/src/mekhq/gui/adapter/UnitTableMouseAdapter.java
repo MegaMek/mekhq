@@ -687,8 +687,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equals(COMMAND_FLUFF_NAME)) { // Single Unit only
             String fluffName = (String) JOptionPane.showInputDialog(gui.getFrame(),
-                  "Name for this unit?",
-                  "Unit Name",
+                  getTextAt(RESOURCE_BUNDLE, "editUnitName.message"),
+                  getTextAt(RESOURCE_BUNDLE, "editUnitName.title"),
                   JOptionPane.QUESTION_MESSAGE,
                   null,
                   null,
@@ -761,7 +761,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     continue;
                 }
 
+                boolean wasMaintenanceDue = unit.getDaysSinceMaintenance() != 0;
                 Maintenance.performImmediateMaintenance(campaign, unit);
+
+                boolean wasMaintained = wasMaintenanceDue && (unit.getDaysSinceMaintenance() == 0);
+                if (wasMaintained && (units.length == 1)) {
+                    new MaintenanceReportDialog(gui.getFrame(), unit).setVisible(true);
+                }
             }
         }
     }
@@ -1055,14 +1061,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (oneActive) {
-                menuItem = new JMenuItem(oneSelected ? "Mothball" : "Mass Mothball");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE,
+                      oneSelected ? "mothballUnit.text" : "mothballUnit.mass.text"));
                 menuItem.setActionCommand(COMMAND_MOTHBALL);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }
 
             if (oneMothballed) {
-                menuItem = new JMenuItem(oneSelected ? "Activate" : "Mass Activate");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE,
+                      oneSelected ? "activateUnit.text" : "activateUnit.mass.text"));
                 menuItem.setActionCommand(COMMAND_ACTIVATE);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
@@ -1135,7 +1143,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (oneSelected && gui.getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE)) {
-                menuItem = new JMenuItem("Show Part Quality Report");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "partsQualityReport.text"));
                 menuItem.setActionCommand(COMMAND_PARTS_REPORT);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
@@ -1358,7 +1366,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             // sell unit
             if (!allDeployed && gui.getCampaign().getCampaignOptions().get(CampaignOption.SELL_UNITS)) {
                 popup.addSeparator();
-                menuItem = new JMenuItem("Sell Unit");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE,
+                      oneSelected ? "sellUnit.text" : "sellUnit.multiple.text"));
                 menuItem.setActionCommand(COMMAND_SELL);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);

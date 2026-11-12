@@ -821,8 +821,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         RoundedJButton btnNeededParts = new RoundedJButton(resourceMap.getString("btnNeededParts.text"));
         btnNeededParts.setToolTipText(resourceMap.getString("btnNeededParts.toolTipText"));
-        btnNeededParts.addActionListener(evt -> new AcquisitionsDialog(getFrame(), true, getCampaignGui()).setVisible(
-              true));
+        btnNeededParts.addActionListener(evt -> {
+            AcquisitionsDialog acquisitionsDialog = new AcquisitionsDialog(getFrame(), true, getCampaignGui());
+            acquisitionsDialog.setTitle(resourceMap.getString("btnNeededParts.text"));
+            acquisitionsDialog.setVisible(true);
+        });
         panProcurementButtons.add(btnNeededParts);
 
         RoundedJButton btnPartsReport = new RoundedJButton(resourceMap.getString("btnPartsReport.text"));
