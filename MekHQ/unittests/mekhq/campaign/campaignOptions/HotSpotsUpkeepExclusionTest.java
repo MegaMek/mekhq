@@ -73,7 +73,9 @@ class HotSpotsUpkeepExclusionTest {
     @CsvSource({ "false, false, false", "true, false, true", "false, true, false", "true, true, false" })
     void peacetimeCostIsOnlyChargedWithoutUpkeep(boolean usePeacetimeCost, boolean payForUpkeep, boolean expected) {
         CampaignOptions campaignOptions = new CampaignOptions();
-        campaignOptions.set(CampaignOption.USE_PEACETIME_COST, usePeacetimeCost);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS, usePeacetimeCost);
+        campaignOptions.set(CampaignOption.PAY_FOR_TRAINING_MUNITIONS, usePeacetimeCost);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_FUEL, usePeacetimeCost);
         campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, payForUpkeep);
 
         assertEquals(expected, campaignOptions.isChargingPeacetimeCost());
@@ -85,12 +87,14 @@ class HotSpotsUpkeepExclusionTest {
         CampaignOptions campaignOptions = new CampaignOptions();
         campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, true);
         campaignOptions.set(CampaignOption.PAY_FOR_OVERHEAD, true);
-        campaignOptions.set(CampaignOption.USE_PEACETIME_COST, true);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS, true);
+        campaignOptions.set(CampaignOption.PAY_FOR_TRAINING_MUNITIONS, true);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_FUEL, true);
         campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, true);
 
         assertTrue(campaignOptions.get(CampaignOption.PAY_FOR_MAINTAIN));
         assertTrue(campaignOptions.get(CampaignOption.PAY_FOR_OVERHEAD));
-        assertTrue(campaignOptions.get(CampaignOption.USE_PEACETIME_COST));
+        assertTrue(campaignOptions.isAnyPeacetimeCostSelected());
 
         campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, false);
 
@@ -142,7 +146,7 @@ class HotSpotsUpkeepExclusionTest {
 
         assertEquals(campaignOptions.get(CampaignOption.PAY_FOR_MAINTAIN), campaignOptions.isChargingMaintenance());
         assertEquals(campaignOptions.get(CampaignOption.PAY_FOR_OVERHEAD), campaignOptions.isChargingOverhead());
-        assertEquals(campaignOptions.get(CampaignOption.USE_PEACETIME_COST),
+        assertEquals(campaignOptions.isAnyPeacetimeCostSelected(),
               campaignOptions.isChargingPeacetimeCost());
     }
 }

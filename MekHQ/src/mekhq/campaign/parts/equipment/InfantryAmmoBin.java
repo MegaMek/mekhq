@@ -218,6 +218,20 @@ public class InfantryAmmoBin extends AmmoBin {
         return Money.of(getWeaponType().getAmmoCost() / getWeaponType().getAmmoWeight());
     }
 
+    /**
+     * Infantry ammunition is priced from its weapon rather than from the munition in the bin, which is already the
+     * ordinary price.
+     */
+    @Override
+    protected Money getStandardMunitionPricePerTon() {
+        return getPricePerTon();
+    }
+
+    @Override
+    protected int getStandardMunitionShotsPerTon() {
+        return getShotsPerTon();
+    }
+
     @Override
     protected int getShotsPerTon() {
         return (int) Math.floor(getWeaponType().getShots() / getWeaponType().getAmmoWeight());

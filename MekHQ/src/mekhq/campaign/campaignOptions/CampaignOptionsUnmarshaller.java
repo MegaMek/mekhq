@@ -148,6 +148,17 @@ public class CampaignOptionsUnmarshaller {
             // Removed option: the strategic view always uses the default minimap theme now.
             case "strategicViewTheme" -> {
             }
+            // 0.51.01 compatibility: one switch replaced by separate spare parts, training munitions and fuel options.
+            case "usePeacetimeCost" -> {
+                if (parseBoolean(nodeContents)) {
+                    campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS, true);
+                    campaignOptions.set(CampaignOption.PAY_FOR_TRAINING_MUNITIONS, true);
+                    campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_FUEL, true);
+                }
+            }
+            // Removed option: spare parts now always pay the acquisition price multipliers (CO p.24).
+            case "useExtendedPartsModifier" -> {
+            }
             default -> LOGGER.warn("Potentially unexpected entry in campaign options: {}", nodeName);
         }
     }

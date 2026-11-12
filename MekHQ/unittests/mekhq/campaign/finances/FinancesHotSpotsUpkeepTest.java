@@ -87,7 +87,9 @@ class FinancesHotSpotsUpkeepTest {
         campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, true);
         campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, true);
         campaignOptions.set(CampaignOption.PAY_FOR_OVERHEAD, true);
-        campaignOptions.set(CampaignOption.USE_PEACETIME_COST, true);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS, true);
+        campaignOptions.set(CampaignOption.PAY_FOR_TRAINING_MUNITIONS, true);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_FUEL, true);
         campaignOptions.set(CampaignOption.SHOW_PEACETIME_COST, false);
         campaignOptions.set(CampaignOption.PAY_FOR_SALARIES, false);
         campaignOptions.set(CampaignOption.USE_TAXES, false);
@@ -167,7 +169,9 @@ class FinancesHotSpotsUpkeepTest {
     @Test
     void withoutUpkeepOverheadIsChargedInstead() {
         campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, false);
-        campaignOptions.set(CampaignOption.USE_PEACETIME_COST, false);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS, false);
+        campaignOptions.set(CampaignOption.PAY_FOR_TRAINING_MUNITIONS, false);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_FUEL, false);
 
         newDay(FIRST_OF_MONTH);
 

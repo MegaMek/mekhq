@@ -82,9 +82,10 @@ class FinancesGeneralPage {
     private JPanel pnlGeneralOptions;
     private JCheckBox useLoanLimitsBox;
     private JCheckBox usePercentageMaintenanceBox;
-    private JCheckBox useExtendedPartsModifierBox;
-    private JCheckBox usePeacetimeCostBox;
     private JCheckBox showPeacetimeCostBox;
+    private JCheckBox payForPeacetimeSparePartsBox;
+    private JCheckBox payForTrainingMunitionsBox;
+    private JCheckBox payForPeacetimeFuelBox;
     private JLabel lblFinancialYearDuration;
     private MMComboBox<FinancialYearDuration> comboFinancialYearDuration;
     private JCheckBox newFinancialYearFinancesToCSVExportBox;
@@ -334,13 +335,15 @@ class FinancesGeneralPage {
         usePercentageMaintenanceBox = new CampaignOptionsCheckBox("UsePercentageMaintenanceBox",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         usePercentageMaintenanceBox.addMouseListener(createTipPanelUpdater("UsePercentageMaintenanceBox"));
-        useExtendedPartsModifierBox = new CampaignOptionsCheckBox("UseExtendedPartsModifierBox");
-        useExtendedPartsModifierBox.addMouseListener(createTipPanelUpdater("UseExtendedPartsModifierBox"));
-        usePeacetimeCostBox = new CampaignOptionsCheckBox("UsePeacetimeCostBox");
-        usePeacetimeCostBox.addMouseListener(createTipPanelUpdater("UsePeacetimeCostBox"));
         showPeacetimeCostBox = new CampaignOptionsCheckBox("ShowPeacetimeCostBox");
         showPeacetimeCostBox
                 .addMouseListener(createTipPanelUpdater("ShowPeacetimeCostBox"));
+        payForPeacetimeSparePartsBox = new CampaignOptionsCheckBox("PayForPeacetimeSparePartsBox");
+        payForPeacetimeSparePartsBox.addMouseListener(createTipPanelUpdater("PayForPeacetimeSparePartsBox"));
+        payForTrainingMunitionsBox = new CampaignOptionsCheckBox("PayForTrainingMunitionsBox");
+        payForTrainingMunitionsBox.addMouseListener(createTipPanelUpdater("PayForTrainingMunitionsBox"));
+        payForPeacetimeFuelBox = new CampaignOptionsCheckBox("PayForPeacetimeFuelBox");
+        payForPeacetimeFuelBox.addMouseListener(createTipPanelUpdater("PayForPeacetimeFuelBox"));
 
         lblFinancialYearDuration = new CampaignOptionsLabel("FinancialYearDuration",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
@@ -393,9 +396,10 @@ class FinancesGeneralPage {
         panel.addCheckBoxGrid(2,
                 useLoanLimitsBox,
                 usePercentageMaintenanceBox,
-                useExtendedPartsModifierBox,
-                usePeacetimeCostBox,
                 showPeacetimeCostBox,
+                payForPeacetimeSparePartsBox,
+                payForTrainingMunitionsBox,
+                payForPeacetimeFuelBox,
                 newFinancialYearFinancesToCSVExportBox,
                 chkSimulateGrayMonday,
                 chkUsePlanetaryCostReductions,
@@ -571,9 +575,10 @@ class FinancesGeneralPage {
 
         useLoanLimitsBox.setSelected(model.useLoanLimits);
         usePercentageMaintenanceBox.setSelected(model.usePercentageMaintenance);
-        useExtendedPartsModifierBox.setSelected(model.useExtendedPartsModifier);
-        usePeacetimeCostBox.setSelected(model.usePeacetimeCost);
         showPeacetimeCostBox.setSelected(model.showPeacetimeCost);
+        payForPeacetimeSparePartsBox.setSelected(model.payForPeacetimeSpareParts);
+        payForTrainingMunitionsBox.setSelected(model.payForTrainingMunitions);
+        payForPeacetimeFuelBox.setSelected(model.payForPeacetimeFuel);
         comboFinancialYearDuration.setSelectedItem(model.financialYearDuration);
         newFinancialYearFinancesToCSVExportBox.setSelected(model.newFinancialYearFinancesToCSVExport);
         chkSimulateGrayMonday.setSelected(model.simulateGrayMonday);
@@ -638,8 +643,8 @@ class FinancesGeneralPage {
      */
     private void updateHotSpotsUpkeepExclusions() {
         boolean isPayForHotSpotsUpkeep = payForHotSpotsUpkeepBox.isSelected();
-        JCheckBox[] excludedBoxes = { payForMaintainBox, payForOverheadBox, usePeacetimeCostBox,
-                                      showPeacetimeCostBox };
+        JCheckBox[] excludedBoxes = { payForMaintainBox, payForOverheadBox, payForPeacetimeSparePartsBox,
+                                      payForTrainingMunitionsBox, payForPeacetimeFuelBox, showPeacetimeCostBox };
 
         for (JCheckBox excludedBox : excludedBoxes) {
             if (isPayForHotSpotsUpkeep) {
@@ -664,9 +669,10 @@ class FinancesGeneralPage {
 
         model.useLoanLimits = useLoanLimitsBox.isSelected();
         model.usePercentageMaintenance = usePercentageMaintenanceBox.isSelected();
-        model.useExtendedPartsModifier = useExtendedPartsModifierBox.isSelected();
-        model.usePeacetimeCost = usePeacetimeCostBox.isSelected();
         model.showPeacetimeCost = showPeacetimeCostBox.isSelected();
+        model.payForPeacetimeSpareParts = payForPeacetimeSparePartsBox.isSelected();
+        model.payForTrainingMunitions = payForTrainingMunitionsBox.isSelected();
+        model.payForPeacetimeFuel = payForPeacetimeFuelBox.isSelected();
         model.financialYearDuration = comboFinancialYearDuration.getSelectedItem();
         model.newFinancialYearFinancesToCSVExport = newFinancialYearFinancesToCSVExportBox.isSelected();
         model.simulateGrayMonday = chkSimulateGrayMonday.isSelected();

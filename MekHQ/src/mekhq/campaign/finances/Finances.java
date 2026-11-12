@@ -400,7 +400,10 @@ public class Finances {
 
         // Handle peacetime operating expenses, payroll, and loan payments
         if (isNewMonth) {
-            if (campaignOptions.isChargingPeacetimeCost()) {
+            boolean isChargingSpareParts = campaignOptions.isChargingPeacetimeSpareParts();
+            boolean isChargingTrainingMunitions = campaignOptions.isChargingPeacetimeTrainingMunitions();
+            boolean isChargingFuel = campaignOptions.isChargingPeacetimeFuel();
+            if (isChargingSpareParts || isChargingTrainingMunitions || isChargingFuel) {
                 if (!campaignOptions.get(CampaignOption.SHOW_PEACETIME_COST)) {
                     // Do not include salaries as that will be tracked below
                     Money peacetimeCost = accountant.getPeacetimeCost(false);
@@ -415,39 +418,46 @@ public class Finances {
                         addReportInsufficientFunds(campaign, resourceMap.getString("OperatingCosts.text"));
                     }
                 } else {
-                    Money sparePartsCost = accountant.getMonthlySpareParts();
-                    Money ammoCost = accountant.getMonthlyAmmo();
-                    Money fuelCost = accountant.getMonthlyFuel();
-
-                    if (debit(TransactionType.MAINTENANCE,
-                          today,
-                          sparePartsCost,
-                          resourceMap.getString("PeacetimeCostsParts.title"))) {
-                        campaign.addReport(FINANCES, String.format(resourceMap.getString("PeacetimeCostsParts.text"),
-                              sparePartsCost.toAmountAndSymbolString()));
-                    } else {
-                        addReportInsufficientFunds(campaign, resourceMap.getString("SpareParts.text"));
+                    if (isChargingSpareParts) {
+                        Money sparePartsCost = accountant.getMonthlySpareParts();
+                        if (debit(TransactionType.MAINTENANCE,
+                              today,
+                              sparePartsCost,
+                              resourceMap.getString("PeacetimeCostsParts.title"))) {
+                            campaign.addReport(FINANCES,
+                                  String.format(resourceMap.getString("PeacetimeCostsParts.text"),
+                                        sparePartsCost.toAmountAndSymbolString()));
+                        } else {
+                            addReportInsufficientFunds(campaign, resourceMap.getString("SpareParts.text"));
+                        }
                     }
 
-                    if (debit(TransactionType.MAINTENANCE,
-                          today,
-                          ammoCost,
-                          resourceMap.getString("PeacetimeCostsAmmunition.title"))) {
-                        campaign.addReport(FINANCES,
-                              String.format(resourceMap.getString("PeacetimeCostsAmmunition.text"),
-                                    ammoCost.toAmountAndSymbolString()));
-                    } else {
-                        addReportInsufficientFunds(campaign, resourceMap.getString("TrainingMunitions.text"));
+                    if (isChargingTrainingMunitions) {
+                        Money ammoCost = accountant.getMonthlyAmmo();
+                        if (debit(TransactionType.MAINTENANCE,
+                              today,
+                              ammoCost,
+                              resourceMap.getString("PeacetimeCostsAmmunition.title"))) {
+                            campaign.addReport(FINANCES,
+                                  String.format(resourceMap.getString("PeacetimeCostsAmmunition.text"),
+                                        ammoCost.toAmountAndSymbolString()));
+                        } else {
+                            addReportInsufficientFunds(campaign, resourceMap.getString("TrainingMunitions.text"));
+                        }
                     }
 
-                    if (debit(TransactionType.MAINTENANCE,
-                          today,
-                          fuelCost,
-                          resourceMap.getString("PeacetimeCostsFuel.title"))) {
-                        campaign.addReport(FINANCES, String.format(resourceMap.getString("PeacetimeCostsFuel.text"),
-                              fuelCost.toAmountAndSymbolString()));
-                    } else {
-                        addReportInsufficientFunds(campaign, resourceMap.getString("Fuel.text"));
+                    if (isChargingFuel) {
+                        Money fuelCost = accountant.getMonthlyFuel();
+                        if (debit(TransactionType.MAINTENANCE,
+                              today,
+                              fuelCost,
+                              resourceMap.getString("PeacetimeCostsFuel.title"))) {
+                            campaign.addReport(FINANCES,
+                                  String.format(resourceMap.getString("PeacetimeCostsFuel.text"),
+                                        fuelCost.toAmountAndSymbolString()));
+                        } else {
+                            addReportInsufficientFunds(campaign, resourceMap.getString("Fuel.text"));
+                        }
                     }
                 }
             }

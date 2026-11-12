@@ -126,7 +126,7 @@ public class BAArmor extends Armor {
 
     @Override
     public Money getBuyCost() {
-        return getActualValue();
+        return getPurchaseCost();
     }
 
     @Override
