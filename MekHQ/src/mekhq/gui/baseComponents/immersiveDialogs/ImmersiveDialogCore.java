@@ -70,7 +70,6 @@ import megamek.common.icons.Portrait;
 import megamek.common.ui.AppIcons;
 import megamek.common.ui.FastJScrollPane;
 import megamek.logging.MMLogger;
-import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.force.Formation;
@@ -456,7 +455,7 @@ public class ImmersiveDialogCore extends JDialog {
      * Sets the title of the dialog window using localized text.
      */
     protected void setTitle() {
-        setTitle(MHQConstants.PROJECT_NAME);
+        setTitle(getText("incomingTransmission.title"));
     }
 
     private String getSourceLabel(Person speaker) {

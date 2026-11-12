@@ -531,7 +531,7 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             MRMSService.mrmsAllUnits(getCampaign());
             JOptionPane.showMessageDialog(getCampaignGui().getFrame(),
                   "Mass Repair/Salvage complete.",
-                  "Complete",
+                  "Instant Mass Repair/Salvage Complete",
                   JOptionPane.INFORMATION_MESSAGE);
         });
         return btnMRMSInstantAll;
