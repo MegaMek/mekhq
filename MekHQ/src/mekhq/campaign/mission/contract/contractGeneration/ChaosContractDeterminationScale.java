@@ -45,6 +45,7 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.unit.Unit;
 
 public class ChaosContractDeterminationScale {
@@ -103,6 +104,17 @@ public class ChaosContractDeterminationScale {
         return scale;
     }
 
+    /**
+     * Only Frontline and Maneuver formations count toward Scale. Patrol is a combat role elsewhere, but not here.
+     *
+     * @param role the formation's combat role
+     *
+     * @return {@code true} if a formation with this role counts toward Scale
+     */
+    private static boolean isScaleRole(CombatRole role) {
+        return role != null && (role.isFrontline() || role.isManeuver());
+    }
+
     static double generateScaleForDetachment(PlayerForce playerForce, LocalHangar hangar,
           boolean convertSupportPointsToBattleValue) {
         int validBattleValue = 0;
@@ -111,7 +123,7 @@ public class ChaosContractDeterminationScale {
             int formationId = unit.getFormationId();
             Formation formation = playerForce.getFormation(formationId);
             if (formation != null) {
-                if (formation.isFormationType(STANDARD) && formation.getCombatRoleInMemory().isCombatRole()) {
+                if (formation.isFormationType(STANDARD) && isScaleRole(formation.getCombatRoleInMemory())) {
                     Entity entity = unit.getEntity();
                     validBattleValue += entity != null ? entity.calculateBattleValue(true, true) : 0;
                 }
@@ -123,9 +135,9 @@ public class ChaosContractDeterminationScale {
 
     /**
      * Determines the Scale of the player's entire TO&amp;E, for Hot Spots upkeep. Unlike
-     * {@link #generateScaleForDetachment(PlayerForce, LocalHangar, boolean)}, every unit assigned to a
-     * formation counts, regardless of formation type or combat role. Units outside the TO&amp;E and mothballed units
-     * are ignored.
+     * {@link #generateScaleForDetachment(PlayerForce, LocalHangar, boolean)}, every unit assigned to a Frontline or
+     * Maneuver formation counts, regardless of formation type. Units outside the TO&amp;E, units in other roles, and
+     * mothballed units are ignored.
      *
      * @param playerForce                       the player force whose TO&amp;E is weighed
      * @param hangar                            the hangar holding the player force's units
@@ -166,7 +178,7 @@ public class ChaosContractDeterminationScale {
             }
 
             Formation formation = playerForce.getFormation(unit.getFormationId());
-            if (formation != null) {
+            if (formation != null && isScaleRole(formation.getCombatRoleInMemory())) {
                 Entity entity = unit.getEntity();
                 totalBattleValue += entity != null ? entity.calculateBattleValue(true, true) : 0;
             }
