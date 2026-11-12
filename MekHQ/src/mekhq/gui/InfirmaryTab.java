@@ -499,7 +499,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
                 boolean canAssignToDoctor = canAssignToDoctor(doctor);
                 Person patient = unassignedPatientModel.getElementAt(i);
 
-                if (null != patient && patient.needsFixing() && canAssignToDoctor) {
+                if (null != patient && patient.needsFixing() && canAssignToDoctor
+                          && !patient.getId().equals(doctor.getId())) {
                     patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
                     break;
@@ -509,7 +510,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
             for (Person patient : selectedPatients) {
                 boolean canAssignToDoctor = canAssignToDoctor(doctor);
 
-                if (null != patient && patient.needsFixing() && canAssignToDoctor) {
+                if (null != patient && patient.needsFixing() && canAssignToDoctor
+                          && !patient.getId().equals(doctor.getId())) {
                     patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
                 }

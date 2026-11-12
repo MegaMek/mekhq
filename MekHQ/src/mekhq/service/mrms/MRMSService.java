@@ -330,21 +330,30 @@ public class MRMSService {
             units.add(unit);
         }
 
-        // Sort the list status fixing the least damaged first
-        units.sort((o1, o2) -> {
-            int damageIdx1 = UnitStatusSorter.getDamageStateIndex(Unit.getDamageStateName(o1.getDamageState()));
-            int damageIdx2 = UnitStatusSorter.getDamageStateIndex(Unit.getDamageStateName(o2.getDamageState()));
-
-            if (damageIdx2 == damageIdx1) {
-                return 0;
-            } else if (damageIdx2 < damageIdx1) {
-                return -1;
-            }
-
-            return 1;
-        });
-
         mrmsUnits(campaign, units, configuredOptions);
+    }
+
+    /**
+     * Puts units in the order Mass Repair works on them: units with crew assigned first, then the least damaged first.
+     * Every Mass Repair run uses this order: New Day, Instant, and the units picked in the Mass Repair dialog.
+     *
+     * <p>Each unit takes all the tech time it can use before the next is looked at, so the order decides who goes
+     * without. Crewed units are the ones the player means to field, so they come before uncrewed ones, such as
+     * salvage or spares in the hangar, however damaged either is.</p>
+     *
+     * @param units the units to sort, in place
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void sortByRepairPriority(List<Unit> units) {
+        Comparator<Unit> crewedFirst = Comparator.comparing(unit -> unit.getCrew().isEmpty());
+        Comparator<Unit> leastDamagedFirst = Comparator.comparingInt(MRMSService::getDamageStateIndex).reversed();
+        units.sort(crewedFirst.thenComparing(leastDamagedFirst));
+    }
+
+    private static int getDamageStateIndex(Unit unit) {
+        return UnitStatusSorter.getDamageStateIndex(Unit.getDamageStateName(unit.getDamageState()));
     }
 
     public static void mrmsUnits(Campaign campaign, List<Unit> units, MRMSConfiguredOptions configuredOptions) {
@@ -356,7 +365,11 @@ public class MRMSService {
         Map<MRMSUnitAction.STATUS, List<MRMSUnitAction>> unitActionsByStatus = new HashMap<>();
         List<MRMSOption> activeMRMSOptions = configuredOptions.getActiveMRMSOptions();
 
-        for (Unit unit : units) {
+        // Sorted copy, so the caller's list (such as the dialog's selection) is left as it was
+        List<Unit> unitsInRepairOrder = new ArrayList<>(units);
+        sortByRepairPriority(unitsInRepairOrder);
+
+        for (Unit unit : unitsInRepairOrder) {
             MRMSUnitAction unitAction = performUnitMRMS(campaign,
                   unit,
                   unit.isSalvage(),
