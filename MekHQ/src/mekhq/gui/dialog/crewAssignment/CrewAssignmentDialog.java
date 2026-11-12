@@ -658,7 +658,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             if (!isAssigned) {
                 unassigned++;
             }
-            if ((state.assignment == Assignment.EVERYONE) || ((state.assignment == Assignment.ASSIGNED) == isAssigned)) {
+            if ((state.assignment == Assignment.EVERYONE)
+                      || ((state.assignment == Assignment.ASSIGNED) == isAssigned)) {
                 roleTotal++;
                 for (PersonnelRole role : List.of(person.getPrimaryRole(), person.getSecondaryRole())) {
                     if (CrewAssignmentState.isFilterableRole(role)) {

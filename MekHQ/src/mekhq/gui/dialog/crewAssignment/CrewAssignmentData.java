@@ -157,9 +157,9 @@ final class CrewAssignmentData {
     }
 
     /**
-     * Whether someone is listed in the dialog's list of people. They must be active and employed by the campaign, so camp
-     * followers are never listed, and have a combat role, be a tech, or have a profession that can take a vehicle's
-     * crew seat. Other support staff are not listed.
+     * Whether someone is listed in the dialog's list of people. They must be active and employed by the campaign, so
+     * camp followers are never listed, and have a combat role, be a tech, or have a profession that can take a
+     * vehicle's crew seat. Other support staff are not listed.
      *
      * @param person a person
      *
