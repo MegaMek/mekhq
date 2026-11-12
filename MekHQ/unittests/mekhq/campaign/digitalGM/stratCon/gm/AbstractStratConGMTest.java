@@ -248,7 +248,7 @@ class AbstractStratConGMTest {
     }
 
     @Test
-    void getFacilityStrategyEffectsAndForceReturnsRunForEveryTrack() {
+    void getFacilityStrategyEffectsRunForEveryTrack() {
         StratConTrackState track1 = trackWith();
         StratConTrackState track2 = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track1, track2), new ArrayList<>());
@@ -259,8 +259,60 @@ class AbstractStratConGMTest {
 
         // The loop always calls facility(); skipping in Mapless/Singles is handled by wiring a NoOpFacilityStrategy
         verify(gm.facility, times(2)).applyPeriodicEffects(any(), eq(campaignState), anyBoolean());
+    }
+
+    @Test
+    void handleNewDayLeavesForceReturnsToTheEarlierStep() {
+        StratConTrackState track = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        TestGM gm = new TestGM(false);
+
+        gm.handleNewDay(newDay(TUESDAY, contract));
+
+        // Returns run before the hangar is processed (processForceReturns); running them again here would roll patrol
+        // returns twice
+        verify(gm.lifecycle, never()).processForceReturnDates(any(), any());
+    }
+
+    @Test
+    void processForceReturnsRunsForEveryTrack() {
+        StratConTrackState track1 = trackWith();
+        StratConTrackState track2 = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track1, track2), new ArrayList<>());
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        TestGM gm = new TestGM(false);
+
+        gm.processForceReturns(newDay(TUESDAY, contract).getCampaign());
+
         verify(gm.lifecycle).processForceReturnDates(eq(track1), any());
         verify(gm.lifecycle).processForceReturnDates(eq(track2), any());
+    }
+
+    @Test
+    void processForceReturnsSkipsContractsWithoutStratCon() {
+        AbstractContract contract = contractWith(null, ContractMoraleLevel.STALEMATE);
+        TestGM gm = new TestGM(false);
+
+        gm.processForceReturns(newDay(TUESDAY, contract).getCampaign());
+
+        verifyNoInteractions(gm.lifecycle);
+    }
+
+    @Test
+    void processForceReturnsClearsPhantomScenariosFirst() {
+        StratConScenario phantom = scenario(null, false);
+        StratConScenario strategicObjective = scenario(null, false);
+        when(strategicObjective.isStrategicObjective()).thenReturn(true);
+        StratConTrackState track = trackWith(phantom, strategicObjective);
+        StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        TestGM gm = new TestGM(false);
+
+        gm.processForceReturns(newDay(TUESDAY, contract).getCampaign());
+
+        verify(track).removeScenario(phantom);
+        verify(track, never()).removeScenario(strategicObjective);
     }
 
     @Test

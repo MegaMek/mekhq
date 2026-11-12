@@ -890,6 +890,19 @@ public abstract class AbstractContract {
         return employerData.factionCode();
     }
 
+    /**
+     * The code of the faction whose Faction Standing governs this contract's employer side - and so whose regard
+     * decides perks such as Command Circuit access. This is the covert sponsor when there is one (for a false flag
+     * operation, the real backer rather than the front), otherwise the employer.
+     *
+     * @return the employer's sponsor code when one exists, otherwise the employer's faction code
+     *
+     * @see #getStandingEmployerFaction()
+     */
+    public String getStandingEmployerFactionCode() {
+        return employerData.standingFactionCode();
+    }
+
     public Faction getEmployerFaction() {
         return employerData.getFaction();
     }

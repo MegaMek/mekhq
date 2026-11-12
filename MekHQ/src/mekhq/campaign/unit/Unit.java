@@ -7056,7 +7056,15 @@ public class Unit implements ITechnology, ILocatable {
      * @return {@code true} if the person is assigned to this unit
      */
     private boolean isServingAboard(Person person) {
-        return equals(person.getUnit());
+        Unit personUnit = person.getUnit();
+        if (personUnit == null) {
+            return false;
+        }
+
+        // Matched by id, not equals(): while a campaign loads, a person's unit is a placeholder of another class until
+        // their references are fixed, and the engineer is chosen before then. Failing that match left a ship with no
+        // engineer, which cancelled its activation or mothballing and its scheduled repairs on every load.
+        return (personUnit == this) || ((id != null) && id.equals(personUnit.getId()));
     }
 
     /**
@@ -8245,8 +8253,9 @@ public class Unit implements ITechnology, ILocatable {
 
         setMothballTime(0);
 
-        // ...if we were mothballing, restore our crew
-        if (!isMothballed()) {
+        // ...if we were mothballing, restore our crew. Nothing was saved when the save-mothball-state option is off, so
+        // there is nothing to restore
+        if (!isMothballed() && (mothballInfo != null)) {
             mothballInfo.restorePreMothballInfo(this, getCampaign());
             mothballInfo = null;
         }

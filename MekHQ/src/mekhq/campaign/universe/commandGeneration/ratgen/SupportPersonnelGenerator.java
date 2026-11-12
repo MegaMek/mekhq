@@ -213,7 +213,7 @@ public final class SupportPersonnelGenerator {
 
     /**
      * Generates {@code ceil(baselineDemand × coverage / 100)} Persons of the given role, applying
-     * the user-selected skill level and faction-appropriate rank to each. Returns the actual count
+     * the user-selected skill level and the rank the campaign's rank system calls for to each. Returns the actual count
      * created (zero if either baseline or coverage is non-positive).
      */
     private static int generateRole(Campaign campaign, CommandGenerationOptions options,
@@ -237,7 +237,8 @@ public final class SupportPersonnelGenerator {
             // level this person actually rolled. With the "Random" picker each one differs.
             SkillLevel rolled = resolveRandom(skillLevel);
             Person person = createAndRecruit(campaign, options, skillGen, role, toExperienceLevel(rolled),
-                  RulesetRankAssigner.supportRankFor(role, rolled, faction), faction, targetRankSystem,
+                  RulesetRankAssigner.supportRankFor(role, rolled,
+                        RulesetRankAssigner.RankFamily.of(targetRankSystem)), faction, targetRankSystem,
                   rankValidator);
             if (person != null) {
                 out.add(person);
@@ -287,7 +288,7 @@ public final class SupportPersonnelGenerator {
             SkillLevel rolled = resolveRandom(skillLevel);
             Person admin = createAndRecruit(campaign, options, skillGen, PersonnelRole.ADMINISTRATOR,
                   toExperienceLevel(rolled), RulesetRankAssigner.supportRankFor(PersonnelRole.ADMINISTRATOR, rolled,
-                        faction), faction, targetRankSystem, rankValidator);
+                        RulesetRankAssigner.RankFamily.of(targetRankSystem)), faction, targetRankSystem, rankValidator);
             if (admin == null) {
                 break;
             }
@@ -347,7 +348,8 @@ public final class SupportPersonnelGenerator {
             for (int i = 0; i < needed; i++) {
                 SkillLevel rolled = resolveRandom(skillLevel);
                 Person person = createAndRecruit(campaign, options, skillGen, role, toExperienceLevel(rolled),
-                      RulesetRankAssigner.supportRankFor(role, rolled, faction), faction, targetRankSystem,
+                      RulesetRankAssigner.supportRankFor(role, rolled,
+                            RulesetRankAssigner.RankFamily.of(targetRankSystem)), faction, targetRankSystem,
                       rankValidator);
                 if (person != null) {
                     out.add(person);
