@@ -336,6 +336,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
             } finally {
                 manufacturing = false;
             }
+
+            setFabricating(false);
+            setFabricateUntilSuccess(false);
             return messageSurroundedBySpanWithColor(getPositiveColor(), " <b>fabricated</b>.");
         }
         return super.succeed();
