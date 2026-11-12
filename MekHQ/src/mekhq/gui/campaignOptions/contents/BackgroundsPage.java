@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -348,9 +349,9 @@ class BackgroundsPage {
     private void updateComboTooltip(MMComboBox<?> combo) {
         final Object selected = combo.getSelectedItem();
         if (selected instanceof PlanetarySystem system) {
-            combo.setToolTipText(system.getName(generalPage.getDate()));
+            combo.setToolTipText(wordWrap(system.getName(generalPage.getDate())));
         } else if (selected instanceof Planet planet) {
-            combo.setToolTipText(planet.getName(generalPage.getDate()));
+            combo.setToolTipText(wordWrap(planet.getName(generalPage.getDate())));
         } else {
             combo.setToolTipText(null);
         }
