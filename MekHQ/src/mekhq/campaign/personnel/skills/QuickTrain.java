@@ -532,7 +532,8 @@ public class QuickTrain {
      * @param isDoctorsUseAdministration campaign option: doctors substitute administration
      * @param isTechsUseAdministration   campaign option: techs substitute administration
      * @param isUseGlobalTechSkillsOnly  campaign option: techs only use their profession's global tech skill; when
-     *                                   disabled, every tech skill is a profession skill for tech professions
+     *                                   disabled, tech professions also train their specialization (see
+     *                                   {@link TechSpecialization}), or every tech skill if they have none
      * @param isUseArtillery             campaign option: include artillery skills
      * @param isUseSmallArmsOnly         campaign option: infantry uses Small Arms only
      * @param person                     the person whose skills are being evaluated
@@ -576,11 +577,20 @@ public class QuickTrain {
                   false));
         }
 
-        // Without the global-tech-only option, every tech skill counts as a profession skill for tech professions
+        // Without the global-tech-only option, tech professions also train their granular tech skills. A specialized
+        // tech trains only their specialization alongside their profession skill, so training never wears down the
+        // lead that made it; a tech without one trains every tech skill, keeping them level.
         if (!isUseGlobalTechSkillsOnly && profession.isTech()) {
-            for (String techSkill : SkillType.getTechSkills()) {
-                if (!targetSkills.contains(techSkill)) {
-                    targetSkills.add(techSkill);
+            String disciplineSkill = TechSpecialization.getDisciplineSkill(person, false);
+            if (disciplineSkill != null) {
+                if (!targetSkills.contains(disciplineSkill)) {
+                    targetSkills.add(disciplineSkill);
+                }
+            } else {
+                for (String techSkill : SkillType.getTechSkills()) {
+                    if (!targetSkills.contains(techSkill)) {
+                        targetSkills.add(techSkill);
+                    }
                 }
             }
         }
