@@ -75,6 +75,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.universe.Faction;
 
 /**
  * Static helpers implementing the Chaos Campaign reputation system (Hot Spots: Draconis Reach).
@@ -869,7 +870,7 @@ public class ChaosReputation {
     }
 
     public static void applyStartingCriminalRecord(LocalDate currentDate, Person person) {
-        boolean isPirate = person.getOriginFaction().isPirateOrBanditCaste();
+        boolean isPirate = Faction.isPirateOrBanditCaste(person.getOriginFaction().getShortName());
         boolean isChild = person.isChild(currentDate, false);
         boolean isCivilian = person.isCivilian();
 

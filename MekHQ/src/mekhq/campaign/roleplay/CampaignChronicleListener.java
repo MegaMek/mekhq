@@ -174,7 +174,7 @@ public class CampaignChronicleListener {
             }
             Faction faction = event.getChosenFaction();
             UltimatumChoice choice = !event.isWentRogue() ? UltimatumChoice.SIDE
-                                           : faction.isPirateOrBanditCaste()
+                                           : Faction.isPirateOrBanditCaste(faction.getShortName())
                                                    ? UltimatumChoice.PIRATE : UltimatumChoice.MERCENARY;
             List<UUID> departed = new ArrayList<>();
             for (Person person : event.getDeparted()) {

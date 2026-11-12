@@ -1245,7 +1245,7 @@ public abstract class AbstractContract {
 
     private boolean isPirateBackedPirateRaid() {
         return getObjectiveType().isPirateRaid() &&
-                     getStandingEmployerFaction().isPirateOrBanditCaste();
+                     Faction.isPirateOrBanditCaste(getStandingEmployerFaction().getShortName());
     }
 
     /**
