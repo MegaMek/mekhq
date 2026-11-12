@@ -35,6 +35,7 @@ package mekhq.gui.utilities;
 import static mekhq.campaign.force.FormationType.STANDARD;
 
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
 import java.util.StringJoiner;
@@ -43,6 +44,7 @@ import java.util.stream.Stream;
 
 import megamek.common.units.UnitType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.Profession;
@@ -78,6 +80,85 @@ public class StaticChecks {
 
     public static boolean areAnyUnitsDeployed(Vector<Unit> units) {
         return units.stream().anyMatch(Unit::isDeployed);
+    }
+
+    /**
+     * Checks whether a unit's formation membership is frozen because it is deployed, either to a scenario or (through
+     * its formation or a parent formation) to a StratCon track. Pulling a unit out of a deployed formation would
+     * otherwise bring it home early, skipping the formation's return date.
+     *
+     * @param unit the unit to check
+     *
+     * @return {@code true} if the unit may not be moved to, or removed from, a formation
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isUnitLockedByDeployment(Unit unit) {
+        return unit.isDeployed() || StratConRulesManager.isUnitDeployedToStratCon(unit);
+    }
+
+    /**
+     * @param units the units to check
+     *
+     * @return {@code true} if any of the units is locked by {@link #isUnitLockedByDeployment(Unit)}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean areAnyUnitsLockedByDeployment(Collection<Unit> units) {
+        for (Unit unit : units) {
+            if (isUnitLockedByDeployment(unit)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Checks whether a formation's membership is frozen because it, or a formation above it, is deployed to a
+     * scenario or a StratCon track. Units may not be added to or removed from such a formation, and it may not be
+     * moved elsewhere in the TO&amp;E.
+     *
+     * @param campaign  the campaign the formation belongs to
+     * @param formation the formation to check
+     *
+     * @return {@code true} if the formation's membership may not change
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isFormationLockedByDeployment(Campaign campaign, Formation formation) {
+        return formation.isDeployed() || StratConRulesManager.isFormationDeployedToStratCon(campaign, formation);
+    }
+
+    /**
+     * Checks whether deleting any of the given formations would pull deployed units or formations out of their
+     * deployment: the formation itself is locked, a sub-formation is deployed to a StratCon track, or any unit inside
+     * is locked.
+     *
+     * @param campaign   the campaign the formations belong to
+     * @param formations the formations to check
+     * @param units      every unit inside those formations, including sub-formations
+     *
+     * @return {@code true} if any of the formations may not be deleted
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean areAnyFormationsHoldingDeployments(Campaign campaign, Collection<Formation> formations,
+          Collection<Unit> units) {
+        for (Formation formation : formations) {
+            if (isFormationLockedByDeployment(campaign, formation)) {
+                return true;
+            }
+            for (Formation subFormation : formation.getAllSubFormations()) {
+                if (StratConRulesManager.isFormationDeployedToStratCon(campaign, subFormation)) {
+                    return true;
+                }
+            }
+        }
+        return areAnyUnitsLockedByDeployment(units);
     }
 
     /**

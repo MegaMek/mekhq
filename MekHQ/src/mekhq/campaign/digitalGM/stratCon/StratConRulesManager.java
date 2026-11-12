@@ -4447,24 +4447,39 @@ public class StratConRulesManager {
      */
     public static boolean isUnitDeployedToStratCon(Unit unit) {
         Campaign campaign = unit.getCampaign();
-        if (!campaign.getCampaignOptions().isUseStratCon()) {
+        Formation formation = campaign.getPlayerForce().getFormation(unit.getFormationId());
+        return isFormationDeployedToStratCon(campaign, formation);
+    }
+
+    /**
+     * Checks whether {@code formation}, or any formation above it, has been deployed to a StratCon track. A formation
+     * deployed as a whole takes its sub-formations with it, so a lance inside a deployed company counts as deployed.
+     *
+     * @param campaign  the campaign whose active contracts are searched
+     * @param formation the formation to check; {@code null} (an unassigned unit) is never deployed
+     *
+     * @return {@code true} if the formation or one of its parents is on a StratCon track
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isFormationDeployedToStratCon(Campaign campaign, @Nullable Formation formation) {
+        if ((formation == null) || !campaign.getCampaignOptions().isUseStratCon()) {
             return false;
         }
 
-        List<Integer> formationIds = new ArrayList<>();
-        formationIds.add(unit.getFormationId());
-
-        Formation formation = campaign.getPlayerForce().getFormation(unit.getFormationId());
-        if (formation != null) {
-            for (Formation parent : formation.getAllParents()) {
-                formationIds.add(parent.getId());
-            }
+        // this is a little inefficient, but probably there aren't too many active AtB contracts at a time
+        List<AbstractContract> activeContracts = campaign.getActiveContracts();
+        if (isForceDeployedToStratCon(activeContracts, formation.getId())) {
+            return true;
         }
 
-        // this is a little inefficient, but probably there aren't too many active AtB
-        // contracts at a time
-        List<AbstractContract> activeContracts = campaign.getActiveContracts();
-        return formationIds.stream().anyMatch(formationId -> isForceDeployedToStratCon(activeContracts, formationId));
+        for (Formation parent : formation.getAllParents()) {
+            if (isForceDeployedToStratCon(activeContracts, parent.getId())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static boolean isForceDeployedToStratCon(List<AbstractContract> activeAtBContracts, int forceId) {
