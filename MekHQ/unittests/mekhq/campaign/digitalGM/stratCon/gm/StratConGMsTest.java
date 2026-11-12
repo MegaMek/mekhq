@@ -33,6 +33,7 @@
 package mekhq.campaign.digitalGM.stratCon.gm;
 
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
@@ -41,8 +42,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.DigitalGMRegistry;
 import mekhq.campaign.digitalGM.IDigitalGM;
 import mekhq.campaign.digitalGM.IForceDeploymentStrategy;
@@ -149,6 +150,37 @@ class StratConGMsTest {
 
         assertSame(gm.mapGenerationSentinel,
               StratConGMs.mapGeneration(campaignWith(StratConPlayType.NORMAL).getCampaignOptions()));
+    }
+
+    /** A Normal-play GM that records whether it was asked to send formations home. */
+    private static class ReturnRecordingGM extends StratConDigitalGM {
+        Campaign returnedFor;
+
+        @Override
+        public void processForceReturns(Campaign campaign) {
+            returnedFor = campaign;
+        }
+    }
+
+    @Test
+    void forceReturnsRouteToActiveGm() {
+        ReturnRecordingGM gm = new ReturnRecordingGM();
+        register(gm);
+        Campaign campaign = campaignWith(StratConPlayType.NORMAL);
+
+        StratConGMs.processForceReturns(campaign);
+
+        assertSame(campaign, gm.returnedFor);
+    }
+
+    @Test
+    void forceReturnsDoNothingWhenNoGmIsActive() {
+        ReturnRecordingGM gm = new ReturnRecordingGM();
+        register(gm);
+
+        StratConGMs.processForceReturns(campaignWith(StratConPlayType.DISABLED));
+
+        assertNull(gm.returnedFor);
     }
 
     @Test
