@@ -171,6 +171,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.enums.CrewAssignmentState;
+import mekhq.campaign.unit.enums.CrewSeat;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.utilities.CampaignTransportUtilities;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -7055,7 +7056,15 @@ public class Unit implements ITechnology, ILocatable {
      * @return {@code true} if the person is assigned to this unit
      */
     private boolean isServingAboard(Person person) {
-        return equals(person.getUnit());
+        Unit personUnit = person.getUnit();
+        if (personUnit == null) {
+            return false;
+        }
+
+        // Matched by id, not equals(): while a campaign loads, a person's unit is a placeholder of another class until
+        // their references are fixed, and the engineer is chosen before then. Failing that match left a ship with no
+        // engineer, which cancelled its activation or mothballing and its scheduled repairs on every load.
+        return (personUnit == this) || ((id != null) && id.equals(personUnit.getId()));
     }
 
     /**
@@ -7661,6 +7670,90 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
+     * Finds the crew seat a person holds in this unit.
+     *
+     * @param person the person to look for
+     *
+     * @return the seat they hold, or {@code null} if they do not crew this unit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable CrewSeat getCrewSeat(final @Nullable Person person) {
+        if (person == null) {
+            return null;
+        }
+
+        if (person.equals(techOfficer)) {
+            return CrewSeat.TECH_OFFICER;
+        }
+
+        if (person.equals(navigator)) {
+            return CrewSeat.NAVIGATOR;
+        }
+
+        // addPilotOrSoldier puts the person in both lists whenever the cockpit has one position for both jobs
+        boolean isDriver = drivers.contains(person);
+        boolean isGunner = gunners.contains(person);
+        if (isDriver && isGunner) {
+            return CrewSeat.PILOT_OR_SOLDIER;
+        } else if (isDriver) {
+            return CrewSeat.DRIVER;
+        } else if (isGunner) {
+            return CrewSeat.GUNNER;
+        }
+
+        if (vesselCrew.contains(person)) {
+            return CrewSeat.VESSEL_CREW;
+        }
+
+        return null;
+    }
+
+    /**
+     * Checks whether this unit has room for one more person in the given seat.
+     *
+     * @param crewSeat the seat to check
+     *
+     * @return {@code true} if the seat is open
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean hasOpenCrewSeat(final CrewSeat crewSeat) {
+        return switch (crewSeat) {
+            case PILOT_OR_SOLDIER -> usesSoldiers() ? canTakeMoreGunners() : canTakeMoreDrivers();
+            case DRIVER -> canTakeMoreDrivers();
+            case GUNNER -> canTakeMoreGunners();
+            case VESSEL_CREW -> canTakeMoreVesselCrew();
+            case NAVIGATOR -> canTakeNavigator();
+            case TECH_OFFICER -> canTakeTechOfficer();
+        };
+    }
+
+    /**
+     * Seats a person in the given crew seat of this unit, using the same assignment method the seat was filled with.
+     *
+     * <p>This does not check that the seat is open; see {@link #hasOpenCrewSeat(CrewSeat)}.</p>
+     *
+     * @param person   the person to seat
+     * @param crewSeat the seat to give them
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addToCrewSeat(final Person person, final CrewSeat crewSeat) {
+        switch (crewSeat) {
+            case PILOT_OR_SOLDIER -> addPilotOrSoldier(person);
+            case DRIVER -> addDriver(person);
+            case GUNNER -> addGunner(person);
+            case VESSEL_CREW -> addVesselCrew(person);
+            case NAVIGATOR -> setNavigator(person);
+            case TECH_OFFICER -> setTechOfficer(person);
+        }
+    }
+
+    /**
      * @return true if the unit has no commander
      */
     public boolean isUnmanned() {
@@ -8160,8 +8253,9 @@ public class Unit implements ITechnology, ILocatable {
 
         setMothballTime(0);
 
-        // ...if we were mothballing, restore our crew
-        if (!isMothballed()) {
+        // ...if we were mothballing, restore our crew. Nothing was saved when the save-mothball-state option is off, so
+        // there is nothing to restore
+        if (!isMothballed() && (mothballInfo != null)) {
             mothballInfo.restorePreMothballInfo(this, getCampaign());
             mothballInfo = null;
         }

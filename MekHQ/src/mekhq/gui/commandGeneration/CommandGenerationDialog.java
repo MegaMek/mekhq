@@ -61,6 +61,7 @@ import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import javax.swing.SwingWorker;
 
 import jakarta.annotation.Nullable;
@@ -122,6 +123,8 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      * command that differs from the one previewed.
      */
     private CommandGenerationOptions settingsAtLastGenerate;
+    /** The settings {@link #reviewOptions()} read for the refresh under way, or {@code null} between refreshes. */
+    private @Nullable CommandGenerationOptions reviewOptionsCache;
 
     /**
      * Whether the last press of Accept &amp; Build actually started a build.
@@ -331,9 +334,6 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         CommandGenerationOptions defaults = new CommandGenerationOptions();
         seedSpecifiedFactionFromCampaign(defaults, "restoreDefaults");
         pane.loadValuesFromOptions(defaults);
-        // The formation mix lives on the force generator rather than in CommandGenerationOptions, so loading
-        // defaults does not reach it and it has to be cleared explicitly.
-        pane.getEngine().clearFormationMix();
         // As on first show: restoring defaults sets the naming method directly, so the faction's own
         // convention is re-applied afterwards rather than being overwritten by it.
         pane.applyFactionDrivenDefaults();
@@ -342,11 +342,9 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
     /**
      * Overwrites {@link CommandGenerationOptions#getSpecifiedFaction()} with the current
      * campaign's faction. The CommandGenerationOptions constructor defaults specifiedFaction to a
-     * global default (typically Mercenary) regardless of campaign, so a Clan campaign loading the
-     * dialog for the first time would otherwise have a MERC rank-authority faction seeded —
-     * meaning {@code RulesetRankAssigner} resolves to MERC, picks the IS rank-index policy
-     * (enlisted=12 / support=8), and assigns IS rank names to Clan Persons. Seeding here makes
-     * the campaign-creation faction choice the default for rank assignment too.
+     * global default (typically Mercenary) regardless of campaign; the command is always generated
+     * for the campaign's faction, so the options are made to say so. Ranks do not come from it: they
+     * follow the rank system chosen in Campaign Options.
      *
      * @param options the fresh options about to be handed to the tabs
      * @param caller  identifier for the call site (logged so traces can distinguish first-open
@@ -464,10 +462,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
         // post-gen extras on the EDT.
         LOGGER.info("[CompanyGen][Worker] okAction: starting combat-commit phase (thread={})",
               Thread.currentThread().getName());
-        // Snapshot the hangar before the combat phase so the starting-cash stage after support can
-        // price exactly the units this build creates (combat + support), not pre-existing ones.
-        Set<UUID> preExistingUnitIds = CommandGenerator.snapshotHangarUnitIds(getCampaign());
-        // And the roster, so the founder flags, callsigns and hiring fees reach exactly the people this
+        // Snapshot the roster, so the founder flags and callsigns reach exactly the people this
         // build hires: the support staff and the vehicle and ship crews as well as the combat crews.
         Set<UUID> preExistingPersonIds = CommandGenerator.snapshotPersonnelIds(getCampaign());
         // Everyone the build creates, from the combat crews through the starting simulation's children to the
@@ -495,30 +490,21 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
                             supportListener);
                       // Spares, cargo lift and temporary crew run once the support vehicles exist, so they
                       // are stocked, lifted and crewed like everything else.
-                      CommandGenerator.SpareCosts spareCosts = CommandGenerator.completeBuild(getCampaign(), options,
-                            supportListener);
-                      return new SupportPhaseResult(supportPersons, spareCosts);
+                      CommandGenerator.completeBuild(getCampaign(), options, supportListener);
+                      return supportPersons;
                   },
-                  supportResult -> {
-                      generatedPersons.addAll(supportResult.persons());
+                  supportPersons -> {
+                      generatedPersons.addAll(supportPersons);
                       // The medical reserve is part of the command as built: hired before the roster flags and
-                      // the starting cash so its spares are founders, pay the hiring fee, and count toward the
+                      // the starting cash so its spares are founders and count toward the
                       // running costs the cash is measured in.
                       generateMedicalReserve(options, generatedPersons);
                       List<Person> hired = CommandGenerator.personsAddedSince(getCampaign(), preExistingPersonIds);
                       CommandGenerator.applyRosterFlags(getCampaign(), options, hired);
-                      CommandGenerator.processStartingCash(getCampaign(), options, preExistingUnitIds,
-                            hired, supportResult.spareCosts());
+                      CommandGenerator.processStartingCash(getCampaign(), options);
                       runStartingSimulationThen(options, hired);
                   });
         });
-    }
-
-    /**
-     * What the support phase hands back: the support staff it hired and the value of the spares the build's
-     * stock-up added.
-     */
-    private record SupportPhaseResult(List<Person> persons, CommandGenerator.SpareCosts spareCosts) {
     }
 
     /**
@@ -655,7 +641,7 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      * @return the build's resource-cost warnings for the settings as the pages stand, for the Review page
      */
     private List<String> reviewWarnings() {
-        CommandGenerationOptions options = collectOptionsFromTabs("review");
+        CommandGenerationOptions options = reviewOptions();
         return collectPreGenerationWarnings(options, options.getForceDescriptorSnapshot().getEchelon());
     }
 
@@ -664,7 +650,23 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
      *       use
      */
     private boolean settingsChangedSinceRoll() {
-        return (settingsAtLastGenerate != null) && !settingsAtLastGenerate.equals(collectOptionsFromTabs("review"));
+        return (settingsAtLastGenerate != null) && !settingsAtLastGenerate.equals(reviewOptions());
+    }
+
+    /**
+     * The settings as the pages stand, for Review. Review asks for them twice in one refresh, once for its warnings and
+     * once to compare with the roll, and reading every page back is the costly part, so they are read once and kept
+     * until the refresh is over.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private CommandGenerationOptions reviewOptions() {
+        if (reviewOptionsCache == null) {
+            reviewOptionsCache = collectOptionsFromTabs("review");
+            SwingUtilities.invokeLater(() -> reviewOptionsCache = null);
+        }
+        return reviewOptionsCache;
     }
 
     /**

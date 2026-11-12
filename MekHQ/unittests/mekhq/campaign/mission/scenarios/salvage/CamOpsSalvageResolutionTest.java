@@ -91,6 +91,8 @@ import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractData.MissionStatus;
 import mekhq.campaign.mission.contract.utilities.ContractSettlement;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -239,6 +241,7 @@ class CamOpsSalvageResolutionTest {
         private final AbstractContract contract = mock(AbstractContract.class);
         private final Scenario scenario = mock(Scenario.class);
         private final List<Unit> addedUnits = new ArrayList<>();
+        private final List<Part> addedUnitParts = new ArrayList<>();
         // Salvage delivered on the day it is resolved is present; salvage still in transit is not
         private boolean isAddedUnitPresent = true;
 
@@ -255,6 +258,7 @@ class CamOpsSalvageResolutionTest {
                 Unit unit = mock(Unit.class);
                 when(unit.getEntity()).thenReturn(entity);
                 when(unit.isPresent()).thenReturn(isAddedUnitPresent);
+                when(unit.getParts()).thenReturn(addedUnitParts);
                 addedUnits.add(unit);
                 return unit;
             });
@@ -339,6 +343,32 @@ class CamOpsSalvageResolutionTest {
             resolve(new CappedSalvageSettlement(0.5), List.of(wreck), List.of(), List.of());
 
             verify(wreck.getEntity(), never()).setCamouflage(any());
+        }
+
+        @Test
+        void salvageQualityIsKeptByDefault() {
+            Part part = mock(Part.class);
+            addedUnitParts.add(part);
+
+            resolve(new CappedSalvageSettlement(0.5), List.of(wreck(1000)), List.of(), List.of());
+
+            verify(part, never()).reduceQuality();
+        }
+
+        @Test
+        void salvageQualityIsReducedWhenEnabled() {
+            options.set(CampaignOption.IS_REDUCE_SALVAGE_QUALITY, true);
+            Part part = mock(Part.class);
+            Part otherPart = mock(Part.class);
+            MissingPart missingPart = mock(MissingPart.class);
+            addedUnitParts.addAll(List.of(part, otherPart, missingPart));
+
+            resolve(new CappedSalvageSettlement(0.5), List.of(wreck(1000)), List.of(), List.of());
+
+            verify(part).reduceQuality();
+            verify(otherPart).reduceQuality();
+            // Missing parts have no quality to reduce
+            verify(missingPart, never()).reduceQuality();
         }
 
         @Test
@@ -696,7 +726,7 @@ class CamOpsSalvageResolutionTest {
         @Test
         void noTechsMeansNoAccidents() {
             try (MockedStatic<Compute> compute = snakeEyes(2)) {
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(), 5);
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(), 5, false);
 
                 compute.verifyNoInteractions();
             }
@@ -708,7 +738,7 @@ class CamOpsSalvageResolutionTest {
 
             try (MockedStatic<Compute> compute = snakeEyes(3);
                   MockedStatic<InjurySPAUtility> ignored = noSpaAdjustment()) {
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 4);
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 4, false);
 
                 compute.verify(() -> Compute.d6(2), times(4));
                 verify(tech, never()).setHits(anyInt());
@@ -722,7 +752,7 @@ class CamOpsSalvageResolutionTest {
 
             try (MockedStatic<Compute> ignored = snakeEyes(2);
                   MockedStatic<InjurySPAUtility> ignored2 = noSpaAdjustment()) {
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1);
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1, false);
 
                 verify(tech).setHits(4);
                 verify(tech, never()).changeStatus(any(), any(), any());
@@ -740,7 +770,7 @@ class CamOpsSalvageResolutionTest {
 
             try (MockedStatic<Compute> ignored = snakeEyes(2);
                   MockedStatic<InjurySPAUtility> ignored2 = noSpaAdjustment()) {
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1);
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1, false);
 
                 verify(campaign).addReport(eq(DailyReportType.MEDICAL), report.capture());
             }
@@ -758,7 +788,7 @@ class CamOpsSalvageResolutionTest {
 
             try (MockedStatic<Compute> ignored = snakeEyes(2);
                   MockedStatic<InjurySPAUtility> ignored2 = noSpaAdjustment()) {
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1);
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1, false);
 
                 verify(campaign).addReport(eq(DailyReportType.MEDICAL), report.capture());
             }
@@ -774,7 +804,7 @@ class CamOpsSalvageResolutionTest {
 
             try (MockedStatic<Compute> ignored = snakeEyes(2);
                   MockedStatic<InjurySPAUtility> ignored2 = noSpaAdjustment()) {
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 3);
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 3, false);
 
                 // The tech is removed from the pool once dead, so later accidents can't find anyone to hurt
                 verify(tech, times(1)).changeStatus(campaign, TODAY, PersonnelStatus.ACCIDENTAL);
@@ -794,7 +824,7 @@ class CamOpsSalvageResolutionTest {
                 // The accident roll is snake eyes, but the reroll isn't
                 compute.when(() -> Compute.d6(2)).thenReturn(2, 7);
 
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1);
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1, false);
 
                 verify(tech).spendEdge();
                 verify(tech, never()).setHits(anyInt());
@@ -811,7 +841,7 @@ class CamOpsSalvageResolutionTest {
 
             try (MockedStatic<Compute> ignored = snakeEyes(2);
                   MockedStatic<InjurySPAUtility> ignored2 = noSpaAdjustment()) {
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1);
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1, false);
 
                 verify(tech).spendEdge();
                 verify(tech).setHits(3);
@@ -826,7 +856,7 @@ class CamOpsSalvageResolutionTest {
 
             try (MockedStatic<Compute> ignored = snakeEyes(2);
                   MockedStatic<InjurySPAUtility> ignored2 = noSpaAdjustment()) {
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1);
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1, false);
 
                 verify(tech, never()).spendEdge();
                 verify(tech).setHits(3);
@@ -842,7 +872,7 @@ class CamOpsSalvageResolutionTest {
                   MockedStatic<InjurySPAUtility> ignored2 = noSpaAdjustment();
                   MockedStatic<InjuryUtil> injuryUtil =
                         mockStatic(InjuryUtil.class)) {
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1);
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1, false);
 
                 injuryUtil.verify(() -> InjuryUtil
                                               .resolveCombatDamage(campaign, tech, 3));
@@ -859,7 +889,7 @@ class CamOpsSalvageResolutionTest {
 
             try (MockedStatic<Compute> ignored = snakeEyes(2);
                   MockedStatic<InjurySPAUtility> ignored2 = noSpaAdjustment()) {
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1);
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1, false);
 
                 verify(tech, never()).spendEdge();
                 verify(tech).setHits(3);
@@ -873,9 +903,61 @@ class CamOpsSalvageResolutionTest {
 
             try (MockedStatic<Compute> ignored = snakeEyes(2);
                   MockedStatic<InjurySPAUtility> ignored2 = noSpaAdjustment()) {
-                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(missingTechId), 2);
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(missingTechId), 2, false);
 
                 verify(campaign, never()).addReport(any(DailyReportType.class), anyString());
+            }
+        }
+
+        @Test
+        void carefulSalvageRollsThreeDiceInsteadOfTwo() {
+            Person tech = tech(0);
+
+            try (MockedStatic<Compute> compute = snakeEyes(2);
+                  MockedStatic<InjurySPAUtility> ignored = noSpaAdjustment()) {
+                compute.when(() -> Compute.d6(3)).thenReturn(4);
+
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 4, true);
+
+                compute.verify(() -> Compute.d6(3), times(4));
+                compute.verify(() -> Compute.d6(2), never());
+                verify(tech, never()).setHits(anyInt());
+                verify(campaign, never()).addReport(any(DailyReportType.class), anyString());
+            }
+        }
+
+        @Test
+        void carefulSalvageAccidentsHappenOnAThree() {
+            Person tech = tech(0);
+
+            try (MockedStatic<Compute> compute = snakeEyes(7);
+                  MockedStatic<InjurySPAUtility> ignored = noSpaAdjustment()) {
+                compute.when(() -> Compute.d6(3)).thenReturn(3);
+
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1, true);
+
+                verify(tech).setHits(3);
+                verify(campaign).addReport(eq(DailyReportType.MEDICAL), anyString());
+            }
+        }
+
+        @Test
+        void carefulSalvageEdgeRerollAlsoUsesThreeDice() {
+            options.set(CampaignOption.USE_EDGE, true);
+            Person tech = tech(0);
+            when(tech.getCurrentEdge()).thenReturn(1);
+            when(tech.getOptions().booleanOption(PersonnelOptions.EDGE_SALVAGE_ACCIDENTS)).thenReturn(true);
+
+            try (MockedStatic<Compute> compute = snakeEyes(2);
+                  MockedStatic<InjurySPAUtility> ignored = noSpaAdjustment()) {
+                // The accident roll is a 3, but the reroll isn't. A snake eyes reroll on 2d6 would not count.
+                compute.when(() -> Compute.d6(3)).thenReturn(3, 10);
+
+                CamOpsSalvageUtilities.performRiskySalvageChecks(campaign, List.of(tech.getId()), 1, true);
+
+                verify(tech).spendEdge();
+                verify(tech, never()).setHits(anyInt());
+                compute.verify(() -> Compute.d6(2), never());
             }
         }
     }

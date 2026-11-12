@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.skills;
 
 import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.campaign.personnel.PersonnelOptions.TECH_SPECIALIST_MYOMER;
 import static mekhq.campaign.personnel.enums.PersonnelStatus.ACTIVE;
 import static mekhq.campaign.personnel.skills.SkillType.S_LEADER;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -60,6 +61,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
@@ -231,6 +233,73 @@ class QuickTrainTest {
         verify(person, never()).getSkill(SkillType.S_TECH_AERO);
     }
 
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void techWithASpecialistAbilityTrainsOnlyTheProfessionSkillAndTheSpecialization() {
+        Person person = processablePerson();
+        when(person.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
+        person.getOptions().getOption(TECH_SPECIALIST_MYOMER).setValue(true);
+        Campaign campaign = processCampaign(person, null);
+        when(campaign.getCampaignOptions().get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)).thenReturn(false);
+
+        List<String> targets = QuickTrain.getTargetSkills(campaign, person, options(false));
+
+        assertTrue(targets.contains(SkillType.S_TECH_MEK), "the profession skill is trained");
+        assertTrue(targets.contains(SkillType.S_TECH_MYOMER), "the specialization is trained");
+        assertFalse(targets.contains(SkillType.S_TECH_ELECTRONIC), "other granular tech skills are not");
+        assertFalse(targets.contains(SkillType.S_TECH_VEHICLE), "another profession's tech skill is not");
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void techWithASkillLeadKeepsItByTrainingOnlyTheProfessionSkillAndTheSpecialization() {
+        Person person = processablePerson();
+        when(person.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
+        holdsTechSkill(person, SkillType.S_TECH_MYOMER, 5);
+        holdsTechSkill(person, SkillType.S_TECH_MECHANICAL, 3);
+        Campaign campaign = processCampaign(person, null);
+        when(campaign.getCampaignOptions().get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)).thenReturn(false);
+
+        List<String> targets = QuickTrain.getTargetSkills(campaign, person, options(false));
+
+        assertTrue(targets.contains(SkillType.S_TECH_MEK));
+        assertTrue(targets.contains(SkillType.S_TECH_MYOMER));
+        assertFalse(targets.contains(SkillType.S_TECH_MECHANICAL),
+              "raising the weaker skill would wear down the lead that makes the specialization");
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void techWithoutASpecializationTrainsEveryTechSkill() {
+        Person person = processablePerson();
+        when(person.getPrimaryRole()).thenReturn(PersonnelRole.MEK_TECH);
+        holdsTechSkill(person, SkillType.S_TECH_MYOMER, 4);
+        holdsTechSkill(person, SkillType.S_TECH_MECHANICAL, 3);
+        Campaign campaign = processCampaign(person, null);
+        when(campaign.getCampaignOptions().get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)).thenReturn(false);
+
+        List<String> targets = QuickTrain.getTargetSkills(campaign, person, options(false));
+
+        for (String techSkill : SkillType.getTechSkills()) {
+            assertTrue(targets.contains(techSkill), techSkill + " is trained");
+        }
+    }
+
+    private static void holdsTechSkill(Person person, String skillName, int level) {
+        Skill skill = mock(Skill.class);
+        when(skill.getLevel()).thenReturn(level);
+        when(person.getSkill(skillName)).thenReturn(skill);
+    }
+
     private static Person activePerson() {
         Person person = mock(Person.class);
         when(person.getStatus()).thenReturn(ACTIVE);
@@ -245,6 +314,7 @@ class QuickTrainTest {
         when(person.getSkills()).thenReturn(mock(Skills.class));
         when(person.getPrimaryRole()).thenReturn(PersonnelRole.NONE);
         when(person.getSecondaryRole()).thenReturn(PersonnelRole.NONE);
+        when(person.getOptions()).thenReturn(new PersonnelOptions());
         return person;
     }
 
