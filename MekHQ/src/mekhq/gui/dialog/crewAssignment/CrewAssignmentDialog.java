@@ -79,6 +79,7 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.*;
 import mekhq.gui.model.LocationFilterItem;
+import mekhq.gui.view.PersonViewPanel;
 
 /**
  * The crew assignment dialog: assign people and techs to one location's units, in a heads-up display in the style of
@@ -1182,6 +1183,29 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         }
         refresh();
         peoplePage.reveal(entry);
+    }
+
+    @Override
+    public void viewPerson(Person person) {
+        // Read-only, and modal over this dialog, so the staged plan cannot change while it is open
+        JDialog view = new JDialog(this, person.getFullTitle(), true);
+        JScrollPane scroll = new JScrollPane(new PersonViewPanel(person, campaign, campaign.getGUI()),
+              ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
+        JButton close = new JButton(getTextAt(RESOURCE_BUNDLE, "personView.close"));
+        close.addActionListener(event -> view.dispose());
+        JPanel buttons = new JPanel();
+        buttons.add(close);
+
+        JPanel content = new JPanel(new BorderLayout());
+        content.add(scroll, BorderLayout.CENTER);
+        content.add(buttons, BorderLayout.SOUTH);
+        view.setContentPane(content);
+        view.getRootPane().setDefaultButton(close);
+        view.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        view.setSize(scaleForGUI(760, 720));
+        view.setLocationRelativeTo(this);
+        view.setVisible(true);
     }
 
     /** @return the units whose cards are listed, in order */

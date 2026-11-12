@@ -132,6 +132,9 @@ final class CrewUnitBoard extends JPanel {
 
         void openPerson(Person person);
 
+        /** Opens the person's full record, as the Personnel tab shows it, in a window of its own. */
+        void viewPerson(Person person);
+
         void clearSelection();
     }
 
@@ -298,7 +301,13 @@ final class CrewUnitBoard extends JPanel {
         JPanel top = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         top.add(Hud.eyebrow(text("board.assigning")), BorderLayout.WEST);
         if (person != null) {
-            top.add(Hud.link(text("people.clear"), actions::clearSelection), BorderLayout.EAST);
+            JLabel view = Hud.link(text("board.viewPerson"), () -> actions.viewPerson(person));
+            view.setToolTipText(text("board.viewPerson.toolTipText"));
+            JPanel links = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+            links.add(view);
+            links.add(Box.createHorizontalStrut(scaleForGUI(14)));
+            links.add(Hud.link(text("people.clear"), actions::clearSelection));
+            top.add(links, BorderLayout.EAST);
         }
         basket.add(leftAligned(top));
 
