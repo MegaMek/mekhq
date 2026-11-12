@@ -1559,7 +1559,7 @@ public class SkillType {
      */
     private static void updateSkillSubType(SkillType skillType) {
         // <51.01 compatibility handler
-        if (S_TECH_CYBERNETICS.equals(skillType.name)) {
+        if (S_TECH_CYBERNETICS.equals(skillType.name) || S_MEDTECH.equals(skillType.name)) {
             skillType.subType = UTILITY;
         }
     }
@@ -2241,7 +2241,7 @@ public class SkillType {
         return new SkillType(S_MEDTECH,
               11,
               false,
-              SUPPORT,
+              UTILITY,
               INTELLIGENCE,
               NO_ATTRIBUTE,
               null,

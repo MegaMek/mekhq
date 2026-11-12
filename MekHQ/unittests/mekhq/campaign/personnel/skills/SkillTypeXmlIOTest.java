@@ -155,6 +155,34 @@ class SkillTypeXmlIOTest {
         assertEquals(SkillSubType.UTILITY, hash.get(SkillType.S_TECH_CYBERNETICS).getSubType());
     }
 
+    /**
+     * Saves and presets written before MedTech became a Utility skill store it as Support; loading them must upgrade
+     * the subtype.
+     */
+    @Test
+    void readUpgradesLegacyMedTechSubType() throws Exception {
+        assertEquals(SkillSubType.UTILITY, SkillType.createMedTech().getSubType());
+
+        SkillType.generateInstanceFromXML(writeLegacyMedTech(), new Version());
+
+        assertEquals(SkillSubType.UTILITY, SkillType.getType(SkillType.S_MEDTECH).getSubType());
+    }
+
+    @Test
+    void separateReadUpgradesLegacyMedTechSubType() throws Exception {
+        Map<String, SkillType> hash = new HashMap<>();
+        SkillType.generateSeparateInstanceFromXML(writeLegacyMedTech(), hash, new Version());
+
+        assertEquals(SkillSubType.UTILITY, hash.get(SkillType.S_MEDTECH).getSubType());
+    }
+
+    private static Node writeLegacyMedTech() throws Exception {
+        String xml = writeSkillType(SkillType.createMedTech())
+                           .replace("<subType>UTILITY</subType>", "<subType>SUPPORT</subType>");
+        assertTrue(xml.contains("<subType>SUPPORT</subType>"), "legacy subType was not written: " + xml);
+        return parse(xml);
+    }
+
     private static Node writeLegacyTechCybernetics() throws Exception {
         String xml = writeSkillType(SkillType.getType(SkillType.S_TECH_CYBERNETICS))
                            .replace("<subType>UTILITY</subType>", "<subType>ROLEPLAY_GENERAL</subType>");

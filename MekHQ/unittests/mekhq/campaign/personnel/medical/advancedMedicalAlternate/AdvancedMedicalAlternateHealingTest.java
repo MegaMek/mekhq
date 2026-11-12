@@ -233,17 +233,17 @@ class AdvancedMedicalAlternateHealingTest {
         Person singleInjuryPatient = mock(Person.class);
         when(singleInjuryPatient.getTotalInjurySeverity()).thenReturn(1);
         when(singleInjuryPatient.getAdjustedToughness()).thenReturn(0);
-        assertEquals(0, AdvancedMedicalAlternateHealing.getConcurrentInjuryPenalty(singleInjuryPatient, injury));
+        assertEquals(0, AdvancedMedicalAlternateHealing.getConcurrentInjuryPenalty(singleInjuryPatient, injury, 0));
 
         Person multipleInjuryPatient = mock(Person.class);
         when(multipleInjuryPatient.getTotalInjurySeverity()).thenReturn(4);
         when(multipleInjuryPatient.getAdjustedToughness()).thenReturn(1);
-        assertEquals(2, AdvancedMedicalAlternateHealing.getConcurrentInjuryPenalty(multipleInjuryPatient, injury));
+        assertEquals(2, AdvancedMedicalAlternateHealing.getConcurrentInjuryPenalty(multipleInjuryPatient, injury, 0));
 
         Person toughPatient = mock(Person.class);
         when(toughPatient.getTotalInjurySeverity()).thenReturn(2);
         when(toughPatient.getAdjustedToughness()).thenReturn(3);
-        assertEquals(0, AdvancedMedicalAlternateHealing.getConcurrentInjuryPenalty(toughPatient, injury));
+        assertEquals(0, AdvancedMedicalAlternateHealing.getConcurrentInjuryPenalty(toughPatient, injury, 0));
     }
 
     @Test
@@ -263,6 +263,22 @@ class AdvancedMedicalAlternateHealingTest {
             assertEquals(failure.getReport() + " AdvancedMedicalAlternateHealing.check.delayed",
                   AdvancedMedicalAlternateHealing.getHealingReport(failure, false));
         }
+    }
+
+    @Test
+    @DisplayName("getConcurrentInjuryPenalty reduces the injury penalty by 1 per MedTech level, to a minimum of 0")
+    void getConcurrentInjuryPenalty_reducedByMedTech() {
+        Injury injury = mock(Injury.class);
+        when(injury.getHits()).thenReturn(1);
+
+        Person patient = mock(Person.class);
+        when(patient.getTotalInjurySeverity()).thenReturn(5);
+        when(patient.getAdjustedToughness()).thenReturn(1);
+
+        assertEquals(3, AdvancedMedicalAlternateHealing.getConcurrentInjuryPenalty(patient, injury, 0));
+        assertEquals(1, AdvancedMedicalAlternateHealing.getConcurrentInjuryPenalty(patient, injury, 2));
+        assertEquals(0, AdvancedMedicalAlternateHealing.getConcurrentInjuryPenalty(patient, injury, 5));
+        assertEquals(3, AdvancedMedicalAlternateHealing.getConcurrentInjuryPenalty(patient, injury, -2));
     }
 
     @Test
