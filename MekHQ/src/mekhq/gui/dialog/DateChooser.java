@@ -747,25 +747,28 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_starleague" + LOGO_FILE_TYPE);
             }
             case 2 -> {
-                turningPoints = List.of("OperationExodus",
+                turningPoints = List.of("StartOfEarlySuccessionWar",
+                      "OperationExodus",
                       "OperationKlondike",
                       "SecondSuccessionWar",
                       "ThirdSuccessionWar");
-                turningPointDates = List.of(LocalDate.of(2784, 11, 4),
+                turningPointDates = List.of(LocalDate.of(2781, 1, 1),
+                      LocalDate.of(2784, 11, 4),
                       LocalDate.of(2821, 7, 2),
                       LocalDate.of(2830, 1, 1),
                       LocalDate.of(2866, 1, 1));
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
             }
             case 3 -> {
-                turningPoints = List.of("OperationFreedom");
-                turningPointDates = List.of(LocalDate.of(2913, 2, 1));
+                turningPoints = List.of("StartOfLateSuccessionWarLosTech", "OperationFreedom");
+                turningPointDates = List.of(LocalDate.of(2901, 1, 1), LocalDate.of(2913, 2, 1));
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
             }
             case 4 -> {
-                turningPoints = List.of("RestorationWarBegins", "ThirdSuccessionWarEnds", "FourthSuccessionWar",
-                      "FRRFounded", "WarOf3039");
-                turningPointDates = List.of(LocalDate.of(3022, 1, 31),
+                turningPoints = List.of("StartOfLateSuccessionWarRenaissance", "RestorationWarBegins",
+                      "ThirdSuccessionWarEnds", "FourthSuccessionWar", "FRRFounded", "WarOf3039");
+                turningPointDates = List.of(LocalDate.of(3020, 1, 1),
+                      LocalDate.of(3022, 1, 31),
                       LocalDate.of(3025, 1, 1),
                       LocalDate.of(3028, 8, 20),
                       LocalDate.of(3034, 3, 13),
@@ -773,8 +776,10 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_sw" + LOGO_FILE_TYPE);
             }
             case 5 -> {
-                turningPoints = List.of("FirstContact", "YearOfPeace", "Tukayyid", "RefusalWar", "OperationBulldog");
+                turningPoints = List.of("FirstContact", "StartOfClanInvasion", "YearOfPeace", "Tukayyid", "RefusalWar",
+                      "OperationBulldog");
                 turningPointDates = List.of(LocalDate.of(3049, 1, 1),
+                      LocalDate.of(3050, 1, 1),
                       LocalDate.of(3050, 10, 31),
                       LocalDate.of(3052, 5, 1),
                       LocalDate.of(3057, 9, 1),
@@ -782,34 +787,37 @@ public class DateChooser extends JDialog implements ActionListener, FocusListene
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_claninvasion" + LOGO_FILE_TYPE);
             }
             case 6 -> {
-                turningPoints = List.of("LyranSecession", "FCCWStarts", "JadeFalconOffensive");
+                turningPoints = List.of("LyranSecession", "StartOfCivilWar", "FCCWStarts", "JadeFalconOffensive");
                 turningPointDates = List.of(LocalDate.of(3057, 9, 17),
+                      LocalDate.of(3062, 1, 1),
                       LocalDate.of(3062, 11, 16),
                       LocalDate.of(3064, 5, 10));
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_civilwar" + LOGO_FILE_TYPE);
             }
             case 7 -> {
-                turningPoints = List.of("FirstBattleOfHarlech", "WarsOfReaving", "OperationScour");
+                turningPoints = List.of("FirstBattleOfHarlech", "StartOfJihad", "WarsOfReaving", "OperationScour");
                 turningPointDates = List.of(LocalDate.of(3067, 10, 15),
+                      LocalDate.of(3068, 1, 1),
                       LocalDate.of(3071, 12, 1),
                       LocalDate.of(3077, 1, 10));
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_jihad" + LOGO_FILE_TYPE);
             }
             case 8 -> {
-                turningPoints = List.of("RepublicFounded", "OperationGoldenDawn");
-                turningPointDates = List.of(LocalDate.of(3081, 3, 7), LocalDate.of(3081, 4, 3));
+                turningPoints = List.of("StartOfEarlyRepublic", "RepublicFounded", "OperationGoldenDawn");
+                turningPointDates = List.of(LocalDate.of(3081, 1, 1), LocalDate.of(3081, 3, 7), LocalDate.of(3081, 4, 3));
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_darkage" + LOGO_FILE_TYPE);
             }
             case 9 -> {
-                turningPoints = List.of("SecondCombineDominionWar", "VictoriaWar", "CapellanCrusades");
+                turningPoints = List.of("SecondCombineDominionWar", "StartOfLateRepublic", "VictoriaWar", "CapellanCrusades");
                 turningPointDates = List.of(LocalDate.of(3098, 9, 14),
+                      LocalDate.of(3101, 1, 1),
                       LocalDate.of(3103, 9, 7),
                       LocalDate.of(3111, 10, 11));
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_darkage" + LOGO_FILE_TYPE);
             }
             case 10 -> {
-                turningPoints = List.of("GreyMonday");
-                turningPointDates = List.of(LocalDate.of(3132, 8, 3));
+                turningPoints = List.of("StartOfDarkAge", "GreyMonday");
+                turningPointDates = List.of(LocalDate.of(3131, 1, 1), LocalDate.of(3132, 8, 3));
                 eraLogo = new ImageIcon(LOGO_DIRECTORY + "era_darkage" + LOGO_FILE_TYPE);
             }
             case 11 -> {
