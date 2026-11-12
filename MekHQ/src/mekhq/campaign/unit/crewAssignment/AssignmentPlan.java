@@ -402,7 +402,7 @@ public class AssignmentPlan {
      * @return {@code true} if staging them there would succeed
      */
     public boolean canStage(final Person person, final Unit unit, final SeatType type) {
-        return couldTake(person, unit, type) && (openSeats(unit, type) > 0);
+        return whyNotSeat(person, unit, type) == null;
     }
 
     /**
@@ -416,10 +416,7 @@ public class AssignmentPlan {
      * @return {@code true} if they could take the seat once a place in it is free
      */
     public boolean couldTake(final Person person, final Unit unit, final SeatType type) {
-        return !Objects.equals(plannedUnitOf(person), unit)
-                     && unit.isAvailable()
-                     && SeatEligibility.canTake(person, unit, type, useAltAdvancedMedical, useImplants)
-                     && LocationUtils.areSameEffectiveLocation(unit, person);
+        return whyCannotTake(person, unit, type) == null;
     }
 
     /**
@@ -509,7 +506,7 @@ public class AssignmentPlan {
      *       {@link Person#getMaintenanceTimeUsing()} counts them: none while the unit is in salvage mode, or while the
      *       tech is refitting it
      */
-    private static int techMinutesFor(final Person tech, final Unit unit) {
+    public int techMinutesNeeded(final Person tech, final Unit unit) {
         if (unit.isSalvage() || (unit.isRefitting() && (unit.getRefit() != null)
                                        && tech.equals(unit.getRefit().getTech()))) {
             return 0;
@@ -537,12 +534,7 @@ public class AssignmentPlan {
      * @return {@code true} if staging them there would succeed
      */
     public boolean canStageTech(final Person tech, final Unit unit) {
-        return !tech.equals(plannedTechOf(unit))
-                     && unit.isAvailable()
-                     && SeatEligibility.canTech(tech, unit)
-                     && !isTechBusy.test(tech)
-                     && LocationUtils.areSameEffectiveLocation(unit, tech)
-                     && ((plannedTechMinutes(tech) + techMinutesFor(tech, unit)) <= techMinutesAvailable(tech));
+        return whyNotTech(tech, unit) == null;
     }
 
     // endregion Reading techs
@@ -986,7 +978,7 @@ public class AssignmentPlan {
         }
         final Person fromTech = change.fromTech();
         if ((fromTech != null)
-                  && ((plannedTechMinutes(fromTech) + techMinutesFor(fromTech, unit))
+                  && ((plannedTechMinutes(fromTech) + techMinutesNeeded(fromTech, unit))
                             > techMinutesAvailable(fromTech))) {
             return false;
         }
@@ -1119,6 +1111,19 @@ public class AssignmentPlan {
      * @since 0.51.01
      */
     public @Nullable Reason whyNotSeat(final Person person, final Unit unit, final SeatType type) {
+        final Reason reason = whyCannotTake(person, unit, type);
+        if (reason != null) {
+            return reason;
+        }
+        return (openSeats(unit, type) < 1) ? Reason.SEAT_FULL : null;
+    }
+
+    /**
+     * The first thing, other than the seat being full, in the way of a person taking a seat.
+     *
+     * @return the reason, or {@code null} if they could take the seat once a place in it is free
+     */
+    private @Nullable Reason whyCannotTake(final Person person, final Unit unit, final SeatType type) {
         if (!unit.isAvailable()) {
             return Reason.UNIT_UNAVAILABLE;
         } else if (Objects.equals(plannedUnitOf(person), unit)) {
@@ -1129,8 +1134,6 @@ public class AssignmentPlan {
             return Reason.NOT_QUALIFIED;
         } else if (!LocationUtils.areSameEffectiveLocation(unit, person)) {
             return Reason.DIFFERENT_LOCATION;
-        } else if (openSeats(unit, type) < 1) {
-            return Reason.SEAT_FULL;
         }
         return null;
     }
@@ -1158,23 +1161,10 @@ public class AssignmentPlan {
             return Reason.NOT_QUALIFIED;
         } else if (!LocationUtils.areSameEffectiveLocation(unit, tech)) {
             return Reason.DIFFERENT_LOCATION;
-        } else if ((plannedTechMinutes(tech) + techMinutesFor(tech, unit)) > techMinutesAvailable(tech)) {
+        } else if ((plannedTechMinutes(tech) + techMinutesNeeded(tech, unit)) > techMinutesAvailable(tech)) {
             return Reason.NO_TECH_TIME;
         }
         return null;
-    }
-
-    /**
-     * @param tech a tech
-     * @param unit a unit
-     *
-     * @return the minutes of the tech's daily time the unit would take; see {@link #plannedTechMinutes}
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public int techMinutesNeeded(final Person tech, final Unit unit) {
-        return techMinutesFor(tech, unit);
     }
 
     /**
@@ -1364,11 +1354,11 @@ public class AssignmentPlan {
     /** Moves a tech change's minutes from the old tech to the new one, or back again when {@code sign} is -1. */
     private void adjustTechMinutes(final StagedTech change, final int sign) {
         if (change.fromTech() != null) {
-            techMinuteChanges.merge(change.fromTech().getId(), -sign * techMinutesFor(change.fromTech(),
+            techMinuteChanges.merge(change.fromTech().getId(), -sign * techMinutesNeeded(change.fromTech(),
                   change.unit()), Integer::sum);
         }
         if (change.toTech() != null) {
-            techMinuteChanges.merge(change.toTech().getId(), sign * techMinutesFor(change.toTech(), change.unit()),
+            techMinuteChanges.merge(change.toTech().getId(), sign * techMinutesNeeded(change.toTech(), change.unit()),
                   Integer::sum);
         }
     }

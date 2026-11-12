@@ -46,6 +46,7 @@ import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.List;
@@ -55,6 +56,7 @@ import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.WrapLayout;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -145,6 +147,46 @@ final class CrewUnitBoard extends JPanel {
         void clearSelection();
     }
 
+    /**
+     * What the units shown still need, and so what the bulk actions can do: the open places by seat type, how many
+     * units lack a tech, and whether temporary crew can be added or removed.
+     *
+     * @param openBySeat  the open places on the units shown, by seat type, in seat order
+     * @param sampleOf    a unit that has each of those seats, to name it by: a Driver seat is a Pilot seat on anything
+     *                    but a ground vehicle
+     * @param needTech    how many of the units shown take a tech and have none
+     * @param canFillTemp {@code true} if a unit shown has real crew aboard to lead temporary crew
+     * @param hasTemp     {@code true} if a unit shown has temporary crew
+     */
+    record Work(Map<SeatType, Integer> openBySeat, Map<SeatType, Unit> sampleOf, int needTech, boolean canFillTemp,
+          boolean hasTemp) {
+        static Work of(List<UnitEntry> shown, AssignmentPlan plan, boolean techsOnly) {
+            Map<SeatType, Integer> openBySeat = new EnumMap<>(SeatType.class);
+            Map<SeatType, Unit> sampleOf = new EnumMap<>(SeatType.class);
+            int needTech = 0;
+            boolean canFillTemp = false;
+            boolean hasTemp = false;
+            for (UnitEntry entry : shown) {
+                Unit unit = entry.unit();
+                if (!techsOnly) {
+                    for (CrewSeat seat : plan.seatsOf(unit)) {
+                        int open = plan.openSeats(unit, seat.type());
+                        if (open > 0) {
+                            openBySeat.merge(seat.type(), open, Integer::sum);
+                            sampleOf.putIfAbsent(seat.type(), unit);
+                        }
+                    }
+                    canFillTemp |= plan.plannedRealCrew(unit) > 0;
+                    hasTemp |= plan.plannedTotalTempCrew(unit) > 0;
+                }
+                if (SeatEligibility.takesTech(unit) && (plan.plannedTechOf(unit) == null)) {
+                    needTech++;
+                }
+            }
+            return new Work(openBySeat, sampleOf, needTech, canFillTemp, hasTemp);
+        }
+    }
+
     private final Actions actions;
     private final JPanel basket = column();
     private final JTextField search = new JTextField();
@@ -155,11 +197,14 @@ final class CrewUnitBoard extends JPanel {
     private final JScrollPane scroll;
     private final Map<Unit, JComponent> cardOf = new HashMap<>();
     private int cardLimit = CARD_STEP;
+    /** The filters the cards were last listed under; a change starts the cards again from the first ones. */
+    private List<Object> filterSignature = List.of();
 
     // What the board last drew, kept so "Show more" and reveal can build more cards without the dialog
     private CrewAssignmentState state;
     private CrewAssignmentData data;
     private List<UnitEntry> shown = List.of();
+    private Work work = new Work(Map.of(), Map.of(), 0, false, false);
 
     CrewUnitBoard(Actions actions) {
         super(new BorderLayout());
@@ -239,13 +284,23 @@ final class CrewUnitBoard extends JPanel {
      * @param state       the dialog's state
      * @param data        the location's units, people and plan
      * @param shown       the units that pass the filters, in the order to list them
+     * @param work        what the units shown still need
      * @param filterChips the filter chips to show under the search field
      */
-    void refresh(CrewAssignmentState state, CrewAssignmentData data, List<UnitEntry> shown,
+    void refresh(CrewAssignmentState state, CrewAssignmentData data, List<UnitEntry> shown, Work work,
           List<? extends JComponent> filterChips) {
         this.state = state;
         this.data = data;
         this.shown = List.copyOf(shown);
+        this.work = work;
+
+        // Narrowing or widening the list starts the cards over; "Show more" only lasts while the list stays the same
+        List<Object> signature = Arrays.asList(state.page, state.unitStatus, state.techStatus, state.unitType,
+              state.formation, state.unitQuery, state.pinnedUnits.size());
+        if (!signature.equals(filterSignature)) {
+            filterSignature = signature;
+            cardLimit = CARD_STEP;
+        }
 
         chips.removeAll();
         filterChips.forEach(chips::add);
@@ -303,7 +358,7 @@ final class CrewUnitBoard extends JPanel {
 
     private void buildBasket() {
         basket.removeAll();
-        Person person = state.selectedPeople.isEmpty() ? null : state.selectedPeople.iterator().next();
+        Person person = state.selectedPerson;
 
         JPanel top = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         top.add(Hud.eyebrow(text("board.assigning")), BorderLayout.WEST);
@@ -328,48 +383,13 @@ final class CrewUnitBoard extends JPanel {
     }
 
     private void buildBulk() {
-        AssignmentPlan plan = data.plan();
         boolean techsOnly = isTechsPage();
-        Map<SeatType, Integer> openBySeat = new EnumMap<>(SeatType.class);
-        // A unit that has each seat, to name it by: a Driver seat is a Pilot seat on anything but a ground vehicle
-        Map<SeatType, Unit> sampleOf = new EnumMap<>(SeatType.class);
-        int needTech = 0;
-        boolean canFillTemp = false;
-        boolean hasTemp = false;
-        for (UnitEntry entry : shown) {
-            Unit unit = entry.unit();
-            if (!techsOnly) {
-                for (CrewSeat seat : plan.seatsOf(unit)) {
-                    int open = plan.openSeats(unit, seat.type());
-                    if (open > 0) {
-                        openBySeat.merge(seat.type(), open, Integer::sum);
-                        sampleOf.putIfAbsent(seat.type(), unit);
-                    }
-                }
-                canFillTemp |= plan.plannedRealCrew(unit) > 0;
-                hasTemp |= plan.plannedTotalTempCrew(unit) > 0;
-            }
-            if (SeatEligibility.takesTech(unit) && (plan.plannedTechOf(unit) == null)) {
-                needTech++;
-            }
-        }
-        int openTotal = openBySeat.values().stream().mapToInt(Integer::intValue).sum();
+        Map<SeatType, Integer> openBySeat = work.openBySeat();
+        int needTech = work.needTech();
         count.setText(techsOnly ?
                             getFormattedTextAt(RESOURCE_BUNDLE, "board.units.count.techs", shown.size(), needTech) :
-                            getFormattedTextAt(RESOURCE_BUNDLE, "board.units.count", shown.size(), openTotal,
-                                  needTech));
-
-        // What auto-fill fills: the chosen seat type, or the missing techs, kept to something the units shown need
-        if (techsOnly) {
-            state.targetTech = needTech > 0;
-        } else {
-            if ((state.targetSeat == null) || !openBySeat.containsKey(state.targetSeat)) {
-                state.targetSeat = openBySeat.isEmpty() ? null : openBySeat.keySet().iterator().next();
-            }
-            if ((needTech == 0) || ((state.targetSeat == null) && !state.targetTech)) {
-                state.targetTech = (needTech > 0) && (state.targetSeat == null);
-            }
-        }
+                            getFormattedTextAt(RESOURCE_BUNDLE, "board.units.count", shown.size(),
+                                  openBySeat.values().stream().mapToInt(Integer::intValue).sum(), needTech));
 
         bulk.removeAll();
         bulk.setVisible(!shown.isEmpty());
@@ -381,9 +401,9 @@ final class CrewUnitBoard extends JPanel {
         JPanel row = wrap(4);
         if (!techsOnly) {
             for (Map.Entry<SeatType, Integer> entry : openBySeat.entrySet()) {
-                HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "board.seatChip",
-                      CrewRowRenderers.seatLabel(sampleOf.get(entry.getKey()), entry.getKey()), entry.getValue()),
-                      () -> actions.chooseTargetSeat(entry.getKey()));
+                String seatName = CrewRowRenderers.seatLabel(work.sampleOf().get(entry.getKey()), entry.getKey());
+                HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "board.seatChip", seatName,
+                      entry.getValue()), () -> actions.chooseTargetSeat(entry.getKey()));
                 chip.setActive(!state.targetTech && (entry.getKey() == state.targetSeat));
                 row.add(chip);
             }
@@ -413,9 +433,9 @@ final class CrewUnitBoard extends JPanel {
         row.add(bulkButton(autoFillText, techsOnly ? "board.autoFill.techs.toolTipText" : "board.autoFill.toolTipText",
               wanted > 0, actions::autoFill));
         if (!techsOnly) {
-            row.add(bulkButton(text("board.fillTempCrew"), "board.fillTempCrew.toolTipText", canFillTemp,
+            row.add(bulkButton(text("board.fillTempCrew"), "board.fillTempCrew.toolTipText", work.canFillTemp(),
                   actions::fillTempCrewOnShown));
-            row.add(bulkButton(text("board.removeTempCrew"), "board.removeTempCrew.shown.toolTipText", hasTemp,
+            row.add(bulkButton(text("board.removeTempCrew"), "board.removeTempCrew.shown.toolTipText", work.hasTemp(),
                   actions::removeTempCrewOnShown));
         }
         bulk.add(leftAligned(row));
@@ -452,7 +472,7 @@ final class CrewUnitBoard extends JPanel {
                 arrivals.computeIfAbsent(change.toUnit(), key -> new ArrayList<>()).add(change);
             }
         }
-        List<Person> selected = List.copyOf(state.selectedPeople);
+        Person selected = state.selectedPerson;
         int built = Math.min(cardLimit, shown.size());
         for (UnitEntry entry : shown.subList(0, built)) {
             JComponent card = card(entry, plan, arrivals.getOrDefault(entry.unit(), List.of()), selected);
@@ -479,7 +499,7 @@ final class CrewUnitBoard extends JPanel {
     }
 
     private JComponent card(UnitEntry entry, AssignmentPlan plan, List<StagedAssignment> arrivals,
-          List<Person> selected) {
+          @Nullable Person selected) {
         Unit unit = entry.unit();
         boolean isOpen = unit.equals(state.selectedUnit);
         boolean techsOnly = isTechsPage();
@@ -583,9 +603,8 @@ final class CrewUnitBoard extends JPanel {
      * Adds the unit's tech slot, laid out as a seat is: its name and how full it is, with a button to make the
      * selected person the tech or the reason they cannot be, and under it who holds the slot, or that it is open.
      */
-    private void addTechLines(JPanel card, Unit unit, AssignmentPlan plan, List<Person> selected) {
+    private void addTechLines(JPanel card, Unit unit, AssignmentPlan plan, @Nullable Person person) {
         Person tech = plan.plannedTechOf(unit);
-        Person person = selected.isEmpty() ? null : selected.get(0);
         Reason reason = (person == null) ? null : plan.whyNotTech(person, unit);
         boolean canTake = (person != null) && (reason == null);
 
@@ -638,13 +657,12 @@ final class CrewUnitBoard extends JPanel {
      * cannot take it.
      */
     private void addSeatLine(JPanel card, Unit unit, AssignmentPlan plan, CrewCoverage.SeatCoverage seatCoverage,
-          List<Person> selected, boolean isOpen) {
+          @Nullable Person person, boolean isOpen) {
         CrewSeat seat = seatCoverage.seat();
         SeatType type = seat.type();
         String seatName = CrewRowRenderers.seatLabel(unit, type);
 
         JPanel right = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
-        Person person = selected.isEmpty() ? null : selected.get(0);
         if (person != null) {
             Reason reason = plan.whyNotSeat(person, unit, type);
             if (reason == null) {
@@ -670,7 +688,7 @@ final class CrewUnitBoard extends JPanel {
      * @return the line, or {@code null} if there is nothing to say about the seat
      */
     private JComponent crewLine(Unit unit, AssignmentPlan plan, CrewCoverage.SeatCoverage seatCoverage,
-          List<StagedAssignment> arrivals, List<Person> selected, boolean isOpen) {
+          List<StagedAssignment> arrivals, @Nullable Person selected, boolean isOpen) {
         CrewSeat seat = seatCoverage.seat();
         List<Person> staying = new ArrayList<>();
         for (Person person : seat.occupants()) {
@@ -685,15 +703,8 @@ final class CrewUnitBoard extends JPanel {
             }
         }
 
-        Person replacer = null;
-        if (plan.openSeats(unit, seat.type()) <= 0) {
-            for (Person person : selected) {
-                if (plan.couldTake(person, unit, seat.type())) {
-                    replacer = person;
-                    break;
-                }
-            }
-        }
+        Person replacer = ((selected != null) && (plan.openSeats(unit, seat.type()) <= 0)
+                                 && plan.couldTake(selected, unit, seat.type())) ? selected : null;
 
         JPanel crew = wrap(10);
         int named = 0;

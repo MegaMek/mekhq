@@ -201,8 +201,8 @@ final class CrewAssignmentState {
     FamiliarityBand familiarity = FamiliarityBand.ANY;
     String peopleQuery = "";
 
-    /** The selected person: the dialog only ever puts one person in here, or none. */
-    final Set<Person> selectedPeople = new LinkedHashSet<>();
+    /** The selected person, or {@code null} for none. */
+    @Nullable Person selectedPerson;
 
     /** The seat auto-fill fills on the units shown, or {@code null} to pick the first one with room. */
     @Nullable SeatType targetSeat;
@@ -214,6 +214,30 @@ final class CrewAssignmentState {
      * its whole crew and its extra actions, and the Familiarity filter measures against its chassis.
      */
     @Nullable Unit selectedUnit;
+
+    /**
+     * Keeps what auto-fill fills to something the units shown still need: a seat type with an open place, or the
+     * missing techs. On the Techs page it is always the techs.
+     *
+     * @param openSeatTypes the seat types with an open place on the units shown, in the order to prefer them
+     * @param needTech      how many of the units shown take a tech and have none
+     * @param techsOnly     {@code true} on the Techs page
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void settleAutoFillTarget(Set<SeatType> openSeatTypes, int needTech, boolean techsOnly) {
+        if (techsOnly) {
+            targetTech = needTech > 0;
+            return;
+        }
+        if ((targetSeat == null) || !openSeatTypes.contains(targetSeat)) {
+            targetSeat = openSeatTypes.isEmpty() ? null : openSeatTypes.iterator().next();
+        }
+        if ((needTech == 0) || ((targetSeat == null) && !targetTech)) {
+            targetTech = (needTech > 0) && (targetSeat == null);
+        }
+    }
 
     // region Filters
 

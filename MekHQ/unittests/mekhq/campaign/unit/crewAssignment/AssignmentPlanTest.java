@@ -293,6 +293,38 @@ class AssignmentPlanTest {
     }
 
     @Test
+    void aStagedArrivalCanBeReplacedAndUndoBringsThemBack() {
+        Person arrival = fixture.person("Arrival", PersonnelRole.MEKWARRIOR);
+        Person newcomer = fixture.person("Newcomer", PersonnelRole.MEKWARRIOR);
+        Unit unit = fixture.soloPilotUnit(mock(Mek.class), "Mek").unit;
+        assertTrue(plan.stage(arrival, unit, SeatType.PILOT));
+
+        assertTrue(plan.canReplace(newcomer, arrival));
+        assertTrue(plan.stageReplacement(newcomer, arrival));
+
+        // The arrival's own staged move is dropped, as they end up where they started
+        assertNull(plan.plannedUnitOf(arrival));
+        assertEquals(unit, plan.plannedUnitOf(newcomer));
+        assertEquals(1, plan.size());
+
+        assertTrue(plan.undo());
+        assertEquals(unit, plan.plannedUnitOf(arrival));
+        assertNull(plan.plannedUnitOf(newcomer));
+    }
+
+    @Test
+    void someoneWhoCannotBeTakenOutCannotBeReplaced() {
+        Person holder = fixture.person("Holder", PersonnelRole.MEKWARRIOR);
+        Person newcomer = fixture.person("Newcomer", PersonnelRole.MEKWARRIOR);
+        fixture.soloPilotUnit(mock(Mek.class), "Mek").with(holder, SeatType.PILOT);
+        when(holder.isDeployed()).thenReturn(true);
+
+        assertFalse(plan.canReplace(newcomer, holder));
+        assertFalse(plan.stageReplacement(newcomer, holder));
+        assertTrue(plan.isEmpty());
+    }
+
+    @Test
     void someoneWithNoSeatCannotBeReplaced() {
         Person free = fixture.person("Free", PersonnelRole.MEKWARRIOR);
         Person newcomer = fixture.person("Newcomer", PersonnelRole.MEKWARRIOR);
