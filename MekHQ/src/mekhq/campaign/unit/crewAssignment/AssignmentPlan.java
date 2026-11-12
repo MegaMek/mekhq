@@ -198,8 +198,10 @@ public class AssignmentPlan {
      */
     public record TempCrewProblem(StagedTempCrew change, Reason reason) {}
 
-    /** Why a staged change cannot be applied. */
+    /** Why a staged change cannot be applied, or why a change cannot be staged in the first place. */
     public enum Reason {
+        /** The person already crews the unit, or is already its tech, once the plan is applied. */
+        ALREADY_ABOARD,
         /** The person is no longer active, employed and free, or has been deployed. */
         NOT_ASSIGNABLE,
         /** The person is not qualified for the seat, or cannot maintain the unit. */
@@ -1100,6 +1102,181 @@ public class AssignmentPlan {
     }
 
     // endregion Changing temporary crew
+
+    // region Explaining, replacing and previewing
+
+    /**
+     * Why a person cannot be staged into a seat right now. This is {@code null} exactly when {@link #canStage} is
+     * {@code true}.
+     *
+     * @param person the person
+     * @param unit   the unit
+     * @param type   the seat
+     *
+     * @return the first thing in the way, or {@code null} if they can be staged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable Reason whyNotSeat(final Person person, final Unit unit, final SeatType type) {
+        if (!unit.isAvailable()) {
+            return Reason.UNIT_UNAVAILABLE;
+        } else if (Objects.equals(plannedUnitOf(person), unit)) {
+            return Reason.ALREADY_ABOARD;
+        } else if (!SeatEligibility.isAssignable(person)) {
+            return Reason.NOT_ASSIGNABLE;
+        } else if (!SeatEligibility.canTake(person, unit, type, useAltAdvancedMedical, useImplants)) {
+            return Reason.NOT_QUALIFIED;
+        } else if (!LocationUtils.areSameEffectiveLocation(unit, person)) {
+            return Reason.DIFFERENT_LOCATION;
+        } else if (openSeats(unit, type) < 1) {
+            return Reason.SEAT_FULL;
+        }
+        return null;
+    }
+
+    /**
+     * Why a tech cannot be staged to maintain a unit right now. This is {@code null} exactly when
+     * {@link #canStageTech} is {@code true}.
+     *
+     * @param tech a person
+     * @param unit the unit
+     *
+     * @return the first thing in the way, or {@code null} if they can be staged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable Reason whyNotTech(final Person tech, final Unit unit) {
+        if (!unit.isAvailable()) {
+            return Reason.UNIT_UNAVAILABLE;
+        } else if (tech.equals(plannedTechOf(unit))) {
+            return Reason.ALREADY_ABOARD;
+        } else if (!SeatEligibility.isAssignable(tech) || isTechBusy.test(tech)) {
+            return Reason.NOT_ASSIGNABLE;
+        } else if (!SeatEligibility.canTech(tech, unit)) {
+            return Reason.NOT_QUALIFIED;
+        } else if (!LocationUtils.areSameEffectiveLocation(unit, tech)) {
+            return Reason.DIFFERENT_LOCATION;
+        } else if ((plannedTechMinutes(tech) + techMinutesFor(tech, unit)) > techMinutesAvailable(tech)) {
+            return Reason.NO_TECH_TIME;
+        }
+        return null;
+    }
+
+    /**
+     * @param tech a tech
+     * @param unit a unit
+     *
+     * @return the minutes of the tech's daily time the unit would take; see {@link #plannedTechMinutes}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int techMinutesNeeded(final Person tech, final Unit unit) {
+        return techMinutesFor(tech, unit);
+    }
+
+    /**
+     * Whether one person could take the seat another will hold, sending that other person out of the unit: the
+     * occupant can be taken out, the newcomer could take the seat once it has room, and the seat is not already over
+     * its size.
+     *
+     * @param newcomer the person to bring in
+     * @param occupant the person who will hold the seat once the plan is applied
+     *
+     * @return {@code true} if {@link #stageReplacement} would succeed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean canReplace(final Person newcomer, final Person occupant) {
+        final Unit unit = plannedUnitOf(occupant);
+        final SeatType seat = plannedSeatOf(occupant);
+        return (unit != null) && (seat != null)
+                     && !newcomer.equals(occupant)
+                     && canUnassign(occupant)
+                     && (openSeats(unit, seat) >= 0)
+                     && couldTake(newcomer, unit, seat);
+    }
+
+    /**
+     * Stages one person into the seat another will hold, and that other person out of the unit, as one step of
+     * history, so a single undo puts both back.
+     *
+     * @param newcomer the person to bring in
+     * @param occupant the person who will hold the seat once the plan is applied
+     *
+     * @return {@code true} if the replacement was staged; {@code false} if {@link #canReplace} says it cannot be
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean stageReplacement(final Person newcomer, final Person occupant) {
+        if (!canReplace(newcomer, occupant)) {
+            return false;
+        }
+        final Unit unit = plannedUnitOf(occupant);
+        final SeatType seat = plannedSeatOf(occupant);
+        final List<Runnable> reverts = new ArrayList<>();
+        put(occupant, null, null, reverts);
+        put(newcomer, unit, seat, reverts);
+        record(reverts);
+        return true;
+    }
+
+    /**
+     * @return the seat the person will hold once the plan is applied, or {@code null} if they will hold none
+     */
+    private @Nullable SeatType plannedSeatOf(final Person person) {
+        final StagedAssignment change = changes.get(person.getId());
+        return (change == null) ? currentSeatOf(person) : change.toSeat();
+    }
+
+    /**
+     * Works out what {@link #stage(List, List)} would stage, without staging it or adding to the history.
+     *
+     * @param people the people, in the order they should be seated
+     * @param units  the units, in the order they should be filled
+     *
+     * @return what would be staged, and who would be left over
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StageResult previewStage(final List<Person> people, final List<Unit> units) {
+        final List<Runnable> reverts = new ArrayList<>();
+        final StageResult result = stage(people, units, reverts);
+        runBack(reverts);
+        return result;
+    }
+
+    /**
+     * Works out what {@link #stageTechs(List, List)} would stage, without staging it or adding to the history.
+     *
+     * @param techs the techs, in the order they should be given units
+     * @param units the units, in the order they should be given techs
+     *
+     * @return what would be staged, and the units that would be left without a tech
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public TechStageResult previewStageTechs(final List<Person> techs, final List<Unit> units) {
+        final List<Runnable> reverts = new ArrayList<>();
+        final TechStageResult result = stageTechs(techs, units, reverts);
+        runBack(reverts);
+        return result;
+    }
+
+    /** Applies a step's reverts, last first, as {@link #undo} does. */
+    private static void runBack(final List<Runnable> reverts) {
+        for (int i = reverts.size() - 1; i >= 0; i--) {
+            reverts.get(i).run();
+        }
+    }
+
+    // endregion Explaining, replacing and previewing
 
     // region History
 

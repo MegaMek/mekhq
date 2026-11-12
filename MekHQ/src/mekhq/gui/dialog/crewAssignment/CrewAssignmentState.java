@@ -48,9 +48,10 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
 
 /**
- * What the player has chosen in the {@link CrewAssignmentDialog}: each page's filters, the units and people selected,
- * and the row being looked at. Selections are kept here rather than in the lists, so they survive filtering and
- * switching pages; that is how a bulk assignment is built up across the Units and Personnel pages.
+ * What the player has chosen in the {@link CrewAssignmentDialog}: the filters on its list of people and on its unit
+ * cards, the people selected, and the unit whose card is open. The selection is kept here rather than in the list, so
+ * it survives filtering. Units are never selected: the player assigns the selected people by pressing a button on the
+ * seat or tech slot of the unit they should go to.
  *
  * <p>The filter rules are here too, as plain methods, so the pages only show their results.</p>
  *
@@ -59,7 +60,7 @@ import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
  */
 final class CrewAssignmentState {
     /**
-     * Which units the Units page shows, by how well they are crewed once the plan is applied. Seats temporary crew
+     * Which units the unit cards show, by how well they are crewed once the plan is applied. Seats temporary crew
      * hold count as crewed, so a unit running on temporary crew does not need crew; {@link #ON_TEMP_CREW} finds those
      * units, to replace their temporary crew with real people.
      */
@@ -67,13 +68,37 @@ final class CrewAssignmentState {
         NEEDS_CREW, UNMANNED, ON_TEMP_CREW, NEEDS_TECH, FULLY_CREWED, ALL
     }
 
-    /** Which people the Personnel page shows, by whether they crew a unit once the plan is applied. */
+    /**
+     * Which people the people list shows, by whether they crew a unit once the plan is applied; on the Techs page, by
+     * whether they maintain one.
+     */
     enum Assignment {
         UNASSIGNED, ASSIGNED, EVERYONE
     }
 
     /**
-     * Which people the Personnel page shows, by their health: fit for duty, wounded (any injury severity, counting
+     * Which units the Techs page shows, by whether they have a tech once the plan is applied.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    enum TechStatus {
+        NEEDS_TECH, HAS_TECH, ALL
+    }
+
+    /**
+     * How the Techs page orders its techs: the most experienced first, those with the most daily time left first, or
+     * those who maintain the fewest units first.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    enum TechSort {
+        BEST, TIME_FREE, FEWEST_UNITS
+    }
+
+    /**
+     * Which people the people list shows, by their health: fit for duty, wounded (any injury severity, counting
      * advanced medical injuries), or pregnant. A wounded, pregnant person counts as both, and is not fit for duty.
      *
      * @author Illiani
@@ -84,7 +109,7 @@ final class CrewAssignmentState {
     }
 
     /**
-     * Which people the Personnel page shows, by their chassis familiarity: the familiarity steps where its bonuses
+     * Which people the people list shows, by their chassis familiarity: the familiarity steps where its bonuses
      * change. Only offered while chassis familiarity is in use.
      *
      * @author Illiani
@@ -106,7 +131,7 @@ final class CrewAssignmentState {
     }
 
     /**
-     * One entry in the Personnel page's Role filter: a single role, or a {@link RoleGroup}. A person matches if their
+     * One entry in the people list's Role filter: a single role, or a {@link RoleGroup}. A person matches if their
      * primary or secondary role does.
      *
      * @author Illiani
@@ -158,52 +183,47 @@ final class CrewAssignmentState {
     /** A seat type on one unit, used to show only the people who qualify for it. */
     record SeatFilter(Unit unit, SeatType seat) {}
 
-    CrewAssignmentPage page = CrewAssignmentPage.UNITS;
+    CrewAssignmentPage page = CrewAssignmentPage.ASSIGN;
 
-    // Units page
+    // Unit cards
     UnitStatus unitStatus = UnitStatus.NEEDS_CREW;
     @Nullable String unitType;
     @Nullable String formation;
     String unitQuery = "";
-    /** When set, the Units page shows only units with a seat this person could take. */
+    /** When set, the unit cards show only units with a seat this person could take. */
     @Nullable Person seatsForPerson;
-    /** When set, the Units page shows only units this tech could take on, or already maintains. */
+    /** When set, the unit cards show only units this tech could take on, or already maintains. */
     @Nullable Person unitsForTech;
+    /** When not empty, only these units are listed: the ones the dialog was opened for. */
+    final Set<Unit> pinnedUnits = new LinkedHashSet<>();
+    /** The Techs page's own status filter, in place of {@link #unitStatus}. */
+    TechStatus techStatus = TechStatus.NEEDS_TECH;
+    TechSort techSort = TechSort.BEST;
+    /** {@code true} while the panel shows where "spread the selected over the units shown" would put everyone. */
+    boolean isSpreadPreview;
 
-    // Personnel page
+    // People list
     Assignment assignment = Assignment.UNASSIGNED;
     @Nullable RoleFilter role;
     Condition condition = Condition.ANY;
     /** Stays {@link FamiliarityBand#ANY} while chassis familiarity is off, as the filter is not offered then. */
     FamiliarityBand familiarity = FamiliarityBand.ANY;
     String peopleQuery = "";
-    /** When set, the Personnel page shows only people who could take this seat, even if it is full now. */
+    /** When set, the people list shows only people who could take this seat, even if it is full now. */
     @Nullable SeatFilter qualifiedFor;
-    /** When set, the Personnel page shows only techs who could take this unit on, or already maintain it. */
+    /** When set, the people list shows only techs who could take this unit on, or already maintain it. */
     @Nullable Unit techFor;
 
-    // Selections, kept in the order they were made
-    final Set<Unit> selectedUnits = new LinkedHashSet<>();
+    /** The selected people, in the order they were selected; the first selected are the first assigned. */
     final Set<Person> selectedPeople = new LinkedHashSet<>();
 
-    /** The seat auto-fill fills on the selected units, or {@code null} to pick the first one with room. */
+    /** The seat auto-fill fills on the units shown, or {@code null} to pick the first one with room. */
     @Nullable SeatType targetSeat;
-    /** {@code true} when auto-fill gives techs to the selected units instead of filling a seat. */
+    /** {@code true} when auto-fill gives techs to the units shown instead of filling a seat. */
     boolean targetTech;
 
-    // The row whose details the inspector shows; at most one is set
-    @Nullable Unit focusedUnit;
-    @Nullable Person focusedPerson;
-
-    void focus(Unit unit) {
-        focusedUnit = unit;
-        focusedPerson = null;
-    }
-
-    void focus(Person person) {
-        focusedPerson = person;
-        focusedUnit = null;
-    }
+    /** The unit whose card is open, showing its whole crew and its extra actions; {@code null} for none. */
+    @Nullable Unit openUnit;
 
     // region Filters
 
@@ -211,7 +231,7 @@ final class CrewAssignmentState {
      * @param entry a unit
      * @param plan  the staged plan, whose changes count toward how well the unit is crewed
      *
-     * @return {@code true} if the Units page should list the unit
+     * @return {@code true} if the unit should have a card
      */
     boolean shows(UnitEntry entry, AssignmentPlan plan) {
         Unit unit = entry.unit();
@@ -221,7 +241,12 @@ final class CrewAssignmentState {
         if ((formation != null) && !formation.equals(entry.formationName())) {
             return false;
         }
-        if ((seatsForPerson != null) && (plan.seatFor(seatsForPerson, unit) == null)) {
+        if (!pinnedUnits.isEmpty() && !pinnedUnits.contains(unit)) {
+            return false;
+        }
+        // Seats are not shown on the Techs page, so a seat filter left over from the Assign page does not apply
+        if ((page != CrewAssignmentPage.TECHS) && (seatsForPerson != null)
+                  && (plan.seatFor(seatsForPerson, unit) == null)) {
             return false;
         }
         if ((unitsForTech != null) && !unitsForTech.equals(plan.plannedTechOf(unit))
@@ -239,10 +264,22 @@ final class CrewAssignmentState {
      * @param entry a unit
      * @param plan  the staged plan
      *
-     * @return {@code true} if the unit matches the Units page's status filter, ignoring its other filters
+     * @return {@code true} if the unit matches the unit cards' status filter, ignoring its other filters
      */
     boolean matchesStatus(UnitEntry entry, AssignmentPlan plan) {
         Unit unit = entry.unit();
+        if (page == CrewAssignmentPage.TECHS) {
+            // Only units a tech can maintain have a card on the Techs page
+            if (!SeatEligibility.takesTech(unit)) {
+                return false;
+            }
+            boolean hasTech = plan.plannedTechOf(unit) != null;
+            return switch (techStatus) {
+                case NEEDS_TECH -> !hasTech;
+                case HAS_TECH -> hasTech;
+                case ALL -> true;
+            };
+        }
         if (unitStatus == UnitStatus.NEEDS_TECH) {
             return SeatEligibility.takesTech(unit) && (plan.plannedTechOf(unit) == null);
         }
@@ -250,7 +287,7 @@ final class CrewAssignmentState {
     }
 
     /**
-     * Whether someone counts as assigned on the Personnel page. A tech is assigned while they maintain any unit, even
+     * Whether someone counts as assigned in the people list. A tech is assigned while they maintain any unit, even
      * though they crew none.
      *
      * @param person a person
@@ -267,7 +304,49 @@ final class CrewAssignmentState {
     }
 
     /**
-     * Whether the Personnel page's Role filter offers a role: the combat roles, and the tech roles (MekTech, Mechanic,
+     * @param person a person the dialog has read for this location
+     *
+     * @return {@code true} if the current page lists them at all, before any filter: everyone on the Assign page, only
+     *       techs on the Techs page
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    boolean lists(Person person) {
+        return (page != CrewAssignmentPage.TECHS) || person.isTech();
+    }
+
+    /**
+     * Whether someone counts as assigned under the current page's Assignment filter: on the Techs page, a tech who
+     * maintains a unit; elsewhere, as {@link #isAssigned}.
+     *
+     * @param person a person
+     * @param plan   the staged plan
+     *
+     * @return {@code true} if the Assignment filter should treat the person as assigned
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    boolean countsAsAssigned(Person person, AssignmentPlan plan) {
+        return (page == CrewAssignmentPage.TECHS) ? !plan.plannedTechUnits(person).isEmpty() :
+                     isAssigned(person, plan);
+    }
+
+    /**
+     * @param page a page
+     *
+     * @return the Assignment filter the page starts on: free people on the Assign page, every tech on the Techs page
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static Assignment defaultAssignment(CrewAssignmentPage page) {
+        return (page == CrewAssignmentPage.TECHS) ? Assignment.EVERYONE : Assignment.UNASSIGNED;
+    }
+
+    /**
+     * Whether the people list's Role filter offers a role: the combat roles, and the tech roles (MekTech, Mechanic,
      * AeroTek and BA Tech), so techs can be found when picking someone to maintain a unit.
      *
      * @param role a personnel role
@@ -327,11 +406,14 @@ final class CrewAssignmentState {
      * @param entry a person
      * @param plan  the staged plan, whose changes count toward whether the person crews a unit
      *
-     * @return {@code true} if the Personnel page should list the person
+     * @return {@code true} if the people list should show the person
      */
     boolean shows(PersonEntry entry, AssignmentPlan plan) {
         Person person = entry.person();
-        boolean isAssigned = isAssigned(person, plan);
+        if (!lists(person)) {
+            return false;
+        }
+        boolean isAssigned = countsAsAssigned(person, plan);
         if (((assignment == Assignment.UNASSIGNED) && isAssigned)
                   || ((assignment == Assignment.ASSIGNED) && !isAssigned)) {
             return false;
@@ -346,7 +428,8 @@ final class CrewAssignmentState {
                   && !matches(familiarityScore(person, familiarityChassis()), familiarity)) {
             return false;
         }
-        if ((qualifiedFor != null) && !plan.couldTake(person, qualifiedFor.unit(), qualifiedFor.seat())
+        if ((page != CrewAssignmentPage.TECHS) && (qualifiedFor != null)
+                  && !plan.couldTake(person, qualifiedFor.unit(), qualifiedFor.seat())
                   && !qualifiedFor.unit().equals(plan.plannedUnitOf(person))) {
             return false;
         }
@@ -379,7 +462,7 @@ final class CrewAssignmentState {
 
     /**
      * @param entry     a person, whose hits are their {@link Person#getTotalInjurySeverity()}
-     * @param condition the Personnel page's condition filter
+     * @param condition the people list's condition filter
      *
      * @return {@code true} if the person matches the condition filter
      *
@@ -399,7 +482,7 @@ final class CrewAssignmentState {
 
     /**
      * Counts the filters on a page's side rail set away from where the page starts, for when the rail is hidden.
-     * Starting choices, such as Unassigned on the Personnel page, are not counted.
+     * Starting choices, such as Unassigned in the people list, are not counted.
      *
      * @param page the page whose rail filters to count
      *
@@ -411,16 +494,14 @@ final class CrewAssignmentState {
     int activeRailFilters(CrewAssignmentPage page) {
         int active = 0;
         switch (page) {
-            case UNITS -> {
+            case ASSIGN, TECHS -> {
                 if (unitType != null) {
                     active++;
                 }
                 if (formation != null) {
                     active++;
                 }
-            }
-            case PERSONNEL -> {
-                if (assignment != Assignment.UNASSIGNED) {
+                if (assignment != defaultAssignment(page)) {
                     active++;
                 }
                 if (role != null) {
@@ -442,7 +523,7 @@ final class CrewAssignmentState {
 
     /**
      * The unit whose chassis the familiarity filter measures against: the unit a seat or tech is being found for, or
-     * else the one unit selected. With none of those, or several units selected, there is no one chassis to measure.
+     * else the unit whose card is open. With none of those, there is no one chassis to measure.
      *
      * @return the unit, or {@code null} to measure each person's best familiarity with any chassis
      *
@@ -456,10 +537,7 @@ final class CrewAssignmentState {
         if (techFor != null) {
             return techFor;
         }
-        if (selectedUnits.size() == 1) {
-            return selectedUnits.iterator().next();
-        }
-        return null;
+        return openUnit;
     }
 
     /**
@@ -497,7 +575,7 @@ final class CrewAssignmentState {
 
     /**
      * @param score a person's familiarity
-     * @param band  the Personnel page's familiarity filter
+     * @param band  the people list's familiarity filter
      *
      * @return {@code true} if the score falls in the band
      *

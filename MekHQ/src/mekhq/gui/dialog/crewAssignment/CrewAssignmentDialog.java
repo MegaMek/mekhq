@@ -62,10 +62,10 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
-import mekhq.campaign.unit.crewAssignment.AssignmentPlan.AssignResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Problem;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StageResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTech;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTempCrew;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TechStageResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TempCrewResult;
@@ -73,45 +73,41 @@ import mekhq.campaign.unit.crewAssignment.AutoFill;
 import mekhq.campaign.unit.crewAssignment.CrewAssignmentService;
 import mekhq.campaign.unit.crewAssignment.CrewAssignmentService.CommitReport;
 import mekhq.campaign.unit.crewAssignment.CrewSeat;
+import mekhq.campaign.unit.crewAssignment.SeatEligibility;
 import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.hud.*;
 import mekhq.gui.baseComponents.hud.HudFilterList.Item;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
-import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Assignment;
-import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Condition;
-import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Crewing;
-import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.FamiliarityBand;
-import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.RoleFilter;
-import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.RoleGroup;
-import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SeatFilter;
-import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SingleRole;
-import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.UnitStatus;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.*;
 import mekhq.gui.model.LocationFilterItem;
 
 /**
- * The crew assignment dialog: assign many people to many units at once, in a heads-up display in the style of the
- * interstellar map.
+ * The crew assignment dialog: assign people and techs to one location's units, in a heads-up display in the style of
+ * the interstellar map.
  *
- * <p>The Units and Personnel pages each list one location's units or people, filtered from a side rail and a search
- * field. Selections carry across pages, so a player can pick platoons on one page and soldiers on the other, then
- * assign them in one go, or let auto-fill put the best free people into every open seat. Names link between the pages.
- * Nothing changes until the player commits: assignments are staged in an {@link AssignmentPlan}, shown on the Review
- * page, can be undone a step at a time, and are applied by {@link CrewAssignmentService}.</p>
+ * <p>The Assign page shows the location's people on the left and a card per unit on the right, each filtered from the
+ * side rail and its own search field. The player ticks people, then presses the button on the seat or tech slot of the
+ * unit they should go to, so who goes where is always the player's choice; a mark beside anyone aboard takes them out
+ * again, and a full seat offers to replace whoever holds it. The Techs page is the same layout for maintenance alone:
+ * the techs, with the time each has left, beside the units and who maintains them. Auto-fill, temporary crew and
+ * spreading the selected people over the units, previewed first, work on every unit shown at once. Nothing changes
+ * until the player commits:
+ * assignments are staged in an {@link AssignmentPlan}, shown on the Review page, can be undone a step at a time, and
+ * are applied by {@link CrewAssignmentService}.</p>
  *
  * <p>The dialog is modal, so the campaign cannot change under a staged plan.</p>
  *
  * @author Illiani
  * @since 0.51.01
  */
-public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actions {
+public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actions {
     private static final MMLogger LOGGER = MMLogger.create(CrewAssignmentDialog.class);
     static final String RESOURCE_BUNDLE = "mekhq.resources.CrewAssignmentDialog";
 
     /** Wide enough for most formation names and their counts; longer names are shortened, with a tooltip. */
     private static final int RAIL_WIDTH = 300;
-    private static final int UNIT_ROW_HEIGHT = 52;
     private static final int PERSON_ROW_HEIGHT = 46;
     private static final int REVIEW_ROW_HEIGHT = 46;
 
@@ -123,8 +119,11 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     private String message = "";
     private boolean isWarning;
     private boolean closeRequested;
-    private int lastUnitIndex = -1;
     private int lastPersonIndex = -1;
+    /** The page with a list and cards the player was last on, which is where a link on the Review page goes back to. */
+    private CrewAssignmentPage lastWorkPage = CrewAssignmentPage.ASSIGN;
+    /** The units that pass the filters, in the order their cards are listed; the bulk actions work on these. */
+    private List<UnitEntry> shownUnits = List.of();
 
     private final HudModeSelector<CrewAssignmentPage> modeSelector;
     private final JLabel subtitle = new JLabel();
@@ -166,17 +165,16 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
 
     private final CardLayout pageCards = new CardLayout();
     private final JPanel pageHolder = new JPanel(pageCards);
-    private final CrewListPage<UnitEntry> unitsPage;
     private final CrewListPage<PersonEntry> peoplePage;
     private final CrewListPage<CrewRowRenderers.ReviewItem> reviewPage;
     private final HudVerdictBanner problemsBanner = new HudVerdictBanner();
-    private final CrewInspector inspector = new CrewInspector(this);
+    private final CrewUnitBoard board = new CrewUnitBoard(this);
 
     // Guides: one per page, sliding over the window from the right
     private final HudCheckBox autoOpenGuides = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, "guide.autoOpen"));
     private final HudGuideDrawer guideDrawer;
     private final HudButton guideButton = new HudButton("", false, true);
-    /** Hides or shows the filter rail on every page, for more room for the lists. */
+    /** Hides or shows the filter rail, for more room for the list and the cards. */
     private final HudButton filtersButton = new HudButton("", false, true);
     /** The page whose guide was last offered, so moving to another page offers that page's guide once. */
     private CrewAssignmentPage guideOfferedFor;
@@ -192,13 +190,12 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     // region Opening
 
     /**
-     * Opens the dialog for the location of the given units or people, with them already selected. People open it on
-     * the Units page, showing where they could serve; units open it on the Personnel page, showing who could crew
-     * them.
+     * Opens the dialog for the location of the given units or people. People are opened already selected, ready to be
+     * assigned; units are opened as the only cards listed, until the player clears that filter.
      *
      * @param frame    the main window
      * @param campaign the campaign
-     * @param units    units to select, possibly none
+     * @param units    the units to list, possibly none, for every unit that needs crew
      * @param people   people to select, possibly none
      *
      * @author Illiani
@@ -234,25 +231,16 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
               getTextAt(RESOURCE_BUNDLE, "tile.pending.sub"));
 
         AssignmentPlan plan = data.plan();
-        unitsPage = new CrewListPage<>(getTextAt(RESOURCE_BUNDLE, "units.search"), text -> {
-            state.unitQuery = text;
-            refresh();
-        }, new CrewRowRenderers.UnitRow(plan, state.selectedUnits::contains), UNIT_ROW_HEIGHT, this::onUnitRow);
         peoplePage = new CrewListPage<>(getTextAt(RESOURCE_BUNDLE, "personnel.search"), text -> {
             state.peopleQuery = text;
             refresh();
-        }, new CrewRowRenderers.PersonRow(plan, state.selectedPeople::contains), PERSON_ROW_HEIGHT,
+        }, new CrewRowRenderers.PersonRow(plan, state.selectedPeople::contains, this::isTechsPage),
+              PERSON_ROW_HEIGHT,
               this::onPersonRow);
+        peoplePage.setSelectAll(this::selectShownPeople);
+        // A click on a Review row does nothing by itself; its links open the unit or person it names
         reviewPage = new CrewListPage<>(null, text -> {}, new CrewRowRenderers.ReviewRow(plan), REVIEW_ROW_HEIGHT,
-              (item, index, isRange) -> {
-                  switch (item) {
-                      case CrewRowRenderers.CrewItem crewItem -> state.focus(crewItem.change().person());
-                      case CrewRowRenderers.TechItem techItem -> state.focus(techItem.change().unit());
-                      case CrewRowRenderers.TempCrewItem tempItem -> state.focus(tempItem.change().unit());
-                  }
-                  refresh();
-              });
-        unitsPage.setLinkHandler((entry, link) -> openLink(link));
+              (item, index, isRange) -> {});
         peoplePage.setLinkHandler((entry, link) -> openLink(link));
         reviewPage.setLinkHandler((change, link) -> openLink(link));
 
@@ -286,8 +274,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
                 requestClose();
             }
         });
-        setMinimumSize(scaleForGUI(1200, 700));
-        getContentPane().setPreferredSize(scaleForGUI(1400, 840));
+        setMinimumSize(scaleForGUI(1280, 700));
+        getContentPane().setPreferredSize(scaleForGUI(1520, 860));
         pack();
         setLocationRelativeTo(frame);
         setPreferences();
@@ -322,36 +310,33 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     }
 
     private void preselect(Collection<Unit> units, Collection<Person> people) {
-        for (Unit unit : units) {
-            if (data.entryFor(unit) != null) {
-                state.selectedUnits.add(unit);
-            }
-        }
         for (Person person : people) {
             if (data.entryFor(person) != null) {
                 state.selectedPeople.add(person);
             }
         }
-        if (!state.selectedPeople.isEmpty() && state.selectedUnits.isEmpty()) {
-            Person first = state.selectedPeople.iterator().next();
-            state.focus(first);
-            if (state.selectedPeople.size() == 1) {
-                state.seatsForPerson = first;
+        for (Unit unit : units) {
+            if (data.entryFor(unit) != null) {
+                state.pinnedUnits.add(unit);
             }
-            state.page = CrewAssignmentPage.UNITS;
-        } else if (!state.selectedUnits.isEmpty()) {
-            Unit first = state.selectedUnits.iterator().next();
-            state.focus(first);
-            if (state.selectedUnits.size() == 1) {
+        }
+        if (!state.pinnedUnits.isEmpty()) {
+            // Opened for these units: list only them, however well they are crewed, and show who could fill the
+            // first open seat when there is just the one
+            state.unitStatus = UnitStatus.ALL;
+            Unit first = state.pinnedUnits.iterator().next();
+            state.openUnit = first;
+            if (state.pinnedUnits.size() == 1) {
                 for (CrewSeat seat : data.plan().seatsOf(first)) {
                     if (data.plan().openSeats(first, seat.type()) > 0) {
                         state.qualifiedFor = new SeatFilter(first, seat.type());
-                        state.targetSeat = seat.type();
                         break;
                     }
                 }
             }
-            state.page = CrewAssignmentPage.PERSONNEL;
+        } else if (state.selectedPeople.size() == 1) {
+            // Opened for one person: list only the units with a seat they could take
+            state.seatsForPerson = state.selectedPeople.iterator().next();
         }
     }
 
@@ -369,8 +354,11 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         body.add(buildRail(), BorderLayout.WEST);
 
         pageHolder.setOpaque(false);
-        pageHolder.add(unitsPage, CrewAssignmentPage.UNITS.name());
-        pageHolder.add(peoplePage, CrewAssignmentPage.PERSONNEL.name());
+        JPanel work = new JPanel(new BorderLayout());
+        work.setOpaque(false);
+        work.add(peoplePage, BorderLayout.CENTER);
+        work.add(board, BorderLayout.EAST);
+        pageHolder.add(work, CrewAssignmentPage.ASSIGN.name());
         JPanel review = new JPanel(new BorderLayout());
         review.setOpaque(false);
         problemsBanner.setVisible(false);
@@ -378,7 +366,6 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         review.add(reviewPage, BorderLayout.CENTER);
         pageHolder.add(review, CrewAssignmentPage.REVIEW.name());
         body.add(pageHolder, BorderLayout.CENTER);
-        body.add(inspector, BorderLayout.EAST);
 
         content.add(buildCommandBar(), BorderLayout.NORTH);
         content.add(body, BorderLayout.CENTER);
@@ -423,38 +410,37 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     }
 
     private JComponent buildRail() {
-        JPanel unitRail = column();
-        unitRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.location"))));
-        unitRail.add(leftAligned(locationPicker));
-        unitRail.add(Box.createVerticalStrut(scaleForGUI(12)));
-        unitRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.unitType"))));
-        unitRail.add(leftAligned(typeFilter));
-        unitRail.add(Box.createVerticalStrut(scaleForGUI(12)));
-        unitRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.formation"))));
-        unitRail.add(leftAligned(formationFilter));
-
-        JPanel peopleRail = column();
-        peopleRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.assignment"))));
-        peopleRail.add(leftAligned(assignmentFilter));
-        peopleRail.add(Box.createVerticalStrut(scaleForGUI(12)));
-        peopleRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.role"))));
-        peopleRail.add(leftAligned(roleFilter));
-        peopleRail.add(Box.createVerticalStrut(scaleForGUI(12)));
-        peopleRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.condition"))));
-        peopleRail.add(leftAligned(conditionFilter));
+        // One rail for the Assign page: where, then who is listed, then which units have a card
+        JPanel rail = column();
+        rail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.location"))));
+        rail.add(leftAligned(locationPicker));
+        rail.add(Box.createVerticalStrut(scaleForGUI(12)));
+        rail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.assignment"))));
+        rail.add(leftAligned(assignmentFilter));
+        rail.add(Box.createVerticalStrut(scaleForGUI(12)));
+        rail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.role"))));
+        rail.add(leftAligned(roleFilter));
+        rail.add(Box.createVerticalStrut(scaleForGUI(12)));
+        rail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.condition"))));
+        rail.add(leftAligned(conditionFilter));
         if (data.familiarityMode().isEnabled()) {
             familiarityBasis.setForeground(TEXT_MUTED);
             familiarityBasis.setFont(hudFont(Font.PLAIN, 0.85f, 0.0f));
-            peopleRail.add(Box.createVerticalStrut(scaleForGUI(12)));
-            peopleRail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.familiarity"))));
-            peopleRail.add(leftAligned(familiarityBasis));
-            peopleRail.add(Box.createVerticalStrut(scaleForGUI(4)));
-            peopleRail.add(leftAligned(familiarityFilter));
+            rail.add(Box.createVerticalStrut(scaleForGUI(12)));
+            rail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.familiarity"))));
+            rail.add(leftAligned(familiarityBasis));
+            rail.add(Box.createVerticalStrut(scaleForGUI(4)));
+            rail.add(leftAligned(familiarityFilter));
         }
+        rail.add(Box.createVerticalStrut(scaleForGUI(12)));
+        rail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.unitType"))));
+        rail.add(leftAligned(typeFilter));
+        rail.add(Box.createVerticalStrut(scaleForGUI(12)));
+        rail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.formation"))));
+        rail.add(leftAligned(formationFilter));
 
         railHolder.setOpaque(false);
-        railHolder.add(railScroll(unitRail), CrewAssignmentPage.UNITS.name());
-        railHolder.add(railScroll(peopleRail), CrewAssignmentPage.PERSONNEL.name());
+        railHolder.add(railScroll(rail), CrewAssignmentPage.ASSIGN.name());
         railHolder.add(railScroll(column()), CrewAssignmentPage.REVIEW.name());
         railHolder.setPreferredSize(scaleForGUI(RAIL_WIDTH, 0));
         railHolder.setBorder(BorderFactory.createMatteBorder(0, 0, 0, scaleForGUI(1), BORDER));
@@ -536,23 +522,27 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         }
         guideButton.setText("?  " + getFormattedTextAt(RESOURCE_BUNDLE, "guide.button", state.page.getLabel())
                                              .toUpperCase(Locale.ROOT));
-        pageCards.show(pageHolder, state.page.name());
-        railCards.show(railHolder, state.page.name());
+        // The Assign and Techs pages are one layout, and one rail, showing different things
+        String card = state.page.isWorkPage() ? CrewAssignmentPage.ASSIGN.name() : state.page.name();
+        pageCards.show(pageHolder, card);
+        railCards.show(railHolder, card);
         refreshFiltersButton();
         subtitle.setText(getFormattedTextAt(RESOURCE_BUNDLE, "header.subtitle", data.locationName(),
               campaign.getLocalDate()));
 
         switch (state.page) {
-            case UNITS -> refreshUnitsPage(plan);
-            case PERSONNEL -> refreshPersonnelPage(plan);
+            case ASSIGN, TECHS -> {
+                lastWorkPage = state.page;
+                refreshPeople(plan);
+                refreshUnits(plan);
+            }
             case REVIEW -> refreshReviewPage(plan);
         }
-        inspector.refresh(state, data);
         refreshTiles(plan);
         refreshDock(plan);
     }
 
-    private void refreshUnitsPage(AssignmentPlan plan) {
+    private void refreshUnits(AssignmentPlan plan) {
         List<UnitEntry> shown = new ArrayList<>();
         Map<String, Integer> byType = new TreeMap<>();
         Map<String, Integer> byFormation = new TreeMap<>();
@@ -569,9 +559,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
                 shown.add(entry);
             }
         }
-        unitsPage.setRows(shown);
-        unitsPage.setCount(getFormattedTextAt(RESOURCE_BUNDLE, "units.count", shown.size(),
-              state.selectedUnits.size()));
+        shownUnits = List.copyOf(shown);
 
         typeFilter.setItems(withAll("rail.allTypes", statusMatches, byType));
         typeFilter.setSelected(state.unitType);
@@ -579,15 +567,53 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         formationFilter.setSelected(state.formation);
 
         List<JComponent> chips = new ArrayList<>();
-        for (UnitStatus status : UnitStatus.values()) {
-            HudChip chip = new HudChip(getTextAt(RESOURCE_BUNDLE, "UnitStatus." + status.name()), () -> {
-                state.unitStatus = status;
+        if (isTechsPage()) {
+            for (TechStatus status : TechStatus.values()) {
+                HudChip chip = new HudChip(getTextAt(RESOURCE_BUNDLE, "TechStatus." + status.name()), () -> {
+                    state.techStatus = status;
+                    refresh();
+                });
+                chip.setActive(state.techStatus == status);
+                chips.add(chip);
+            }
+        } else {
+            for (UnitStatus status : UnitStatus.values()) {
+                HudChip chip = new HudChip(getTextAt(RESOURCE_BUNDLE, "UnitStatus." + status.name()), () -> {
+                    state.unitStatus = status;
+                    refresh();
+                });
+                chip.setActive(state.unitStatus == status);
+                chips.add(chip);
+            }
+        }
+        if (!state.pinnedUnits.isEmpty()) {
+            HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "units.pinned",
+                  state.pinnedUnits.size()), () -> {
+                state.pinnedUnits.clear();
                 refresh();
             });
-            chip.setActive(state.unitStatus == status);
+            chip.setActive(true);
             chips.add(chip);
         }
-        if (state.seatsForPerson != null) {
+        // With one person selected, the cards can be narrowed to where that person could go
+        Person only = (state.selectedPeople.size() == 1) ? state.selectedPeople.iterator().next() : null;
+        if ((only != null) && (state.seatsForPerson == null) && (state.unitsForTech == null)) {
+            if (!isTechsPage()) {
+                chips.add(new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "units.seatsFor.offer",
+                      only.getFullTitle()), () -> {
+                    state.seatsForPerson = only;
+                    refresh();
+                }));
+            }
+            if (only.isTech()) {
+                chips.add(new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "units.forTech.offer",
+                      only.getFullTitle()), () -> {
+                    state.unitsForTech = only;
+                    refresh();
+                }));
+            }
+        }
+        if ((state.seatsForPerson != null) && !isTechsPage()) {
             HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "units.seatsFor",
                   state.seatsForPerson.getFullTitle()), () -> {
                 state.seatsForPerson = null;
@@ -605,14 +631,15 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
             chip.setActive(true);
             chips.add(chip);
         }
-        unitsPage.setChips(chips);
+        board.refresh(state, data, shown, chips);
     }
 
-    private void refreshPersonnelPage(AssignmentPlan plan) {
+    private void refreshPeople(AssignmentPlan plan) {
         List<PersonEntry> shown = new ArrayList<>();
         Map<PersonnelRole, Integer> byRole = new TreeMap<>();
         Map<RoleGroup, Integer> byRoleGroup = new EnumMap<>(RoleGroup.class);
         int unassigned = 0;
+        int listed = 0;
         int roleTotal = 0;
         Map<Condition, Integer> byCondition = new EnumMap<>(Condition.class);
         Map<FamiliarityBand, Integer> byFamiliarity = new EnumMap<>(FamiliarityBand.class);
@@ -621,8 +648,13 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         List<PersonEntry> people = data.people();
         for (PersonEntry entry : people) {
             Person person = entry.person();
+            if (!state.lists(person)) {
+                // The Techs page lists only techs
+                continue;
+            }
+            listed++;
             // Counted the way the list filters, so the rail's counts match the rows shown
-            boolean isAssigned = CrewAssignmentState.isAssigned(person, plan);
+            boolean isAssigned = state.countsAsAssigned(person, plan);
             if (!isAssigned) {
                 unassigned++;
             }
@@ -656,15 +688,43 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
                 shown.add(entry);
             }
         }
+        if (isTechsPage()) {
+            // The list arrives best first; the other orders keep that order among equals
+            switch (state.techSort) {
+                case BEST -> {
+                }
+                case TIME_FREE -> shown.sort(Comparator.comparingInt((PersonEntry entry) ->
+                      plan.techMinutesAvailable(entry.person()) - plan.plannedTechMinutes(entry.person())).reversed());
+                case FEWEST_UNITS -> shown.sort(Comparator.comparingInt((PersonEntry entry) ->
+                      plan.plannedTechUnits(entry.person()).size()));
+            }
+        }
         peoplePage.setRows(shown);
-        peoplePage.setCount(getFormattedTextAt(RESOURCE_BUNDLE, "personnel.count", shown.size(),
+        peoplePage.setCount(getFormattedTextAt(RESOURCE_BUNDLE, isTechsPage() ? "personnel.count.techs" :
+                                                                      "personnel.count", shown.size(),
               state.selectedPeople.size()));
+        List<JComponent> links = new ArrayList<>();
+        // Taking the selected people out of their units and off the units they maintain
+        boolean anyPlaced = state.selectedPeople.stream()
+                                  .anyMatch(person -> plan.canUnassign(person)
+                                                            || !plan.plannedTechUnits(person).isEmpty());
+        if (anyPlaced) {
+            JLabel unassign = Hud.link(getTextAt(RESOURCE_BUNDLE, "people.unassign"), this::unassignSelectedPeople);
+            unassign.setToolTipText(getTextAt(RESOURCE_BUNDLE, "people.unassign.toolTipText"));
+            links.add(unassign);
+        }
+        links.add(Hud.link(getFormattedTextAt(RESOURCE_BUNDLE, "people.selectAll", shown.size()),
+              this::selectShownPeople));
+        if (!state.selectedPeople.isEmpty()) {
+            links.add(Hud.link(getTextAt(RESOURCE_BUNDLE, "people.clear"), this::clearSelection));
+        }
+        peoplePage.setCountLinks(links);
 
         assignmentFilter.setItems(List.of(
               new Item<>(Assignment.UNASSIGNED, getTextAt(RESOURCE_BUNDLE, "Assignment.UNASSIGNED"), unassigned),
               new Item<>(Assignment.ASSIGNED, getTextAt(RESOURCE_BUNDLE, "Assignment.ASSIGNED"),
-                    people.size() - unassigned),
-              new Item<>(Assignment.EVERYONE, getTextAt(RESOURCE_BUNDLE, "Assignment.EVERYONE"), people.size())));
+                    listed - unassigned),
+              new Item<>(Assignment.EVERYONE, getTextAt(RESOURCE_BUNDLE, "Assignment.EVERYONE"), listed)));
         assignmentFilter.setSelected(state.assignment);
         List<Item<RoleFilter>> roles = new ArrayList<>();
         roles.add(new Item<>(null, getTextAt(RESOURCE_BUNDLE, "rail.allRoles"), roleTotal));
@@ -688,7 +748,17 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         }
 
         List<JComponent> chips = new ArrayList<>();
-        if (state.qualifiedFor != null) {
+        if (isTechsPage()) {
+            for (TechSort sort : TechSort.values()) {
+                HudChip chip = new HudChip(getTextAt(RESOURCE_BUNDLE, "TechSort." + sort.name()), () -> {
+                    state.techSort = sort;
+                    refresh();
+                });
+                chip.setActive(state.techSort == sort);
+                chips.add(chip);
+            }
+        }
+        if ((state.qualifiedFor != null) && !isTechsPage()) {
             SeatFilter filter = state.qualifiedFor;
             HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "personnel.qualifiedFor",
                   CrewRowRenderers.seatLabel(filter.unit(), filter.seat()), filter.unit().getName()), () -> {
@@ -850,23 +920,20 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
 
     // region Rows and links
 
-    private void onUnitRow(UnitEntry entry, int index, boolean isRange) {
-        List<UnitEntry> rows = unitsPage.rows();
-        toggle(rows, entry, index, isRange, lastUnitIndex, UnitEntry::unit, state.selectedUnits);
-        if (!isRange) {
-            lastUnitIndex = index;
-        }
-        state.focus(entry.unit());
-        refresh();
-    }
-
     private void onPersonRow(PersonEntry entry, int index, boolean isRange) {
         List<PersonEntry> rows = peoplePage.rows();
         toggle(rows, entry, index, isRange, lastPersonIndex, PersonEntry::person, state.selectedPeople);
         if (!isRange) {
             lastPersonIndex = index;
         }
-        state.focus(entry.person());
+        refresh();
+    }
+
+    /** Adds everyone the list shows to the selection. */
+    private void selectShownPeople() {
+        for (PersonEntry entry : peoplePage.rows()) {
+            state.selectedPeople.add(entry.person());
+        }
         refresh();
     }
 
@@ -928,29 +995,128 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
 
     // endregion Rows and links
 
-    // region Inspector actions
+    // region Board actions
+
+    private void showPage(CrewAssignmentPage page) {
+        enterPage(page);
+        refresh();
+    }
+
+    private boolean isTechsPage() {
+        return state.page == CrewAssignmentPage.TECHS;
+    }
+
+    /**
+     * Moves to a page. Going between the Assign and Techs pages starts the filters that mean something different on
+     * each of them over, so a role or a "who fits" filter from one page cannot quietly empty the other; the people
+     * ticked stay ticked. Coming back from the Review page changes nothing.
+     */
+    private void enterPage(CrewAssignmentPage page) {
+        if (page.isWorkPage() && (page != lastWorkPage)) {
+            state.assignment = CrewAssignmentState.defaultAssignment(page);
+            state.role = null;
+            state.qualifiedFor = null;
+            state.techFor = null;
+            state.seatsForPerson = null;
+            state.unitsForTech = null;
+            state.targetTech = false;
+            state.isSpreadPreview = false;
+            lastPersonIndex = -1;
+            lastWorkPage = page;
+        }
+        state.page = page;
+    }
 
     @Override
-    public void showPage(CrewAssignmentPage page) {
-        state.page = page;
+    public void searchUnits(String text) {
+        if (!text.equals(state.unitQuery)) {
+            state.unitQuery = text;
+            refresh();
+        }
+    }
+
+    @Override
+    public void assignToSeat(Unit unit, SeatType seat) {
+        AssignmentPlan plan = data.plan();
+        // In the order they were selected, so the first selected are the first seated; one step of history
+        List<Person> candidates = new ArrayList<>();
+        for (Person person : state.selectedPeople) {
+            if (!unit.equals(plan.plannedUnitOf(person))) {
+                candidates.add(person);
+            }
+        }
+        plan.fillSeats(candidates, List.of(unit), seat);
+        // Asked of the plan rather than read from what it staged: going back to a seat held now cancels a change
+        List<Person> placed = new ArrayList<>();
+        for (Person person : candidates) {
+            if (unit.equals(plan.plannedUnitOf(person))) {
+                placed.add(person);
+            }
+        }
+
+        String seatName = CrewRowRenderers.seatLabel(unit, seat);
+        if (placed.isEmpty()) {
+            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.seatRefused", seatName, unit.getName()), true);
+        } else {
+            // Those placed are done; anyone left stays selected, ready for the next seat or unit
+            placed.forEach(state.selectedPeople::remove);
+            if (placed.contains(state.seatsForPerson)) {
+                state.seatsForPerson = null;
+            }
+            int left = state.selectedPeople.size();
+            setMessage((left == 0) ?
+                             getFormattedTextAt(RESOURCE_BUNDLE, "message.seatStaged", placed.size(), seatName,
+                                   unit.getName()) :
+                             getFormattedTextAt(RESOURCE_BUNDLE, "message.seatStagedSome", placed.size(), seatName,
+                                   unit.getName(), left), false);
+        }
         refresh();
     }
 
     @Override
-    public void assignSelected() {
-        // Crew first, then spare techs, as one step of history
-        AssignResult result = data.plan().assign(sortedSelectedPeople(), orderedSelectedUnits());
-        StageResult crew = result.crew();
-        TechStageResult techs = result.techs();
-        Set<Person> techsPlaced = new HashSet<>();
-        techs.staged().forEach(change -> techsPlaced.add(change.toTech()));
+    public void assignTech(Unit unit) {
+        AssignmentPlan plan = data.plan();
+        Person current = plan.plannedTechOf(unit);
+        // The first selected tech who can take the unit on; they stay selected, as a tech can take several units
+        for (Person person : List.copyOf(state.selectedPeople)) {
+            if (person.isTech() && !person.equals(current) && plan.stageTech(person, unit)) {
+                setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.techStaged", person.getFullTitle(),
+                      unit.getName()), false);
+                refresh();
+                return;
+            }
+        }
+        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.techRefused", unit.getName()), true);
+        refresh();
+    }
 
-        int staged = crew.staged().size() + techs.staged().size();
-        int leftOver = (int) crew.leftOver().stream().filter(person -> !techsPlaced.contains(person)).count();
-        reportStaged(staged, leftOver);
-        // Those placed are done; anyone left over stays selected, ready to try with other units
-        state.selectedPeople.retainAll(crew.leftOver());
-        state.selectedPeople.removeAll(techsPlaced);
+    @Override
+    public void removeFromUnit(Person person) {
+        AssignmentPlan plan = data.plan();
+        Unit unit = plan.plannedUnitOf(person);
+        if ((unit != null) && plan.unassign(List.of(person)).leftOver().isEmpty()) {
+            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.removedFrom", person.getFullTitle(),
+                  unit.getName()), false);
+        } else {
+            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.cannotRemove", person.getFullTitle()), true);
+        }
+        refresh();
+    }
+
+    @Override
+    public void removeTech(Unit unit) {
+        AssignmentPlan plan = data.plan();
+        plan.unassignTechs(List.of(unit));
+        boolean removed = plan.plannedTechOf(unit) == null;
+        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, removed ? "message.techRemoved" : "message.notHere",
+              unit.getName()), !removed);
+        refresh();
+    }
+
+    @Override
+    public void removeCrew(Unit unit) {
+        int staged = data.plan().clearUnits(List.of(unit));
+        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.unassigned", staged), staged == 0);
         refresh();
     }
 
@@ -963,14 +1129,14 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
             }
         }
         if (state.targetTech) {
-            TechStageResult result = AutoFill.fillTechs(data.plan(), orderedSelectedUnits(), candidates);
+            TechStageResult result = AutoFill.fillTechs(data.plan(), shownUnitList(), candidates);
             reportStaged(result.staged().size(), 0);
             if (!result.leftOver().isEmpty()) {
                 setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.techsLeftOver", result.staged().size(),
                       result.leftOver().size()), true);
             }
         } else if (state.targetSeat != null) {
-            StageResult result = AutoFill.fill(data.plan(), orderedSelectedUnits(), state.targetSeat, candidates,
+            StageResult result = AutoFill.fill(data.plan(), shownUnitList(), state.targetSeat, candidates,
                   data.ranking());
             reportStaged(result.staged().size(), result.leftOver().size());
         }
@@ -988,10 +1154,75 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     }
 
     @Override
-    public void clearSelection() {
-        state.selectedUnits.clear();
+    public void selectOnly(List<Person> people) {
         state.selectedPeople.clear();
-        lastUnitIndex = -1;
+        state.selectedPeople.addAll(people);
+        lastPersonIndex = -1;
+        refresh();
+    }
+
+    @Override
+    public void replaceOccupant(Person newcomer, Person occupant) {
+        AssignmentPlan plan = data.plan();
+        Unit unit = plan.plannedUnitOf(occupant);
+        if ((unit != null) && plan.stageReplacement(newcomer, occupant)) {
+            state.selectedPeople.remove(newcomer);
+            if (newcomer.equals(state.seatsForPerson)) {
+                state.seatsForPerson = null;
+            }
+            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.replaced", occupant.getFullTitle(),
+                  newcomer.getFullTitle(), unit.getName()), false);
+        } else {
+            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.replaceRefused", occupant.getFullTitle()), true);
+        }
+        refresh();
+    }
+
+    @Override
+    public void toggleSpreadPreview() {
+        state.isSpreadPreview = !state.isSpreadPreview;
+        refresh();
+    }
+
+    @Override
+    public void spreadSelected() {
+        AssignmentPlan plan = data.plan();
+        // In the order they were selected, over the units in the order their cards are listed: what the preview showed
+        List<Person> people = List.copyOf(state.selectedPeople);
+        if (isTechsPage()) {
+            TechStageResult result = plan.stageTechs(people, shownUnitList());
+            if (result.staged().isEmpty()) {
+                setMessage(getTextAt(RESOURCE_BUNDLE, "message.spreadNone"), true);
+            } else {
+                // A tech given a unit is done with; one given none stays selected
+                for (StagedTech change : result.staged()) {
+                    state.selectedPeople.remove(change.toTech());
+                }
+                if (result.leftOver().isEmpty()) {
+                    reportStaged(result.staged().size(), 0);
+                } else {
+                    setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.techsLeftOver",
+                          result.staged().size(), result.leftOver().size()), true);
+                }
+            }
+        } else {
+            StageResult result = plan.stage(people, shownUnitList());
+            if (result.leftOver().size() == people.size()) {
+                setMessage(getTextAt(RESOURCE_BUNDLE, "message.spreadNone"), true);
+            } else {
+                state.selectedPeople.retainAll(result.leftOver());
+                state.seatsForPerson = null;
+                reportStaged(people.size() - result.leftOver().size(), result.leftOver().size());
+            }
+        }
+        state.isSpreadPreview = false;
+        refresh();
+    }
+
+    @Override
+    public void clearSelection() {
+        state.isSpreadPreview = false;
+        state.selectedPeople.clear();
         lastPersonIndex = -1;
         refresh();
     }
@@ -1009,46 +1240,51 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         refresh();
     }
 
-    @Override
-    public void unassignSelectedPeople() {
+    /** Takes the selected people out of their units and off every unit they maintain. */
+    private void unassignSelectedPeople() {
         int staged = data.plan().unassignEverything(sortedSelectedPeople());
         setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.unassigned", staged), staged == 0);
         refresh();
     }
 
     @Override
-    public void clearSelectedUnits() {
-        int staged = data.plan().clearUnits(orderedSelectedUnits());
-        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.unassigned", staged), staged == 0);
-        refresh();
+    public void fillTempCrewOn(Unit unit) {
+        fillTempCrew(List.of(unit));
     }
 
     @Override
-    public void removeSelectedTechs() {
-        int staged = data.plan().unassignTechs(orderedSelectedUnits());
-        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.unassigned", staged), staged == 0);
-        refresh();
+    public void fillTempCrewOnShown() {
+        fillTempCrew(shownUnitList());
     }
 
-    @Override
-    public void fillTempCrew() {
-        TempCrewResult result = data.plan().fillTempCrew(orderedSelectedUnits(), data.tempCrewPool());
+    private void fillTempCrew(List<Unit> units) {
+        TempCrewResult result = data.plan().fillTempCrew(units, data.tempCrewPool());
         int filled = result.staged().size();
         int added = result.staged().stream().mapToInt(StagedTempCrew::change).sum();
         if (filled == 0) {
             setMessage(getTextAt(RESOURCE_BUNDLE, "message.tempCrewNone"), true);
-        } else if (!result.leftOver().isEmpty()) {
+        } else if (!result.leftOver().isEmpty() && (units.size() == 1)) {
             setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.tempCrewFilledSome", added, filled,
                   result.leftOver().size()), true);
         } else {
+            // Across every unit shown, the units with nothing to fill are expected, not a warning
             setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.tempCrewFilled", added, filled), false);
         }
         refresh();
     }
 
     @Override
-    public void removeTempCrew() {
-        TempCrewResult result = data.plan().removeTempCrew(orderedSelectedUnits());
+    public void removeTempCrewOn(Unit unit) {
+        removeTempCrew(List.of(unit));
+    }
+
+    @Override
+    public void removeTempCrewOnShown() {
+        removeTempCrew(shownUnitList());
+    }
+
+    private void removeTempCrew(List<Unit> units) {
+        TempCrewResult result = data.plan().removeTempCrew(units);
         int removed = -result.staged().stream().mapToInt(StagedTempCrew::change).sum();
         setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.tempCrewRemoved", removed,
               result.staged().size()), result.staged().isEmpty());
@@ -1057,53 +1293,59 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
 
     @Override
     public void findTechFor(Unit unit) {
-        state.selectedUnits.add(unit);
-        state.targetTech = true;
+        // The list narrows to the techs who could take the unit on; the player ticks one and presses its button
         state.techFor = unit;
         state.qualifiedFor = null;
         state.assignment = Assignment.EVERYONE;
         state.role = null;
         state.peopleQuery = "";
         peoplePage.setSearchText("");
-        state.page = CrewAssignmentPage.PERSONNEL;
         refresh();
     }
 
     @Override
-    public void findUnitsForTech(Person tech) {
-        state.selectedPeople.add(tech);
-        state.unitsForTech = tech;
-        state.seatsForPerson = null;
-        state.unitStatus = UnitStatus.ALL;
-        state.unitType = null;
-        state.formation = null;
-        state.unitQuery = "";
-        unitsPage.setSearchText("");
-        state.page = CrewAssignmentPage.UNITS;
+    public void findPeopleFor(Unit unit, SeatType seat) {
+        // The list narrows to the free people who could take the seat; the player ticks them and presses its button
+        state.qualifiedFor = new SeatFilter(unit, seat);
+        state.techFor = null;
+        state.assignment = Assignment.UNASSIGNED;
+        state.role = null;
+        state.peopleQuery = "";
+        peoplePage.setSearchText("");
         refresh();
     }
 
     @Override
-    public void openUnit(Unit unit) {
+    public void toggleUnit(Unit unit) {
+        state.openUnit = unit.equals(state.openUnit) ? null : unit;
+        refresh();
+    }
+
+    /** Shows a unit's card, open, clearing the unit filters if they hide it. */
+    private void openUnit(Unit unit) {
         UnitEntry entry = data.entryFor(unit);
         if (entry == null) {
             setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.notHere", unit.getName()), true);
             refresh();
             return;
         }
+        // Stay on the Techs page for a unit a tech can maintain; anything else only has a card on the Assign page
+        enterPage(((lastWorkPage == CrewAssignmentPage.TECHS) && SeatEligibility.takesTech(unit)) ?
+                        CrewAssignmentPage.TECHS : CrewAssignmentPage.ASSIGN);
         if (!state.shows(entry, data.plan())) {
             state.unitStatus = UnitStatus.ALL;
+            state.techStatus = TechStatus.ALL;
             state.unitType = null;
             state.formation = null;
             state.seatsForPerson = null;
             state.unitsForTech = null;
+            state.pinnedUnits.clear();
             state.unitQuery = "";
-            unitsPage.setSearchText("");
+            board.setSearchText("");
         }
-        state.focus(unit);
-        state.page = CrewAssignmentPage.UNITS;
+        state.openUnit = unit;
         refresh();
-        unitsPage.reveal(entry);
+        board.reveal(unit);
     }
 
     @Override
@@ -1114,58 +1356,30 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
             refresh();
             return;
         }
+        // Stay on the Techs page for a tech; anyone else is only listed on the Assign page
+        enterPage(((lastWorkPage == CrewAssignmentPage.TECHS) && person.isTech()) ?
+                        CrewAssignmentPage.TECHS : CrewAssignmentPage.ASSIGN);
         if (!state.shows(entry, data.plan())) {
             state.assignment = Assignment.EVERYONE;
             state.role = null;
+            state.condition = Condition.ANY;
+            state.familiarity = FamiliarityBand.ANY;
             state.qualifiedFor = null;
             state.techFor = null;
             state.peopleQuery = "";
             peoplePage.setSearchText("");
         }
-        state.focus(person);
-        state.page = CrewAssignmentPage.PERSONNEL;
         refresh();
         peoplePage.reveal(entry);
     }
 
-    @Override
-    public void findPeopleFor(Unit unit, SeatType seat) {
-        state.selectedUnits.add(unit);
-        state.targetSeat = seat;
-        state.qualifiedFor = new SeatFilter(unit, seat);
-        state.techFor = null;
-        state.targetTech = false;
-        state.assignment = Assignment.UNASSIGNED;
-        state.role = null;
-        state.peopleQuery = "";
-        peoplePage.setSearchText("");
-        state.page = CrewAssignmentPage.PERSONNEL;
-        refresh();
-    }
-
-    @Override
-    public void findUnitsFor(Person person) {
-        state.selectedPeople.add(person);
-        state.seatsForPerson = person;
-        state.unitsForTech = null;
-        state.unitStatus = UnitStatus.NEEDS_CREW;
-        state.unitType = null;
-        state.formation = null;
-        state.unitQuery = "";
-        unitsPage.setSearchText("");
-        state.page = CrewAssignmentPage.UNITS;
-        refresh();
-    }
-
-    /** @return the selected units in the order the Units page lists them */
-    private List<Unit> orderedSelectedUnits() {
-        List<Unit> ordered = new ArrayList<>();
-        for (UnitEntry entry : data.units()) {
-            if (state.selectedUnits.contains(entry.unit())) {
-                ordered.add(entry.unit());
-            }
+    /** @return the units whose cards are listed, in order */
+    private List<Unit> shownUnitList() {
+        List<Unit> units = new ArrayList<>(shownUnits.size());
+        for (UnitEntry entry : shownUnits) {
+            units.add(entry.unit());
         }
-        return ordered;
+        return units;
     }
 
     /** @return the selected people, best first */
@@ -1175,7 +1389,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
         return sorted;
     }
 
-    // endregion Inspector actions
+    // endregion Board actions
 
     // region Guides
 
@@ -1215,6 +1429,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
             return;
         }
         location = item;
+        state.pinnedUnits.clear();
         reload();
         setMessage("", false);
         refresh();
@@ -1223,25 +1438,25 @@ public class CrewAssignmentDialog extends JDialog implements CrewInspector.Actio
     /** Reads the location again, after a commit or a change of location; selections and filters start over. */
     private void reload() {
         data = new CrewAssignmentData(campaign, location);
-        state.selectedUnits.clear();
         state.selectedPeople.clear();
-        state.focusedUnit = null;
-        state.focusedPerson = null;
+        state.openUnit = null;
         state.seatsForPerson = null;
         state.unitsForTech = null;
         state.qualifiedFor = null;
         state.techFor = null;
         state.targetTech = false;
+        state.isSpreadPreview = false;
         state.unitType = null;
         state.formation = null;
         state.role = null;
         state.condition = Condition.ANY;
         state.familiarity = FamiliarityBand.ANY;
-        lastUnitIndex = -1;
         lastPersonIndex = -1;
+        shownUnits = List.of();
+        board.resetCards();
         // The row renderers hold the plan they draw from, so they are given the new one
-        unitsPage.setRenderer(new CrewRowRenderers.UnitRow(data.plan(), state.selectedUnits::contains));
-        peoplePage.setRenderer(new CrewRowRenderers.PersonRow(data.plan(), state.selectedPeople::contains));
+        peoplePage.setRenderer(new CrewRowRenderers.PersonRow(data.plan(), state.selectedPeople::contains,
+              this::isTechsPage));
         reviewPage.setRenderer(new CrewRowRenderers.ReviewRow(data.plan()));
     }
 

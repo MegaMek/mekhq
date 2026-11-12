@@ -41,8 +41,10 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
  * @since 0.51.01
  */
 enum CrewAssignmentPage {
-    UNITS("CrewAssignmentPage.UNITS"),
-    PERSONNEL("CrewAssignmentPage.PERSONNEL"),
+    /** People on the left, units and their seats on the right: where every assignment is made. */
+    ASSIGN("CrewAssignmentPage.ASSIGN"),
+    /** The same layout for maintenance: the techs on the left, the units and who maintains them on the right. */
+    TECHS("CrewAssignmentPage.TECHS"),
     REVIEW("CrewAssignmentPage.REVIEW");
 
     private final String labelKey;
@@ -53,5 +55,15 @@ enum CrewAssignmentPage {
 
     String getLabel() {
         return getTextAt(CrewAssignmentDialog.RESOURCE_BUNDLE, labelKey);
+    }
+
+    /**
+     * @return {@code true} for the pages that list people beside unit cards; {@code false} for the Review page
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    boolean isWorkPage() {
+        return this != REVIEW;
     }
 }

@@ -186,6 +186,58 @@ class AssignmentPlanTechTempCrewTest {
     }
 
     @Test
+    void whyNotTechExplainsWhatIsInTheWay() {
+        Person tech = fixture.tech("Tech", 60);
+        Person pilot = fixture.person("Pilot", PersonnelRole.MEKWARRIOR);
+        Unit first = mek("A").unit;
+        Unit second = mek("B").unit;
+
+        assertNull(plan.whyNotTech(tech, first));
+        assertEquals(Reason.NOT_QUALIFIED, plan.whyNotTech(pilot, first));
+
+        // Each unit takes 60 minutes a day, so the first uses up the tech's whole day
+        assertTrue(plan.stageTech(tech, first));
+
+        assertEquals(Reason.ALREADY_ABOARD, plan.whyNotTech(tech, first));
+        assertEquals(Reason.NO_TECH_TIME, plan.whyNotTech(tech, second));
+        assertFalse(plan.canStageTech(tech, second));
+    }
+
+    @Test
+    void whyNotTechSaysABusyTechIsNotAvailable() {
+        Person tech = fixture.tech("Tech", 480);
+        plan.setTechBusy(person -> person == tech);
+
+        assertEquals(Reason.NOT_ASSIGNABLE, plan.whyNotTech(tech, mek("Mek").unit));
+    }
+
+    @Test
+    void theMinutesAUnitNeedsAreTheMinutesItTakes() {
+        Person tech = fixture.tech("Tech", 480);
+        Unit unit = mek("Mek").unit;
+
+        int needed = plan.techMinutesNeeded(tech, unit);
+        plan.stageTech(tech, unit);
+
+        assertEquals(needed, plan.plannedTechMinutes(tech));
+    }
+
+    @Test
+    void aTechPreviewStagesNothingAndLeavesNoHistory() {
+        Person tech = fixture.tech("Tech", 150);
+        List<Unit> units = List.of(mek("A").unit, mek("B").unit, mek("C").unit);
+
+        TechStageResult preview = plan.previewStageTechs(List.of(tech), units);
+
+        assertEquals(2, preview.staged().size());
+        assertEquals(List.of(units.get(2)), preview.leftOver());
+        assertTrue(plan.isEmpty());
+        assertFalse(plan.canUndo());
+        assertEquals(0, plan.plannedTechMinutes(tech));
+        assertNull(plan.plannedTechOf(units.get(0)));
+    }
+
+    @Test
     void selfCrewedUnitsTakeNoTech() {
         Person tech = fixture.tech("Tech", 480);
         Unit dropShip = mek("DropShip").unit;

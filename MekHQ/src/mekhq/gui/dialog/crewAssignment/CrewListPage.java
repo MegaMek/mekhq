@@ -41,6 +41,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 import java.awt.BorderLayout;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -112,6 +113,8 @@ final class CrewListPage<T> extends JPanel {
     private final HudLinkList<T> list = new HudLinkList<>(model);
     private final JPanel chips = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, scaleForGUI(6), 0));
     private final JLabel count = new JLabel();
+    /** Links beside the count line, such as "Select all shown". */
+    private final JPanel countLinks = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(14), 0));
     private final @Nullable JTextField search;
 
     /**
@@ -168,9 +171,12 @@ final class CrewListPage<T> extends JPanel {
         head.add(chips);
         count.setForeground(TEXT_FAINT);
         count.setFont(hudFont(Font.PLAIN, 0.82f, 0.0f));
-        count.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(6), 0, 0, 0));
-        count.setAlignmentX(LEFT_ALIGNMENT);
-        head.add(count);
+        JPanel countRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(10), 0));
+        countRow.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(6), 0, 0, 0));
+        countRow.add(count, BorderLayout.CENTER);
+        countRow.add(countLinks, BorderLayout.EAST);
+        countRow.setAlignmentX(LEFT_ALIGNMENT);
+        head.add(countRow);
 
         list.setCellRenderer(renderer);
         list.setFixedCellHeight(scaleForGUI(rowHeight));
@@ -255,6 +261,40 @@ final class CrewListPage<T> extends JPanel {
 
     void setCount(String text) {
         count.setText(text);
+    }
+
+    /**
+     * Replaces the links beside the count line.
+     *
+     * @param links the links, left to right; none for a page without any
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void setCountLinks(List<? extends JComponent> links) {
+        countLinks.removeAll();
+        links.forEach(countLinks::add);
+        countLinks.revalidate();
+        countLinks.repaint();
+    }
+
+    /**
+     * Makes Ctrl+A (Cmd+A on a Mac) in the list select every row shown, as it would in any list.
+     *
+     * @param onSelectAll called when the player presses the shortcut
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void setSelectAll(Runnable onSelectAll) {
+        list.getInputMap(JComponent.WHEN_FOCUSED).put(KeyStroke.getKeyStroke(KeyEvent.VK_A,
+              Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx()), "selectAllRows");
+        list.getActionMap().put("selectAllRows", new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent event) {
+                onSelectAll.run();
+            }
+        });
     }
 
     /** Puts text in the search field without the player typing it, for example to clear it. */

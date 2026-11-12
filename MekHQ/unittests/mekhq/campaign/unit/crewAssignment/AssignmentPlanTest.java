@@ -233,6 +233,102 @@ class AssignmentPlanTest {
     }
 
     @Test
+    void whyNotSeatNamesTheFirstThingInTheWay() {
+        Unit squad = platoon("Squad", 1);
+        Person soldier = fixture.person("Soldier", PersonnelRole.SOLDIER);
+        Person second = fixture.person("Second", PersonnelRole.SOLDIER);
+        Person trooper = fixture.person("Trooper", PersonnelRole.BATTLE_ARMOUR);
+
+        assertNull(plan.whyNotSeat(soldier, squad, SeatType.SOLDIER));
+        assertEquals(Reason.NOT_QUALIFIED, plan.whyNotSeat(trooper, squad, SeatType.SOLDIER));
+
+        plan.stage(soldier, squad, SeatType.SOLDIER);
+
+        assertEquals(Reason.ALREADY_ABOARD, plan.whyNotSeat(soldier, squad, SeatType.SOLDIER));
+        assertEquals(Reason.SEAT_FULL, plan.whyNotSeat(second, squad, SeatType.SOLDIER));
+    }
+
+    @Test
+    void whyNotSeatAgreesWithCanStage() {
+        Unit squad = platoon("Squad", 1);
+        Unit refitting = platoon("Refitting", 1);
+        when(refitting.isAvailable()).thenReturn(false);
+        Person soldier = fixture.person("Soldier", PersonnelRole.SOLDIER);
+
+        assertTrue(plan.canStage(soldier, squad, SeatType.SOLDIER));
+        assertNull(plan.whyNotSeat(soldier, squad, SeatType.SOLDIER));
+        assertFalse(plan.canStage(soldier, refitting, SeatType.SOLDIER));
+        assertEquals(Reason.UNIT_UNAVAILABLE, plan.whyNotSeat(soldier, refitting, SeatType.SOLDIER));
+    }
+
+    @Test
+    void aReplacementSwapsTheNewcomerInAsOneStepOfHistory() {
+        Person holder = fixture.person("Holder", PersonnelRole.MEKWARRIOR);
+        Person newcomer = fixture.person("Newcomer", PersonnelRole.MEKWARRIOR);
+        Unit unit = fixture.soloPilotUnit(mock(Mek.class), "Mek").with(holder, SeatType.PILOT).unit;
+
+        assertTrue(plan.canReplace(newcomer, holder));
+        assertTrue(plan.stageReplacement(newcomer, holder));
+
+        assertNull(plan.plannedUnitOf(holder));
+        assertEquals(unit, plan.plannedUnitOf(newcomer));
+        assertEquals(0, plan.openSeats(unit, SeatType.PILOT));
+        assertEquals(2, plan.size());
+
+        // One undo puts both of them back
+        assertTrue(plan.undo());
+        assertTrue(plan.isEmpty());
+        assertEquals(unit, plan.plannedUnitOf(holder));
+    }
+
+    @Test
+    void someoneUnqualifiedCannotReplaceAnyone() {
+        Person holder = fixture.person("Holder", PersonnelRole.MEKWARRIOR);
+        Person soldier = fixture.person("Soldier", PersonnelRole.SOLDIER);
+        fixture.soloPilotUnit(mock(Mek.class), "Mek").with(holder, SeatType.PILOT);
+
+        assertFalse(plan.canReplace(soldier, holder));
+        assertFalse(plan.stageReplacement(soldier, holder));
+        assertTrue(plan.isEmpty());
+    }
+
+    @Test
+    void someoneWithNoSeatCannotBeReplaced() {
+        Person free = fixture.person("Free", PersonnelRole.MEKWARRIOR);
+        Person newcomer = fixture.person("Newcomer", PersonnelRole.MEKWARRIOR);
+
+        assertFalse(plan.canReplace(newcomer, free));
+    }
+
+    @Test
+    void aPreviewStagesNothingAndLeavesNoHistory() {
+        Unit unit = platoon("Platoon", 2);
+        List<Person> people = soldiers(3);
+
+        StageResult preview = plan.previewStage(people, List.of(unit));
+
+        assertEquals(2, preview.staged().size());
+        assertEquals(List.of(people.get(2)), preview.leftOver());
+        assertTrue(plan.isEmpty());
+        assertFalse(plan.canUndo());
+        assertEquals(2, plan.openSeats(unit, SeatType.SOLDIER));
+        assertNull(plan.plannedUnitOf(people.get(0)));
+    }
+
+    @Test
+    void aPreviewMatchesWhatStagingThenDoes() {
+        Unit first = platoon("First", 1);
+        Unit second = platoon("Second", 2);
+        List<Person> people = soldiers(3);
+
+        StageResult preview = plan.previewStage(people, List.of(first, second));
+        StageResult staged = plan.stage(people, List.of(first, second));
+
+        assertEquals(preview.staged(), staged.staged());
+        assertEquals(preview.leftOver(), staged.leftOver());
+    }
+
+    @Test
     void changesKeepTheOrderTheyWereStaged() {
         Unit unit = platoon("Platoon", 3);
         List<Person> people = soldiers(3);

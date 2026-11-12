@@ -102,18 +102,17 @@ class CrewAssignmentStateFamiliarityTest {
     @Test
     void chassisComesFromTheSeatBeingFilledFirst() {
         CrewAssignmentState state = new CrewAssignmentState();
-        state.selectedUnits.add(unitWithChassis("Locust"));
+        state.openUnit = unitWithChassis("Locust");
         state.qualifiedFor = new SeatFilter(unitWithChassis("Atlas"), SeatType.PILOT);
         assertEquals("Atlas", state.familiarityChassis());
     }
 
     @Test
-    void chassisComesFromASingleSelectedUnit() {
+    void chassisComesFromTheOpenUnitCard() {
         CrewAssignmentState state = new CrewAssignmentState();
-        state.selectedUnits.add(unitWithChassis("Locust"));
-        assertEquals("Locust", state.familiarityChassis());
-
-        state.selectedUnits.add(unitWithChassis("Atlas"));
         assertNull(state.familiarityChassis());
+
+        state.openUnit = unitWithChassis("Locust");
+        assertEquals("Locust", state.familiarityChassis());
     }
 }

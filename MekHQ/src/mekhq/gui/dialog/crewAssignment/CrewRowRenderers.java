@@ -46,6 +46,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
@@ -67,14 +68,11 @@ import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Reason;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTech;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTempCrew;
-import mekhq.campaign.unit.crewAssignment.SeatEligibility;
 import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudLinkList;
-import mekhq.gui.baseComponents.hud.HudRing;
 import mekhq.gui.baseComponents.hud.HudToolTip;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
-import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
 
 /**
  * The row renderers of the crew assignment lists, and the labels they share. Links in a row carry the {@link Unit} or
@@ -281,115 +279,25 @@ final class CrewRowRenderers {
 
     // endregion Shared labels
 
-    // region Units
-
-    /** A unit row: its crewing ring, name and type, formation and lead crew member, and a badge per seat. */
-    static final class UnitRow extends Row implements ListCellRenderer<UnitEntry> {
-        private final AssignmentPlan plan;
-        private final Predicate<Unit> isSelected;
-        private HudRing ring;
-        private final JLabel formation = label(LINE_FONT, TEXT_MUTED);
-        private final JLabel lead = label(LINE_FONT, ACCENT_BRIGHT);
-
-        UnitRow(AssignmentPlan plan, Predicate<Unit> isSelected) {
-            super(true);
-            this.plan = plan;
-            this.isSelected = isSelected;
-            secondLine.add(formation);
-            secondLine.add(lead);
-        }
-
-        @Override
-        void addMarker(JPanel left) {
-            ring = new HudRing();
-            left.add(Box.createHorizontalStrut(scaleForGUI(6)));
-            left.add(ring);
-        }
-
-        @Override
-        public Component getListCellRendererComponent(JList<? extends UnitEntry> list, UnitEntry entry, int index,
-              boolean selectedInList, boolean cellHasFocus) {
-            Unit unit = entry.unit();
-            paintState(isSelected.test(unit));
-            CrewCoverage.UnitCoverage coverage = CrewCoverage.of(unit, plan);
-            ring.setColor(crewingColor(coverage.crewing()), false);
-            name.setText(unit.getName());
-            role.setText(entry.typeName());
-            status.setText(entry.damageName());
-            status.setForeground(damageColor(entry.damageState()));
-            formation.setText(entry.formationName().isEmpty() ? "" : entry.formationName() + "  ·  ");
-
-            Person leader = firstCrew(unit);
-            if (leader == null) {
-                setLink(list, index, lead, getTextAt(RESOURCE_BUNDLE,
-                      (coverage.temp() > 0) ? "row.tempCrewOnly" : "row.noCrew"), null);
-            } else {
-                setLink(list, index, lead,
-                      getFormattedTextAt(RESOURCE_BUNDLE, "row.lead", leader.getFullTitle()), leader);
-            }
-
-            badges.removeAll();
-            for (CrewCoverage.SeatCoverage seat : coverage.seats()) {
-                // Real people over the seat's size, then any places temporary crew hold, such as "GUNNER 2/10 +8 TEMP"
-                JLabel badge = badge();
-                String text = seatLabel(unit, seat.seat().type()).toUpperCase(Locale.ROOT) + ' ' + seat.real() + '/'
-                                    + seat.seat().capacity();
-                if (seat.temp() > 0) {
-                    text += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, "row.tempCrew", seat.temp())
-                                        .toUpperCase(Locale.ROOT);
-                }
-                badge.setText(text);
-                if (seat.uncovered() > 0) {
-                    setBadgeColor(badge, AMBER, AMBER.darker());
-                } else if (seat.temp() > 0) {
-                    setBadgeColor(badge, ACCENT, BORDER_CYAN);
-                } else {
-                    setBadgeColor(badge, READY, BORDER);
-                }
-                badges.add(Box.createHorizontalStrut(scaleForGUI(4)));
-                badges.add(badge);
-            }
-            if (SeatEligibility.takesTech(unit)) {
-                JLabel techBadge = badge();
-                Person tech = plan.plannedTechOf(unit);
-                techBadge.setText(getTextAt(RESOURCE_BUNDLE, (tech == null) ? "row.noTech" : "row.tech")
-                                        .toUpperCase(Locale.ROOT));
-                if (tech == null) {
-                    setBadgeColor(techBadge, AMBER, AMBER.darker());
-                } else {
-                    setBadgeColor(techBadge, READY, BORDER);
-                    techBadge.setToolTipText(tech.getFullTitle());
-                }
-                badges.add(Box.createHorizontalStrut(scaleForGUI(4)));
-                badges.add(techBadge);
-            }
-            return this;
-        }
-
-        private static Person firstCrew(Unit unit) {
-            List<Person> crew = unit.getCrew();
-            return crew.isEmpty() ? null : crew.get(0);
-        }
-    }
-
-    // endregion Units
-
     // region People
 
     /** A person row: their name and role, where they will serve, their abilities, and their experience level. */
     static final class PersonRow extends Row implements ListCellRenderer<PersonEntry> {
         private final AssignmentPlan plan;
         private final Predicate<Person> isSelected;
+        /** {@code true} while the row is drawn on the Techs page, where it shows a tech's workload, not their seat. */
+        private final BooleanSupplier isTechView;
         private final JLabel where = label(LINE_FONT, TEXT_MUTED);
         /** Hits and fatigue, on the second line beside where the person serves. */
         private final JLabel condition = label(LINE_FONT, TEXT_MUTED);
         private final JLabel abilities = badge();
         private final JLabel skill = label(SKILL_FONT, TEXT);
 
-        PersonRow(AssignmentPlan plan, Predicate<Person> isSelected) {
+        PersonRow(AssignmentPlan plan, Predicate<Person> isSelected, BooleanSupplier isTechView) {
             super(true);
             this.plan = plan;
             this.isSelected = isSelected;
+            this.isTechView = isTechView;
             secondLine.add(where);
             secondLine.add(Box.createHorizontalStrut(scaleForGUI(10)));
             secondLine.add(condition);
@@ -420,7 +328,15 @@ final class CrewRowRenderers {
 
             Unit planned = plan.plannedUnitOf(person);
             StagedAssignment change = plan.changeFor(person);
-            if ((planned == null) && person.isTech()) {
+            if (isTechView.getAsBoolean() && person.isTech()) {
+                // On the Techs page the time left is what decides who takes the next unit, so it is spelled out
+                int units = plan.plannedTechUnits(person).size();
+                int used = plan.plannedTechMinutes(person);
+                int available = plan.techMinutesAvailable(person);
+                setLink(list, index, where, getFormattedTextAt(RESOURCE_BUNDLE, "row.techLoad.free", units,
+                      Math.max(0, available - used), available), null);
+                where.setForeground((used > available) ? DANGER : (used == available) ? AMBER : TEXT);
+            } else if ((planned == null) && person.isTech()) {
                 int units = plan.plannedTechUnits(person).size();
                 int used = plan.plannedTechMinutes(person);
                 int available = plan.techMinutesAvailable(person);
