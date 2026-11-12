@@ -267,25 +267,6 @@ public class AdvancedMedicalAlternateHealing {
     }
 
     /**
-     * Works out the healing penalty caused by the patient's injuries.
-     *
-     * <p>The penalty is the patient's total injury severity, reduced by their adjusted Toughness and by each level the
-     * healer has in MedTech, to a minimum of 0.</p>
-     *
-     * @param patient      the person being treated
-     * @param medTechLevel the healer's MedTech skill level; a negative level gives no reduction
-     *
-     * @return the injury penalty to the healing roll, never negative
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    static int getInjuryPenalty(Person patient, int medTechLevel) {
-        int injurySeverity = patient.getTotalInjurySeverity() - patient.getAdjustedToughness();
-        return max(0, injurySeverity - max(0, medTechLevel));
-    }
-
-    /**
      * @param healer    the person providing care
      * @param skillName the skill to look up
      *
@@ -431,20 +412,21 @@ public class AdvancedMedicalAlternateHealing {
      * Works out the healing penalty caused by the patient's other injuries.
      *
      * <p>Every injury the patient carries, except the one being treated, adds its hits to the penalty, and the
-     * patient's adjusted Toughness offsets that total. The injury being treated is left out, so a patient with a
-     * single injury takes no penalty.</p>
+     * patient's adjusted Toughness and each level the healer has in MedTech offset that total. The injury being
+     * treated is left out, so a patient with a single injury takes no penalty.</p>
      *
-     * @param patient the person being treated
-     * @param injury  the injury being treated
+     * @param patient      the person being treated
+     * @param injury       the injury being treated
+     * @param medTechLevel the healer's MedTech skill level; a negative level gives no reduction
      *
      * @return the penalty to the healing roll, never negative
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static int getConcurrentInjuryPenalty(Person patient, Injury injury) {
+    static int getConcurrentInjuryPenalty(Person patient, Injury injury, int medTechLevel) {
         int otherInjurySeverity = patient.getTotalInjurySeverity() - injury.getHits();
-        return max(0, otherInjurySeverity - patient.getAdjustedToughness());
+        return max(0, otherInjurySeverity - patient.getAdjustedToughness() - max(0, medTechLevel));
     }
 
     /**
