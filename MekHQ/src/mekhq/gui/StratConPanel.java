@@ -94,6 +94,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondi
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffectStatus.SupportRules;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply.SupplyStatus;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
@@ -2298,10 +2299,10 @@ public class StratConPanel extends JPanel implements ActionListener {
      */
     private void appendFacilityNetworkInfo(StringBuilder infoBuilder, StratConCoords coords) {
         if (StratConFacilitySupply.isSupplyLinesActive(campaign)) {
-            infoBuilder.append(getTextAt(RESOURCE_BUNDLE,
-                  StratConFacilitySupply.isCutOff(currentTrack, coords) ?
-                        "stratConTab.hexInfo.supplyCut" :
-                        "stratConTab.hexInfo.supplyConnected"));
+            String supplyStatusKey = getSupplyStatusKey(StratConFacilitySupply.getSupplyStatus(currentTrack, coords));
+            if (supplyStatusKey != null) {
+                infoBuilder.append(getTextAt(RESOURCE_BUNDLE, supplyStatusKey));
+            }
         }
 
         int besiegerCount = StratConFacilitySiege.getSieges(currentTrack, coords).size();
@@ -2320,6 +2321,24 @@ public class StratConPanel extends JPanel implements ActionListener {
             }
             infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.synergy", partnerNames));
         }
+    }
+
+    /**
+     * @param supplyStatus a facility's standing on its side's supply lines
+     *
+     * @return the {@code AtBStratCon} resource key for the hex information's supply line, or {@code null} when there
+     *       is nothing to show, because the sector has no supply lines
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nullable String getSupplyStatusKey(SupplyStatus supplyStatus) {
+        return switch (supplyStatus) {
+            case NONE -> null;
+            case CUT -> "stratConTab.hexInfo.supplyCut";
+            case SOURCE -> "stratConTab.hexInfo.supplySource";
+            case CONNECTED -> "stratConTab.hexInfo.supplyConnected";
+        };
     }
 
     /**
