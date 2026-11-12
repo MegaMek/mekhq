@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.roleplay;
 
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -175,7 +174,7 @@ public class CampaignChronicleListener {
             }
             Faction faction = event.getChosenFaction();
             UltimatumChoice choice = !event.isWentRogue() ? UltimatumChoice.SIDE
-                                           : PIRATE_FACTION_CODE.equals(faction.getShortName())
+                                           : faction.isPirateOrBanditCaste()
                                                    ? UltimatumChoice.PIRATE : UltimatumChoice.MERCENARY;
             List<UUID> departed = new ArrayList<>();
             for (Person person : event.getDeparted()) {

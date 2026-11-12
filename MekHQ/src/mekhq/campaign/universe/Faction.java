@@ -468,6 +468,43 @@ public class Faction {
     }
 
     /**
+     * Returns whether the given faction code is the generic pirate faction ({@link #PIRATE_FACTION_CODE}) or its Clan
+     * counterpart, the Bandit Caste ({@link #BANDIT_CASTE_FACTION_CODE}).
+     *
+     * <p>The Bandit Caste is simply a Clan flavor of the pirates, so anything that special-cases "the pirates" by
+     * faction code should use this method rather than comparing against {@code PIR} alone.</p>
+     *
+     * @param factionCode the faction code to test (may be {@code null})
+     *
+     * @return {@code true} if the code is {@code PIR} or {@code BAN}
+     */
+    public static boolean isPirateOrBanditCaste(final @Nullable String factionCode) {
+        return PIRATE_FACTION_CODE.equals(factionCode) || BANDIT_CASTE_FACTION_CODE.equals(factionCode);
+    }
+
+    /**
+     * @return {@code true} if this faction is the generic pirate faction or the Bandit Caste
+     *
+     * @see #isPirateOrBanditCaste(String)
+     */
+    public boolean isPirateOrBanditCaste() {
+        return isPirateOrBanditCaste(shortName);
+    }
+
+    /**
+     * Returns the faction code of the pirates appropriate to the given campaign faction: the Bandit Caste for a Clan
+     * campaign faction, otherwise the generic pirates.
+     *
+     * @param campaignFaction the faction of the campaign (may be {@code null})
+     *
+     * @return {@link #BANDIT_CASTE_FACTION_CODE} if the faction is a Clan, otherwise {@link #PIRATE_FACTION_CODE}
+     */
+    public static String getPirateFactionCodeFor(final @Nullable Faction campaignFaction) {
+        return (campaignFaction != null && campaignFaction.isClan()) ? BANDIT_CASTE_FACTION_CODE
+                     : PIRATE_FACTION_CODE;
+    }
+
+    /**
      * Determines whether the given faction/date/location falls within the Fortress Republic period.
      *
      * <p>If {@code factionShortName} is non-{@code null}, only the Republic of the Sphere qualifies. A

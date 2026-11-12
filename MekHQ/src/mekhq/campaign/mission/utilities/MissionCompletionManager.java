@@ -38,7 +38,6 @@ import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.USE_PIRATE_LOOTING;
 import static mekhq.campaign.mission.scenarios.ScenarioStatus.DRAW;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.DEFAULT_TEMPORARY_CAPACITY;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.time.LocalDate;
@@ -675,7 +674,7 @@ public class MissionCompletionManager {
      * @since 0.51.01
      */
     static void applyPirateCrimeModifier(Campaign campaign, AbstractContract mission) {
-        if (mission.getEmployerFactionCode().equals(PIRATE_FACTION_CODE)) {
+        if (Faction.isPirateOrBanditCaste(mission.getEmployerFactionCode())) {
             // CamOps 'other crimes' value
             campaign.getPlayerForce().changeCrimePirateModifier(10);
         }

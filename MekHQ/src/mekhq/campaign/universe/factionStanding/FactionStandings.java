@@ -34,7 +34,6 @@ package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.universe.Faction.DEFAULT_CODE;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_0;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_6;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_8;
@@ -631,7 +630,7 @@ public class FactionStandings {
      * @since 0.50.07
      */
     private static String convertSpecialFaction(String factionCode, int gameYear) {
-        if (factionCode.equals(PIRATE_FACTION_CODE)) {
+        if (Faction.isPirateOrBanditCaste(factionCode)) {
             factionCode = PIRACY_SUCCESS_INDEX_FACTION_CODE;
         } else if (factionCode.equals(MERCENARY_FACTION_CODE)) {
             Faction mercenaryOrganization = Faction.getActiveMercenaryOrganization(gameYear);
@@ -1309,7 +1308,7 @@ public class FactionStandings {
             if (!report.isBlank()) {
                 regardChangeReports.add(report);
             }
-        } else if (campaignFactionCode.equals(PIRATE_FACTION_CODE)) {
+        } else if (Faction.isPirateOrBanditCaste(campaignFactionCode)) {
             report = changeRegardForFaction(campaignFactionCode,
                   PIRACY_SUCCESS_INDEX_FACTION_CODE,
                   regardDeltaEmployer,

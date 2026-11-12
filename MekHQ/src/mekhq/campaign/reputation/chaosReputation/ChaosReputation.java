@@ -49,7 +49,6 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_NONE;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_ULTRA_GREEN;
 import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MAX_CRIME_PENALTY;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
@@ -870,7 +869,7 @@ public class ChaosReputation {
     }
 
     public static void applyStartingCriminalRecord(LocalDate currentDate, Person person) {
-        boolean isPirate = person.getOriginFaction().getShortName().equals(PIRATE_FACTION_CODE);
+        boolean isPirate = person.getOriginFaction().isPirateOrBanditCaste();
         boolean isChild = person.isChild(currentDate, false);
         boolean isCivilian = person.isCivilian();
 
