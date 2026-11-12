@@ -59,6 +59,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
@@ -105,6 +106,7 @@ final class CrewAssignmentData {
     private final ToIntFunction<PersonnelRole> tempCrewPool;
     private final Comparator<Person> ranking;
     private final boolean useTransfers;
+    private final Familiarity familiarityMode;
     private final LocalDate today;
     private final String locationName;
 
@@ -116,6 +118,7 @@ final class CrewAssignmentData {
         CampaignOptions options = campaign.getCampaignOptions();
         today = campaign.getLocalDate();
         useTransfers = options.get(CampaignOption.USE_TRANSFERS);
+        familiarityMode = options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         locationName = location.toString();
         plan = new AssignmentPlan(options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL),
               options.get(CampaignOption.USE_IMPLANTS), options.get(CampaignOption.TECHS_USE_ADMINISTRATION));
@@ -153,10 +156,42 @@ final class CrewAssignmentData {
         unitEntries.forEach(entry -> units.put(entry.unit().getId(), entry));
     }
 
-    /** Someone is listed if they are active and either have a combat role or are a tech; other support staff are not. */
-    private static boolean isShown(Person person) {
+    /**
+     * Whether someone is listed on the Personnel page. They must be active and employed by the campaign, so camp
+     * followers are never listed, and have a combat role, be a tech, or have a profession that can take a vehicle's
+     * crew seat. Other support staff are not listed.
+     *
+     * @param person a person
+     *
+     * @return {@code true} if the person is listed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isShown(Person person) {
         return person.getStatus().isActive()
-                     && (person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat() || person.isTech());
+                     && person.isEmployed()
+                     && (isListedRole(person.getPrimaryRole()) || isListedRole(person.getSecondaryRole())
+                               || person.isTech());
+    }
+
+    private static boolean isListedRole(PersonnelRole role) {
+        return role.isCombat() || role.isVehicleCrewExtended();
+    }
+
+    /**
+     * Whether auto-fill may choose someone. Only combat personnel and techs are chosen, so auto-fill never takes a
+     * doctor, administrator or other staff member away from their duties; the player places them by hand.
+     *
+     * @param person a listed person
+     *
+     * @return {@code true} if auto-fill may choose the person
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isAutoFillCandidate(Person person) {
+        return person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat() || person.isTech();
     }
 
     private static PersonEntry describe(Campaign campaign, Person person, SkillLevel level, boolean useFatigue) {
@@ -224,6 +259,16 @@ final class CrewAssignmentData {
 
     boolean isUseTransfers() {
         return useTransfers;
+    }
+
+    /**
+     * @return the campaign's chassis familiarity mode; the familiarity filter is only offered while it is enabled
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    Familiarity familiarityMode() {
+        return familiarityMode;
     }
 
     LocalDate today() {
