@@ -86,16 +86,19 @@ class CrewAssignmentStateTechsPageTest {
     void onTheTechsPageATechIsAssignedOnlyWhileTheyMaintainAUnit() {
         CrewAssignmentState state = new CrewAssignmentState();
         AssignmentPlan plan = new AssignmentPlan(false, false);
+        // The units are made first: a mock cannot be stubbed inside another stubbing's thenReturn
+        Unit crewed = unit();
+        Unit maintained = unit();
         // A tech who crews a unit but maintains none
         Person tech = person(true);
-        when(tech.getUnit()).thenReturn(unit());
+        when(tech.getUnit()).thenReturn(crewed);
 
         assertTrue(state.countsAsAssigned(tech, plan));
 
         state.page = CrewAssignmentPage.TECHS;
         assertFalse(state.countsAsAssigned(tech, plan));
 
-        when(tech.getTechUnits()).thenReturn(List.of(unit()));
+        when(tech.getTechUnits()).thenReturn(List.of(maintained));
         assertTrue(state.countsAsAssigned(tech, plan));
     }
 
