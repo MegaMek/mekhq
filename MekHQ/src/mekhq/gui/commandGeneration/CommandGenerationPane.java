@@ -105,7 +105,7 @@ public class CommandGenerationPane extends JPanel {
     private static final String BUNDLE = CommandGenerationUtilities.getCommandGenerationResourceBundle();
     // ComStar and the Word of Blake name their formations with the Greek alphabet, as the Clans do.
     private static final List<String> GREEK_NAMED_FACTION_KEYS = List.of("CS", "WOB");
-    private static final int TRACKED_MONTHS = 12;
+    private static final int TRACKED_MONTHS = 24;
 
     private final Campaign campaign;
     private final ForceGeneratorTab engine;
@@ -362,17 +362,22 @@ public class CommandGenerationPane extends JPanel {
 
     /** Refreshes the tiles, the subtitle and every page from the current roll and settings. */
     public void refreshAll() {
+        long start = System.nanoTime();
+        // People is refreshed whatever is on show: the tiles read the hires it works out.
         peoplePage.refresh();
-        logisticsPage.refresh();
-        // Review asks the dialog to read every page back, which is too much work to repeat on every change while it
-        // is not on screen; it is brought up to date when it is shown.
-        if (currentPage == DesignerPage.REVIEW) {
+        // Logistics and Review only change what they show, so they are brought up to date when they are on screen;
+        // showing a page refreshes it. Review in particular reads every page back, too much to repeat on each change.
+        if (currentPage == DesignerPage.LOGISTICS) {
+            logisticsPage.refresh();
+        } else if (currentPage == DesignerPage.REVIEW) {
             reviewPage.refresh();
         }
         refreshTiles();
         for (Runnable listener : List.copyOf(refreshListeners)) {
             listener.run();
         }
+        LOGGER.debug("[CommandDesigner][Perf] refreshed the {} page and tiles in {}ms", currentPage,
+              (System.nanoTime() - start) / 1_000_000);
     }
 
     private void refreshTiles() {
@@ -399,21 +404,10 @@ public class CommandGenerationPane extends JPanel {
             personnelTile.setSub(text("Designer.tile.personnel.empty"));
         }
 
-        if (!logisticsPage.isProcessFinances()) {
-            cashTile.setValue(text("Designer.tile.cash.off"), TEXT_FAINT);
-            cashTile.setSub(text("Designer.tile.cash.off.sub"));
-            cashTile.hideMeter();
-        } else if (logisticsPage.isRandomizeStartingCash()) {
-            cashTile.setValue(getFormattedTextAt(BUNDLE, "Designer.tile.cash.random", logisticsPage.getDiceCount()),
-                  ACCENT_BRIGHT);
-            cashTile.setSub(text("Designer.tile.cash.random.sub"));
-            cashTile.hideMeter();
-        } else {
-            int months = logisticsPage.getStartingCashMonths();
-            cashTile.setValue(getFormattedTextAt(BUNDLE, "Designer.tile.cash.months", months), ACCENT_BRIGHT);
-            cashTile.setSub(text("Designer.tile.cash.months.sub"));
-            cashTile.setMeter(months / (double) TRACKED_MONTHS, ACCENT, null);
-        }
+        int months = logisticsPage.getStartingCashMonths();
+        cashTile.setValue(getFormattedTextAt(BUNDLE, "Designer.tile.cash.months", months), ACCENT_BRIGHT);
+        cashTile.setSub(text("Designer.tile.cash.months.sub"));
+        cashTile.setMeter(months / (double) TRACKED_MONTHS, ACCENT, null);
 
         if (!forcePage.isLiftRolled()) {
             liftTile.setValue(text("Designer.tile.lift.hire"), AMBER);

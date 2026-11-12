@@ -33,6 +33,7 @@
 package mekhq.campaign.universe.factionStanding;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
@@ -164,4 +165,48 @@ class FactionStandingUtilitiesTest {
               factionStandings, null, 88_154L, Set.of(), when, Set.of(), Set.of(), factionHints));
     }
 
+    /** A false flag contract: FS is the visible front, WoB the real sponsor the player's standing answers to. */
+    private static AbstractContract falseFlagContract() {
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getEmployerFactionCode()).thenReturn("FS");
+        when(contract.getStandingEmployerFactionCode()).thenReturn("WOB");
+        return contract;
+    }
+
+    /** High enough regard for Command Circuit access with the front, far too low with the sponsor. */
+    private static FactionStandings frontFavouredStandings() {
+        FactionStandings factionStandings = mock(FactionStandings.class);
+        when(factionStandings.getRegardForFaction("FS", true)).thenReturn(
+              FactionStandingLevel.STANDING_LEVEL_8.getMinimumRegard());
+        when(factionStandings.getRegardForFaction("WOB", true)).thenReturn(
+              FactionStandingLevel.STANDING_LEVEL_1.getMinimumRegard());
+        return factionStandings;
+    }
+
+    @Test
+    void commandCircuitForAcceptedFalseFlagFollowsTheSponsorNotTheFront() {
+        assertFalse(FactionStandingUtilities.isUseCommandCircuit(false, false, true, frontFavouredStandings(),
+              List.of(falseFlagContract())));
+    }
+
+    @Test
+    void commandCircuitForAcceptedContractUsesTheStandingFaction() {
+        FactionStandings factionStandings = frontFavouredStandings();
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getStandingEmployerFactionCode()).thenReturn("FS");
+
+        assertTrue(FactionStandingUtilities.isUseCommandCircuit(false, false, true, factionStandings,
+              List.of(contract)));
+    }
+
+    @Test
+    void commandCircuitForAnUnacceptedContractHonoursTheCampaignOption() {
+        FactionStandings factionStandings = frontFavouredStandings();
+
+        assertTrue(FactionStandingUtilities.isUseCommandCircuit(false, false, true, factionStandings, "FS"));
+        assertFalse(FactionStandingUtilities.isUseCommandCircuit(false, false, false, factionStandings, "FS"),
+              "With Faction Standing Command Circuits disabled the estimate must match the journey: no circuit");
+        assertTrue(FactionStandingUtilities.isUseCommandCircuit(true, true, false, factionStandings, "WOB"),
+              "A GM override always grants the circuit");
+    }
 }

@@ -215,6 +215,21 @@ public class StratConPointOfInterest {
     }
 
     /**
+     * The last day the player can still act on this point of interest. It expires at the start of its expiry date
+     * (see {@link #hasReachedExpiryDate}), so the day before is the last one it is still active on. This is the date to
+     * show the player.
+     *
+     * @return the day before the expiry date, or {@code null} if this point of interest never expires
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlTransient
+    public @Nullable LocalDate getLastActiveDate() {
+        return (expiryDate == null) ? null : expiryDate.minusDays(1);
+    }
+
+    /**
      * @return a name for this point of interest that replaces its definition's, or {@code null} to use the
      *       definition's
      */

@@ -2049,12 +2049,14 @@ public class AtBDynamicScenarioFactory {
         // We want a minimum value here, to avoid situations where we spawn scenarios with only a
         // single turn requirement.
         // This effectively treats any player-aligned forces less than 6 as 6.
-        primaryUnitCount = max(DEFAULT_TIME_LIMIT, 6);
+        primaryUnitCount = max(primaryUnitCount, DEFAULT_TIME_LIMIT);
 
         for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
-            // We set a default time to protect against instances where setting time limit fails
-            // for some reason.
-            objective.setTimeLimit(DEFAULT_TIME_LIMIT);
+            // Only fill in a default when the objective has no time limit at all. Fixed time limits come from the
+            // template and must be kept as authored.
+            if (objective.getTimeLimit() == null) {
+                objective.setTimeLimit(DEFAULT_TIME_LIMIT);
+            }
 
             if (objective.getTimeLimitType() == TimeLimitType.ScaledToPrimaryUnitCount) {
                 Integer scaleFactor = objective.getTimeLimitScaleFactor();

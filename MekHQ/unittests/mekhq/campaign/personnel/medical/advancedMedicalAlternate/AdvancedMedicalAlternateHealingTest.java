@@ -42,6 +42,7 @@ import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_PROTHESIS_TEC
 import static mekhq.campaign.personnel.PersonnelOptions.UNOFFICIAL_TRAUMA_SURGEON;
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.BodyLocation.LEFT_HAND;
+import static mekhq.campaign.personnel.medical.BodyLocation.RIBS;
 import static mekhq.campaign.personnel.medical.BodyLocation.RIGHT_FOREARM;
 import static mekhq.campaign.personnel.medical.BodyLocation.RIGHT_HAND;
 import static mekhq.campaign.personnel.medical.MedicalController.ACADEMY_MEDICAL_CARE_TARGET_NUMBER;
@@ -187,6 +188,33 @@ class AdvancedMedicalAlternateHealingTest {
 
         Person patient = mock(Person.class);
         when(patient.getPermanentInjuries()).thenReturn(List.of(clonedHand, prostheticHand));
+
+        Set<BodyLocation> penalties = invokePrivateStatic("getProstheticPenalties",
+              new Class<?>[] { Person.class }, patient);
+
+        assertEquals(Set.of(RIGHT_HAND), penalties);
+    }
+
+    @Test
+    @DisplayName("getProstheticPenalties ignores cosmetic surgery and fracture repair")
+    void getProstheticPenalties_ignoresCosmeticSurgeryAndFractureRepair() throws Exception {
+        Injury cosmeticSurgery = mock(Injury.class);
+        when(cosmeticSurgery.getType()).thenReturn(AlternateInjuries.COSMETIC_SURGERY);
+        when(cosmeticSurgery.getSubType()).thenReturn(PROSTHETIC_GENERIC);
+        when(cosmeticSurgery.getLocation()).thenReturn(LEFT_HAND);
+
+        Injury fractureRepair = mock(Injury.class);
+        when(fractureRepair.getType()).thenReturn(AlternateInjuries.FRACTURE_REPAIR);
+        when(fractureRepair.getSubType()).thenReturn(PROSTHETIC_GENERIC);
+        when(fractureRepair.getLocation()).thenReturn(RIBS);
+
+        Injury prostheticHand = mock(Injury.class);
+        when(prostheticHand.getType()).thenReturn(AlternateInjuries.PROSTHETIC_HAND);
+        when(prostheticHand.getSubType()).thenReturn(PROSTHETIC_GENERIC);
+        when(prostheticHand.getLocation()).thenReturn(RIGHT_HAND);
+
+        Person patient = mock(Person.class);
+        when(patient.getPermanentInjuries()).thenReturn(List.of(cosmeticSurgery, fractureRepair, prostheticHand));
 
         Set<BodyLocation> penalties = invokePrivateStatic("getProstheticPenalties",
               new Class<?>[] { Person.class }, patient);

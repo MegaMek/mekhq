@@ -305,11 +305,9 @@ public class StratConRulesManager {
                 track = getRandomItem(tracks);
             }
 
-            final int deploymentDelay = track.getDeploymentTime();
-            final LocalDate scenarioTargetDate = campaign.getLocalDate().plusDays(deploymentDelay);
             final LocalDate contractEnd = campaignState.getContract().getEndingDate();
 
-            if ((contractEnd != null) && !scenarioTargetDate.isBefore(contractEnd)) {
+            if ((contractEnd != null) && !campaign.getLocalDate().isBefore(contractEnd)) {
                 LOGGER.info("Skipping scenario because it is on or after the contract end date.");
                 return;
             }
@@ -477,7 +475,7 @@ public class StratConRulesManager {
      * @param emphasizeStrategicTargets A {@code boolean} that increases the likelihood of selecting strategic targets,
      *                                  such as <b>PLAYER</b>-held facilities, for scenario placement.
      * @param daysTilDeployment         An {@link Integer} specifying the number of days until the scenario occurs, or
-     *                                  {@code null} to select a random date within the next 7 days.
+     *                                  {@code null} for today.
      *
      * @return A newly created {@link StratConScenario}, or {@code null} if scenario generation fails due to invalid
      *       configurations, insufficient forces, or a lack of valid coordinates.
@@ -681,7 +679,9 @@ public class StratConRulesManager {
         StratConGMs.opForGeneration(campaignOptions).generateOpFor(backingScenario, contract, campaign);
         swapInPlayerUnits(scenario, campaign, FORMATION_NONE);
 
-        if (!autoAssignLances && !scenario.overrideForceAutoAssignment()) {
+        // The player always picks the one formation that answers an Official Challenge, so it never takes a
+        // formation on its own - whatever the caller asked for.
+        if (isCombatChallenge || (!autoAssignLances && !scenario.overrideForceAutoAssignment())) {
             for (int forceID : scenario.getPlayerTemplateForceIDs()) {
                 backingScenario.removeFormation(forceID);
             }
@@ -1101,8 +1101,7 @@ public class StratConRulesManager {
      * @param track             The relevant StratCon track.
      * @param template          A specific {@link ScenarioTemplate} to use, or {@code null} to select a random
      *                          template.
-     * @param daysTilDeployment How many days until the scenario takes place, or {@code null} to pick a random day
-     *                          within the next 7 days.
+     * @param daysTilDeployment How many days until the scenario takes place, or {@code null} for today.
      *
      * @return The newly generated {@link StratConScenario}.
      */
@@ -1126,6 +1125,12 @@ public class StratConRulesManager {
 
                 if (scenario == null) {
                     return null;
+                }
+
+                // An Official Challenge is moved off the hex these forces hold and answered by one formation of the
+                // player's choosing, so none of the other forces here are drawn into it.
+                if (scenario.getBackingScenario().getStratConScenarioType().isOfficialChallenge()) {
+                    break;
                 }
             } else {
                 scenario.incrementRequiredPlayerLances();
@@ -1348,7 +1353,11 @@ public class StratConRulesManager {
             if (scenario != null) {
                 finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario);
 
-                if (isAmbushed) {
+                // An Official Challenge never lands on the deployed hex, so the deploying force was not caught by it.
+                boolean isOfficialChallenge = scenario.getBackingScenario()
+                                                    .getStratConScenarioType()
+                                                    .isOfficialChallenge();
+                if (isAmbushed && !isOfficialChallenge) {
                     // Ambushes are always Crisis scenarios, this stop
                     scenario.getBackingScenario().setIsCrisis(true);
                     scenario.setTurningPoint(false);
@@ -1518,8 +1527,7 @@ public class StratConRulesManager {
      * @param template          A specific {@link ScenarioTemplate} to use for scenario setup, or {@code null} to select
      *                          the scenario template randomly.
      * @param ignoreFacilities  Whether we should ignore any facilities at the selected location
-     * @param daysTilDeployment How many days until the scenario takes place, or {@code null} to pick a random day
-     *                          within the next 7 days.
+     * @param daysTilDeployment How many days until the scenario takes place, or {@code null} for today.
      *
      * @return The newly set up {@link StratConScenario}.
      */
@@ -1774,9 +1782,15 @@ public class StratConRulesManager {
             return null;
         }
 
+        // A sortie is fought where the besiegers stand, so it can never be an Official Challenge - those never spawn
+        // on an occupied hex.
         ScenarioTemplate template = isSortie ?
-                                          null :
+                                          getRandomNonChallengeScenario(campaign, track, formationId) :
                                           StratConScenarioFactory.getSpecificScenario(SIEGE_RELIEF_SCENARIO_TEMPLATE);
+        if (isSortie && (template == null)) {
+            return null;
+        }
+
         StratConScenario scenario = (template == null) ?
                                           generateScenario(campaign, contract, track, formationId, formationCoords,
                                                 null) :
@@ -3036,6 +3050,38 @@ public class StratConRulesManager {
     }
 
     /**
+     * Selects a random, non-ambush scenario template for a formation, as {@link #getFleetAppropriateRandomScenario}
+     * does, but never an Official Challenge. For fights that must happen on the formation's own hex.
+     *
+     * @param campaign    the current {@link Campaign}
+     * @param track       the track the scenario is for
+     * @param formationId the ID of the formation the scenario is for
+     *
+     * @return a suitable {@link ScenarioTemplate}, or {@code null} if none other than an Official Challenge was rolled
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nullable ScenarioTemplate getRandomNonChallengeScenario(Campaign campaign,
+          StratConTrackState track, int formationId) {
+        int unitType = MEK;
+        Formation formation = campaign.getPlayerForce().getFormation(formationId);
+        if (formation != null) {
+            unitType = formation.getPrimaryUnitType(campaign);
+        }
+
+        final int maximumAttempts = 20;
+        for (int attempt = 0; attempt < maximumAttempts; attempt++) {
+            ScenarioTemplate template = getFleetAppropriateRandomScenario(campaign, track, unitType);
+            if ((template != null) && !template.getStratConScenarioType().isOfficialChallenge()) {
+                return template;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Selects a random scenario template for the given unit type that is allowed on the given track: a track holding a
      * facility that prevents aerospace (see {@link StratConTrackState#isAerospacePrevented()}) never gets an air or
      * space template. Unlike {@link #getFleetAppropriateRandomScenario}, this does not apply the fleet-capability
@@ -3136,8 +3182,8 @@ public class StratConRulesManager {
      * @param track             the {@link StratConTrackState} where the scenario is placed
      * @param forceID           the ID of the force for which the scenario is generated
      * @param scenarioCoords    the {@link StratConCoords} specifying where the scenario will be generated
-     * @param daysTilDeployment the number of days until the scenario is deployed; if {@code null}, deployment dates are
-     *                          determined dynamically
+     * @param daysTilDeployment the number of days until the scenario takes place, or {@code null} for
+     *                          today
      *
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation fails
      */
@@ -3172,7 +3218,7 @@ public class StratConRulesManager {
      * <p>The generated scenario is configured as follows:
      * <ul>
      *     <li>If no template is provided, a random template is chosen based on the unit type of the given force.</li>
-     *     <li>If provided, deployment dates are explicitly set. Otherwise, dates are determined dynamically.</li>
+     *     <li>The battle takes place {@code daysTilDeployment} days from today, or today if it is {@code null}.</li>
      *     <li>Global modifiers, facility modifiers, attached unit modifiers, and allied force modifiers
      *         are applied as appropriate.</li>
      *     <li>The scenario is marked as unresolved and is registered with the campaign and track.</li>
@@ -3191,8 +3237,8 @@ public class StratConRulesManager {
      * @param coords            the {@link StratConCoords} specifying where the scenario will be placed
      * @param template          the {@link ScenarioTemplate} to use for scenario generation; if {@code null}, a random
      *                          one is selected
-     * @param daysTilDeployment the number of days until the scenario is deployed; if {@code null}, dates will be
-     *                          dynamically set
+     * @param daysTilDeployment the number of days until the scenario takes place, or {@code null} for
+     *                          today
      *
      * @return the generated {@link StratConScenario}, or {@code null} if scenario generation failed
      */
@@ -3226,6 +3272,18 @@ public class StratConRulesManager {
         if (template == null) {
             LOGGER.error("Failed to fetch random scenario template. Aborting scenario generation.");
             return null;
+        }
+
+        // An Official Challenge is issued through official channels, not stumbled into: it never spawns on a hex that
+        // is already taken - by a deployed formation, a scenario, a facility, or an occupying point of interest. Move
+        // it to a free hex instead, where the player chooses which formation answers it.
+        if ((coords != null) && template.getStratConScenarioType().isOfficialChallenge()) {
+            coords = getOfficialChallengeCoords(campaign.getCampaignOptions(), track, coords);
+            if (coords == null) {
+                LOGGER.warn("No free hex for an Official Challenge on track {}; skipping scenario generation.",
+                      track.getDisplayableName());
+                return null;
+            }
         }
 
         AtBDynamicScenario backingScenario = AtBDynamicScenarioFactory.initializeScenarioFromTemplate(template,
@@ -3279,11 +3337,7 @@ public class StratConRulesManager {
               restrictAlliedModifiers, restrictEnemyModifiers);
         scenario.setCurrentState(ScenarioState.UNRESOLVED);
 
-        if (daysTilDeployment == null) {
-            setScenarioDates(track, campaign, scenario);
-        } else {
-            setScenarioDates(daysTilDeployment, track, campaign, scenario);
-        }
+        setScenarioDates((daysTilDeployment == null) ? 0 : daysTilDeployment, track, campaign, scenario);
 
         // the backing scenario ID must be updated after registering the backing
         // scenario
@@ -3299,6 +3353,51 @@ public class StratConRulesManager {
         }
 
         return scenario;
+    }
+
+    /**
+     * Whether a hex is unfit for an Official Challenge: something already takes it up (a scenario, a facility, or an
+     * occupying point of interest - see {@link StratConTrackState#isHexOccupied}), or a player formation is deployed
+     * there.
+     *
+     * @param track  the track the challenge would be placed on, or {@code null} if it has none
+     * @param coords the hex to test, or {@code null} if the scenario has no position
+     *
+     * @return {@code true} if the challenge must be placed elsewhere
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    /**
+     * Picks the hex an Official Challenge is placed on: the rolled hex if it is free (see
+     * {@link #isOccupiedForOfficialChallenge}), otherwise a free hex chosen by the active GM's OpFor deployment
+     * strategy.
+     *
+     * @param campaignOptions the campaign options, used to consult the active GM
+     * @param track           the track the challenge is placed on
+     * @param coords          the hex the challenge was rolled for, or {@code null} if it has no position
+     *
+     * @return the hex to place the challenge on, or {@code null} if the rolled hex is taken and no free hex exists
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable StratConCoords getOfficialChallengeCoords(CampaignOptions campaignOptions,
+          StratConTrackState track, @Nullable StratConCoords coords) {
+        if (!isOccupiedForOfficialChallenge(track, coords)) {
+            return coords;
+        }
+
+        return StratConGMs.opForDeployment(campaignOptions).getUnoccupiedCoords(track);
+    }
+
+    static boolean isOccupiedForOfficialChallenge(@Nullable StratConTrackState track,
+          @Nullable StratConCoords coords) {
+        if ((track == null) || (coords == null)) {
+            return false;
+        }
+
+        return track.isHexOccupied(coords) || track.getAssignedForceCoords().containsValue(coords);
     }
 
     /**
@@ -3683,28 +3782,19 @@ public class StratConRulesManager {
     }
 
     /**
-     * Worker function that sets scenario deploy/battle/return dates based on the track's properties and current
-     * campaign date
+     * Worker function that sets a scenario's deployment, battle, and return dates. The battle takes place
+     * {@code daysUntilBattle} days from the campaign's current date - there is no lead time between deploying and the
+     * battle - and the deployed forces return to base the track's deployment time after the battle.
+     *
+     * @param daysUntilBattle how many days from today the battle takes place
+     * @param track           the track the scenario sits on, which supplies the deployment time
+     * @param campaign        the current campaign
+     * @param scenario        the scenario to date
      */
-    private static void setScenarioDates(StratConTrackState track, Campaign campaign, StratConScenario scenario) {
-        int deploymentDay = track.getDeploymentTime() < 7 ? randomInt(7 - track.getDeploymentTime()) : 0;
-        setScenarioDates(deploymentDay, track, campaign, scenario);
-    }
-
-    /**
-     * Worker function that sets scenario deploy/battle/return dates based on the track's properties and current
-     * campaign date. Takes a fixed deployment day of X days from campaign's today date.
-     */
-    private static void setScenarioDates(int deploymentDelay, StratConTrackState track, Campaign campaign,
+    private static void setScenarioDates(int daysUntilBattle, StratConTrackState track, Campaign campaign,
           StratConScenario scenario) {
-        // set up deployment day, battle day, return day here
-        // safety code to prevent attempts to generate random int with upper bound of 0
-        // which is apparently illegal
-        int battleDay = deploymentDelay + (track.getDeploymentTime() > 0 ? randomInt(track.getDeploymentTime()) : 0);
-        int returnDay = deploymentDelay + track.getDeploymentTime();
-
-        LocalDate battleDate = campaign.getLocalDate().plusDays(battleDay);
-        LocalDate returnDate = campaign.getLocalDate().plusDays(returnDay);
+        LocalDate battleDate = campaign.getLocalDate().plusDays(daysUntilBattle);
+        LocalDate returnDate = battleDate.plusDays(track.getDeploymentTime());
 
         scenario.setDeploymentDate(battleDate);
         scenario.setActionDate(battleDate);
