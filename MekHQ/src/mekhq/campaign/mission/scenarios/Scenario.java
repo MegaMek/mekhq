@@ -1410,11 +1410,27 @@ public class Scenario implements IPlayerSettings {
                 }
 
             }
+
+            retVal.afterLoadFromXml(version);
         } catch (Exception ex) {
             LOGGER.error("", ex);
         }
 
         return retVal;
+    }
+
+    /**
+     * Called once every field, including the scenario objectives, has been loaded from XML. Subclasses override this
+     * for repairs that need the fully loaded scenario; {@link #loadFieldsFromXmlNode(Node, Version, Campaign)} runs
+     * before the objectives are read, so it can't do them.
+     *
+     * @param version the version the save was written with
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected void afterLoadFromXml(final Version version) {
+        // Do nothing
     }
 
     /**
