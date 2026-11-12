@@ -97,6 +97,7 @@ import org.jfree.chart.renderer.xy.XYItemRenderer;
 import org.jfree.chart.renderer.xy.XYLineAndShapeRenderer;
 import org.jfree.chart.ui.RectangleEdge;
 import org.jfree.chart.ui.RectangleInsets;
+import org.jfree.data.Range;
 import org.jfree.data.category.CategoryDataset;
 import org.jfree.data.category.DefaultCategoryDataset;
 import org.jfree.data.time.Day;
@@ -396,6 +397,16 @@ public final class FinancesTab extends CampaignGuiTab {
         chart.setBackgroundPaint(panelColor);
 
         XYPlot plot = (XYPlot) chart.getPlot();
+
+        // Replace the factory-built date axis with one that can't be zoomed out indefinitely. Otherwise, repeated
+        // mouse-wheel zooming grows the visible range exponentially, and JFreeChart (whose largest automatic tick unit
+        // is 100 years) tries to generate an unbounded number of ticks, exhausting the heap and freezing the UI.
+        DateAxis factoryAxis = (DateAxis) plot.getDomainAxis();
+        BoundedDateAxis boundedAxis = new BoundedDateAxis(factoryAxis.getLabel());
+        boundedAxis.setLowerMargin(factoryAxis.getLowerMargin());
+        boundedAxis.setUpperMargin(factoryAxis.getUpperMargin());
+        plot.setDomainAxis(boundedAxis);
+
         plot.setBackgroundPaint(Color.LIGHT_GRAY);
         plot.setDomainGridlinePaint(textColor);
         plot.setRangeGridlinePaint(textColor);
@@ -821,6 +832,37 @@ public final class FinancesTab extends CampaignGuiTab {
         if (chart.getLegend() != null) {
             chart.getLegend().setBackgroundPaint(panelColor);
             chart.getLegend().setItemPaint(textColor);
+        }
+    }
+
+    /**
+     * A {@link DateAxis} whose visible span is clamped between one day and one thousand years.
+     *
+     * <p>Every route that changes the axis range (mouse-wheel zoom, zoom rectangle, auto-range, panning) funnels
+     * through {@link #setRange(Range, boolean, boolean)}, so clamping there keeps the number of generated ticks bounded
+     * no matter how far the user zooms.</p>
+     */
+    private static class BoundedDateAxis extends DateAxis {
+        private static final double MILLIS_PER_DAY = 24.0 * 60 * 60 * 1000;
+        private static final double MINIMUM_SPAN_MILLIS = MILLIS_PER_DAY;
+        private static final double MAXIMUM_SPAN_MILLIS = 1000 * 365.2425 * MILLIS_PER_DAY;
+
+        BoundedDateAxis(String label) {
+            super(label);
+        }
+
+        @Override
+        public void setRange(Range range, boolean turnOffAutoRange, boolean notify) {
+            if (range != null) {
+                double length = range.getLength();
+                double clampedLength = Math.clamp(length, MINIMUM_SPAN_MILLIS, MAXIMUM_SPAN_MILLIS);
+                if (clampedLength != length) {
+                    double center = range.getCentralValue();
+                    double halfLength = clampedLength / 2.0;
+                    range = new Range(center - halfLength, center + halfLength);
+                }
+            }
+            super.setRange(range, turnOffAutoRange, notify);
         }
     }
 }
