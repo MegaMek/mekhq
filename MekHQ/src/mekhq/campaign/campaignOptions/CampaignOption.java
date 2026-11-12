@@ -269,6 +269,8 @@ public final class CampaignOption<T> {
           of(Integer.class, CampaignOptions.TRANSIT_UNIT_MONTH, "unitTransitTime");
     public static final CampaignOption<Boolean> NO_DELIVERIES_IN_TRANSIT =
           of(Boolean.class, false, "noDeliveriesInTransit");
+    public static final CampaignOption<Boolean> USE_MARGIN_OF_SUCCESS_DELIVERY =
+          of(Boolean.class, false, "useMarginOfSuccessDelivery");
     public static final CampaignOption<Boolean> USE_PLANETARY_ACQUISITION =
           of(Boolean.class, false, "usePlanetaryAcquisition");
     public static final CampaignOption<Integer> MAX_JUMPS_PLANETARY_ACQUISITION =
@@ -824,12 +826,14 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "payForHousing");
     public static final CampaignOption<Boolean> USE_LOAN_LIMITS =
           of(Boolean.class, false, "useLoanLimits");
-    public static final CampaignOption<Boolean> USE_PEACETIME_COST =
-          of(Boolean.class, false, "usePeacetimeCost");
-    public static final CampaignOption<Boolean> USE_EXTENDED_PARTS_MODIFIER =
-          of(Boolean.class, false, "useExtendedPartsModifier");
     public static final CampaignOption<Boolean> SHOW_PEACETIME_COST =
           of(Boolean.class, false, "showPeacetimeCost");
+    public static final CampaignOption<Boolean> PAY_FOR_PEACETIME_SPARE_PARTS =
+          of(Boolean.class, false, "payForPeacetimeSpareParts");
+    public static final CampaignOption<Boolean> PAY_FOR_TRAINING_MUNITIONS =
+          of(Boolean.class, false, "payForTrainingMunitions");
+    public static final CampaignOption<Boolean> PAY_FOR_PEACETIME_FUEL =
+          of(Boolean.class, false, "payForPeacetimeFuel");
     public static final CampaignOption<FinancialYearDuration> FINANCIAL_YEAR_DURATION =
           of(FinancialYearDuration.class, FinancialYearDuration.ANNUAL, "financialYearDuration");
     public static final CampaignOption<Boolean> NEW_FINANCIAL_YEAR_FINANCES_TO_CSV_EXPORT =
@@ -858,6 +862,19 @@ public final class CampaignOption<T> {
           of(Double.class, 1.0, "clanPartPriceMultiplier");
     public static final CampaignOption<Double> MIXED_TECH_UNIT_PRICE_MULTIPLIER =
           of(Double.class, 1.0, "mixedTechUnitPriceMultiplier");
+    public static final CampaignOption<Double> CLAN_TECH_INVASION_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "clanTechInvasionPriceMultiplier");
+    public static final CampaignOption<Double> CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "clanTechPostInvasionPriceMultiplier");
+    public static final CampaignOption<Double> SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "successionWarsAdvancedTechPriceMultiplier");
+    public static final CampaignOption<Double> TECH_RATING_E_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "techRatingEPriceMultiplier");
+    public static final CampaignOption<Double> TECH_RATING_F_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "techRatingFPriceMultiplier");
+    /** Unofficial: the acquisition multipliers also apply when buying and selling parts, not only units. */
+    public static final CampaignOption<Boolean> APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS =
+          of(Boolean.class, false, "applyAcquisitionMultipliersToParts");
     public static final CampaignOption<Double> DAMAGED_PARTS_VALUE_MULTIPLIER =
           of(Double.class, 0.33, "damagedPartsValueMultiplier");
     public static final CampaignOption<Double> UNREPAIRABLE_PARTS_VALUE_MULTIPLIER =

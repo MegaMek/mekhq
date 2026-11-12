@@ -704,7 +704,7 @@ public record ForceQuartermaster(Campaign campaign) {
 
         if (getCampaignOptions().get(CampaignOption.PAY_FOR_UNITS)) {
             double contractMultiplier = campaign().getPlayerForce().getPurchaseCostMultiplier(campaign().getActiveContracts());
-            Money cost = new Unit(en, campaign()).getBuyCost()
+            Money cost = new Unit(en, campaign()).getPurchaseCost()
                                .multipliedBy(valueMultiplier)
                                .multipliedBy(contractMultiplier);
             if (campaign().getPlayerForce()
@@ -732,7 +732,7 @@ public record ForceQuartermaster(Campaign campaign) {
     public void sellUnit(Unit unit) {
         Objects.requireNonNull(unit);
 
-        Money sellValue = unit.getSellValue();
+        Money sellValue = unit.getSalePrice();
 
         // a unit the campaign cannot find is not sold, so nothing is paid for it
         if (campaign().removeUnit(unit.getId())) {
@@ -787,7 +787,7 @@ public record ForceQuartermaster(Campaign campaign) {
             return;
         }
 
-        Money cost = part.getActualValue().multipliedBy(quantity);
+        Money cost = part.getSalePrice().multipliedBy(quantity);
         String plural = "";
         if (quantity > 1) {
             plural = "s";
@@ -849,7 +849,7 @@ public record ForceQuartermaster(Campaign campaign) {
             saleProportion = 1.0;
         }
 
-        Money cost = ammo.getActualValue().multipliedBy(saleProportion);
+        Money cost = ammo.getSalePrice().multipliedBy(saleProportion);
 
         campaign().getPlayerForce().getFinances().credit(TransactionType.EQUIPMENT_SALE, campaign().getLocalDate(),
               cost, "Sale of " + shots + " " + ammo.getName());
@@ -893,7 +893,7 @@ public record ForceQuartermaster(Campaign campaign) {
             saleProportion = 1.0;
         }
 
-        Money cost = armor.getActualValue().multipliedBy(saleProportion);
+        Money cost = armor.getSalePrice().multipliedBy(saleProportion);
 
         campaign().getPlayerForce().getFinances().credit(TransactionType.EQUIPMENT_SALE, campaign().getLocalDate(),
               cost, "Sale of " + points + " " + armor.getName());
@@ -1034,7 +1034,7 @@ public record ForceQuartermaster(Campaign campaign) {
 
         if (getCampaignOptions().get(CampaignOption.PAY_FOR_PARTS)) {
             double contractMultiplier = campaign().getPlayerForce().getPurchaseCostMultiplier(campaign().getActiveContracts());
-            Money cost = part.getActualValue()
+            Money cost = part.getPurchaseCost()
                                .multipliedBy(costMultiplier)
                                .multipliedBy(contractMultiplier);
 

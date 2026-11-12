@@ -137,6 +137,7 @@ import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.MassMothballDialog;
 import mekhq.gui.dialog.QuirksDialog;
+import mekhq.gui.dialog.SetPartQualityDialog;
 import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentDialog;
 import mekhq.gui.dialog.quartermaster.IssueEquipmentDialog;
@@ -230,6 +231,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_EDIT_DAMAGE = "EDIT_DAMAGE";
     public static final String COMMAND_RESTORE_UNIT = "RESTORE_UNIT";
     public static final String COMMAND_SET_QUALITY = "SET_QUALITY";
+    public static final String COMMAND_SET_PART_QUALITY = "SET_PART_QUALITY";
     // endregion GM Commands
     // endregion Commands
 
@@ -341,6 +343,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     MekHQ.triggerEvent(new UnitChangedEvent(unit));
                 }
             }
+        } else if (command.equals(COMMAND_SET_PART_QUALITY)) { // Single Unit only
+            boolean reverse = gui.getCampaign().getCampaignOptions().get(CampaignOption.REVERSE_QUALITY_NAMES);
+            new SetPartQualityDialog(gui.getFrame(), selectedUnit, reverse).setVisible(true);
         } else if (command.equals(COMMAND_SELL)) {
             Money totalValue = Money.zero();
             List<Unit> sellableUnits = new ArrayList<>();
@@ -350,7 +355,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 }
                 if (!unit.isDeployed()) {
                     sellableUnits.add(unit);
-                    totalValue = totalValue.plus(unit.getSellValue());
+                    totalValue = totalValue.plus(unit.getSalePrice());
                 }
             }
 
@@ -599,7 +604,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
         } else if (command.equals(COMMAND_CANCEL_ORDER)) {
             for (Unit u : units) {
-                Money refundAmount = u.getBuyCost()
+                Money refundAmount = u.getPurchaseCost()
                                            .multipliedBy(gui.getCampaign()
                                                                .getCampaignOptions()
                                                                .get(CampaignOption.CANCELLED_ORDER_REFUND_MULTIPLIER));
@@ -687,8 +692,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             MekHQ.triggerEvent(new UnitChangedEvent(selectedUnit));
         } else if (command.equals(COMMAND_FLUFF_NAME)) { // Single Unit only
             String fluffName = (String) JOptionPane.showInputDialog(gui.getFrame(),
-                  "Name for this unit?",
-                  "Unit Name",
+                  getTextAt(RESOURCE_BUNDLE, "editUnitName.message"),
+                  getTextAt(RESOURCE_BUNDLE, "editUnitName.title"),
                   JOptionPane.QUESTION_MESSAGE,
                   null,
                   null,
@@ -761,7 +766,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     continue;
                 }
 
+                boolean wasMaintenanceDue = unit.getDaysSinceMaintenance() != 0;
                 Maintenance.performImmediateMaintenance(campaign, unit);
+
+                boolean wasMaintained = wasMaintenanceDue && (unit.getDaysSinceMaintenance() == 0);
+                if (wasMaintained && (units.length == 1)) {
+                    new MaintenanceReportDialog(gui.getFrame(), unit).setVisible(true);
+                }
             }
         }
     }
@@ -1055,14 +1066,16 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (oneActive) {
-                menuItem = new JMenuItem(oneSelected ? "Mothball" : "Mass Mothball");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE,
+                      oneSelected ? "mothballUnit.text" : "mothballUnit.mass.text"));
                 menuItem.setActionCommand(COMMAND_MOTHBALL);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
             }
 
             if (oneMothballed) {
-                menuItem = new JMenuItem(oneSelected ? "Activate" : "Mass Activate");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE,
+                      oneSelected ? "activateUnit.text" : "activateUnit.mass.text"));
                 menuItem.setActionCommand(COMMAND_ACTIVATE);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
@@ -1135,7 +1148,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             }
 
             if (oneSelected && gui.getCampaign().getCampaignOptions().get(CampaignOption.CHECK_MAINTENANCE)) {
-                menuItem = new JMenuItem("Show Part Quality Report");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "partsQualityReport.text"));
                 menuItem.setActionCommand(COMMAND_PARTS_REPORT);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
@@ -1358,7 +1371,8 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
             // sell unit
             if (!allDeployed && gui.getCampaign().getCampaignOptions().get(CampaignOption.SELL_UNITS)) {
                 popup.addSeparator();
-                menuItem = new JMenuItem("Sell Unit");
+                menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE,
+                      oneSelected ? "sellUnit.text" : "sellUnit.multiple.text"));
                 menuItem.setActionCommand(COMMAND_SELL);
                 menuItem.addActionListener(this);
                 popup.add(menuItem);
@@ -1473,6 +1487,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setActionCommand(COMMAND_SET_QUALITY);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
+
+                if (oneSelected) {
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "setPartQuality.text"));
+                    menuItem.setActionCommand(COMMAND_SET_PART_QUALITY);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
 
                 if (oneNotPresent) {
                     menuItem = new JMenuItem("Unit Arrives Immediately");

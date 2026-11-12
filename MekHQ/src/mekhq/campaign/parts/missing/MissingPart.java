@@ -90,7 +90,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
 
     @Override
     public Money getBuyCost() {
-        return getNewPart().getActualValue();
+        return getNewPart().getPurchaseCost();
     }
 
     @Override

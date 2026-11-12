@@ -99,6 +99,11 @@ public final class TransportAssignmentMenus {
                 case TACTICAL_TRANSPORT -> new AssignForceToTacticalTransportMenu(campaign, unitSet);
                 case TOW_TRANSPORT -> new AssignForceToTowTransportMenu(campaign, unitSet);
             };
+
+            if (!formationSelected && (assignMenu.getItemCount() > 0)) {
+                assignMenu.setText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE,
+                      "AssignForceToTransportMenu.unit." + campaignTransportType.name() + ".text"));
+            }
             addMenuIfNonEmpty(popup, assignMenu);
             addUnassignSelfMenuItem(popup, campaign, units, campaignTransportType, formationSelected);
             addUnassignTransportedMenuItem(popup, campaign, units, campaignTransportType);

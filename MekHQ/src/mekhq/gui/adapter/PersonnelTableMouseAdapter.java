@@ -1535,7 +1535,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 PopupValueChoiceDialog salaryDialog = new PopupValueChoiceDialog(getFrame(),
                       true,
-                      resources.getString("changeSalary.text"),
+                      resources.getString("setSalary.text"),
+                      resources.getString("changeSalary.instructions"),
                       Math.clamp(originalSalary, -1, 1000000000),
                       -1,
                       1000000000);

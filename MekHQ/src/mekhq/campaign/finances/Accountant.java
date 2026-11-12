@@ -120,7 +120,16 @@ public record Accountant(Campaign campaign) {
           int temporaryMedicPool, Map<PersonnelRole, Integer> tempCrewMap, boolean includeSalaries) {
         Collection<Unit> units = getUnitsInFormations(formations, hangar);
 
-        Money peacetimeCosts = getSparePartsTotal(units).plus(getFuelTotal(units)).plus(getAmmoTotal(units));
+        Money peacetimeCosts = Money.zero();
+        if (campaignOptions.get(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS)) {
+            peacetimeCosts = peacetimeCosts.plus(getSparePartsTotal(units));
+        }
+        if (campaignOptions.get(CampaignOption.PAY_FOR_PEACETIME_FUEL)) {
+            peacetimeCosts = peacetimeCosts.plus(getFuelTotal(hangar.getUnits(), units));
+        }
+        if (campaignOptions.get(CampaignOption.PAY_FOR_TRAINING_MUNITIONS)) {
+            peacetimeCosts = peacetimeCosts.plus(getAmmoTotal(units));
+        }
 
         if (includeSalaries && campaignOptions.get(CampaignOption.PAY_FOR_SALARIES)) {
             Collection<Person> personnel = getCrewsOfUnits(units);
@@ -862,20 +871,41 @@ public record Accountant(Campaign campaign) {
         return personnel;
     }
 
+    /**
+     * @return the monthly peacetime spare parts cost of the units in the TO&amp;E, or zero when spare parts are not part
+     *       of peacetime costs
+     */
     public Money getMonthlySpareParts() {
-        return getSparePartsTotal(getAllUnits());
-    }
-
-    public Money getMonthlyFuel() {
-        return getFuelTotal(getAllUnits());
-    }
-
-    public Money getMonthlyAmmo() {
-        return getAmmoTotal(getAllUnits());
+        if (!getCampaignOptions().get(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS)) {
+            return Money.zero();
+        }
+        return getSparePartsTotal(getUnitsInFormations());
     }
 
     /**
-     * Calculates the total monthly spare parts cost for the given units.
+     * @return the monthly peacetime fuel cost of the units in the TO&amp;E, after using the hydrogen produced by every
+     *       active fusion engine in the hangar, or zero when fuel is not part of peacetime costs
+     */
+    public Money getMonthlyFuel() {
+        if (!getCampaignOptions().get(CampaignOption.PAY_FOR_PEACETIME_FUEL)) {
+            return Money.zero();
+        }
+        return getFuelTotal(getHangar().getUnits(), getUnitsInFormations());
+    }
+
+    /**
+     * @return the monthly peacetime training munitions cost of the units in the TO&amp;E, or zero when training
+     *       munitions are not part of peacetime costs
+     */
+    public Money getMonthlyAmmo() {
+        if (!getCampaignOptions().get(CampaignOption.PAY_FOR_TRAINING_MUNITIONS)) {
+            return Money.zero();
+        }
+        return getAmmoTotal(getUnitsInFormations());
+    }
+
+    /**
+     * Calculates the total monthly spare parts cost for the given units. Only active units in the TO&amp;E are charged.
      *
      * @param units the units to total spare parts costs for
      *
@@ -884,7 +914,7 @@ public record Accountant(Campaign campaign) {
     public static Money getSparePartsTotal(Collection<Unit> units) {
         Money total = Money.zero();
         for (Unit unit : units) {
-            if (!unit.isMothballed()) {
+            if (isChargedPeacetimeCosts(unit)) {
                 total = total.plus(unit.getSparePartsCost());
             }
         }
@@ -893,17 +923,51 @@ public record Accountant(Campaign campaign) {
     }
 
     /**
-     * Calculates the total monthly fuel cost for the given units.
-     *
-     * <p>Every non-mothballed unit with a fusion engine contributes to the pool of hydrogen produced each month;
-     * that pooled production is then used to determine the fuel cost of every unit that is in the TOE (and by extension
-     * in use).</p>
+     * Calculates the total monthly fuel cost for the given units, with each unit's own fusion engine (if any) adding
+     * to the hydrogen pool.
      *
      * @param units the units to total fuel costs for
      *
      * @return the total {@link Money} cost of fuel
+     *
+     * @see #getFuelTotal(Collection, Collection)
      */
     public static Money getFuelTotal(Collection<Unit> units) {
+        return getFuelTotal(units, units);
+    }
+
+    /**
+     * Calculates the total monthly fuel cost for the given units.
+     *
+     * <p>Every non-mothballed unit with a fusion engine contributes to the pool of hydrogen produced each month, even
+     * when it is outside the TO&amp;E. The units in the TO&amp;E (and by extension in use) then draw on that pool for
+     * the hydrogen they burn, each taking only what it uses, and buy whatever the pool can no longer cover.</p>
+     *
+     * @param hydrogenProducers the units whose fusion engines produce hydrogen
+     * @param units             the units to total fuel costs for
+     *
+     * @return the total {@link Money} cost of fuel
+     */
+    public static Money getFuelTotal(Collection<Unit> hydrogenProducers, Collection<Unit> units) {
+        double availableHydrogen = getMonthlyHydrogenProduction(hydrogenProducers);
+
+        Money total = Money.zero();
+        for (Unit unit : units) {
+            if (isChargedPeacetimeCosts(unit)) {
+                total = total.plus(unit.getFuelCost(availableHydrogen));
+                availableHydrogen = Math.max(0, availableHydrogen - unit.getMonthlyHydrogenUsage());
+            }
+        }
+
+        return total;
+    }
+
+    /**
+     * @param units the units whose fusion engines produce hydrogen
+     *
+     * @return the tons of hydrogen the active fusion engines among the given units produce in a month
+     */
+    private static double getMonthlyHydrogenProduction(Collection<Unit> units) {
         int daysInMonth = 28; // we use a 28-day month so we don't need to bring in and process the exact date
         int dailyHydrogenProduction = 10;
         int monthlyHydrogenProduction = daysInMonth * dailyHydrogenProduction;
@@ -917,7 +981,7 @@ public record Accountant(Campaign campaign) {
             Entity entity = unit.getEntity();
 
             if (entity == null) {
-                LOGGER.info("(getFuelTotal) entity is null for {}", unit);
+                LOGGER.info("(getMonthlyHydrogenProduction) entity is null for {}", unit);
                 continue;
             }
 
@@ -926,31 +990,20 @@ public record Accountant(Campaign campaign) {
             Engine engine = entity.getEngine();
 
             if (engine == null) {
-                LOGGER.debug("(getFuelTotal) engine is null for {}", unit);
+                LOGGER.debug("(getMonthlyHydrogenProduction) engine is null for {}", unit);
                 continue;
             }
 
-            if (entity.getEngine().isFusion()) {
+            if (engine.isFusion()) {
                 totalFusionEngines++;
             }
         }
 
-        // Calculate total hydrogen production based on the number of fusion engines
-        int hydrogenProduction = totalFusionEngines * monthlyHydrogenProduction;
-
-        Money total = Money.zero();
-        for (Unit unit : units) {
-            // Is it in the TO&E and by extension in use?
-            if (unit.getFormationId() != FORMATION_NONE) {
-                total = total.plus(unit.getFuelCost(hydrogenProduction));
-            }
-        }
-
-        return total;
+        return (double) totalFusionEngines * monthlyHydrogenProduction;
     }
 
     /**
-     * Calculates the total monthly ammo cost for the given units.
+     * Calculates the total monthly ammo cost for the given units. Only active units in the TO&amp;E are charged.
      *
      * @param units the units to total ammo costs for
      *
@@ -959,12 +1012,26 @@ public record Accountant(Campaign campaign) {
     public static Money getAmmoTotal(Collection<Unit> units) {
         Money total = Money.zero();
         for (Unit unit : units) {
-            if (!unit.isMothballed()) {
+            if (isChargedPeacetimeCosts(unit)) {
                 total = total.plus(unit.getAmmoCost());
             }
         }
 
         return total;
+    }
+
+    /**
+     * Peacetime operating costs only apply to units in the TO&amp;E, and not while they are mothballed.
+     *
+     * @param unit the unit to check
+     *
+     * @return {@code true} if the unit pays peacetime operating costs
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isChargedPeacetimeCosts(Unit unit) {
+        return !unit.isMothballed() && (unit.getFormationId() != FORMATION_NONE);
     }
 
     /**
@@ -1067,7 +1134,7 @@ public record Accountant(Campaign campaign) {
             return forceValue;
         }
 
-        if (campaignOptions.get(CampaignOption.USE_PEACETIME_COST)) {
+        if (campaignOptions.isAnyPeacetimeCostSelected()) {
             final Money forceValue = getForceValue(formations,
                   hangar,
                   campaignFaction,

@@ -169,27 +169,36 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     }
 
     public int getFullShots() {
+        int fullShots = getFullShotsOfStandardMunitions();
+
+        // If ProtoMeks are using alternate munitions then cut in half
+        if (!oneShot && isProtoMekLoadedWithAlternateMunitions()) {
+            fullShots = fullShots / 2;
+        }
+
+        return fullShots;
+    }
+
+    /**
+     * @return the shots this bin holds when filled with standard rounds, before ProtoMeks halve alternate munitions
+     */
+    private int getFullShotsOfStandardMunitions() {
         if (oneShot) {
             return 1;
         }
 
-        int fullShots = getType().getShots();
-
         Mounted<?> mounted = getMounted();
-        if (mounted != null) {
-            if (mounted.getOriginalShots() > 0) {
-                fullShots = mounted.getOriginalShots();
-            }
-
-            if (unit.getEntity() instanceof ProtoMek) {
-                // If ProtoMeks are using alternate munitions then cut in half
-                if (!EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(getType().getMunitionType())) {
-                    fullShots = fullShots / 2;
-                }
-            }
+        if ((mounted != null) && (mounted.getOriginalShots() > 0)) {
+            return mounted.getOriginalShots();
         }
 
-        return fullShots;
+        return getType().getShots();
+    }
+
+    private boolean isProtoMekLoadedWithAlternateMunitions() {
+        return (getMounted() != null)
+                     && (unit.getEntity() instanceof ProtoMek)
+                     && !EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(getType().getMunitionType());
     }
 
     protected int getCurrentShots() {
@@ -215,13 +224,82 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     }
 
     protected int getShotsPerTon() {
-        AmmoType ammoType = getType();
+        return getShotsPerTon(getType());
+    }
+
+    private static int getShotsPerTon(AmmoType ammoType) {
         if (ammoType.getKgPerShot() > 0) {
             return (int) Math.floor(1000.0 / ammoType.getKgPerShot());
         }
 
         // if not listed by kg per shot, we assume this is a single ton increment
-        return getType().getShots();
+        return ammoType.getShots();
+    }
+
+    /**
+     * The value of this bin filled to capacity with standard rounds, whatever munition it actually holds. CamOps prices
+     * peacetime training ammunition this way, since it is inexpensive training ammunition rather than the munitions
+     * carried into battle.
+     *
+     * @return the price of filling this bin with standard munitions
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getStandardMunitionCapacityValue() {
+        int shotsPerTon = getStandardMunitionShotsPerTon();
+        if (shotsPerTon <= 0) {
+            return Money.zero();
+        }
+
+        return getStandardMunitionPricePerTon().multipliedBy(getStandardMunitionCapacityShots()).dividedBy(shotsPerTon);
+    }
+
+    /**
+     * @return how many standard rounds fill this bin
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected int getStandardMunitionCapacityShots() {
+        // ProtoMeks fit half as many alternate rounds, so the bin holds the unhalved count of standard ones
+        return isProtoMekLoadedWithAlternateMunitions() ? getFullShotsOfStandardMunitions() : getFullShots();
+    }
+
+    /**
+     * @return the price of a ton of the standard munition of the ammunition this bin holds
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected Money getStandardMunitionPricePerTon() {
+        return Money.of(getStandardMunitionType().getRawCost());
+    }
+
+    /**
+     * @return how many standard rounds of the ammunition this bin holds make up a ton
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected int getStandardMunitionShotsPerTon() {
+        return getShotsPerTon(getStandardMunitionType());
+    }
+
+    /**
+     * Alternate munitions (Thunder, Artemis-capable, armor-piercing and so on) are built from a standard base type,
+     * which MegaMek keeps.
+     *
+     * @return the standard munition of the ammunition loaded in this bin
+     */
+    private AmmoType getStandardMunitionType() {
+        Mounted<?> mounted = getMounted();
+        // Use the ammo type on the existing entity, to avoid getting it wrong due to ammo swaps
+        AmmoType loadedType = ((mounted != null) && (mounted.getType() instanceof AmmoType mountedType))
+                                    ? mountedType
+                                    : getType();
+        AmmoType baseType = loadedType.getBaseAmmo();
+        return (baseType != null) ? baseType : loadedType;
     }
 
     @Override
@@ -235,7 +313,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
 
     @Override
     public Money getBuyCost() {
-        return getNewPart().getActualValue();
+        return getNewPart().getPurchaseCost();
     }
 
     public int getShotsNeeded() {
@@ -336,6 +414,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
             } finally {
                 manufacturing = false;
             }
+
+            setFabricating(false);
+            setFabricateUntilSuccess(false);
             return messageSurroundedBySpanWithColor(getPositiveColor(), " <b>fabricated</b>.");
         }
         return super.succeed();

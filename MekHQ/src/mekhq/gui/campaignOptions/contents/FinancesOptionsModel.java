@@ -43,9 +43,10 @@ import mekhq.campaign.finances.enums.UnitCostModel;
 class FinancesOptionsModel {
     boolean useLoanLimits;
     boolean usePercentageMaintenance;
-    boolean useExtendedPartsModifier;
-    boolean usePeacetimeCost;
     boolean showPeacetimeCost;
+    boolean payForPeacetimeSpareParts;
+    boolean payForTrainingMunitions;
+    boolean payForPeacetimeFuel;
     FinancialYearDuration financialYearDuration;
     boolean newFinancialYearFinancesToCSVExport;
     boolean simulateGrayMonday;
@@ -89,6 +90,12 @@ class FinancesOptionsModel {
     double clanUnitPriceMultiplier;
     double clanPartPriceMultiplier;
     double mixedTechUnitPriceMultiplier;
+    double clanTechInvasionPriceMultiplier;
+    double clanTechPostInvasionPriceMultiplier;
+    double successionWarsAdvancedTechPriceMultiplier;
+    double techRatingEPriceMultiplier;
+    double techRatingFPriceMultiplier;
+    boolean applyAcquisitionMultipliersToParts;
     double[] usedPartPriceMultipliers;
     double damagedPartsValueMultiplier;
     double unrepairablePartsValueMultiplier;
@@ -97,9 +104,10 @@ class FinancesOptionsModel {
     FinancesOptionsModel(@Nonnull CampaignOptions options) {
         useLoanLimits = options.get(CampaignOption.USE_LOAN_LIMITS);
         usePercentageMaintenance = options.get(CampaignOption.USE_PERCENTAGE_MAINTENANCE);
-        useExtendedPartsModifier = options.get(CampaignOption.USE_EXTENDED_PARTS_MODIFIER);
-        usePeacetimeCost = options.get(CampaignOption.USE_PEACETIME_COST);
         showPeacetimeCost = options.get(CampaignOption.SHOW_PEACETIME_COST);
+        payForPeacetimeSpareParts = options.get(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS);
+        payForTrainingMunitions = options.get(CampaignOption.PAY_FOR_TRAINING_MUNITIONS);
+        payForPeacetimeFuel = options.get(CampaignOption.PAY_FOR_PEACETIME_FUEL);
         financialYearDuration = options.get(CampaignOption.FINANCIAL_YEAR_DURATION);
         newFinancialYearFinancesToCSVExport = options.get(CampaignOption.NEW_FINANCIAL_YEAR_FINANCES_TO_CSV_EXPORT);
         simulateGrayMonday = options.get(CampaignOption.SIMULATE_GRAY_MONDAY);
@@ -144,6 +152,12 @@ class FinancesOptionsModel {
         clanUnitPriceMultiplier = options.get(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER);
         clanPartPriceMultiplier = options.get(CampaignOption.CLAN_PART_PRICE_MULTIPLIER);
         mixedTechUnitPriceMultiplier = options.get(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER);
+        clanTechInvasionPriceMultiplier = options.get(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER);
+        clanTechPostInvasionPriceMultiplier = options.get(CampaignOption.CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER);
+        successionWarsAdvancedTechPriceMultiplier = options.get(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER);
+        techRatingEPriceMultiplier = options.get(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER);
+        techRatingFPriceMultiplier = options.get(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER);
+        applyAcquisitionMultipliersToParts = options.get(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS);
         usedPartPriceMultipliers = Arrays.copyOf(options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS),
               options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS).length);
         damagedPartsValueMultiplier = options.get(CampaignOption.DAMAGED_PARTS_VALUE_MULTIPLIER);
@@ -154,9 +168,10 @@ class FinancesOptionsModel {
     void applyTo(@Nonnull CampaignOptions options) {
         options.set(CampaignOption.USE_LOAN_LIMITS, useLoanLimits);
         options.set(CampaignOption.USE_PERCENTAGE_MAINTENANCE, usePercentageMaintenance);
-        options.set(CampaignOption.USE_EXTENDED_PARTS_MODIFIER, useExtendedPartsModifier);
-        options.set(CampaignOption.USE_PEACETIME_COST, usePeacetimeCost);
         options.set(CampaignOption.SHOW_PEACETIME_COST, showPeacetimeCost);
+        options.set(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS, payForPeacetimeSpareParts);
+        options.set(CampaignOption.PAY_FOR_TRAINING_MUNITIONS, payForTrainingMunitions);
+        options.set(CampaignOption.PAY_FOR_PEACETIME_FUEL, payForPeacetimeFuel);
         options.set(CampaignOption.FINANCIAL_YEAR_DURATION, financialYearDuration);
         options.set(CampaignOption.NEW_FINANCIAL_YEAR_FINANCES_TO_CSV_EXPORT, newFinancialYearFinancesToCSVExport);
         options.set(CampaignOption.SIMULATE_GRAY_MONDAY, simulateGrayMonday);
@@ -201,6 +216,12 @@ class FinancesOptionsModel {
         options.set(CampaignOption.CLAN_UNIT_PRICE_MULTIPLIER, clanUnitPriceMultiplier);
         options.set(CampaignOption.CLAN_PART_PRICE_MULTIPLIER, clanPartPriceMultiplier);
         options.set(CampaignOption.MIXED_TECH_UNIT_PRICE_MULTIPLIER, mixedTechUnitPriceMultiplier);
+        options.set(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER, clanTechInvasionPriceMultiplier);
+        options.set(CampaignOption.CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER, clanTechPostInvasionPriceMultiplier);
+        options.set(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER, successionWarsAdvancedTechPriceMultiplier);
+        options.set(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER, techRatingEPriceMultiplier);
+        options.set(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER, techRatingFPriceMultiplier);
+        options.set(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS, applyAcquisitionMultipliersToParts);
         for (int i = 0; i < Math.min(options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS).length,
               usedPartPriceMultipliers.length); i++) {
             options.get(CampaignOption.USED_PART_PRICE_MULTIPLIERS)[i] = usedPartPriceMultipliers[i];
