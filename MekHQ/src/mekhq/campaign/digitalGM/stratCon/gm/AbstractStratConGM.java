@@ -185,9 +185,11 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
 
     /**
      * The shared StratCon daily lifecycle. Runs the scenario-generation routine for every track attached to an active
-     * contract: cleaning up phantom scenarios, returning forces whose deployment has ended, applying facility effects,
-     * expiring ignored scenarios, scheduling ordinary scenarios (up front, or the coming week's in Single Drop play), and
-     * generating those due today.
+     * contract: applying facility effects, expiring ignored scenarios, scheduling ordinary scenarios (up front, or the
+     * coming week's in Single Drop play), and generating those due today.
+     *
+     * <p>Returning formations whose deployment has ended is not part of this. It runs earlier in the day, through
+     * {@link #processForceReturns(Campaign)}, so those formations are home before the hangar is processed.</p>
      *
      * @param event the new-day event (already enable-gated by {@link AbstractDigitalGM#onNewDay})
      */
@@ -229,13 +231,8 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
 
             boolean hasAssignedSingleDropScenario = false;
             for (StratConTrackState track : campaignState.getTracks()) {
-                cleanupPhantomScenarios(track);
-
-                // check if some of the forces have finished deployment
-                // please do this before generating scenarios for track
-                // to avoid unintentionally cleaning out integrated force deployments on
-                // 0-deployment-length tracks
-                getScenarioLifecycleStrategy().processForceReturnDates(track, campaign);
+                // Formations whose deployment has ended were already sent home earlier in the day (see
+                // processForceReturns), before the hangar was processed.
 
                 // map-based play applies facility effects here; Mapless/Singles supply a no-op strategy
                 getFacilityStrategy().applyPeriodicEffects(track, campaignState, isStartOfMonth);
@@ -436,6 +433,35 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
         // ambient weekly scenarios are discarded while routed.
         if ((dueCount > 0) && !contract.getMoraleLevel().isRouted()) {
             StratConContractInitializer.spawnScheduledStrategicScenarios(campaign, contract, dueCount);
+        }
+    }
+
+    /**
+     * Sends home every formation whose StratCon deployment has ended, on every track of every active contract, after
+     * first clearing out phantom scenarios.
+     *
+     * <p>The new day calls this before it processes the hangar, rather than from {@link #handleNewDay(NewDayEvent)},
+     * which only runs once the rest of the day is done. Salvage from a battle is delivered on the day the salvaging
+     * formations return, so if they came home last, New Day Mass Repair would only see the salvage and spend the
+     * techs' time on it while the formations' own damaged units still counted as deployed. It also still comes before
+     * scenario generation, so integrated force deployments on 0-deployment-length tracks are not cleaned out.</p>
+     *
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void processForceReturns(Campaign campaign) {
+        for (AbstractContract contract : campaign.getActiveContracts()) {
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
+            if (campaignState == null) {
+                continue;
+            }
+
+            for (StratConTrackState track : campaignState.getTracks()) {
+                cleanupPhantomScenarios(track);
+                getScenarioLifecycleStrategy().processForceReturnDates(track, campaign);
+            }
         }
     }
 

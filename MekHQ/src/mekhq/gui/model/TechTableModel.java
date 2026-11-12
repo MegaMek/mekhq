@@ -39,6 +39,7 @@ import java.util.ArrayList;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
@@ -47,6 +48,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.TechSpecialization;
 import mekhq.campaign.work.IPartWork;
 import mekhq.campaign.work.TechRepairAbilities;
 import mekhq.campaign.work.TechTaskEstimate;
@@ -160,6 +162,33 @@ public class TechTableModel extends DataTableModel<Person> {
     }
 
     /**
+     * @param campaign the campaign
+     * @param tech     a tech
+     * @param part     the selected job, or {@code null} if none is selected
+     *
+     * @return one line naming the tech's specialization, colored and marked when it fits the selected job, or an empty
+     *       string if they have none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static String describeSpecialization(Campaign campaign, Person tech, @Nullable IPartWork part) {
+        boolean useGlobalTechSkillsOnly = TechSpecialization.usesGlobalTechSkillsOnly(campaign);
+        String specialization = TechSpecialization.describe(tech, useGlobalTechSkillsOnly);
+        if (specialization.isEmpty()) {
+            return "";
+        }
+
+        if (TechSpecialization.isSpecialistFor(tech, useGlobalTechSkillsOnly, part)) {
+            return "<font color='" + ReportingUtilities.getPositiveColor() + "'><b>"
+                         + getFormattedTextAt(CAMPAIGN_RESOURCE_BUNDLE, "TechTableModel.specialistForJob",
+                  specialization) + "</b></font><br/>";
+        }
+        return "<i>" + getFormattedTextAt(CAMPAIGN_RESOURCE_BUNDLE, "TechTableModel.specialization", specialization)
+                     + "</i><br/>";
+    }
+
+    /**
      * @deprecated Use {@link #getTechDescription(Person, boolean, IPartWork)} instead.
      */
     @Deprecated(since = "0.50.06", forRemoval = true)
@@ -193,6 +222,9 @@ public class TechTableModel extends DataTableModel<Person> {
         toReturn.append(tech.getFullTitle()).append("</b>");
         // The formation the tech works for, so techs kept on a sub-contract stand apart from the main force
         toReturn.append(describeFormation(getCampaign(), tech)).append("<br/>");
+
+        // What the tech is best used for, called out when it fits the selected job
+        toReturn.append(describeSpecialization(getCampaign(), tech, part));
 
         SkillModifierData skillModifierData = tech.getSkillModifierData();
         Skill taskSkill = (null == part) ? null : tech.getSkillForWorkingOn(part);

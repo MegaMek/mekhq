@@ -62,6 +62,17 @@ final class TrainingConsoleState {
         XP
     }
 
+    /**
+     * Which side of the officer cut the people list shows, by whether each person's rank is an officer rank.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    enum RankGroup {
+        OFFICERS,
+        ENLISTED
+    }
+
     /** Which skills the Skills page lists. */
     enum SkillGroup {
         HELD,
@@ -101,6 +112,7 @@ final class TrainingConsoleState {
     // Filters
     String query = "";
     @Nullable PersonnelRole role;
+    @Nullable RankGroup rankGroup;
     @Nullable String formation;
     @Nullable SkillLevel level;
     boolean isIncludePrisoners;
