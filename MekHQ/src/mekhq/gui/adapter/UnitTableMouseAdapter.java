@@ -137,6 +137,7 @@ import mekhq.gui.dialog.LargeCraftAmmoSwapDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.MassMothballDialog;
 import mekhq.gui.dialog.QuirksDialog;
+import mekhq.gui.dialog.SetPartQualityDialog;
 import mekhq.gui.dialog.SmallSVAmmoSwapDialog;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentDialog;
 import mekhq.gui.dialog.quartermaster.IssueEquipmentDialog;
@@ -230,6 +231,7 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
     public static final String COMMAND_EDIT_DAMAGE = "EDIT_DAMAGE";
     public static final String COMMAND_RESTORE_UNIT = "RESTORE_UNIT";
     public static final String COMMAND_SET_QUALITY = "SET_QUALITY";
+    public static final String COMMAND_SET_PART_QUALITY = "SET_PART_QUALITY";
     // endregion GM Commands
     // endregion Commands
 
@@ -341,6 +343,9 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                     MekHQ.triggerEvent(new UnitChangedEvent(unit));
                 }
             }
+        } else if (command.equals(COMMAND_SET_PART_QUALITY)) { // Single Unit only
+            boolean reverse = gui.getCampaign().getCampaignOptions().get(CampaignOption.REVERSE_QUALITY_NAMES);
+            new SetPartQualityDialog(gui.getFrame(), selectedUnit, reverse).setVisible(true);
         } else if (command.equals(COMMAND_SELL)) {
             Money totalValue = Money.zero();
             List<Unit> sellableUnits = new ArrayList<>();
@@ -1482,6 +1487,13 @@ public class UnitTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setActionCommand(COMMAND_SET_QUALITY);
                 menuItem.addActionListener(this);
                 menu.add(menuItem);
+
+                if (oneSelected) {
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "setPartQuality.text"));
+                    menuItem.setActionCommand(COMMAND_SET_PART_QUALITY);
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
 
                 if (oneNotPresent) {
                     menuItem = new JMenuItem("Unit Arrives Immediately");
