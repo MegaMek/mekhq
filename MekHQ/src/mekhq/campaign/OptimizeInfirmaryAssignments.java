@@ -32,8 +32,13 @@
  */
 package mekhq.campaign;
 
+import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
+import java.util.UUID;
 
+import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -111,7 +116,7 @@ public class OptimizeInfirmaryAssignments {
      * <p>This method ensures that each doctor is assigned to a limited number of patients, determined by their
      * calculated medical capacity. It first unassigns any existing doctor assignments for the provided patients, then
      * assigns doctors to the patients one by one. If a doctor reaches their capacity, the next available doctor is
-     * assigned. Any remaining unassigned patients are left without a doctor when all doctors are exhausted.</p>
+     * assigned. Doctors never treat themselves; an injured doctor is given the next doctor in the list. Any remaining unassigned patients are left without a doctor when all doctors are exhausted.</p>
      *
      * @param isDoctorsUseAdministration A flag indicating whether the administrative skills of the doctors should be
      *                                   factored into their medical capacity calculation.
@@ -135,9 +140,8 @@ public class OptimizeInfirmaryAssignments {
                                     campaign.getPlayerForce().calculateMASHTheaterCapacity(campaign) :
                                     Integer.MAX_VALUE;
 
+        Map<UUID, Integer> remainingCapacityByDoctor = new HashMap<>();
         int totalPatientCounter = 0;
-        int patientCounter = 0;
-        int doctorCapacity = 0;
 
         for (Person patient : patients) {
             patient.setDoctorId(null, healingWaitingPeriod);
@@ -152,12 +156,13 @@ public class OptimizeInfirmaryAssignments {
                 continue;
             }
 
-            Person doctor = doctors.getFirst();
-            if (doctorCapacity == 0) {
-                doctorCapacity = doctor.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients);
-            }
-
-            if (doctorCapacity == 0) {
+            Person doctor = findAvailableDoctor(patient,
+                  doctors,
+                  remainingCapacityByDoctor,
+                  isDoctorsUseAdministration,
+                  maximumPatients);
+            if (doctor == null) {
+                // The only doctor with room left is the patient themselves
                 continue;
             }
 
@@ -166,13 +171,54 @@ public class OptimizeInfirmaryAssignments {
             totalPatientCounter++;
             MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
 
-            // Check if the current doctor has reached their patient limit
-            if (++patientCounter == doctorCapacity) {
-                doctors.removeFirst(); // Move to the next doctor
-                patientCounter = 0; // Reset patient counter
-                doctorCapacity = 0; // Reset doctor capacity
+            // Check if the doctor has reached their patient limit
+            int remainingCapacity = remainingCapacityByDoctor.get(doctor.getId()) - 1;
+            remainingCapacityByDoctor.put(doctor.getId(), remainingCapacity);
+            if (remainingCapacity <= 0) {
+                doctors.remove(doctor);
             }
         }
+    }
+
+    /**
+     * Finds the highest-priority doctor who can take on the given patient.
+     *
+     * <p>Doctors never treat themselves, so a doctor who is also the patient is passed over in favour of the next
+     * doctor in the list. Doctors with no room for patients are dropped from the list as they are found.</p>
+     *
+     * @param patient                    the patient needing a doctor
+     * @param doctors                    the available doctors, highest priority first
+     * @param remainingCapacityByDoctor  each doctor's remaining patient capacity, filled in as doctors are first
+     *                                   considered
+     * @param isDoctorsUseAdministration whether Administration affects a doctor's medical capacity
+     * @param maximumPatients            the base number of patients a doctor can handle
+     *
+     * @return the doctor to assign, or {@code null} if no doctor other than the patient has room
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nullable Person findAvailableDoctor(Person patient, List<Person> doctors,
+          Map<UUID, Integer> remainingCapacityByDoctor, boolean isDoctorsUseAdministration, int maximumPatients) {
+        Iterator<Person> doctorIterator = doctors.iterator();
+        while (doctorIterator.hasNext()) {
+            Person doctor = doctorIterator.next();
+            int remainingCapacity = remainingCapacityByDoctor.computeIfAbsent(doctor.getId(),
+                  doctorId -> doctor.getDoctorMedicalCapacity(isDoctorsUseAdministration, maximumPatients));
+
+            if (remainingCapacity <= 0) {
+                doctorIterator.remove();
+                continue;
+            }
+
+            if (doctor.getId().equals(patient.getId())) {
+                continue;
+            }
+
+            return doctor;
+        }
+
+        return null;
     }
 
     /**

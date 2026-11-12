@@ -452,6 +452,9 @@ public class CamOpsSalvageUtilities {
      * among the assigned technicians. For each salvaged unit, there is a small chance (snake eyes on 2d6) that an
      * injury event occurs. When an injury event occurs, a random technician from the assigned pool is injured.</p>
      *
+     * <p>Techs working carefully (see {@link SalvageRecoverySession#setCarefulSalvage(boolean)}) take ten times as
+     * long, but only have an accident on a 3 on 3d6.</p>
+     *
      * <p>The severity of injuries is determined by rolling 1d6 for hits, which may be modified by the victim's SPAs
      * (Special Pilot Abilities). The method respects the campaign's medical system settings, using either advanced
      * medical injury resolution or simple hit tracking.</p>
@@ -461,7 +464,8 @@ public class CamOpsSalvageUtilities {
      *
      * <p>Key features:</p>
      * <ul>
-     *   <li>Rolls 2d6 for each salvaged unit; snake eyes (2) triggers an injury event</li>
+     *   <li>Rolls 2d6 for each salvaged unit; snake eyes (2) triggers an injury event. Careful salvage rolls 3d6
+     *   instead, and only a 3 triggers one</li>
      *   <li>Random technician selection for each injury event</li>
      *   <li>Injury severity adjusted by victim's SPAs and campaign fatigue settings</li>
      *   <li>Compatible with both simple and advanced medical systems</li>
@@ -471,11 +475,13 @@ public class CamOpsSalvageUtilities {
      * @param campaign              the current campaign
      * @param techUUIDs             list of technicians assigned to salvage operations (may be modified if techs die)
      * @param numberOfSalvagedUnits the number of units being salvaged
+     * @param isCarefulSalvage      {@code true} if the techs worked carefully, making accidents rarer
      *
      * @author Illiani
      * @since 0.50.10
      */
-    public static void performRiskySalvageChecks(Campaign campaign, List<UUID> techUUIDs, int numberOfSalvagedUnits) {
+    public static void performRiskySalvageChecks(Campaign campaign, List<UUID> techUUIDs, int numberOfSalvagedUnits,
+          boolean isCarefulSalvage) {
         if (techUUIDs.isEmpty()) {
             return;
         }
@@ -485,7 +491,7 @@ public class CamOpsSalvageUtilities {
         final int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
         final boolean useInjuryFatigue = InjurySPAUtility.isUseInjuryFatigue(campaignOptions);
 
-        int injuryEvents = getInjuryEventsCount(numberOfSalvagedUnits);
+        int injuryEvents = getInjuryEventsCount(numberOfSalvagedUnits, isCarefulSalvage);
 
         List<Person> techs = getValidTechs(campaign, techUUIDs);
 
@@ -498,7 +504,7 @@ public class CamOpsSalvageUtilities {
             Person victim = ObjectUtility.getRandomItem(techs);
 
             if (campaignOptions.get(CampaignOption.USE_EDGE) && victim.getCurrentEdge() > 0) {
-                if (performEdgeReroll(campaign, victim)) {
+                if (performEdgeReroll(campaign, victim, isCarefulSalvage)) {
                     continue;
                 }
             }
@@ -585,15 +591,14 @@ public class CamOpsSalvageUtilities {
         return newHits;
     }
 
-    private static boolean performEdgeReroll(Campaign campaign, Person victim) {
+    private static boolean performEdgeReroll(Campaign campaign, Person victim, boolean isCarefulSalvage) {
         if (victim.getOptions().booleanOption(PersonnelOptions.EDGE_SALVAGE_ACCIDENTS)) {
             campaign.addReport(PERSONNEL,
                   getFormattedTextAt(RESOURCE_BUNDLE, "CamOpsSalvageUtilities.reroll",
                         victim.getHyperlinkedName()));
             victim.spendEdge();
 
-            int roll = d6(2);
-            return roll != 2;
+            return !isAccidentRoll(isCarefulSalvage);
         }
 
         return false;
@@ -613,15 +618,31 @@ public class CamOpsSalvageUtilities {
         return techs;
     }
 
-    private static int getInjuryEventsCount(int numberOfSalvagedUnits) {
+    private static int getInjuryEventsCount(int numberOfSalvagedUnits, boolean isCarefulSalvage) {
         int injuryEvents = 0;
         for (int i = 0; i < numberOfSalvagedUnits; i++) {
-            int roll = d6(2);
-            if (roll == 2) {
+            if (isAccidentRoll(isCarefulSalvage)) {
                 injuryEvents++;
             }
         }
         return injuryEvents;
+    }
+
+    /**
+     * Rolls for a salvage accident: snake eyes on 2d6, or a 3 on 3d6 if the techs are working carefully.
+     *
+     * @param isCarefulSalvage {@code true} if the techs are working carefully
+     *
+     * @return {@code true} if there is an accident
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isAccidentRoll(boolean isCarefulSalvage) {
+        if (isCarefulSalvage) {
+            return d6(3) == 3;
+        }
+        return d6(2) == 2;
     }
 
     /**

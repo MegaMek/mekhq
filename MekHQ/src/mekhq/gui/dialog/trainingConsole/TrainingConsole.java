@@ -81,6 +81,7 @@ import mekhq.gui.baseComponents.hud.HudModeSelector;
 import mekhq.gui.baseComponents.hud.HudStatTile;
 import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.AbilityGroup;
 import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.AttributeGroup;
+import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.RankGroup;
 import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.SkillGroup;
 import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.Sort;
 import mekhq.gui.dialog.trainingConsole.TrainingRoster.PersonEntry;
@@ -148,6 +149,10 @@ public class TrainingConsole extends JDialog {
     private final HudButton railToggle = new HudButton("", false, true);
     private final HudFilterList<PersonnelRole> roleFilter = new HudFilterList<>(value -> {
         state.role = value;
+        refreshList();
+    });
+    private final HudFilterList<RankGroup> rankFilter = new HudFilterList<>(value -> {
+        state.rankGroup = value;
         refreshList();
     });
     private final HudFilterList<String> formationFilter = new HudFilterList<>(value -> {
@@ -367,6 +372,9 @@ public class TrainingConsole extends JDialog {
         column.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.role"))));
         column.add(leftAligned(roleFilter));
         column.add(Box.createVerticalStrut(scaleForGUI(12)));
+        column.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.rank"))));
+        column.add(leftAligned(rankFilter));
+        column.add(Box.createVerticalStrut(scaleForGUI(12)));
         column.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.level"))));
         column.add(leftAligned(levelFilter));
         column.add(Box.createVerticalStrut(scaleForGUI(12)));
@@ -559,6 +567,7 @@ public class TrainingConsole extends JDialog {
               (PersonnelRole role) -> role.getLabel(false)));
         Map<String, Integer> byFormation = new TreeMap<>();
         Map<SkillLevel, Integer> byLevel = new EnumMap<>(SkillLevel.class);
+        Map<RankGroup, Integer> byRankGroup = new EnumMap<>(RankGroup.class);
         String query = state.query.trim().toLowerCase(Locale.ROOT);
         for (PersonEntry entry : roster.entries()) {
             Person person = entry.person();
@@ -573,11 +582,13 @@ public class TrainingConsole extends JDialog {
                 byFormation.merge(entry.formationName(), 1, Integer::sum);
             }
             byLevel.merge(entry.skillLevel(), 1, Integer::sum);
+            byRankGroup.merge(rankGroupOf(entry), 1, Integer::sum);
             base.add(entry);
         }
         List<PersonEntry> filtered = new ArrayList<>();
         for (PersonEntry entry : base) {
             if (((state.role == null) || (entry.role() == state.role))
+                      && ((state.rankGroup == null) || (rankGroupOf(entry) == state.rankGroup))
                       && ((state.formation == null) || entry.formationName().equals(state.formation))
                       && ((state.level == null) || (entry.skillLevel() == state.level))) {
                 filtered.add(entry);
@@ -618,6 +629,13 @@ public class TrainingConsole extends JDialog {
         roleFilter.setItems(roles);
         roleFilter.setSelected(state.role);
 
+        List<Item<RankGroup>> rankGroups = new ArrayList<>();
+        rankGroups.add(new Item<>(null, getTextAt(RESOURCE_BUNDLE, "rail.allRanks"), base.size()));
+        byRankGroup.forEach((rankGroup, count) -> rankGroups.add(new Item<>(rankGroup,
+              getTextAt(RESOURCE_BUNDLE, "rail.rank." + rankGroup.name()), count)));
+        rankFilter.setItems(rankGroups);
+        rankFilter.setSelected(state.rankGroup);
+
         List<Item<SkillLevel>> levels = new ArrayList<>();
         levels.add(new Item<>(null, getTextAt(RESOURCE_BUNDLE, "rail.allLevels"), base.size()));
         byLevel.forEach((level, count) -> levels.add(new Item<>(level, level.toString(), count)));
@@ -633,6 +651,18 @@ public class TrainingConsole extends JDialog {
         includePrisoners.setSelected(state.isIncludePrisoners);
         onlyStaged.setSelected(state.isOnlyStaged);
         hideExcluded.setSelected(state.isHideExcluded);
+    }
+
+    /**
+     * @param entry a person in the list
+     *
+     * @return whether the person's rank puts them among the officers or the enlisted
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static RankGroup rankGroupOf(PersonEntry entry) {
+        return entry.isOfficer() ? RankGroup.OFFICERS : RankGroup.ENLISTED;
     }
 
     /** Redraws the purchase panel, the review page, the tiles and the dock, after a purchase or a setting changed. */
