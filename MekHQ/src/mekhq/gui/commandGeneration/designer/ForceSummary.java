@@ -171,6 +171,30 @@ public final class ForceSummary {
         }
     }
 
+    /**
+     * Whether another summary counts exactly the same units, the same ones struck out. A board rebuilt only to change
+     * names or a highlight keeps its old summary when this holds, so work keyed to the summary, such as the People
+     * page's staffing estimate, is not repeated.
+     *
+     * @param other the summary to compare with
+     *
+     * @return {@code true} if both hold the same unit instances, included and struck out alike
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    boolean hasSameUnits(ForceSummary other) {
+        if ((rolledUnits != other.rolledUnits) || (includedEntities.size() != other.includedEntities.size())) {
+            return false;
+        }
+        for (int index = 0; index < includedEntities.size(); index++) {
+            if (includedEntities.get(index) != other.includedEntities.get(index)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     /** @return every unit rolled, struck out or not */
     public int getRolledUnits() {
         return rolledUnits;

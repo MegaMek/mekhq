@@ -62,6 +62,11 @@ import mekhq.campaign.unit.Unit;
  * @since 0.51.01
  */
 public class SalvageRecoverySession {
+    /**
+     * How much longer every recovery takes when the techs work carefully (see {@link #setCarefulSalvage(boolean)}).
+     */
+    public static final int CAREFUL_SALVAGE_TIME_MULTIPLIER = 10;
+
     private final AbstractSalvage salvageRules;
     private final SalvageSettlement settlement;
     private final SalvageRecoveryPlan plan;
@@ -73,6 +78,7 @@ public class SalvageRecoverySession {
     private final Money employerSalvageInitial;
     private final Money availableFunds;
     private boolean isStolen;
+    private boolean isCarefulSalvage;
 
     /**
      * What happens to a recovered wreck.
@@ -187,6 +193,32 @@ public class SalvageRecoverySession {
      */
     public boolean isStolen() {
         return isStolen;
+    }
+
+    /**
+     * @return {@code true} if the techs are working carefully: every recovery takes
+     *       {@value #CAREFUL_SALVAGE_TIME_MULTIPLIER} times as long, but accidents are rarer (see
+     *       {@link CamOpsSalvageUtilities#performRiskySalvageChecks(mekhq.campaign.Campaign, List, int, boolean)})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isCarefulSalvage() {
+        return isCarefulSalvage;
+    }
+
+    /**
+     * Sets whether the techs work carefully. Assignments are kept even if they no longer fit in the techs' time; the
+     * player is then stopped from confirming until they do.
+     *
+     * @param isCarefulSalvage {@code true} to have every recovery take {@value #CAREFUL_SALVAGE_TIME_MULTIPLIER} times
+     *                         as long, in exchange for fewer accidents
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setCarefulSalvage(boolean isCarefulSalvage) {
+        this.isCarefulSalvage = isCarefulSalvage;
     }
 
     /**
@@ -438,11 +470,21 @@ public class SalvageRecoverySession {
     /**
      * @param recovery the wreck's recovery
      *
-     * @return the tech time recovering the wreck takes, in minutes
+     * @return the tech time recovering the wreck takes, in minutes; {@value #CAREFUL_SALVAGE_TIME_MULTIPLIER} times as
+     *       long if the techs are working carefully
      */
     public int getRecoveryMinutes(WreckRecovery recovery) {
         RecoveryTimeData timeData = recoveryTimes.get(recovery.getWreck().getId());
-        return (timeData == null) ? 0 : timeData.totalRecoveryTime();
+        if (timeData == null) {
+            return 0;
+        }
+
+        long minutes = timeData.totalRecoveryTime();
+        if (isCarefulSalvage) {
+            minutes *= CAREFUL_SALVAGE_TIME_MULTIPLIER;
+        }
+        // Saturate rather than overflow, so an absurd recovery time can't wrap around to negative
+        return (int) Math.min(Integer.MAX_VALUE, minutes);
     }
 
     /**

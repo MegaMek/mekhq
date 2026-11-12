@@ -61,7 +61,6 @@ import javax.xml.parsers.DocumentBuilder;
 import megamek.Version;
 import megamek.client.generator.RandomUnitGenerator;
 import megamek.client.ui.CopySystemDataAction;
-import megamek.client.ui.ReleaseNotesAction;
 import megamek.client.ui.clientGUI.GUIPreferences;
 import megamek.client.ui.dialogs.UnitLoadingDialog;
 import megamek.client.ui.dialogs.buttonDialogs.CommonSettingsDialog;
@@ -123,6 +122,7 @@ import mekhq.gui.developerTools.StratConFacilityEditorDialog;
 import mekhq.gui.developerTools.StratConPointOfInterestEditorDialog;
 import mekhq.gui.dialog.*;
 import mekhq.gui.dialog.advancedCharacterBuilder.lifePathBuilder.LifePathBuilderDialog;
+import mekhq.gui.dialog.releaseNotes.ReleaseNotesConsole;
 import mekhq.gui.dialog.reportDialogs.CargoReportDialog;
 import mekhq.gui.dialog.reportDialogs.ChaosReputationReportDialog;
 import mekhq.gui.dialog.reportDialogs.HangarReportDialog;
@@ -673,7 +673,10 @@ public class MekHQMenuBar extends JMenuBar {
 
         menuHelp.addSeparator();
 
-        menuHelp.add(new ReleaseNotesAction("mekhq"));
+        JMenuItem releaseNotes = createMenuItem("menuReleaseNotes.text", KeyEvent.VK_UNDEFINED,
+              event -> ReleaseNotesConsole.showReleaseNotes(getFrame()));
+        releaseNotes.setToolTipText(getTextAt("menuReleaseNotes.toolTipText"));
+        menuHelp.add(releaseNotes);
         menuHelp.add(createMenuItem("menuAbout.text", KeyEvent.VK_A,
               event -> new MekHQAboutDialog(getFrame()).show()));
 

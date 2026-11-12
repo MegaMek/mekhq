@@ -102,6 +102,7 @@ class ContractMarketPage {
     private MMComboBox<SalvageSystem> comboSalvageSystem;
     private JCheckBox chkUseRiskySalvage;
     private JCheckBox chkKeepEnemyCamouflageOnSalvage;
+    private JCheckBox chkReduceSalvageQuality;
     private JCheckBox chkEnableSalvageFlagByDefault;
     private JCheckBox chkUseClanSalvageClause;
     private JCheckBox chkUseDynamicDifficulty;
@@ -263,6 +264,10 @@ class ContractMarketPage {
               getMetadata(new Version(0, 51, 1)));
         chkKeepEnemyCamouflageOnSalvage.addMouseListener(createTipPanelUpdater("KeepEnemyCamouflageOnSalvage"));
 
+        chkReduceSalvageQuality = new CampaignOptionsCheckBox("ReduceSalvageQuality",
+              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+        chkReduceSalvageQuality.addMouseListener(createTipPanelUpdater("ReduceSalvageQuality"));
+
         chkEnableSalvageFlagByDefault = new CampaignOptionsCheckBox("EnableSalvageFlagByDefault",
               getMetadata(MILESTONE_BEFORE_METADATA));
         chkEnableSalvageFlagByDefault.addMouseListener(createTipPanelUpdater("EnableSalvageFlagByDefault"));
@@ -365,6 +370,7 @@ class ContractMarketPage {
               chkUseTwoWayPay,
               chkUseRiskySalvage,
               chkKeepEnemyCamouflageOnSalvage,
+              chkReduceSalvageQuality,
               chkEnableSalvageFlagByDefault,
               chkUseClanSalvageClause,
               chkUseDynamicDifficulty,
@@ -739,6 +745,7 @@ class ContractMarketPage {
         comboSalvageSystem.setSelectedItem(model.salvageSystem);
         chkUseRiskySalvage.setSelected(model.useRiskySalvage);
         chkKeepEnemyCamouflageOnSalvage.setSelected(model.keepEnemyCamouflageOnSalvage);
+        chkReduceSalvageQuality.setSelected(model.reduceSalvageQuality);
         chkEnableSalvageFlagByDefault.setSelected(model.enableSalvageFlagByDefault);
         chkUseClanSalvageClause.setSelected(model.useClanSalvageClause);
         chkUseDynamicDifficulty.setSelected(model.useDynamicDifficulty);
@@ -806,6 +813,7 @@ class ContractMarketPage {
         model.salvageSystem = comboSalvageSystem.getSelectedItem();
         model.useRiskySalvage = chkUseRiskySalvage.isSelected();
         model.keepEnemyCamouflageOnSalvage = chkKeepEnemyCamouflageOnSalvage.isSelected();
+        model.reduceSalvageQuality = chkReduceSalvageQuality.isSelected();
         model.enableSalvageFlagByDefault = chkEnableSalvageFlagByDefault.isSelected();
         model.useClanSalvageClause = chkUseClanSalvageClause.isSelected();
         model.useDynamicDifficulty = chkUseDynamicDifficulty.isSelected();
