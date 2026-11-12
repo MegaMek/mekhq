@@ -59,7 +59,7 @@ import org.w3c.dom.NodeList;
  * Remembers how a unit was wired into its C3 networks when it was mothballed, so the wiring can be put back when the
  * unit is activated again.
  *
- * <p>Mothballing takes a unit out of the TO&E, and leaving the TO&E detaches the unit from every C3 network. That
+ * <p>Mothballing takes a unit out of the TOE, and leaving the TOE detaches the unit from every C3 network. That
  * detachment also severs links held <i>by other units</i>: a mothballed C3 master releases all of its slaves, and a
  * mothballed C3i, Naval C3, or Nova CEWS node leaves the shared network. This class captures those links up front,
  * keyed by {@link Unit} ID (entity C3 UUIDs are not stable across entity swaps) and persisted with {@link MothballInfo}.
