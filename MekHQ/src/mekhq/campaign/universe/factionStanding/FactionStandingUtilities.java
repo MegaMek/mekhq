@@ -343,6 +343,10 @@ public class FactionStandingUtilities {
      * active. If not, and if faction standing is used as a criterion, the method evaluates the player's highest faction
      * regard across all active contracts, granting access if this level meets the threshold.</p>
      *
+     * <p>Each contract is judged by the regard of the faction whose standing it answers to
+     * ({@link AbstractContract#getStandingEmployerFactionCode()}): for a false flag operation that is the real sponsor,
+     * not the front the employer presents.</p>
+     *
      * <p>If there are no active contracts, access is denied.</p>
      *
      * @param overridingCommandCircuitRequirements {@code true} if command circuit requirements are overridden
@@ -372,7 +376,8 @@ public class FactionStandingUtilities {
         double highestRegard = FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard();
         if (useFactionStandingCommandCircuit) {
             for (AbstractContract contract : activeContracts) {
-                double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerFactionCode(), true);
+                double currentRegard = factionStandings.getRegardForFaction(contract.getStandingEmployerFactionCode(),
+                      true);
                 if (currentRegard > highestRegard) {
                     highestRegard = currentRegard;
                 }
@@ -384,22 +389,24 @@ public class FactionStandingUtilities {
     }
 
     /**
-     * Determines whether command circuit access should be granted based on campaign settings, GM mode, current faction
-     * standings, and contract employer.
+     * Determines whether command circuit access should be granted for a single contract, based on campaign settings,
+     * GM mode, current faction standings, and the faction whose standing that contract answers to.
      *
      * <p>Access is immediately granted if both command circuit requirements are overridden and GM mode is
-     * active. If not, and if faction standing is used as a criterion, the method evaluates the player's highest faction
-     * regard across all active contracts, granting access if this level meets the threshold.</p>
-     *
-     * <p>If there are no active contracts, access is denied.</p>
+     * active. Otherwise, access is granted only when faction standing is used as a criterion and the player's regard
+     * with {@code standingFactionCode} meets the threshold - the same rule
+     * {@link #isUseCommandCircuit(boolean, boolean, boolean, FactionStandings, List)} applies to accepted contracts, so
+     * a contract's projected start date and the fleet's actual journey agree.</p>
      *
      * <p><b>Note:</b> this overload is intended for when evaluating a contract without the contract being
-     * initialized yet.</p>
+     * accepted yet.</p>
      *
      * @param overridingCommandCircuitRequirements {@code true} if command circuit requirements are overridden
      * @param isGM                                 {@code true} if GM mode is enabled
+     * @param useFactionStandingCommandCircuit     {@code true} if faction standing is used to determine access
      * @param factionStandings                     player faction standing data
-     * @param employerCode                         employer faction code
+     * @param standingFactionCode                  the code of the faction whose standing the contract answers to (see
+     *                                             {@link AbstractContract#getStandingEmployerFactionCode()})
      *
      * @return {@code true} if command circuit access should be used; {@code false} otherwise
      *
@@ -407,14 +414,18 @@ public class FactionStandingUtilities {
      * @since 0.50.07
      */
     public static boolean isUseCommandCircuit(boolean overridingCommandCircuitRequirements, boolean isGM,
-          FactionStandings factionStandings, String employerCode) {
+          boolean useFactionStandingCommandCircuit, FactionStandings factionStandings, String standingFactionCode) {
         boolean useCommandCircuit = overridingCommandCircuitRequirements && isGM;
 
         if (useCommandCircuit) {
             return true;
         }
 
-        double currentRegard = factionStandings.getRegardForFaction(employerCode, true);
+        if (!useFactionStandingCommandCircuit) {
+            return false;
+        }
+
+        double currentRegard = factionStandings.getRegardForFaction(standingFactionCode, true);
         useCommandCircuit = hasCommandCircuitAccess(currentRegard);
         return useCommandCircuit;
     }
