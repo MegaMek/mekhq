@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.optionChangeDialogs;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.MHQConstants.DISCORD_LINK;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
@@ -107,7 +108,7 @@ public class StratConMaplessCampaignOptionsChangedConfirmationDialog {
     }
 
     private static void buildUrlButton(JPanel pnlUpgrades, JButton btnDiscord, String discordLink) {
-        btnDiscord.setToolTipText(discordLink);
+        btnDiscord.setToolTipText(wordWrap(discordLink));
         btnDiscord.setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         btnDiscord.setAlignmentX(Component.CENTER_ALIGNMENT);
         btnDiscord.addActionListener(e -> {
