@@ -849,10 +849,12 @@ public class AbstractProcreationTest {
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
         verify(mockProcreation, times(1)).processRandomPaternityCheck(mockCampaign,
               LocalDate.ofYearDay(3025, 1),
-              mockPerson);
+              mockPerson,
+              false);
         verify(mockProcreation, times(1)).processRandomAdoptionCheck(mockCampaign,
               LocalDate.ofYearDay(3025, 1),
-              mockPerson);
+              mockPerson,
+              false);
     }
 
     @Test
