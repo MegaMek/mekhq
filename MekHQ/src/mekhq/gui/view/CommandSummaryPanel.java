@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.events.CommandGenerationFinishedEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.events.assets.AssetEvent;
@@ -202,6 +203,11 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
 
     @Subscribe
     public void handle(final OptionsChangedEvent event) {
+        refreshAll();
+    }
+
+    @Subscribe
+    public void handle(CommandGenerationFinishedEvent event) {
         refreshAll();
     }
 

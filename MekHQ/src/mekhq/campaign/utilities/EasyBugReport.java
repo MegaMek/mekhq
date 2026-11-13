@@ -38,10 +38,8 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.io.BufferedOutputStream;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.ArrayList;
@@ -50,7 +48,6 @@ import java.util.EnumSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
-import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 import javax.swing.JDialog;
 import javax.swing.JFileChooser;
@@ -64,6 +61,8 @@ import megamek.client.generator.RandomCallsignGenerator;
 import megamek.common.Configuration;
 import megamek.common.preference.ClientPreferences;
 import megamek.common.preference.PreferenceManager;
+import megamek.common.util.BugReportBundle;
+import megamek.common.util.BugReportRedactor;
 import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
@@ -272,6 +271,11 @@ public class EasyBugReport {
             LOGGER.error("Failed to save campaign for bug report");
             return;
         }
+
+        // The startup header can roll out of mekhq.log in a long session, so it is written again now, before the log
+        // is copied. The version, OS, Java and hardware details then always reach the maintainer in the log itself.
+        LOGGER.info("Bug report: packaging. System information now:\n{}",
+              BugReportBundle.asCurrentState(MekHQ.getUnderlyingInformation()));
 
         // Now package campaign + logs into the user-chosen archive
         try {
@@ -604,6 +608,25 @@ public class EasyBugReport {
      */
     static BugReportArchiveResult createBugReportArchive(List<BugReportCandidate> candidates, File archiveFile,
           long maxArchiveBytes) throws IOException {
+        return createBugReportArchive(candidates, archiveFile, maxArchiveBytes, BugReportRedactor.forThisMachine());
+    }
+
+    /**
+     * Writes the candidates as {@link #createBugReportArchive(List, File, long)} does, cleaning every text file with
+     * the given redactor so the archive carries no home folder, login name, computer name or IP address. The
+     * campaign, saves and images are copied unchanged.
+     *
+     * @param candidates      the files to write, in priority order
+     * @param archiveFile     the user-chosen archive; parts are written next to it as {@code <name>-partN.zip}
+     * @param maxArchiveBytes the size cap for each part
+     * @param redactor        the redactor to clean text files with
+     *
+     * @return the parts written and what was included or left out
+     *
+     * @throws IOException if an I/O error occurs while writing the archive
+     */
+    static BugReportArchiveResult createBugReportArchive(List<BugReportCandidate> candidates, File archiveFile,
+          long maxArchiveBytes, BugReportRedactor redactor) throws IOException {
         List<String> includedEntries = new ArrayList<>();
         List<String> droppedEntries = new ArrayList<>();
 
@@ -682,7 +705,7 @@ public class EasyBugReport {
                     );
                 }
 
-                addFileToZip(inputFile, entryName, zipOut);
+                BugReportBundle.addFileToArchive(inputFile, entryName, zipOut, redactor);
                 includedEntries.add(entryName);
             }
         } finally {
@@ -702,6 +725,8 @@ public class EasyBugReport {
         }
 
         int partCount = parts.size();
+        LOGGER.info("Bug report: redacted {} path piece(s), {} host name(s) and {} IP address(es) from the archive",
+              redactor.pathCount(), redactor.hostNameCount(), redactor.ipAddressCount());
         LOGGER.info("Created bug report archive in {} part(s): {}", partCount, parts);
         if (!droppedEntries.isEmpty()) {
             LOGGER.info("Left out {} optional file(s) to avoid another part: {}",
@@ -735,35 +760,5 @@ public class EasyBugReport {
 
         dialog.setVisible(true);
         dialog.dispose();
-    }
-
-    /**
-     * Adds a single file to an open ZIP output stream.
-     *
-     * <p>The file is written using a newly created {@link ZipEntry} with the provided entry name, and its contents
-     * are streamed using a fixed-size buffer until EOF.</p>
-     *
-     * @param source          the source file to read from
-     * @param entryName       the path/name under which the file should appear inside the archive
-     * @param zipOutputStream the open ZIP output stream to which the entry will be written
-     *
-     * @throws IOException if any I/O error occurs while reading or writing
-     * @author Illiani
-     * @since 0.50.11
-     */
-    private static void addFileToZip(File source, String entryName, ZipOutputStream zipOutputStream)
-          throws IOException {
-        ZipEntry entry = new ZipEntry(entryName);
-        zipOutputStream.putNextEntry(entry);
-
-        try (InputStream fileInputStream = new FileInputStream(source)) {
-            byte[] buffer = new byte[8192];
-            int length;
-            while ((length = fileInputStream.read(buffer)) != -1) {
-                zipOutputStream.write(buffer, 0, length);
-            }
-        }
-
-        zipOutputStream.closeEntry();
     }
 }

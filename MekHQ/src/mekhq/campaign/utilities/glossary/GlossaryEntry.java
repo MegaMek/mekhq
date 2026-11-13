@@ -186,7 +186,7 @@ public enum GlossaryEntry {
     RELOADING_FIELD_GUNS("RELOADING_FIELD_GUNS", new Version("0.50.06")),
     REMAIN_DEPLOYED("REMAIN_DEPLOYED", new Version("0.51.01")),
     REPAIRING_DAMAGED_HIP_SHOULDER("REPAIRING_DAMAGED_HIP_SHOULDER", new Version("0.50.06")),
-    REPAIR_SITE("REPAIR_SITE", new Version("0.50.06")),
+    REPAIR_SITE("REPAIR_SITE", new Version("0.51.01")),
     RESUPPLY("RESUPPLY", new Version("0.50.06")),
     SCENARIO_VICTORY_POINTS("SCENARIO_VICTORY_POINTS", new Version("0.50.06")),
     SCENES("SCENES", new Version("0.51.01")),
