@@ -509,7 +509,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final AbstractProcreation procreation = getCampaign().getPlayerForce()
                                                               .getHumanResources()
                                                               .getProcreation();
-                final int size = Integer.parseInt(data[1]);
+                final int size = MathUtility.parseInt(data[1]);
                 Stream.of(people)
                       .filter(person -> person.getGender().isFemale())
                       .filter(person -> (procreation.canProcreate(getCampaign().getLocalDate(), person, false) ==
@@ -532,7 +532,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 final AbstractProcreation procreation = getCampaign().getPlayerForce()
                                                               .getHumanResources()
                                                               .getProcreation();
-                final int size = Integer.parseInt(data[1]);
+                final int size = MathUtility.parseInt(data[1]);
                 Stream.of(people).filter(Person::isPregnant).forEach(person -> {
                     procreation.setPregnancySize(person, size);
                     MekHQ.triggerEvent(new PersonChangedEvent(person));
