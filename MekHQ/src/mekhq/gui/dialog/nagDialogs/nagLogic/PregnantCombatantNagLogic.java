@@ -35,7 +35,9 @@ package mekhq.gui.dialog.nagDialogs.nagLogic;
 import java.util.ArrayList;
 import java.util.List;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 
@@ -49,7 +51,8 @@ public class PregnantCombatantNagLogic {
      *     <li>The campaign has an active contract.</li>
      *     <li>There are pregnant personnel in the list of active personnel.</li>
      *     <li>A pregnant person is assigned to a unit that is part of a combat force
-     *         (i.e., a force with an ID other than {@link Formation#FORMATION_NONE}).</li>
+     *         (i.e., a force with an ID other than {@link Formation#FORMATION_NONE}) that is not a
+     *         {@link FormationType#SUPPORT} formation.</li>
      * </ul>
      *
      * <p>If no active contract exists in the campaign, the method immediately returns {@code false}.
@@ -90,14 +93,34 @@ public class PregnantCombatantNagLogic {
             if (person.isPregnant()) {
                 Unit unit = person.getUnit();
 
-                if (unit != null) {
-                    if (unit.getFormationId() != Formation.FORMATION_NONE) {
-                        pregnantCombatants.add(person);
-                    }
+                if ((unit != null) && (unit.getFormationId() != Formation.FORMATION_NONE)
+                          && !isInSupportFormation(unit)) {
+                    pregnantCombatants.add(person);
                 }
             }
         }
 
         return pregnantCombatants;
+    }
+
+    /**
+     * Determines whether the unit is assigned to a formation of type {@link FormationType#SUPPORT}.
+     *
+     * <p>Support formations are deployed alongside the force but do not take part in combat, so personnel assigned to
+     * them are not considered combatants.</p>
+     *
+     * @param unit the {@link Unit} to check
+     *
+     * @return {@code true} if the unit's formation is a support formation; {@code false} if it is not, or if the
+     *       formation cannot be resolved
+     */
+    private static boolean isInSupportFormation(Unit unit) {
+        Campaign campaign = unit.getCampaign();
+        if (campaign == null) {
+            return false;
+        }
+
+        Formation formation = campaign.getPlayerForce().getFormation(unit.getFormationId());
+        return (formation != null) && formation.isFormationType(FormationType.SUPPORT);
     }
 }
