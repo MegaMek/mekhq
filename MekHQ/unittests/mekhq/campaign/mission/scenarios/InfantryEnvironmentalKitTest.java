@@ -232,6 +232,58 @@ class InfantryEnvironmentalKitTest {
         assertNull(platoon.getArmorKit(), "mild weather in breathable air should not issue a kit");
     }
 
+    @Test
+    @DisplayName("Re-rolling cold weather to mild strips the snow suit from enemy infantry")
+    void rerollingColdToMildRemovesSnowSuit() {
+        AtBDynamicScenario scenario = createScenario(AtmosphericTaint.BREATHABLE, Atmosphere.STANDARD);
+        ConvInfantry enemyPlatoon = new ConvInfantry();
+        AtBDynamicScenarioFactory.changeInfantryKit(enemyPlatoon, false, false, -40);
+        assertNotNull(enemyPlatoon.getArmorKit(), "the platoon should start in a snow suit");
+        scenario.getBotForces().add(new BotForce("Enemy", 2, 0, List.of(enemyPlatoon)));
+
+        // The re-roll has produced a mild temperature
+        scenario.setTemperature(MILD_TEMPERATURE);
+        AtBDynamicScenarioFactory.redressInfantryForWeather(scenario, createCampaignOptions());
+
+        assertNull(enemyPlatoon.getArmorKit(), "the snow suit should be removed once the weather is mild");
+        assertFalse(enemyPlatoon.isArmorEncumbering(), "the snow suit's encumbering flag should be cleared");
+    }
+
+    @Test
+    @DisplayName("Re-rolling mild weather to extreme heat issues a heat suit to enemy and allied infantry")
+    void rerollingMildToHotIssuesHeatSuit() {
+        AtBDynamicScenario scenario = createScenario(AtmosphericTaint.BREATHABLE, Atmosphere.STANDARD);
+        ConvInfantry enemyPlatoon = new ConvInfantry();
+        ConvInfantry alliedPlatoon = new ConvInfantry();
+        AtBDynamicScenarioFactory.changeInfantryKit(enemyPlatoon, false, false, -40);
+        AtBDynamicScenarioFactory.changeInfantryKit(alliedPlatoon, false, false, -40);
+        scenario.getBotForces().add(new BotForce("Enemy", 2, 0, List.of(enemyPlatoon)));
+        scenario.getAlliesPlayer().add(alliedPlatoon);
+
+        scenario.setTemperature(56);
+        AtBDynamicScenarioFactory.redressInfantryForWeather(scenario, createCampaignOptions());
+
+        for (ConvInfantry platoon : List.of(enemyPlatoon, alliedPlatoon)) {
+            assertEquals(MiscType.createISHeatSuitInfArmor().getInternalName(),
+                  platoon.getArmorKit().getInternalName(),
+                  "the cold-weather kit should be replaced with a heat suit");
+        }
+    }
+
+    @Test
+    @DisplayName("Re-rolling the weather leaves kits that MekHQ did not issue alone")
+    void rerollingWeatherKeepsOtherKits() {
+        AtBDynamicScenario scenario = createScenario(AtmosphericTaint.BREATHABLE, Atmosphere.STANDARD);
+        ConvInfantry marines = new ConvInfantry();
+        marines.setArmorKit(MiscType.createISEnvironmentSuitMarineInfArmor());
+        EquipmentType kitBefore = marines.getArmorKit();
+        scenario.getBotForces().add(new BotForce("Enemy", 2, 0, List.of(marines)));
+
+        AtBDynamicScenarioFactory.redressInfantryForWeather(scenario, createCampaignOptions());
+
+        assertEquals(kitBefore, marines.getArmorKit(), "a marine suit should survive a weather re-roll");
+    }
+
     private static AtBDynamicScenario createScenario(AtmosphericTaint atmosphericTaint, Atmosphere atmosphere) {
         AtBDynamicScenario scenario = new AtBDynamicScenario();
         scenario.setAtmosphericTaint(atmosphericTaint);
@@ -243,6 +295,7 @@ class InfantryEnvironmentalKitTest {
     private static CampaignOptions createCampaignOptions() {
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.get(CampaignOption.USE_WEATHER_CONDITIONS)).thenReturn(false);
+        when(campaignOptions.get(CampaignOption.USE_PLANETARY_MODIFIERS)).thenReturn(true);
         return campaignOptions;
     }
 }

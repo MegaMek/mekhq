@@ -78,6 +78,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.BotForceStub;
 import mekhq.campaign.mission.scenarios.Loot;
@@ -935,6 +936,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
         if (chkReroll[REROLL_WEATHER] != null && chkReroll[REROLL_WEATHER].isSelected()) {
             scenario.setWeatherConditions(campaign.getCampaignOptions().get(CampaignOption.USE_NO_TORNADOES));
+            AtBDynamicScenarioFactory.redressInfantryForWeather(scenario, campaign.getCampaignOptions());
             scenario.useReroll();
             chkReroll[REROLL_WEATHER].setSelected(false);
             lblWeatherDesc.setText(scenario.getWeather().toString());
