@@ -76,13 +76,16 @@ import megamek.logging.MMLogger;
  *                             {@code true}
  * @param offersBanditCaste    {@code true} if the player can go rogue as a Bandit Caste, the Clan version of a
  *                             Pirate. Absent from a file means {@code false}
+ * @param hasSharedResult      {@code true} if one results dialog (the news article, or the scene for going rogue) is
+ *                             shown whatever the player chooses, instead of one per choice. Absent from a file means
+ *                             {@code false}
  *
  * @author Illiani
  * @since 0.50.07
  */
 @JsonPropertyOrder({ "name", "date", "notes", "affectedFactionCodes", "sides", "dissenterPreference",
                      "isViolentTransition", "divisiveness", "isIntroducedByThirdParty", "hasNoDissent", "offersMercenary", "offersPirate",
-                     "offersBanditCaste" })
+                     "offersBanditCaste", "hasSharedResult" })
 public record FactionStandingUltimatumData(
       @JsonProperty("name") String name,
       @JsonProperty("date") String date,
@@ -96,7 +99,8 @@ public record FactionStandingUltimatumData(
       @JsonProperty("hasNoDissent") boolean hasNoDissent,
       @JsonProperty("offersMercenary") @Nullable Boolean offersMercenary,
       @JsonProperty("offersPirate") @Nullable Boolean offersPirate,
-      @JsonProperty("offersBanditCaste") @Nullable Boolean offersBanditCaste
+      @JsonProperty("offersBanditCaste") @Nullable Boolean offersBanditCaste,
+      @JsonProperty("hasSharedResult") boolean hasSharedResult
 ) {
     private static final MMLogger LOGGER = MMLogger.create(FactionStandingUltimatumData.class);
 
@@ -137,7 +141,7 @@ public record FactionStandingUltimatumData(
           List<String> affectedFactionCodes, List<FactionStandingUltimatumSide> sides, String dissenterPreference,
           boolean isViolentTransition, int divisiveness) {
         this(name, date, notes, affectedFactionCodes, sides, dissenterPreference, isViolentTransition, divisiveness,
-              false, false, null, null, null);
+              false, false, null, null, null, false);
     }
 
     /**

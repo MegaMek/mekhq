@@ -106,6 +106,7 @@ public final class FactionStandingUltimatum {
               ultimatum.isViolentTransition(),
               ultimatum.getEffectiveDivisiveness(),
               ultimatum.hasNoDissent(),
+              ultimatum.hasSharedResult(),
               FactionStandingUltimatumDialog.getRogueKinds(ultimatum.isMercenaryOffered(),
                     ultimatum.isPirateOffered(), ultimatum.isBanditCasteOffered()),
               ultimatum.name(),

@@ -100,6 +100,7 @@ public class FactionStandingUltimatumDialog {
     static final String KEY_SUPPORT_AGAINST = "against";
     static final String KEY_SIDE_PITCH = "pitch";
     static final String KEY_SIDE_NEWS = "news";
+    static final String KEY_SHARED_RESULT = "result";
     static final String KEY_ROGUE_MERCENARY = "mercenary";
     static final String KEY_ROGUE_PIRATE = "pirate";
     static final String KEY_ROGUE_BANDIT_CASTE = "banditCaste";
@@ -134,6 +135,9 @@ public class FactionStandingUltimatumDialog {
      * @param divisiveness        added to the loyalty check personnel make to follow the player's decision
      * @param hasNoDissent        {@code true} if nobody dissents: the dissenting officer's scene, the dissent strip, and
      *                            the loyalty check are skipped, and the whole campaign follows the player's decision
+     * @param hasSharedResult     {@code true} if one results dialog, with the ultimatum's {@code result} text, is shown
+     *                            whatever the player chooses, in place of each side's news bulletin and the going
+     *                            rogue scene
      * @param rogueKinds          the ways the player can go rogue, in picker order, after the sides; see
      *                            {@link #getRogueKinds(boolean, boolean, boolean)}
      * @param ultimatumName       the unique ultimatum name
@@ -144,7 +148,7 @@ public class FactionStandingUltimatumDialog {
      */
     public FactionStandingUltimatumDialog(Campaign campaign, List<UltimatumSide> sides, @Nullable Person thirdParty,
           String dissenterPreference, boolean isViolentTransition, int divisiveness, boolean hasNoDissent,
-          List<ChoiceKind> rogueKinds, String ultimatumName, LocalDate date) {
+          boolean hasSharedResult, List<ChoiceKind> rogueKinds, String ultimatumName, LocalDate date) {
         this.campaign = campaign;
         PlayerForce playerForce = campaign.getPlayerForce();
         ForceHumanResources humanResources = playerForce.getHumanResources();
@@ -194,10 +198,12 @@ public class FactionStandingUltimatumDialog {
 
         if (choice.kind().isGoingRogue()) {
             processBecomingMercenaryOrPirate(campaign, sides, choice, originalFaction, isViolentTransition,
-                  divisiveness, hasNoDissent, commander, secondInCommand, isTrackingFactionStanding);
+                  divisiveness, hasNoDissent, hasSharedResult, ultimatumName, campaignName, commanderAddress,
+                  commander, secondInCommand, isTrackingFactionStanding);
         } else {
             processChoosingSide(campaign, sides, choice, originalFaction, isViolentTransition, divisiveness,
-                  hasNoDissent, secondInCommand, commander, campaignName, commanderAddress, ultimatumName,
+                  hasNoDissent, hasSharedResult, secondInCommand, commander, campaignName, commanderAddress,
+                  ultimatumName,
                   isTrackingFactionStanding);
         }
 
@@ -530,22 +536,27 @@ public class FactionStandingUltimatumDialog {
      */
     private void processChoosingSide(Campaign campaign, List<UltimatumSide> sides, PickerChoice choice,
           Faction originalFaction, boolean isViolentTransition, int divisiveness, boolean hasNoDissent,
-          @Nullable Person secondInCommand, Person commander, String campaignName, String commanderAddress, String ultimatumName,
-          boolean isTrackingFactionStanding) {
+          boolean hasSharedResult, @Nullable Person secondInCommand, Person commander, String campaignName,
+          String commanderAddress, String ultimatumName, boolean isTrackingFactionStanding) {
         UltimatumSide side = sides.get(choice.sideIndex());
         Faction chosenFaction = side.faction();
 
         // In-character news bulletin. The news text is written around the second-in-command, the dissenting voice.
-        String newsText = getInCharacterText(RESOURCE_BUNDLE,
-              getSideKey(ultimatumName, side.id(), KEY_SIDE_NEWS),
-              commander,
-              secondInCommand,
-              "",
-              campaignName,
-              "",
-              null,
-              commanderAddress);
-        new NewsDialog(campaign, newsText);
+        if (hasSharedResult) {
+            showSharedResult(campaign, ultimatumName, chosenFaction, commander, secondInCommand, campaignName,
+                  commanderAddress);
+        } else {
+            String newsText = getInCharacterText(RESOURCE_BUNDLE,
+                  getSideKey(ultimatumName, side.id(), KEY_SIDE_NEWS),
+                  commander,
+                  secondInCommand,
+                  "",
+                  campaignName,
+                  "",
+                  null,
+                  commanderAddress);
+            new NewsDialog(campaign, newsText);
+        }
 
         // The second-in-command is exempt from the loyalty check; whether they stay is the dissenter's decision below
         processGoingRogue(campaign,
@@ -578,14 +589,21 @@ public class FactionStandingUltimatumDialog {
      */
     private static void processBecomingMercenaryOrPirate(Campaign campaign, List<UltimatumSide> sides,
           PickerChoice choice, Faction originalFaction, boolean isViolentTransition, int divisiveness,
-          boolean hasNoDissent, Person commander, @Nullable Person secondInCommand, boolean isTrackingFactionStanding) {
-        new FactionJudgmentSceneDialog(campaign,
-              commander,
-              secondInCommand,
-              FactionJudgmentSceneType.GO_ROGUE,
-              originalFaction);
-
+          boolean hasNoDissent, boolean hasSharedResult, String ultimatumName, String campaignName,
+          String commanderAddress, Person commander, @Nullable Person secondInCommand,
+          boolean isTrackingFactionStanding) {
         Faction newFaction = getRogueFaction(choice.kind());
+        if (hasSharedResult) {
+            showSharedResult(campaign, ultimatumName, newFaction, commander, secondInCommand, campaignName,
+                  commanderAddress);
+        } else {
+            new FactionJudgmentSceneDialog(campaign,
+                  commander,
+                  secondInCommand,
+                  FactionJudgmentSceneType.GO_ROGUE,
+                  originalFaction);
+        }
+
         // A violent transition is treated as a defection. processGoingRogue also lowers standing with the old faction.
         processGoingRogue(campaign, newFaction, commander, secondInCommand, isViolentTransition, true,
               isTrackingFactionStanding, divisiveness, hasNoDissent);
@@ -599,6 +617,35 @@ public class FactionStandingUltimatumDialog {
                 GoingRogue.processFactionStandingChangeForOldFaction(campaign, sideFaction);
             }
         }
+    }
+
+    /**
+     * Shows the one results dialog an ultimatum with a shared result uses for every choice. Its text can name the
+     * faction the campaign ends up with.
+     *
+     * @param campaign         the current campaign
+     * @param ultimatumName    the unique ultimatum name
+     * @param chosenFaction    the faction the campaign joins by the player's choice
+     * @param commander        the commander
+     * @param secondInCommand  the second-in-command; may be {@code null}
+     * @param campaignName     the campaign's name
+     * @param commanderAddress how to address the commander
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void showSharedResult(Campaign campaign, String ultimatumName, Faction chosenFaction,
+          Person commander, @Nullable Person secondInCommand, String campaignName, String commanderAddress) {
+        String resultText = getInCharacterText(RESOURCE_BUNDLE,
+              getDialogKey(ultimatumName, KEY_SHARED_RESULT),
+              commander,
+              secondInCommand,
+              chosenFaction.getFullName(campaign.getGameYear()),
+              campaignName,
+              "",
+              null,
+              commanderAddress);
+        new NewsDialog(campaign, resultText);
     }
 
     /**
@@ -822,15 +869,41 @@ public class FactionStandingUltimatumDialog {
      */
     public static List<String> getRequiredTextKeys(String ultimatumName, List<String> sideIds, boolean hasNoDissent,
           List<ChoiceKind> rogueKinds) {
+        return getRequiredTextKeys(ultimatumName, sideIds, hasNoDissent, false, rogueKinds);
+    }
+
+    /**
+     * Lists every text key an ultimatum needs, for the ways of going rogue it offers.
+     *
+     * @param ultimatumName   the unique ultimatum name
+     * @param sideIds         the IDs of the ultimatum's sides
+     * @param hasNoDissent    {@code true} if the ultimatum has no dissenter, so the dissenter's scene is never shown
+     * @param hasSharedResult {@code true} if one results dialog serves every choice, so the sides have no news
+     *                        bulletins of their own
+     * @param rogueKinds      the ways of going rogue the ultimatum offers, in picker order
+     *
+     * @return the required keys, scenes first, then the shared result if there is one, then each side's keys in side
+     *       order, then each rogue appeal
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<String> getRequiredTextKeys(String ultimatumName, List<String> sideIds, boolean hasNoDissent,
+          boolean hasSharedResult, List<ChoiceKind> rogueKinds) {
         List<String> keys = new ArrayList<>();
         keys.add(getDialogKey(ultimatumName, KEY_INITIAL_OFFER));
         keys.add(getDialogKey(ultimatumName, KEY_SUPPORT_FOR));
         if (!hasNoDissent) {
             keys.add(getDialogKey(ultimatumName, KEY_SUPPORT_AGAINST));
         }
+        if (hasSharedResult) {
+            keys.add(getDialogKey(ultimatumName, KEY_SHARED_RESULT));
+        }
         for (String sideId : sideIds) {
             keys.add(getSideKey(ultimatumName, sideId, KEY_SIDE_PITCH));
-            keys.add(getSideKey(ultimatumName, sideId, KEY_SIDE_NEWS));
+            if (!hasSharedResult) {
+                keys.add(getSideKey(ultimatumName, sideId, KEY_SIDE_NEWS));
+            }
         }
         for (ChoiceKind rogueKind : rogueKinds) {
             keys.add(getRogueKey(ultimatumName, getRogueTextKey(rogueKind)));
