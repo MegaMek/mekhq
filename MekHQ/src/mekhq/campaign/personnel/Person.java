@@ -1349,9 +1349,32 @@ public class Person implements ILocatable {
     }
 
     public String getRoleDesc() {
+        return getRoleDesc("");
+    }
+
+    /**
+     * Builds the primary and secondary role description, placing a tech specialization suffix next to the profession it
+     * belongs to rather than at the end, so a Mek Tech with a secondary profession reads
+     * {@code Mek Tech (Myomer)/Medic}.
+     *
+     * @param specializationSuffix the specialization, already formatted with its brackets and leading space, or an empty
+     *                             string if there is none
+     *
+     * @return the role description with the suffix following the technician profession
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public String getRoleDesc(String specializationSuffix) {
         String role = getPrimaryRoleDesc();
+        if (getPrimaryRole().isTech()) {
+            role += specializationSuffix;
+        }
         if (!getSecondaryRole().isNone()) {
             role += '/' + getSecondaryRoleDesc();
+            if (!getPrimaryRole().isTech() && getSecondaryRole().isTech()) {
+                role += specializationSuffix;
+            }
         }
         return role;
     }
@@ -1466,6 +1489,23 @@ public class Person implements ILocatable {
      * @since 0.50.06
      */
     public String getFormatedRoleDescriptions(LocalDate today) {
+        return getFormatedRoleDescriptions(today, "");
+    }
+
+    /**
+     * As {@link #getFormatedRoleDescriptions(LocalDate)}, with a tech specialization suffix placed directly after the
+     * technician profession it applies to - the primary role if that is a tech role, otherwise the secondary role.
+     *
+     * @param today                the current in-campaign date
+     * @param specializationSuffix the specialization, already formatted with its brackets and leading space, or an empty
+     *                             string if there is none
+     *
+     * @return the formatted role description
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public String getFormatedRoleDescriptions(LocalDate today, String specializationSuffix) {
         StringBuilder description = new StringBuilder();
 
         // Add dot prefix if unemployed
@@ -1498,10 +1538,18 @@ public class Person implements ILocatable {
             description.append(primaryDesc);
         }
 
+        boolean specializationOnPrimary = primaryRole.isTech();
+        if (specializationOnPrimary) {
+            description.append(specializationSuffix);
+        }
+
         // Handle secondary role
         if (!secondaryRole.isNone()) {
             description.append(" / ");
             description.append(getSecondaryRoleDesc());
+            if (!specializationOnPrimary && secondaryRole.isTech()) {
+                description.append(specializationSuffix);
+            }
         }
 
         return description.toString();
