@@ -1015,6 +1015,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "useGenderedPortraitsOnly");
     public static final CampaignOption<Boolean> NO_RANDOM_PORTRAITS_FOR_CHILDREN =
           of(Boolean.class, true, "noRandomPortraitsForChildren");
+    public static final CampaignOption<Boolean> RANDOM_PORTRAITS_FOR_OFFICERS_ONLY =
+          of(Boolean.class, false, "randomPortraitsForOfficersOnly");
     public static final CampaignOption<Boolean> CHILD_PORTRAITS_WHEN_COMING_OF_AGE =
           of(Boolean.class, true, "childPortraitsWhenComingOfAge");
     public static final CampaignOption<PersonnelMarketStyle> PERSONNEL_MARKET_STYLE =

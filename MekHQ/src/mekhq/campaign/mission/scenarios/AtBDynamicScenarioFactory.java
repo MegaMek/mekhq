@@ -90,6 +90,7 @@ import megamek.common.compute.Compute;
 import megamek.common.containers.MunitionTree;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Transporter;
 import megamek.common.equipment.WeaponMounted;
@@ -103,6 +104,7 @@ import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.AtmosphericTaint;
+import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.planetaryConditions.Wind;
 import megamek.common.units.*;
 import megamek.common.universe.FactionTag;
@@ -520,13 +522,68 @@ public class AtBDynamicScenarioFactory {
      * @param entity          the unit to dress
      * @param campaignOptions the campaign options, to check whether weather conditions are in use
      */
-    static void updateArmorKits(AtBDynamicScenario scenario, Entity entity, CampaignOptions campaignOptions) {
+    static void updateArmorKits(AtBScenario scenario, Entity entity, CampaignOptions campaignOptions) {
         if (entity instanceof ConvInfantry infantry) {
             boolean isLowPressure = scenario.getAtmosphere().isLighterThan(THIN);
             boolean isPoisonous = !scenario.getAtmosphericTaint().isBreathable();
             int temperature = getBattleTemperature(scenario, campaignOptions);
             changeInfantryKit(infantry, isLowPressure, isPoisonous, temperature);
         }
+    }
+
+    /**
+     * Re-dresses the scenario's fixed conventional infantry after its weather has been re-rolled.
+     *
+     * <p>A platoon's environmental kit (snow suit, heat suit, environment suit) is chosen against the conditions that
+     * existed when it was generated. Re-rolling the weather can change the temperature, which would leave a platoon
+     * in a snow suit on a temperate battlefield, or in nothing on a freezing one. This strips the kits this class
+     * issues and issues the right ones for the new conditions, covering both enemy/allied bot forces and
+     * player-controlled allies. Kits that did not come from this class (for example a marine suit from a fixed MUL)
+     * are left alone, as are all other unit types. Platoons generated at deployment time are not touched here: they
+     * are dressed for whatever conditions are current when they are created.</p>
+     *
+     * @param scenario        the scenario whose weather was re-rolled
+     * @param campaignOptions the campaign options, to check whether weather and planetary modifiers are in use
+     */
+    public static void redressInfantryForWeather(AtBScenario scenario, CampaignOptions campaignOptions) {
+        List<Entity> entities = new ArrayList<>(scenario.getAlliesPlayer());
+        for (BotForce botForce : scenario.getBotForces()) {
+            entities.addAll(botForce.getFixedEntityList());
+        }
+
+        boolean usePlanetaryModifiers = campaignOptions.get(CampaignOption.USE_PLANETARY_MODIFIERS);
+        for (Entity entity : entities) {
+            if (!(entity instanceof ConvInfantry infantry) || !isIssuedEnvironmentalKit(infantry.getArmorKit())) {
+                continue;
+            }
+
+            infantry.setArmorKit(null);
+            infantry.setArmorEncumbering(false);
+            infantry.setSpaceSuit(false);
+
+            if (usePlanetaryModifiers) {
+                updateArmorKits(scenario, infantry, campaignOptions);
+            } else {
+                changeInfantryKit(infantry, false, false, getBattleTemperature(scenario, campaignOptions));
+            }
+        }
+    }
+
+    /**
+     * @param kit the armor kit a platoon is wearing, or null
+     *
+     * @return true if the kit is one {@link #changeInfantryKit} can issue (snow suit, heat suit, or a light or
+     *       hostile environment suit)
+     */
+    private static boolean isIssuedEnvironmentalKit(@Nullable EquipmentType kit) {
+        if (kit == null) {
+            return false;
+        }
+        String name = kit.getInternalName();
+        return name.equals(MiscType.createSnowSuitInfArmor().getInternalName()) ||
+                     name.equals(MiscType.createISHeatSuitInfArmor().getInternalName()) ||
+                     name.equals(MiscType.createISEnvironmentSuitLightInfArmor().getInternalName()) ||
+                     name.equals(MiscType.createISEnvironmentSuitHostileInfArmor().getInternalName());
     }
 
     /**
@@ -2572,6 +2629,32 @@ public class AtBDynamicScenarioFactory {
         }
 
         return crewedPlatoon;
+    }
+
+    /**
+     * Last line of defense that makes sure a conventional infantry platoon is dressed for the battlefield it is about
+     * to be deployed onto.
+     *
+     * <p>Platoons are dressed when they are generated, but that kit does not reliably survive until the battle
+     * starts. A scenario's bot forces are saved as MUL data, which records only the kit's effects (such as the
+     * encumbering flag) and not the kit itself. Reloading the campaign therefore leaves an enemy platoon that was
+     * issued a snow suit with no kit at all, and MegaMek kills such a platoon the moment it deploys into extreme
+     * temperatures. Rather than trust that every earlier step dressed the platoon and kept it dressed, this is run
+     * against the conditions MegaMek will actually apply, immediately before the unit is sent to the game.</p>
+     *
+     * <p>Platoons that already wear a kit are left alone, as are all other unit types.</p>
+     *
+     * @param entity     the unit about to be deployed
+     * @param conditions the planetary conditions the game will use
+     */
+    public static void ensureInfantryProtection(Entity entity, PlanetaryConditions conditions) {
+        if (!(entity instanceof ConvInfantry platoon) || (platoon.getArmorKit() != null)) {
+            return;
+        }
+
+        boolean isLowPressure = conditions.getAtmosphere().isLighterThan(THIN);
+        boolean isPoisonous = !conditions.getAtmosphericTaint().isBreathable();
+        changeInfantryKit(platoon, isLowPressure, isPoisonous, conditions.getTemperature());
     }
 
     /**
