@@ -65,6 +65,7 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import jakarta.annotation.Nullable;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
@@ -328,7 +329,8 @@ final class MarketComparePage {
         textRow(built, "dossier.contractMarket.intel.morale", offers,
               contract -> intel(contract, ObfuscatableIntel.MORALE, contract.getMoraleLevel().toString()));
         rankedRow(built, "dossier.contractMarket.intel.intensity", false, offers,
-              contract -> ChaosContractDeterminationScale.formatScale(contract.getExactScale(), true),
+              contract -> ChaosContractDeterminationScale.formatScale(contract.getExactScale(),
+                    market.campaign().getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE)),
               AbstractContract::getExactScale, Better.NEITHER);
 
         section(built, "compare.contractMarket.section.terms");

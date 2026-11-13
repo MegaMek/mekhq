@@ -41,6 +41,7 @@ import javax.swing.JLabel;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.CommandGenerationFinishedEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
@@ -161,7 +162,8 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
         int totalBv = AtBDynamicScenarioFactory.getBVBudgetForStratConSingles(campaign, true);
         lblCombatStrengthValue.setText(getFormattedTextAt("combatStrength.text", totalBv));
         lblScaleValue.setText(ChaosContractDeterminationScale.formatScale(
-              ChaosContractDeterminationScale.getScaleForTableOfOrganization(campaign), true));
+              ChaosContractDeterminationScale.getScaleForTableOfOrganization(campaign),
+              campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE)));
         refreshFunds();
     }
 

@@ -51,6 +51,7 @@ import javax.swing.text.DefaultCaret;
 import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConCombatBonusProjection;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -405,7 +406,8 @@ public class ContractDossierPanel extends JPanel {
         addRow(intel, "dossier.contractMarket.intel.morale",
               intelValue(ObfuscatableIntel.MORALE, contract.getMoraleLevel().toString()));
         addRow(intel, "dossier.contractMarket.intel.intensity",
-              ChaosContractDeterminationScale.formatScale(contract.getExactScale(), true));
+              ChaosContractDeterminationScale.formatScale(contract.getExactScale(),
+                    campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE)));
 
         // A muted, one-line advisory for a contract with a special nature. The natures are mutually exclusive, so at
         // most one shows. For a false flag it is an understated, ambiguously-worded paper-trail tell that (with the

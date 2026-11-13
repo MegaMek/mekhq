@@ -187,7 +187,7 @@ class ChaosTableOfOrganizationScaleTest {
             assertEquals(1, scale(false));
         }
 
-        /** Upkeep covers the whole TO&amp;E, so non-standard formations count, unlike contract Scale. */
+        /** Frontline and Maneuver formations of any type count. */
         @Test
         void nonStandardFormationsCount() {
             addUnit(FORMATION_ID, false, BATTLE_VALUE_PER_SCALE);
