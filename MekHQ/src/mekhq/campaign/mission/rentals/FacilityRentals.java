@@ -144,13 +144,22 @@ public class FacilityRentals {
         }
 
         Money totalCost = Money.of(nonLargeCraftCost + largeCraftCost);
-        if (!presentBayRentDialog(campaign, totalCost)) { // The player chose not to rent anything
+        BayRentalDialog offerDialog = new BayRentalDialog(campaign, totalCost);
+        if (offerDialog.wasFeeWaived()) { // GM option: change site without paying
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, "FacilityRentals.bay.feeWaivedGm",
+                  totalCost.toAmountString());
+            campaign.addReport(FINANCES, report);
+
+            return true;
+        }
+
+        if (!offerDialog.wasConfirmed()) { // The player chose not to rent anything
             return false;
         }
 
         // Returns false if the player cannot afford the rental
         if (!performRentalTransaction(campaign.getPlayerForce().getFinances(), campaign.getLocalDate(), totalCost,
-              ContractRentalType.MAINTENANCE_BAYS)) {
+              rentalType)) {
             String report = getFormattedTextAt(RESOURCE_BUNDLE, "FacilityRentals.bay.unableToAfford",
                   spanOpeningWithCustomColor(getWarningColor()), CLOSING_SPAN_TAG, totalCost.toAmountString());
             campaign.addReport(FINANCES, report);
@@ -159,22 +168,6 @@ public class FacilityRentals {
         }
 
         return true;
-    }
-
-    /**
-     * Presents a dialog to the user for confirming bay rental costs.
-     *
-     * @param campaign   the {@link Campaign} context for the rental operation
-     * @param rentalCost the {@link Money} amount representing the bay rental cost to display
-     *
-     * @return {@code true} if the user confirmed the bay rental; {@code false} if declined
-     *
-     * @author Illiani
-     * @since 0.50.10
-     */
-    private static boolean presentBayRentDialog(Campaign campaign, Money rentalCost) {
-        BayRentalDialog offerDialog = new BayRentalDialog(campaign, rentalCost);
-        return offerDialog.wasConfirmed();
     }
 
     /**
@@ -429,7 +422,8 @@ public class FacilityRentals {
      * <p>
      * Bay rentals are only permitted if the campaign is either off-contract or on a garrison-type contract, and the
      * campaign's location is planetside. If these conditions are not met, a dialog is shown to the user indicating that
-     * no facilities are available.
+     * no facilities are available. The player may choose to ignore this restriction (a GM option that is always
+     * offered, even when GM mode is disabled), in which case the rental process continues as normal.
      * </p>
      *
      * @param campaign      the current campaign context
@@ -438,7 +432,7 @@ public class FacilityRentals {
      *                      {@link Unit#SITE_FACTORY_CONDITIONS})
      *
      * @return {@code true} if the bay change process can proceed; {@code false} if not allowed (e.g., due to contract
-     *       or location restrictions)
+     *       or location restrictions that the player did not choose to ignore)
      */
     public static boolean processBayChangeRequest(Campaign campaign, Unit[] selectedUnits, int bayType) {
         List<AbstractContract> activeAtBContracts = campaign.getActiveContracts();
@@ -452,8 +446,10 @@ public class FacilityRentals {
         }
 
         if (!isBayRentalAllowed || !campaign.getPlayerForce().getForceDetachment().getCurrentLocation().isOnPlanet()) {
-            BayRentalDialog.showNoFacilitiesAvailableDialog(campaign);
-            return false;
+            boolean isRestrictionIgnored = BayRentalDialog.showNoFacilitiesAvailableDialog(campaign);
+            if (!isRestrictionIgnored) {
+                return false;
+            }
         }
 
         // This counts how many units are eligible and how many are eligible and a large craft. We handle

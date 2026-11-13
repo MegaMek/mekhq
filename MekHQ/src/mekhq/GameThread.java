@@ -63,6 +63,7 @@ import megamek.common.weapons.handlers.WeaponOrderHandler;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.scenarios.BotForce;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.unit.Unit;
@@ -371,7 +372,9 @@ class GameThread extends Thread implements CloseClientListener {
         String forceName = botClient.getLocalPlayer().getName() + "|1";
         var entities = new ArrayList<Entity>();
         botForce.generateRandomForces(units, campaign);
+        PlanetaryConditions conditions = getPlanetaryConditions();
         for (Entity entity : botForce.getFullEntityList(campaign)) {
+            AtBDynamicScenarioFactory.ensureInfantryProtection(entity, conditions);
             entity.setOwner(botClient.getLocalPlayer());
             entity.setForceString(forceName);
             /*

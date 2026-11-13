@@ -62,6 +62,7 @@ import megamek.client.ui.clientGUI.ILocalBots;
 import megamek.common.Player;
 import megamek.common.equipment.Minefield;
 import megamek.common.loaders.MapSettings;
+import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.units.Entity;
 import megamek.common.units.IAero;
 import megamek.common.units.Infantry;
@@ -315,10 +316,12 @@ public class AtBGameThread extends GameThread {
 
                 /* Add player-controlled ally units */
                 entities.clear();
+                PlanetaryConditions allyConditions = getPlanetaryConditions();
                 for (Entity entity : scenario.getAlliesPlayer()) {
                     if (null == entity) {
                         continue;
                     }
+                    AtBDynamicScenarioFactory.ensureInfantryProtection(entity, allyConditions);
                     entity.setOwner(client.getLocalPlayer());
 
                     int deploymentRound = entity.getDeployRound();
@@ -859,6 +862,8 @@ public class AtBGameThread extends GameThread {
         String lanceName = RCG.generate();
         botForce.generateRandomForces(units, campaign);
         List<Entity> entitiesSorted = botForce.getFullEntityList(campaign);
+        PlanetaryConditions conditions = getPlanetaryConditions();
+        entitiesSorted.forEach(entity -> AtBDynamicScenarioFactory.ensureInfantryProtection(entity, conditions));
         AbstractContract contract = campaign.getContract(scenario.getMissionId());
         int lanceSize;
 

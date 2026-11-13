@@ -5750,6 +5750,7 @@ public class Person implements ILocatable {
             setLastRankChangeDate(null);
         }
 
+        campaign.getPlayerForce().getHumanResources().assignRandomPortraitOnRankChange(campaign, this);
         campaign.getPlayerForce().getHumanResources().personUpdated(campaign, this);
 
         if (report) {
