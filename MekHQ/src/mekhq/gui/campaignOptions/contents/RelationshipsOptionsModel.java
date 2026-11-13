@@ -33,8 +33,8 @@
 package mekhq.gui.campaignOptions.contents;
 
 import jakarta.annotation.Nonnull;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
@@ -79,6 +79,10 @@ class RelationshipsOptionsModel {
     boolean useRandomPrisonerProcreation;
     int randomProcreationRelationshipDiceSize;
     int randomProcreationRelationshiplessDiceSize;
+    boolean useRandomPaternity;
+    int randomPaternityMaximumChildAge;
+    boolean useRandomSameSexAdoption;
+    int randomAdoptionMaximumChildAge;
     int noInterestInRelationshipsDiceSize;
     int interestedInSameSexDiceSize;
     int interestedInBothSexesDiceSize;
@@ -122,6 +126,10 @@ class RelationshipsOptionsModel {
         useRandomPrisonerProcreation = options.get(CampaignOption.USE_RANDOM_PRISONER_PROCREATION);
         randomProcreationRelationshipDiceSize = options.get(CampaignOption.RANDOM_PROCREATION_RELATIONSHIP_DICE_SIZE);
         randomProcreationRelationshiplessDiceSize = options.get(CampaignOption.RANDOM_PROCREATION_RELATIONSHIPLESS_DICE_SIZE);
+        useRandomPaternity = options.get(CampaignOption.USE_RANDOM_PATERNITY);
+        randomPaternityMaximumChildAge = options.get(CampaignOption.RANDOM_PATERNITY_MAXIMUM_CHILD_AGE);
+        useRandomSameSexAdoption = options.get(CampaignOption.USE_RANDOM_SAME_SEX_ADOPTION);
+        randomAdoptionMaximumChildAge = options.get(CampaignOption.RANDOM_ADOPTION_MAXIMUM_CHILD_AGE);
         noInterestInRelationshipsDiceSize = options.get(CampaignOption.NO_INTEREST_IN_RELATIONSHIPS_DICE_SIZE);
         interestedInSameSexDiceSize = options.get(CampaignOption.INTERESTED_IN_SAME_SEX_DICE_SIZE);
         interestedInBothSexesDiceSize = options.get(CampaignOption.INTERESTED_IN_BOTH_SEXES_DICE_SIZE);
@@ -166,6 +174,10 @@ class RelationshipsOptionsModel {
         options.set(CampaignOption.USE_RANDOM_PRISONER_PROCREATION, useRandomPrisonerProcreation);
         options.set(CampaignOption.RANDOM_PROCREATION_RELATIONSHIP_DICE_SIZE, randomProcreationRelationshipDiceSize);
         options.set(CampaignOption.RANDOM_PROCREATION_RELATIONSHIPLESS_DICE_SIZE, randomProcreationRelationshiplessDiceSize);
+        options.set(CampaignOption.USE_RANDOM_PATERNITY, useRandomPaternity);
+        options.set(CampaignOption.RANDOM_PATERNITY_MAXIMUM_CHILD_AGE, randomPaternityMaximumChildAge);
+        options.set(CampaignOption.USE_RANDOM_SAME_SEX_ADOPTION, useRandomSameSexAdoption);
+        options.set(CampaignOption.RANDOM_ADOPTION_MAXIMUM_CHILD_AGE, randomAdoptionMaximumChildAge);
         options.set(CampaignOption.INTERESTED_IN_SAME_SEX_DICE_SIZE, interestedInSameSexDiceSize);
         options.set(CampaignOption.NO_INTEREST_IN_RELATIONSHIPS_DICE_SIZE, noInterestInRelationshipsDiceSize);
         options.set(CampaignOption.INTERESTED_IN_BOTH_SEXES_DICE_SIZE, interestedInBothSexesDiceSize);

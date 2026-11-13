@@ -37,6 +37,7 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
@@ -45,10 +46,13 @@ import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.UUID;
 
 import megamek.common.compute.Compute;
 import megamek.common.enums.Gender;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -843,6 +847,12 @@ public class AbstractProcreationTest {
         mockProcreation.processNewWeek(mockCampaign, LocalDate.ofYearDay(3025, 1), mockPerson);
         verify(mockPerson, never()).isPregnant();
         verify(mockProcreation, never()).randomlyProcreates(any(), any());
+        verify(mockProcreation, times(1)).processRandomPaternityCheck(mockCampaign,
+              LocalDate.ofYearDay(3025, 1),
+              mockPerson);
+        verify(mockProcreation, times(1)).processRandomAdoptionCheck(mockCampaign,
+              LocalDate.ofYearDay(3025, 1),
+              mockPerson);
     }
 
     @Test
@@ -1064,6 +1074,343 @@ public class AbstractProcreationTest {
             assertTrue(announcements.constructed().isEmpty());
         }
     }
+
+    /**
+     * A child with only a known father takes their surname from him, as there is no mother to fall back on.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testCreateChild_fatherOnlyUsesFathersSurname() {
+        when(mockCampaignOptions.get(CampaignOption.BABY_SURNAME_STYLE)).thenReturn(BabySurnameStyle.MOTHERS);
+        when(mockCampaignOptions.get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN)).thenReturn(false);
+        when(mockCampaign.getPlayerForce().getHumanResources().newDependent(any(), any(), any(), any()))
+              .thenAnswer(invocation -> new Person(mockCampaign));
+
+        final Person father = new Person(mockCampaign);
+        father.setGender(Gender.MALE);
+        father.setSurname("Kerensky");
+
+        final LocalDate dateOfBirth = LocalDate.of(3020, 3, 14);
+        final Person child = new DisabledRandomProcreation(mockCampaignOptions).createChild(mockCampaign,
+              dateOfBirth, null, father, null, null);
+
+        assertEquals("Kerensky", child.getSurname());
+        assertEquals(dateOfBirth, child.getDateOfBirth());
+        assertEquals(EducationLevel.EARLY_CHILDHOOD, child.getEduHighestEducation());
+        // Creating the child must not link them; that is left to the caller
+        assertTrue(child.getGenealogy().getParents().isEmpty());
+    }
+
+    /**
+     * A child can't be created without at least one known parent.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testCreateChild_noParentsThrows() {
+        final AbstractProcreation procreation = new DisabledRandomProcreation(mockCampaignOptions);
+
+        assertThrows(IllegalArgumentException.class,
+              () -> procreation.createChild(mockCampaign, LocalDate.of(3020, 3, 14), null, null, null, null));
+    }
+
+    /**
+     * Linking records the relationship on both sides, and an unknown parent is ignored.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testLinkParentAndChild() {
+        final Person parent = new Person(mockCampaign);
+        final Person child = new Person(mockCampaign);
+
+        AbstractProcreation.linkParentAndChild(null, child);
+        assertTrue(child.getGenealogy().getParents().isEmpty());
+
+        AbstractProcreation.linkParentAndChild(parent, child);
+        assertEquals(List.of(parent), child.getGenealogy().getParents());
+        assertEquals(List.of(child), parent.getGenealogy().getChildren());
+    }
+
+    /**
+     * Changing the number of babies only affects pregnancies, and stays between a single baby and decuplets.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testSetPregnancySize() {
+        final AbstractProcreation procreation = new DisabledRandomProcreation(mockCampaignOptions);
+        final Person person = new Person(mockCampaign);
+
+        procreation.setPregnancySize(person, 2);
+        assertNull(person.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
+
+        person.setDueDate(LocalDate.of(3025, 6, 1));
+        procreation.setPregnancySize(person, 3);
+        assertEquals(3, person.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
+
+        procreation.setPregnancySize(person, 0);
+        assertEquals(1, person.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
+
+        procreation.setPregnancySize(person, AbstractProcreation.MAXIMUM_PREGNANCY_SIZE + 5);
+        assertEquals(AbstractProcreation.MAXIMUM_PREGNANCY_SIZE,
+              person.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA));
+    }
+
+    //region Children Joining Later in Life
+
+    /**
+     * A parent's first possible biological child is born a full pregnancy after their eighteenth birthday.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testGetEarliestChildDateOfBirth() {
+        final Person parent = mock(Person.class);
+        when(parent.getDateOfBirth()).thenReturn(LocalDate.of(3000, 1, 1));
+
+        assertEquals(LocalDate.of(3018, 1, 1).plusDays(MHQConstants.PREGNANCY_STANDARD_DURATION),
+              AbstractProcreation.getEarliestChildDateOfBirth(parent));
+    }
+
+    /**
+     * The oldest biological child is limited by the parent's adult life, and never older than a minor.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testGetMaximumBiologicalChildAge() {
+        final LocalDate today = LocalDate.of(3025, 1, 1);
+        final Person parent = mock(Person.class);
+
+        // Eighteen today, so too young for any child
+        when(parent.getDateOfBirth()).thenReturn(LocalDate.of(3007, 1, 1));
+        assertEquals(-1, AbstractProcreation.getMaximumBiologicalChildAge(today, parent));
+
+        // Twenty-five today, so their first child could be born a little over six years ago
+        when(parent.getDateOfBirth()).thenReturn(LocalDate.of(3000, 1, 1));
+        assertEquals(6, AbstractProcreation.getMaximumBiologicalChildAge(today, parent));
+
+        // Sixty today, which would allow a child far older than a minor
+        when(parent.getDateOfBirth()).thenReturn(LocalDate.of(2965, 1, 1));
+        assertEquals(AbstractProcreation.MAXIMUM_ARRIVING_CHILD_AGE,
+              AbstractProcreation.getMaximumBiologicalChildAge(today, parent));
+    }
+
+    /**
+     * A random date of birth gives the requested age, and never falls before the earliest permitted date.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testGetRandomDateOfBirth() {
+        final LocalDate today = LocalDate.of(3025, 6, 15);
+
+        for (int age = 0; age <= AbstractProcreation.MAXIMUM_ARRIVING_CHILD_AGE; age++) {
+            for (int attempt = 0; attempt < 20; attempt++) {
+                final LocalDate dateOfBirth = AbstractProcreation.getRandomDateOfBirth(today, age, null);
+                assertEquals(age, ChronoUnit.YEARS.between(dateOfBirth, today));
+            }
+        }
+
+        final LocalDate earliestDateOfBirth = LocalDate.of(3021, 3, 1);
+        for (int attempt = 0; attempt < 20; attempt++) {
+            final LocalDate dateOfBirth = AbstractProcreation.getRandomDateOfBirth(today, 4, earliestDateOfBirth);
+            assertFalse(dateOfBirth.isBefore(earliestDateOfBirth));
+            assertEquals(4, ChronoUnit.YEARS.between(dateOfBirth, today));
+        }
+    }
+
+    /**
+     * Random paternity does nothing unless the campaign enables it.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testIsEligibleForRandomPaternity_disabled() {
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_PATERNITY)).thenReturn(false);
+
+        final AbstractProcreation procreation = new DisabledRandomProcreation(mockCampaignOptions);
+
+        assertFalse(procreation.isEligibleForRandomPaternity(mockCampaign,
+              LocalDate.of(3025, 1, 1),
+              mock(Person.class)));
+    }
+
+    /**
+     * A married man's children arrive through his spouse's pregnancy, not random paternity.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testIsEligibleForRandomPaternity_married() {
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_PATERNITY)).thenReturn(true);
+
+        final Genealogy genealogy = mock(Genealogy.class);
+        when(genealogy.hasSpouse()).thenReturn(true);
+        final Person person = mock(Person.class);
+        when(person.getGender()).thenReturn(Gender.MALE);
+        when(person.getGenealogy()).thenReturn(genealogy);
+
+        final AbstractProcreation procreation = new DisabledRandomProcreation(mockCampaignOptions);
+
+        assertFalse(procreation.isEligibleForRandomPaternity(mockCampaign, LocalDate.of(3025, 1, 1), person));
+    }
+
+    /**
+     * An unmarried man who could otherwise procreate is eligible, unless he is too young to have any child.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testIsEligibleForRandomPaternity_unmarried() {
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_PATERNITY)).thenReturn(true);
+
+        final LocalDate today = LocalDate.of(3025, 1, 1);
+        final Genealogy genealogy = mock(Genealogy.class);
+        when(genealogy.hasSpouse()).thenReturn(false);
+        final Person person = mock(Person.class);
+        when(person.getGender()).thenReturn(Gender.MALE);
+        when(person.getGenealogy()).thenReturn(genealogy);
+
+        final AbstractProcreation procreation = spy(new DisabledRandomProcreation(mockCampaignOptions));
+        doReturn(null).when(procreation).canProcreate(today, person, true);
+
+        when(person.getDateOfBirth()).thenReturn(LocalDate.of(3000, 1, 1));
+        assertTrue(procreation.isEligibleForRandomPaternity(mockCampaign, today, person));
+
+        // Just turned eighteen, so no child of his could have been born yet
+        when(person.getDateOfBirth()).thenReturn(LocalDate.of(3007, 1, 1));
+        assertFalse(procreation.isEligibleForRandomPaternity(mockCampaign, today, person));
+    }
+
+    /**
+     * Random adoption does nothing unless the campaign enables it.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testIsEligibleForRandomAdoption_disabled() {
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_SAME_SEX_ADOPTION)).thenReturn(false);
+
+        final AbstractProcreation procreation = new DisabledRandomProcreation(mockCampaignOptions);
+
+        assertFalse(procreation.isEligibleForRandomAdoption(mockCampaign,
+              LocalDate.of(3025, 1, 1),
+              mock(Person.class)));
+    }
+
+    /**
+     * Unmarried people and opposite-sex couples aren't eligible for random adoption.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testIsEligibleForRandomAdoption_unmarriedOrOppositeSex() {
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_SAME_SEX_ADOPTION)).thenReturn(true);
+
+        final LocalDate today = LocalDate.of(3025, 1, 1);
+        final AbstractProcreation procreation = new DisabledRandomProcreation(mockCampaignOptions);
+
+        final Person person = mock(Person.class);
+        final Genealogy genealogy = mock(Genealogy.class);
+        when(person.getGenealogy()).thenReturn(genealogy);
+
+        when(genealogy.getSpouse()).thenReturn(null);
+        assertFalse(procreation.isEligibleForRandomAdoption(mockCampaign, today, person));
+
+        final Person spouse = mock(Person.class);
+        when(person.getGender()).thenReturn(Gender.FEMALE);
+        when(spouse.getGender()).thenReturn(Gender.MALE);
+        when(genealogy.getSpouse()).thenReturn(spouse);
+        assertFalse(procreation.isEligibleForRandomAdoption(mockCampaign, today, person));
+    }
+
+    /**
+     * A same-sex couple who could otherwise procreate is eligible, but only checked from one spouse's side, so they
+     * don't get two rolls a week.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @ParameterizedTest
+    @EnumSource(value = Gender.class, names = { "MALE", "FEMALE" })
+    public void testIsEligibleForRandomAdoption_sameSex(final Gender gender) {
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_SAME_SEX_ADOPTION)).thenReturn(true);
+
+        final LocalDate today = LocalDate.of(3025, 1, 1);
+        final Person lowerIdSpouse = mockSpouseForAdoption(gender, new UUID(0, 1));
+        final Person higherIdSpouse = mockSpouseForAdoption(gender, new UUID(0, 2));
+        when(lowerIdSpouse.getGenealogy().getSpouse()).thenReturn(higherIdSpouse);
+        when(higherIdSpouse.getGenealogy().getSpouse()).thenReturn(lowerIdSpouse);
+
+        final AbstractProcreation procreation = spy(new DisabledRandomProcreation(mockCampaignOptions));
+        doReturn(null).when(procreation).canProcreate(today, lowerIdSpouse, false);
+        doReturn(null).when(procreation).canProcreate(today, higherIdSpouse, false);
+
+        assertTrue(procreation.isEligibleForRandomAdoption(mockCampaign, today, lowerIdSpouse));
+        assertFalse(procreation.isEligibleForRandomAdoption(mockCampaign, today, higherIdSpouse));
+    }
+
+    /**
+     * A same-sex couple can't adopt if either spouse is unable to procreate, such as being deployed.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    public void testIsEligibleForRandomAdoption_spouseCannotProcreate() {
+        when(mockCampaignOptions.get(CampaignOption.USE_RANDOM_SAME_SEX_ADOPTION)).thenReturn(true);
+
+        final LocalDate today = LocalDate.of(3025, 1, 1);
+        final Person person = mock(Person.class);
+        final Genealogy genealogy = mock(Genealogy.class);
+        final Person spouse = mock(Person.class);
+        when(person.getGenealogy()).thenReturn(genealogy);
+        when(genealogy.getSpouse()).thenReturn(spouse);
+        when(person.getGender()).thenReturn(Gender.MALE);
+        when(spouse.getGender()).thenReturn(Gender.MALE);
+        when(person.getId()).thenReturn(new UUID(0, 1));
+        when(spouse.getId()).thenReturn(new UUID(0, 2));
+
+        final AbstractProcreation procreation = spy(new DisabledRandomProcreation(mockCampaignOptions));
+        doReturn(null).when(procreation).canProcreate(today, person, false);
+        doReturn("Deployed").when(procreation).canProcreate(today, spouse, false);
+
+        assertFalse(procreation.isEligibleForRandomAdoption(mockCampaign, today, person));
+    }
+
+    /**
+     * Mocks a married person for the random adoption tests, who is free and not clan personnel.
+     *
+     * @param gender the person's gender
+     * @param id     the person's ID
+     *
+     * @return the person, whose genealogy is a mock with no spouse set
+     */
+    private static Person mockSpouseForAdoption(final Gender gender, final UUID id) {
+        final Person person = mock(Person.class);
+        final Genealogy genealogy = mock(Genealogy.class);
+        when(person.getGenealogy()).thenReturn(genealogy);
+        when(person.getGender()).thenReturn(gender);
+        when(person.getId()).thenReturn(id);
+        lenient().when(person.getPrisonerStatus()).thenReturn(PrisonerStatus.FREE);
+        return person;
+    }
+    //endregion Children Joining Later in Life
 
     /**
      * Stubs the options a single, fatherless birth reads, with birth announcements enabled.

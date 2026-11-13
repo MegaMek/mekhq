@@ -139,6 +139,7 @@ import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.DiseaseService;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.quartermaster.AbstractKitIssuer;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
@@ -249,6 +250,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE";
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
     private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE";
+    private static final String CMD_CHANGE_PREGNANCY_SIZE = "CHANGE_PREGNANCY_SIZE";
+    private static final String CMD_GIVE_BIRTH_NOW = "GIVE_BIRTH_NOW";
+    /** Passed with {@link #CMD_ADD_PREGNANCY} to roll the number of babies as normal. */
+    private static final int RANDOM_PREGNANCY_SIZE = 0;
     private static final String CMD_LOYALTY = "LOYALTY";
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
@@ -501,15 +506,48 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_PREGNANCY: {
+                final AbstractProcreation procreation = getCampaign().getPlayerForce()
+                                                              .getHumanResources()
+                                                              .getProcreation();
+                final int size = Integer.parseInt(data[1]);
                 Stream.of(people)
                       .filter(person -> person.getGender().isFemale())
-                      .filter(person -> (getCampaign().getPlayerForce().getHumanResources().getProcreation()
-                                               .canProcreate(getCampaign().getLocalDate(), person, false) == null))
+                      .filter(person -> (procreation.canProcreate(getCampaign().getLocalDate(), person, false) ==
+                                               null))
                       .forEach(person -> {
-                          getCampaign().getPlayerForce().getHumanResources().getProcreation()
-                                .addPregnancy(getCampaign(), getCampaign().getLocalDate(), person, false);
+                          if (size == RANDOM_PREGNANCY_SIZE) {
+                              procreation.addPregnancy(getCampaign(), getCampaign().getLocalDate(), person, false);
+                          } else {
+                              procreation.addPregnancy(getCampaign(),
+                                    getCampaign().getLocalDate(),
+                                    person,
+                                    size,
+                                    false);
+                          }
                           MekHQ.triggerEvent(new PersonChangedEvent(person));
                       });
+                break;
+            }
+            case CMD_CHANGE_PREGNANCY_SIZE: {
+                final AbstractProcreation procreation = getCampaign().getPlayerForce()
+                                                              .getHumanResources()
+                                                              .getProcreation();
+                final int size = Integer.parseInt(data[1]);
+                Stream.of(people).filter(Person::isPregnant).forEach(person -> {
+                    procreation.setPregnancySize(person, size);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                });
+                break;
+            }
+            case CMD_GIVE_BIRTH_NOW: {
+                // Births happen today, however far along the pregnancy is, with the usual reports and recovery
+                final AbstractProcreation procreation = getCampaign().getPlayerForce()
+                                                              .getHumanResources()
+                                                              .getProcreation();
+                Stream.of(people).filter(Person::isPregnant).forEach(person -> {
+                    procreation.birth(getCampaign(), getCampaign().getLocalDate(), person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                });
                 break;
             }
             case CMD_REMOVE_PREGNANCY: {
@@ -3844,20 +3882,48 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                           .filter(p -> p.getGender().isFemale())
                           .anyMatch(p -> getCampaign().getPlayerForce().getHumanResources().getProcreation()
                                                .canProcreate(getCampaign().getLocalDate(), p, false) == null)) {
-                    menuItem = new JMenuItem(resources.getString(oneSelected ?
-                                                                       "addPregnancy.text" :
-                                                                       "addPregnancies.text"));
-                    menuItem.setActionCommand(CMD_ADD_PREGNANCY);
+                    // A random number of babies as normal, or a set number for twins, triplets, and so on
+                    JMenu addPregnancyMenu = new JMenu(resources.getString(oneSelected ?
+                                                                                 "addPregnancy.text" :
+                                                                                 "addPregnancies.text"));
+                    menuItem = new JMenuItem(getText("pregnancySize.random.text"));
+                    menuItem.setActionCommand(makeCommand(CMD_ADD_PREGNANCY, String.valueOf(RANDOM_PREGNANCY_SIZE)));
                     menuItem.addActionListener(this);
-                    familyMenu.add(menuItem);
+                    addPregnancyMenu.add(menuItem);
+                    addPregnancyMenu.addSeparator();
+                    addPregnancySizeItems(addPregnancyMenu, CMD_ADD_PREGNANCY, null);
+                    familyMenu.add(addPregnancyMenu);
                 }
 
                 if (Stream.of(selected).anyMatch(Person::isPregnant)) {
+                    JMenu changePregnancySizeMenu = new JMenu(getText("changePregnancySize.text"));
+                    // With one person selected, their current number of babies is shown but can't be picked
+                    Integer currentSize = (oneSelected && person.isPregnant()) ?
+                                                person.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA,
+                                                      1) :
+                                                null;
+                    addPregnancySizeItems(changePregnancySizeMenu, CMD_CHANGE_PREGNANCY_SIZE, currentSize);
+                    familyMenu.add(changePregnancySizeMenu);
+
+                    menuItem = new JMenuItem(getText("giveBirthNow.text"));
+                    menuItem.setToolTipText(wordWrap(getText("giveBirthNow.tooltip")));
+                    menuItem.setActionCommand(CMD_GIVE_BIRTH_NOW);
+                    menuItem.addActionListener(this);
+                    familyMenu.add(menuItem);
+
                     menuItem = new JMenuItem(resources.getString(oneSelected ?
                                                                        "removePregnancy.text" :
                                                                        "removePregnancies.text"));
                     menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
                     menuItem.addActionListener(this);
+                    familyMenu.add(menuItem);
+                }
+
+                // A biological child they already had, or an adopted child, for parents of any gender
+                if (oneSelected && !person.isChild(getCampaign().getLocalDate(), true)) {
+                    menuItem = new JMenuItem(getText("addNewChild.text"));
+                    menuItem.addActionListener(evt -> new AddChildDialog(getFrame(), getCampaign(), person)
+                                                            .setVisible(true));
                     familyMenu.add(menuItem);
                 }
             }
@@ -4045,6 +4111,25 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         // endregion GM Menu
 
         return Optional.of(popup);
+    }
+
+    /**
+     * Adds an item to the menu for each possible number of babies, from a single baby up to the most a pregnancy can
+     * have. Each item sends the given command with its number of babies.
+     *
+     * @param menu        the menu to add the items to
+     * @param command     the command each item sends
+     * @param currentSize the selected person's current number of babies, whose item is disabled, or {@code null} if
+     *                    there is none
+     */
+    private void addPregnancySizeItems(final JMenu menu, final String command, final @Nullable Integer currentSize) {
+        for (int size = 1; size <= AbstractProcreation.MAXIMUM_PREGNANCY_SIZE; size++) {
+            JMenuItem sizeItem = new JMenuItem(getText("pregnancySize." + size + ".text"));
+            sizeItem.setActionCommand(makeCommand(command, String.valueOf(size)));
+            sizeItem.addActionListener(this);
+            sizeItem.setEnabled((currentSize == null) || (currentSize != size));
+            menu.add(sizeItem);
+        }
     }
 
     /**

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.log;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.text.MessageFormat;
@@ -42,6 +43,7 @@ import megamek.codeUtilities.StringUtility;
 import mekhq.MekHQ;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
+import mekhq.campaign.personnel.procreation.ChildArrivalType;
 
 /**
  * This class is responsible to control the logging of Personal Log Entries.
@@ -111,6 +113,22 @@ public class PersonalLogger {
               MessageFormat.format(resources.getString("ourChildBorn.text"),
                     spouseName,
                     GenderDescriptors.BOY_GIRL.getDescriptor(baby.getGender()))));
+    }
+
+    /**
+     * Logs a child joining the person's family later in life, such as through adoption.
+     *
+     * @param person      the parent whose log is updated
+     * @param child       the child who joined the family
+     * @param arrivalType how the child came to join the family
+     * @param date        the date the child joined
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void childJoinedFamily(Person person, Person child, ChildArrivalType arrivalType, LocalDate date) {
+        person.addPersonalLogEntry(new PersonalLogEntry(date,
+              getFormattedTextAt(RESOURCE_BUNDLE, arrivalType.getReportKey() + ".text", child.getFullName())));
     }
 
     public static void cheatedDeath(Person person, LocalDate date) {

@@ -2508,40 +2508,7 @@ public class ForceHumanResources {
             child.setOriginFaction(person.getOriginFaction());
             child.setOriginPlanet(person.getOriginPlanet());
 
-            int age = child.getAge(localDate);
-
-            if (age < 16) {
-                child.removeAllSkills();
-            } else if (age < 18) {
-                child.limitSkills(0);
-            }
-
-            Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
-            for (IOption option : Collections.list(options)) {
-                child.getOptions().getOption(option.getName()).clearValue();
-            }
-
-            rerollBackgroundChildEducation(campaign, child);
-
-            int experienceLevel = child.getExperienceLevel(campaign.getCampaignOptions(),
-                  campaign.getPlayerForce().isClanForce(),
-                  campaign.getLocalDate(),
-                  false,
-                  false);
-
-            if (experienceLevel <= 0) {
-                child.setLoyalty(d6(3) + 2);
-            } else if (experienceLevel == 1) {
-                child.setLoyalty(d6(3) + 1);
-            } else {
-                child.setLoyalty(d6(3));
-            }
-
-            if (experienceLevel >= 0) {
-                AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
-                specialAbilityGenerator.setSkillPreferences(campaign.getRandomSkillPreferences());
-                specialAbilityGenerator.generateSpecialAbilities(campaign, child, experienceLevel);
-            }
+            prepareNonInfantChild(campaign, child);
 
             recruitPerson(campaign, child, PrisonerStatus.FREE, true, false, false, true);
 
@@ -2592,6 +2559,59 @@ public class ForceHumanResources {
         }
 
         MekHQ.triggerEvent(new PersonChangedEvent(mother));
+    }
+
+    /**
+     * Brings a child whose date of birth lies in the past in line with their real age.
+     *
+     * <p>Children are generated with a random adult age, which is used to roll their skills, special abilities,
+     * education, and titles. Once their date of birth has been set, this method trims their skills to suit their age,
+     * re-rolls their education, and sets their loyalty and special abilities based on their resulting experience
+     * level.</p>
+     *
+     * <p>The child is <b>not</b> recruited, so the caller can choose how they join the campaign.</p>
+     *
+     * @param campaign the current campaign
+     * @param child    the child to update, whose date of birth must already be set
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void prepareNonInfantChild(Campaign campaign, Person child) {
+        int age = child.getAge(campaign.getLocalDate());
+
+        if (age < 16) {
+            child.removeAllSkills();
+        } else if (age < 18) {
+            child.limitSkills(0);
+        }
+
+        Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
+        for (IOption option : Collections.list(options)) {
+            child.getOptions().getOption(option.getName()).clearValue();
+        }
+
+        rerollBackgroundChildEducation(campaign, child);
+
+        int experienceLevel = child.getExperienceLevel(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate(),
+              false,
+              false);
+
+        if (experienceLevel <= 0) {
+            child.setLoyalty(d6(3) + 2);
+        } else if (experienceLevel == 1) {
+            child.setLoyalty(d6(3) + 1);
+        } else {
+            child.setLoyalty(d6(3));
+        }
+
+        if (experienceLevel >= 0) {
+            AbstractSpecialAbilityGenerator specialAbilityGenerator = new DefaultSpecialAbilityGenerator();
+            specialAbilityGenerator.setSkillPreferences(campaign.getRandomSkillPreferences());
+            specialAbilityGenerator.generateSpecialAbilities(campaign, child, experienceLevel);
+        }
     }
 
     /**

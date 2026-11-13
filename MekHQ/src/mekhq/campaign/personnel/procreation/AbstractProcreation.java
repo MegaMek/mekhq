@@ -47,6 +47,7 @@ import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Enumeration;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.UUID;
@@ -60,6 +61,7 @@ import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData.IntKey;
 import mekhq.campaign.ExtraData.StringKey;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.log.MedicalLogger;
@@ -68,6 +70,7 @@ import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
+import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
 import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -98,6 +101,12 @@ public abstract class AbstractProcreation {
 
     public static final IntKey PREGNANCY_CHILDREN_DATA = new IntKey("procreation:children");
     public static final StringKey PREGNANCY_FATHER_DATA = new StringKey("procreation:father");
+
+    /** The most babies a single pregnancy can have (decuplets), matching the labels in {@code babyAmount.text}. */
+    public static final int MAXIMUM_PREGNANCY_SIZE = 10;
+
+    /** The oldest a child who joins a parent's family later in life can be, so they always arrive as a minor. */
+    public static final int MAXIMUM_ARRIVING_CHILD_AGE = 17;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AbstractProcreation";
     //endregion Variable Declarations
@@ -171,7 +180,7 @@ public abstract class AbstractProcreation {
      */
     protected int determineNumberOfBabies(final int multiplePregnancyOccurrences) {
         int children = 1;
-        while ((Compute.randomInt(multiplePregnancyOccurrences) == 0) && (children < 10)) {
+        while ((Compute.randomInt(multiplePregnancyOccurrences) == 0) && (children < MAXIMUM_PREGNANCY_SIZE)) {
             children++;
         }
         return children;
@@ -389,6 +398,23 @@ public abstract class AbstractProcreation {
     }
 
     /**
+     * Changes the number of babies an existing pregnancy will have. Does nothing if the person isn't pregnant.
+     *
+     * @param mother the pregnant person
+     * @param size   the new number of babies, limited to between one and {@link #MAXIMUM_PREGNANCY_SIZE}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setPregnancySize(final Person mother, final int size) {
+        if (!mother.isPregnant()) {
+            return;
+        }
+
+        mother.getExtraData().set(PREGNANCY_CHILDREN_DATA, Math.clamp(size, 1, MAXIMUM_PREGNANCY_SIZE));
+    }
+
+    /**
      * Removes a pregnancy and clears all related data from the provided person
      *
      * @param person the person to clear the pregnancy data for
@@ -440,39 +466,20 @@ public abstract class AbstractProcreation {
                   getFormattedTextAt(RESOURCE_BUNDLE, "babyAmount.text").split(",")[size - 1]));
         }
 
-        // Create Babies
-        Set<InjuryType> activeInjuryTypes = mother.getActiveInjuryTypes();
-        if (father != null) {
-            activeInjuryTypes.addAll(father.getActiveInjuryTypes());
-        }
+        // Create Babies. Taken before the loop, so the mother's postpartum recovery isn't counted as hereditary
+        final Set<InjuryType> parentInjuryTypes = getParentInjuryTypes(mother, father);
 
-        final boolean useFoundersHavePlotArmor = campaignOptions.get(CampaignOption.USE_FOUNDER_PLOT_ARMOR);
         for (int i = 0; i < size; i++) {
             // Create a baby
-            Faction originFaction = mother.getOriginFaction();
-            Planet originPlanet = campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet();
-            final Person baby = campaign.getPlayerForce()
-                                      .getHumanResources()
-                                      .newDependent(campaign, Gender.RANDOMIZE, originFaction, originPlanet);
-            baby.setSurname(campaignOptions.get(CampaignOption.BABY_SURNAME_STYLE)
-                                  .generateBabySurname(mother, father, baby.getGender()));
-
-            // Every one of these lines fixes a bug we've had with babies. Who knew children were so good at
-            // breaking things?
-            baby.setDateOfBirth(today); // Make sure we don't have any past or future babies
-            baby.removeAllSkills(); // Babies don't have skills beyond making a mess and screaming
-            baby.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.DEPENDENT); // babies can't have jobs
+            final Person baby = createChild(campaign,
+                  today,
+                  mother,
+                  father,
+                  mother.getOriginFaction(),
+                  campaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet());
             baby.setOptions(new PersonnelOptions()); // Stop babies being born with SPAs
-            baby.setPreNominal(""); // Stop babies being born with doctorates
-            baby.setPostNominal(""); // Stop babies being born with post-nominal titles
 
-            if (campaign.getCampaignOptions().get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN) &&
-                      baby.isChild(campaign.getLocalDate(), false)) {
-                baby.setPortrait(new Portrait());
-            }
-
-            baby.setBloodGroup(getInheritedBloodGroup(mother.getBloodGroup(),
-                  father == null ? getRandomBloodGroup() : father.getBloodGroup()));
+            inheritBloodGroup(baby, mother, father);
 
             // Create reports and log the birth
             campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE,
@@ -483,18 +490,7 @@ public abstract class AbstractProcreation {
             logAndUpdateFamily(campaign, today, mother, baby, father);
 
             // Founder Tag Assignment
-            if (campaignOptions.get(CampaignOption.ASSIGN_NON_PRISONER_BABIES_FOUNDER_TAG) && !prisonerStatus.isCurrentPrisoner()) {
-                baby.setFounder(true);
-            } else if (campaignOptions.get(CampaignOption.ASSIGN_CHILDREN_OF_FOUNDERS_FOUNDER_TAG)) {
-                baby.setFounder(baby.getGenealogy().getParents().stream().anyMatch(Person::isFounder));
-            }
-
-            if (baby.isFounder() && useFoundersHavePlotArmor) {
-                baby.gainEdge(1, campaignOptions.get(CampaignOption.MAXIMUM_EDGE));
-            }
-
-            // set education
-            baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
+            applyFounderStatus(campaignOptions, baby, !prisonerStatus.isCurrentPrisoner());
 
             // set loyalty
             baby.setLoyalty(Compute.d6(4, 3));
@@ -530,19 +526,7 @@ public abstract class AbstractProcreation {
             }
 
             // Check for hereditary diseases
-            if (activeInjuryTypes.contains(KAER_PATHOGEN)) {
-                Injury kaerPathogen = KAER_PATHOGEN.newInjury(campaign, baby, INTERNAL, 1);
-                baby.addInjury(kaerPathogen);
-
-                Injury birthDefect = BIRTH_DEFECT.newInjury(campaign, baby, INTERNAL, 1);
-                baby.addInjury(birthDefect);
-            }
-
-            if (mother.getOptions().booleanOption(UNOFFICIAL_DOBROWSKI_SYNDROME)) {
-                baby.getOptions().getOption(UNOFFICIAL_DOBROWSKI_SYNDROME).setValue(true);
-            } else if (father != null && father.getOptions().booleanOption(UNOFFICIAL_DOBROWSKI_SYNDROME)) {
-                baby.getOptions().getOption(UNOFFICIAL_DOBROWSKI_SYNDROME).setValue(true);
-            }
+            applyHereditaryConditions(campaign, baby, parentInjuryTypes, mother, father);
 
             // Alert the player, but only show this dialog for the first child with twins/triplets/etc
             if (campaignOptions.get(CampaignOption.SHOW_LIFE_EVENT_DIALOG_BIRTHS) && (i == 0) && !isStartingSimulation) {
@@ -572,17 +556,76 @@ public abstract class AbstractProcreation {
     }
 
     /**
+     * Creates a child with the common traits shared by every way a child can enter the campaign: no skills, no job,
+     * no titles, early-childhood education, and a surname derived from their parents.
+     *
+     * <p>The child is <b>not</b> recruited, linked to their parents, or given loyalty, blood group, or special
+     * abilities, as these differ between a live birth, a historic birth, and a child who arrives later in life.</p>
+     *
+     * <p>At least one parent must be provided. When only one parent is known, they are used as the sole source of the
+     * child's surname, regardless of their gender.</p>
+     *
+     * @param campaign      the campaign the child is being created in
+     * @param dateOfBirth   the child's date of birth
+     * @param mother        the child's mother, or {@code null} if unknown
+     * @param father        the child's father, or {@code null} if unknown
+     * @param originFaction the child's origin faction, or {@code null} to pick one at random
+     * @param originPlanet  the child's origin planet, or {@code null} to pick one at random
+     *
+     * @return the new child, who has not yet been added to the campaign
+     *
+     * @throws IllegalArgumentException if both {@code mother} and {@code father} are {@code null}
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected Person createChild(final Campaign campaign, final LocalDate dateOfBirth, final @Nullable Person mother,
+          final @Nullable Person father, final @Nullable Faction originFaction, final @Nullable Planet originPlanet) {
+        if (mother == null && father == null) {
+            throw new IllegalArgumentException("A child must have at least one known parent");
+        }
+
+        final Person child = campaign.getPlayerForce()
+                                   .getHumanResources()
+                                   .newDependent(campaign, Gender.RANDOMIZE, originFaction, originPlanet);
+
+        // BabySurnameStyle requires a mother. With only one known parent, every style falls back to the parent in
+        // that slot, so we put the sole parent there regardless of their gender.
+        final BabySurnameStyle surnameStyle = campaign.getCampaignOptions().get(CampaignOption.BABY_SURNAME_STYLE);
+        child.setSurname((mother == null) ?
+                               surnameStyle.generateBabySurname(father, null, child.getGender()) :
+                               surnameStyle.generateBabySurname(mother, father, child.getGender()));
+
+        // Every one of these lines fixes a bug we've had with babies. Who knew children were so good at
+        // breaking things?
+        child.setDateOfBirth(dateOfBirth); // Make sure we don't have any past or future babies
+        child.removeAllSkills(); // Babies don't have skills beyond making a mess and screaming
+        child.setPrimaryRole(campaign.getLocalDate(), PersonnelRole.DEPENDENT); // babies can't have jobs
+        child.setPreNominal(""); // Stop babies being born with doctorates
+        child.setPostNominal(""); // Stop babies being born with post-nominal titles
+        child.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
+
+        if (campaign.getCampaignOptions().get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN) &&
+                  child.isChild(campaign.getLocalDate(), false)) {
+            child.setPortrait(new Portrait());
+        }
+
+        return child;
+    }
+
+    /**
      * Logs the birth of a baby and updates the genealogy information of the family.
+     *
+     * <p>The delivery is only logged when the mother is known, as both log entries describe her giving birth.</p>
      *
      * @param campaign the ongoing campaign
      * @param today    the current date
-     * @param mother   the mother of the baby
+     * @param mother   the mother of the baby, null if unknown
      * @param baby     the newborn baby
      * @param father   the father of the baby, null if unknown
      */
-    private static void logAndUpdateFamily(Campaign campaign, LocalDate today, Person mother, Person baby,
-          Person father) {
-        if (campaign.getCampaignOptions().get(CampaignOption.LOG_PROCREATION)) {
+    private static void logAndUpdateFamily(Campaign campaign, LocalDate today, @Nullable Person mother, Person baby,
+          @Nullable Person father) {
+        if (mother != null && campaign.getCampaignOptions().get(CampaignOption.LOG_PROCREATION)) {
             MedicalLogger.deliveredBaby(mother, baby, today);
             if (father != null) {
                 PersonalLogger.ourChildBorn(father, baby, mother.getFullName(), today);
@@ -590,14 +633,484 @@ public abstract class AbstractProcreation {
         }
 
         // Create genealogy information
-        baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, mother);
-        mother.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
+        linkParentAndChild(mother, baby);
+        linkParentAndChild(father, baby);
+    }
 
-        if (father != null) {
-            baby.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, father);
-            father.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, baby);
+    /**
+     * Records a parent-child relationship in both people's genealogy. Does nothing if the parent is unknown.
+     *
+     * @param parent the parent, or {@code null} if unknown
+     * @param child  the child
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected static void linkParentAndChild(final @Nullable Person parent, final Person child) {
+        if (parent == null) {
+            return;
+        }
+
+        child.getGenealogy().addFamilyMember(FamilialRelationshipType.PARENT, parent);
+        parent.getGenealogy().addFamilyMember(FamilialRelationshipType.CHILD, child);
+    }
+
+    /**
+     * Gives a child a blood group inherited from their parents. An unknown parent contributes a random blood group.
+     *
+     * @param child       the child
+     * @param parent      one parent, or {@code null} if unknown
+     * @param otherParent the other parent, or {@code null} if unknown
+     */
+    private static void inheritBloodGroup(final Person child, final @Nullable Person parent,
+          final @Nullable Person otherParent) {
+        child.setBloodGroup(getInheritedBloodGroup(parent == null ? getRandomBloodGroup() : parent.getBloodGroup(),
+              otherParent == null ? getRandomBloodGroup() : otherParent.getBloodGroup()));
+    }
+
+    /**
+     * Collects the injury types currently affecting either parent, so hereditary conditions can be passed on.
+     *
+     * @param parent      one parent, or {@code null} if unknown
+     * @param otherParent the other parent, or {@code null} if unknown
+     *
+     * @return the combined injury types
+     */
+    private static Set<InjuryType> getParentInjuryTypes(final @Nullable Person parent,
+          final @Nullable Person otherParent) {
+        final Set<InjuryType> injuryTypes = new HashSet<>();
+        if (parent != null) {
+            injuryTypes.addAll(parent.getActiveInjuryTypes());
+        }
+        if (otherParent != null) {
+            injuryTypes.addAll(otherParent.getActiveInjuryTypes());
+        }
+        return injuryTypes;
+    }
+
+    /**
+     * Passes hereditary conditions from the parents on to their child.
+     *
+     * @param campaign          the campaign the child is part of
+     * @param child             the child
+     * @param parentInjuryTypes the injury types affecting either parent; see
+     *                          {@link #getParentInjuryTypes(Person, Person)}
+     * @param parent            one parent, or {@code null} if unknown
+     * @param otherParent       the other parent, or {@code null} if unknown
+     */
+    private static void applyHereditaryConditions(final Campaign campaign, final Person child,
+          final Set<InjuryType> parentInjuryTypes, final @Nullable Person parent, final @Nullable Person otherParent) {
+        if (parentInjuryTypes.contains(KAER_PATHOGEN)) {
+            Injury kaerPathogen = KAER_PATHOGEN.newInjury(campaign, child, INTERNAL, 1);
+            child.addInjury(kaerPathogen);
+
+            Injury birthDefect = BIRTH_DEFECT.newInjury(campaign, child, INTERNAL, 1);
+            child.addInjury(birthDefect);
+        }
+
+        if ((parent != null && parent.getOptions().booleanOption(UNOFFICIAL_DOBROWSKI_SYNDROME)) ||
+                  (otherParent != null && otherParent.getOptions().booleanOption(UNOFFICIAL_DOBROWSKI_SYNDROME))) {
+            child.getOptions().getOption(UNOFFICIAL_DOBROWSKI_SYNDROME).setValue(true);
         }
     }
+
+    /**
+     * Assigns the founder tag to a child, and the founder's plot armor where that is enabled.
+     *
+     * @param campaignOptions the campaign's options
+     * @param child           the child, who must already be linked to their parents
+     * @param isFreeBirth     {@code true} if the child was born into the force and isn't a prisoner. Only these
+     *                        children are eligible for the tag given to all non-prisoner babies.
+     */
+    private static void applyFounderStatus(final CampaignOptions campaignOptions, final Person child,
+          final boolean isFreeBirth) {
+        if (campaignOptions.get(CampaignOption.ASSIGN_NON_PRISONER_BABIES_FOUNDER_TAG) && isFreeBirth) {
+            child.setFounder(true);
+        } else if (campaignOptions.get(CampaignOption.ASSIGN_CHILDREN_OF_FOUNDERS_FOUNDER_TAG)) {
+            child.setFounder(child.getGenealogy().getParents().stream().anyMatch(Person::isFounder));
+        }
+
+        final boolean useFoundersHavePlotArmor = campaignOptions.get(CampaignOption.USE_FOUNDER_PLOT_ARMOR);
+        if (child.isFounder() && useFoundersHavePlotArmor) {
+            child.gainEdge(1, campaignOptions.get(CampaignOption.MAXIMUM_EDGE));
+        }
+    }
+
+    //region Children Joining Later in Life
+
+    /**
+     * Determines the earliest date a biological child of the given parent can have been born. Nobody under eighteen
+     * can procreate in MekHQ, so this is a full pregnancy after the parent's eighteenth birthday.
+     *
+     * @param parent the parent
+     *
+     * @return the earliest possible date of birth for their biological child
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static LocalDate getEarliestChildDateOfBirth(final Person parent) {
+        return parent.getDateOfBirth().plusYears(18).plusDays(MHQConstants.PREGNANCY_STANDARD_DURATION);
+    }
+
+    /**
+     * Determines the oldest a biological child of the given parent can be, capped at
+     * {@link #MAXIMUM_ARRIVING_CHILD_AGE}.
+     *
+     * @param today  the current date
+     * @param parent the parent
+     *
+     * @return the maximum age in years, or {@code -1} if the parent is too young to have any biological child
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getMaximumBiologicalChildAge(final LocalDate today, final Person parent) {
+        final LocalDate earliestDateOfBirth = getEarliestChildDateOfBirth(parent);
+        if (earliestDateOfBirth.isAfter(today)) {
+            return -1;
+        }
+
+        return (int) Math.min(MAXIMUM_ARRIVING_CHILD_AGE, ChronoUnit.YEARS.between(earliestDateOfBirth, today));
+    }
+
+    /**
+     * Picks a random date of birth for someone who is the given age today.
+     *
+     * @param today                 the current date
+     * @param age                   the age in years the person should be today
+     * @param earliestDateOfBirth   the earliest permitted date of birth, or {@code null} for no limit
+     *
+     * @return the date of birth, which never falls before {@code earliestDateOfBirth}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static LocalDate getRandomDateOfBirth(final LocalDate today, final int age,
+          final @Nullable LocalDate earliestDateOfBirth) {
+        // The latest date makes them exactly 'age' today; the earliest is the day before they'd turn 'age' + 1
+        final LocalDate latest = today.minusYears(age);
+        LocalDate earliest = today.minusYears(age + 1L).plusDays(1);
+        if ((earliestDateOfBirth != null) && earliest.isBefore(earliestDateOfBirth)) {
+            earliest = earliestDateOfBirth;
+        }
+
+        return getRandomDateBetween(earliest, latest);
+    }
+
+    /**
+     * Picks a random date between two dates, inclusive.
+     *
+     * @param earliest the earliest date
+     * @param latest   the latest date
+     *
+     * @return the random date, or {@code latest} if {@code earliest} falls after it
+     */
+    private static LocalDate getRandomDateBetween(final LocalDate earliest, final LocalDate latest) {
+        final long span = ChronoUnit.DAYS.between(earliest, latest);
+        if (span <= 0) {
+            return latest;
+        }
+
+        return latest.minusDays(Compute.randomInt((int) span + 1));
+    }
+
+    /**
+     * Adds a child who was not born into the force: a biological child the parent already had, a child they have
+     * just learned about, or a child they have adopted.
+     *
+     * <p>The child is generated to suit their age, linked to their parent(s), and recruited. Biological children
+     * inherit their blood group and any hereditary conditions; adopted children do not. The arrival is reported and,
+     * if procreation logging is enabled, logged for each parent.</p>
+     *
+     * @param campaign    the campaign the child is joining
+     * @param today       the current date
+     * @param parent      the parent the child is joining
+     * @param coParent    the child's other parent, or {@code null} if there is none or they are unknown
+     * @param dateOfBirth the child's date of birth. For a biological child, this must not fall before
+     *                    {@link #getEarliestChildDateOfBirth(Person)} for either parent.
+     * @param arrivalType how the child came to join the family
+     *
+     * @return the new child, who has been added to the campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Person addChild(final Campaign campaign, final LocalDate today, final Person parent,
+          final @Nullable Person coParent, final LocalDate dateOfBirth, final ChildArrivalType arrivalType) {
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+
+        // Surname styles are written around a mother, so a female parent fills that slot where there is one
+        Person surnameMother = parent;
+        Person surnameFather = coParent;
+        if ((coParent != null) && !parent.getGender().isFemale() && coParent.getGender().isFemale()) {
+            surnameMother = coParent;
+            surnameFather = parent;
+        }
+
+        // A biological child comes from their parent's home; an adopted child from wherever the force is now
+        final Planet originPlanet = arrivalType.isBiological() ?
+                                          parent.getOriginPlanet() :
+                                          campaign.getPlayerForce()
+                                                .getForceDetachment()
+                                                .getCurrentLocation()
+                                                .getPlanet();
+        final Person child = createChild(campaign,
+              dateOfBirth,
+              surnameMother,
+              surnameFather,
+              parent.getOriginFaction(),
+              originPlanet);
+
+        // Bring the child's education, special abilities, and loyalty in line with their real age
+        ForceHumanResources.prepareNonInfantChild(campaign, child);
+
+        if (arrivalType.isBiological()) {
+            inheritBloodGroup(child, parent, coParent);
+        }
+
+        linkParentAndChild(parent, child);
+        linkParentAndChild(coParent, child);
+
+        applyFounderStatus(campaignOptions, child, false);
+
+        // Recruit the child but do not employ them, the same as a newborn
+        campaign.getPlayerForce()
+              .getHumanResources()
+              .recruitPerson(campaign, child, PrisonerStatus.FREE, true, true, false);
+
+        if (arrivalType.isBiological()) {
+            applyHereditaryConditions(campaign, child, getParentInjuryTypes(parent, coParent), parent, coParent);
+        }
+
+        reportChildArrival(campaign, today, parent, coParent, child, arrivalType);
+
+        // adjust parents' loyalty
+        parent.performRandomizedLoyaltyChange(campaign, false, true);
+        if (coParent != null) {
+            coParent.performRandomizedLoyaltyChange(campaign, false, true);
+        }
+
+        // check desire for children
+        if (Compute.d6(1) <= 2) {
+            parent.setWantsChildren(false);
+        }
+
+        return child;
+    }
+
+    /**
+     * Reports a child joining the family and, if procreation logging is enabled, logs it for each parent.
+     *
+     * @param campaign    the campaign the child joined
+     * @param today       the current date
+     * @param parent      the parent the child joined
+     * @param coParent    the child's other parent, or {@code null}
+     * @param child       the child
+     * @param arrivalType how the child came to join the family
+     */
+    private static void reportChildArrival(final Campaign campaign, final LocalDate today, final Person parent,
+          final @Nullable Person coParent, final Person child, final ChildArrivalType arrivalType) {
+        final int age = child.getAge(today);
+        final String gender = GenderDescriptors.BOY_GIRL.getDescriptor(child.getGender());
+        final String descriptor = (age < 1) ?
+                                        getFormattedTextAt(RESOURCE_BUNDLE, "childDescriptor.baby.text", gender) :
+                                        getFormattedTextAt(RESOURCE_BUNDLE,
+                                              "childDescriptor.child.text",
+                                              age,
+                                              gender);
+
+        final String reportKey = arrivalType.getReportKey();
+        if (coParent == null) {
+            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE,
+                  reportKey + ".report",
+                  parent.getHyperlinkedName(),
+                  child.getHyperlinkedName(),
+                  descriptor));
+        } else {
+            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE,
+                  reportKey + ".coParent.report",
+                  parent.getHyperlinkedName(),
+                  coParent.getHyperlinkedName(),
+                  child.getHyperlinkedName(),
+                  descriptor));
+        }
+
+        if (campaign.getCampaignOptions().get(CampaignOption.LOG_PROCREATION)) {
+            PersonalLogger.childJoinedFamily(parent, child, arrivalType, today);
+            if (coParent != null) {
+                PersonalLogger.childJoinedFamily(coParent, child, arrivalType, today);
+            }
+        }
+    }
+
+    /**
+     * Determines whether a person is eligible to randomly learn of a child they didn't know they had.
+     *
+     * <p>Only unmarried, non-female personnel are eligible: a married man's children arrive through his spouse's
+     * pregnancy, and women's children arrive through pregnancy. Otherwise, the same restrictions as random
+     * procreation apply, including requiring relationshipless random procreation to be enabled.</p>
+     *
+     * @param campaign the campaign the person is part of
+     * @param today    the current date
+     * @param person   the person to check
+     *
+     * @return {@code true} if they are eligible
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    boolean isEligibleForRandomPaternity(final Campaign campaign, final LocalDate today, final Person person) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_PATERNITY)) {
+            return false;
+        }
+
+        if (person.getGender().isFemale() || person.getGenealogy().hasSpouse()) {
+            return false;
+        }
+
+        if (canProcreate(today, person, true) != null) {
+            return false;
+        }
+
+        return !getEarliestChildDateOfBirth(person).isAfter(today);
+    }
+
+    /**
+     * Checks whether an eligible person randomly learns of a child they didn't know they had. If they do, the child
+     * joins the force, aged anywhere from a newborn up to the campaign's maximum age for these children.
+     *
+     * <p>The chance uses the same relationshipless random procreation roll as women not in a relationship.</p>
+     *
+     * @param campaign the campaign the person is part of
+     * @param today    the current date
+     * @param person   the person to check
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void processRandomPaternityCheck(final Campaign campaign, final LocalDate today, final Person person) {
+        if (!isEligibleForRandomPaternity(campaign, today, person) || !procreation(person)) {
+            return;
+        }
+
+        final int maximumAge = campaign.getCampaignOptions().get(CampaignOption.RANDOM_PATERNITY_MAXIMUM_CHILD_AGE);
+
+        addChild(campaign,
+              today,
+              person,
+              null,
+              getRandomDateOfBirthUpToAge(today, maximumAge, getEarliestChildDateOfBirth(person)),
+              ChildArrivalType.PATERNITY);
+    }
+
+    /**
+     * Picks a random date of birth for someone aged anywhere from a newborn up to the given age today.
+     *
+     * @param today               the current date
+     * @param maximumAge          the oldest they can be, capped at {@link #MAXIMUM_ARRIVING_CHILD_AGE}
+     * @param earliestDateOfBirth the earliest permitted date of birth, or {@code null} for no limit
+     *
+     * @return the date of birth, which never falls before {@code earliestDateOfBirth}
+     */
+    private static LocalDate getRandomDateOfBirthUpToAge(final LocalDate today, final int maximumAge,
+          final @Nullable LocalDate earliestDateOfBirth) {
+        final int cappedMaximumAge = Math.clamp(maximumAge, 0, MAXIMUM_ARRIVING_CHILD_AGE);
+
+        // Anywhere from today to the day before they'd turn one year older than the maximum age
+        LocalDate earliest = today.minusYears(cappedMaximumAge + 1L).plusDays(1);
+        if ((earliestDateOfBirth != null) && earliest.isBefore(earliestDateOfBirth)) {
+            earliest = earliestDateOfBirth;
+        }
+
+        return getRandomDateBetween(earliest, today);
+    }
+
+    /**
+     * Determines whether a married same-sex couple is eligible to randomly adopt a child, checked from one spouse's
+     * side.
+     *
+     * <p>Both spouses are processed every week, so only the spouse with the lower ID is eligible. This stops the
+     * couple getting two rolls a week. Both spouses must otherwise be able to procreate, using the same restrictions
+     * as random procreation, apart from the requirement that they can conceive together.</p>
+     *
+     * @param campaign the campaign the couple is part of
+     * @param today    the current date
+     * @param person   the spouse to check from
+     *
+     * @return {@code true} if the couple is eligible
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    boolean isEligibleForRandomAdoption(final Campaign campaign, final LocalDate today, final Person person) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_SAME_SEX_ADOPTION)) {
+            return false;
+        }
+
+        final Person spouse = person.getGenealogy().getSpouse();
+        if (spouse == null) {
+            return false;
+        }
+
+        // Opposite-sex couples have children through pregnancy instead
+        if (person.getGender().isFemale() != spouse.getGender().isFemale()) {
+            return false;
+        }
+
+        if (person.getId().compareTo(spouse.getId()) > 0) {
+            return false;
+        }
+
+        // The non-random checks cover both spouses' own circumstances. The random checks would refuse a woman with a
+        // wife outright, so the restrictions specific to random procreation are applied separately.
+        if ((canProcreate(today, person, false) != null) || (canProcreate(today, spouse, false) != null)) {
+            return false;
+        }
+
+        return !isBlockedFromRandomProcreation(person) && !isBlockedFromRandomProcreation(spouse);
+    }
+
+    /**
+     * Checks the restrictions that only apply to random procreation: those on clan personnel and prisoners.
+     *
+     * @param person the person to check
+     *
+     * @return {@code true} if random procreation is disabled for them
+     */
+    private boolean isBlockedFromRandomProcreation(final Person person) {
+        return (!isUseRandomClanPersonnelProcreation() && person.isClanPersonnel()) ||
+                     (!isUseRandomPrisonerProcreation() && person.getPrisonerStatus().isCurrentPrisoner());
+    }
+
+    /**
+     * Checks whether an eligible married same-sex couple randomly adopts a child. If they do, the child joins the
+     * force, aged anywhere from a newborn up to the campaign's maximum age for adopted children.
+     *
+     * <p>The chance uses the same random procreation roll as women in a relationship.</p>
+     *
+     * @param campaign the campaign the couple is part of
+     * @param today    the current date
+     * @param person   the spouse to check from
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void processRandomAdoptionCheck(final Campaign campaign, final LocalDate today, final Person person) {
+        if (!isEligibleForRandomAdoption(campaign, today, person) || !procreation(person)) {
+            return;
+        }
+
+        final int maximumAge = campaign.getCampaignOptions().get(CampaignOption.RANDOM_ADOPTION_MAXIMUM_CHILD_AGE);
+
+        addChild(campaign,
+              today,
+              person,
+              person.getGenealogy().getSpouse(),
+              getRandomDateOfBirthUpToAge(today, maximumAge, null),
+              ChildArrivalType.ADOPTION);
+    }
+    //endregion Children Joining Later in Life
 
     /**
      * Creates baby/babies and performs any necessary operations such as setting birthdate, creating reports, updating
@@ -623,27 +1136,13 @@ public abstract class AbstractProcreation {
             Faction originFaction = mother.getOriginFaction();
             Planet originPlanet = mother.getOriginPlanet();
 
-            if (father != null && Compute.randomInt(1) == 0) {
+            // Even chance the child takes the father's origin instead of the mother's
+            if (father != null && Compute.randomInt(2) == 0) {
                 originFaction = father.getOriginFaction();
                 originPlanet = father.getOriginPlanet();
             }
 
-            final Person baby = campaign.getPlayerForce()
-                                      .getHumanResources()
-                                      .newDependent(campaign, Gender.RANDOMIZE, originFaction, originPlanet);
-
-            baby.setSurname(campaign.getCampaignOptions()
-                                  .get(CampaignOption.BABY_SURNAME_STYLE)
-                                  .generateBabySurname(mother, father, baby.getGender()));
-
-            baby.setDateOfBirth(mother.getDueDate());
-            baby.removeAllSkills(); // Limit skills by age for children and adolescents
-            baby.setPrimaryRole(campaign, PersonnelRole.DEPENDENT); // Babies can't have jobs
-
-            if (campaign.getCampaignOptions().get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN) &&
-                      baby.isChild(campaign.getLocalDate(), false)) {
-                baby.setPortrait(new Portrait());
-            }
+            final Person baby = createChild(campaign, mother.getDueDate(), mother, father, originFaction, originPlanet);
 
             // re-roll SPAs to include in any age and skill adjustments
             Enumeration<IOption> options = new PersonnelOptions().getOptions(PersonnelOptions.LVL3_ADVANTAGES);
@@ -651,10 +1150,6 @@ public abstract class AbstractProcreation {
             for (IOption option : Collections.list(options)) {
                 baby.getOptions().getOption(option.getName()).clearValue();
             }
-
-            baby.setPreNominal(""); // Stop babies being born with doctorates
-            baby.setPostNominal(""); // Stop babies being born with post-nominal titles
-            baby.setEduHighestEducation(EducationLevel.EARLY_CHILDHOOD);
 
             baby.setLoyalty(Compute.d6(3) + 2);
 
@@ -767,8 +1262,11 @@ public abstract class AbstractProcreation {
      */
     public void processNewWeek(final Campaign campaign, final LocalDate today, final Person person,
           final boolean isStartingSimulation) {
-        // Instantly return for male personnel
+        // Male personnel can't become pregnant, but may learn of a child they didn't know they had, or adopt one
+        // with their husband
         if (person.getGender().isMale()) {
+            processRandomPaternityCheck(campaign, today, person);
+            processRandomAdoptionCheck(campaign, today, person);
             return;
         }
 
@@ -797,6 +1295,9 @@ public abstract class AbstractProcreation {
 
         // Make the required checks for random procreation
         processRandomProcreationCheck(campaign, today, person, false);
+
+        // Women married to women can't conceive together, but may adopt
+        processRandomAdoptionCheck(campaign, today, person);
     }
 
     /**
