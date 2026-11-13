@@ -43,6 +43,7 @@ import megamek.common.units.Mek;
 import megamek.common.units.ProtoMek;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -191,7 +192,7 @@ public class FinancialReport {
         financialReport.assets = campaign.getPlayerForce().getFinances().getTotalAssetValue();
         financialReport.rentals = campaign.getTotalRentFeesExcludingBays();
 
-        campaign.getPlayerForce().getHangar().forEachUnit(u -> {
+        campaign.getPlayerForce().allUnits().forEach(u -> {
             Money value = u.getSellValue();
             if (u.getEntity() instanceof Mek) {
                 financialReport.mek = financialReport.mek.plus(value);
@@ -211,11 +212,12 @@ public class FinancialReport {
             }
         });
 
-        //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
-        financialReport.spareParts = financialReport.spareParts.plus(
-              campaign.getPlayerForce().getWarehouse().streamSpareParts()
-                    .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
-                    .collect(Collectors.toList()));
+        for (LocalWarehouse warehouse : campaign.getPlayerForce().allWarehouses()) {
+            financialReport.spareParts = financialReport.spareParts.plus(
+                  warehouse.streamSpareParts()
+                        .map(x -> x.getActualValue().multipliedBy(x.getQuantity()))
+                        .collect(Collectors.toList()));
+        }
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         Accountant accountant = campaign.getAccountant();

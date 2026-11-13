@@ -908,7 +908,7 @@ public class CampaignOptionsPane extends JPanel {
         campaign.resetRandomDeath();
 
         // Conventional infantry may have switched between maintaining themselves and being maintained by Techs
-        for (Unit unit : campaign.getPlayerForce().getHangar().getUnits()) {
+        for (Unit unit : campaign.getPlayerForce().allUnits()) {
             unit.reconcileInfantryMaintenance();
         }
 

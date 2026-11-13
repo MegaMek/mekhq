@@ -121,7 +121,7 @@ public class TransportShipAssignment extends TransportAssignment {
     @Override
     public void fixReferences(Campaign campaign, Unit unit) {
         if (getTransportShip() instanceof Unit.UnitRef) {
-            Unit transportShip = campaign.getPlayerForce().getHangar().getUnit(getTransportShip().getId());
+            Unit transportShip = campaign.getPlayerForce().findUnit(getTransportShip().getId());
             if (transportShip != null) {
                 setTransport(transportShip);
                 resolveTransportedLocation();

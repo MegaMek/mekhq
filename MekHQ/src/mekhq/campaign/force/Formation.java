@@ -599,6 +599,28 @@ public class Formation {
     }
 
     /**
+     * As {@link #getAllUnitsAsUnits(LocalHangar, boolean)}, but resolves the unit IDs against every detachment of
+     * {@code force} rather than a single hangar.
+     *
+     * @param force                  the force whose detachments hold the units
+     * @param standardFormationsOnly whether to include only units belonging to standard formations
+     *
+     * @return the resolved units of this formation and its sub-formations
+     */
+    public List<Unit> getAllForceUnitsAsUnits(AbstractForce force, boolean standardFormationsOnly) {
+        List<Unit> allUnits = new ArrayList<>();
+
+        for (UUID unitId : getAllUnits(standardFormationsOnly)) {
+            Unit unit = force.findUnit(unitId);
+            if (unit != null) {
+                allUnits.add(unit);
+            }
+        }
+
+        return allUnits;
+    }
+
+    /**
      * Resolves and returns the {@link Unit} objects that belong to this formation by looking them up in the provided
      * {@link LocalHangar}.
      *

@@ -162,11 +162,13 @@ public class PartsInUseManager {
      * location regardless of which warehouse map physically holds the part (installed parts follow their unit's base).
      */
     private void forEachPartAtPlace(Consumer<Part> consumer) {
-        campaign.getPlayerForce().getWarehouse().forEachPart(part -> {
-            if (placeOf(part) == place) {
-                consumer.accept(part);
-            }
-        });
+        for (LocalWarehouse forceWarehouse : campaign.getPlayerForce().allWarehouses()) {
+            forceWarehouse.forEachPart(part -> {
+                if (placeOf(part) == place) {
+                    consumer.accept(part);
+                }
+            });
+        }
         for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
             base.getBaseWarehouse().forEachPart(part -> {
                 if (placeOf(part) == place) {

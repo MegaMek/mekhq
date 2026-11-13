@@ -196,7 +196,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         clearTransportedUnits();
 
         // And now reset the Transported values for all the units we just booted
-        campaign.getPlayerForce().getHangar().forEachUnit(u -> {
+        campaign.getPlayerForce().allUnits().forEach(u -> {
             if (u.hasTransportShipAssignment()
                       && Objects.equals(transport, u.getTransportShipAssignment().getTransportShip())) {
                 u.setTransportShipAssignment(null);
@@ -215,7 +215,7 @@ public class ShipTransportedUnitsSummary extends AbstractTransportedUnitsSummary
         Set<Unit> newTransportedUnits = new HashSet<>();
         for (Unit transportedUnit : getTransportedUnits()) {
             if (transportedUnit instanceof Unit.UnitRef) {
-                Unit realUnit = campaign.getPlayerForce().getHangar().getUnit(transportedUnit.getId());
+                Unit realUnit = campaign.getPlayerForce().findUnit(transportedUnit.getId());
                 if (realUnit != null) {
                     newTransportedUnits.add(realUnit);
                 } else {

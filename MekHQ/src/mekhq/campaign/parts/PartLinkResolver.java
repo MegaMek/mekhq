@@ -139,7 +139,7 @@ final class PartLinkResolver {
         if (unitWarehouse != null) {
             searchOrder.add(unitWarehouse);
         }
-        searchOrder.add(campaign.getPlayerForce().getWarehouse());
+        searchOrder.addAll(campaign.getPlayerForce().allWarehouses());
         for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
             searchOrder.add(base.getBaseWarehouse());
         }
