@@ -36,6 +36,7 @@ package mekhq.gui.view;
 import static megamek.common.options.OptionsConstants.BASE_BLIND_DROP;
 import static megamek.common.options.OptionsConstants.BASE_REAL_BLIND_DROP;
 import static megamek.common.units.Entity.getEntityMajorTypeName;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -152,6 +153,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private final StubTreeModel playerForceModel;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBScenarioViewPanel";
+
+    private static final int STATS_VALUE_COLUMN = 2;
 
     public AtBScenarioViewPanel(AtBScenario s, Campaign c, JFrame frame) {
         super();
@@ -298,8 +301,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                     ScenarioForceTemplate template = ((AtBDynamicScenario) scenario).getPlayerForceTemplates()
                                                            .get(forceID);
                     if (template != null && template.getActualDeploymentZone() >= 0) {
-                        forceBuilder.append("Deploy: ");
-                        forceBuilder.append(IStartingPositions.START_LOCATION_NAMES[template.getActualDeploymentZone()]);
+                        forceBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "lblDeploymentZone.text",
+                              IStartingPositions.START_LOCATION_NAMES[template.getActualDeploymentZone()]));
                         forceBuilder.append("<br/>");
                     }
                     chop = true;
@@ -458,6 +462,45 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 panStats.add(new JLabel(loot.getShortDescription()), gridBagConstraints);
             }
+        }
+
+        applyStatsColumnLayout();
+    }
+
+    /**
+     * Normalizes the column behavior of the stats grid once every row has been added.
+     *
+     * <p>Rows are built with a shared, repeatedly mutated {@link GridBagConstraints}, so the first row's
+     * {@code weightx} leaked onto both the label column and the value column. That split any spare width evenly
+     * between them, leaving the value column narrow and starting part-way across the panel, which in turn made
+     * wrapping HTML text (unit names, deployment zones) break across lines.</p>
+     *
+     * <p>This makes the label and reroll-checkbox columns take only the width they need (and never wrap), and
+     * gives all spare width to the value column, with its content aligned to the start of the cell.</p>
+     */
+    private void applyStatsColumnLayout() {
+        GridBagLayout layout = (GridBagLayout) panStats.getLayout();
+
+        for (Component component : panStats.getComponents()) {
+            GridBagConstraints constraints = layout.getConstraints(component);
+            if (constraints.gridwidth != 1) {
+                // Full-width rows (description, details, force trees, loot) manage their own layout
+                continue;
+            }
+
+            if (constraints.gridx == STATS_VALUE_COLUMN) {
+                constraints.weightx = 1.0;
+                constraints.fill = GridBagConstraints.HORIZONTAL;
+                constraints.insets = new Insets(1, 0, 1, 0);
+            } else {
+                constraints.weightx = 0.0;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.insets = new Insets(1, 0, 1, 10);
+                component.setMinimumSize(component.getPreferredSize());
+            }
+            constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+
+            layout.setConstraints(component, constraints);
         }
     }
 
