@@ -53,7 +53,8 @@ import megamek.logging.MMLogger;
  *                             to the player; may be {@code null}
  * @param affectedFactionCodes the codes of every faction whose campaigns receive this ultimatum. Never {@code null}
  * @param sides                the sides the player can choose between, in the order the picker shows them. The first
- *                             side delivers the opening offer. Never {@code null}
+ *                             side delivers the opening offer, unless {@code isIntroducedByThirdParty} is set. Never
+ *                             {@code null}
  * @param dissenterPreference  the {@link FactionStandingUltimatumSide#id() ID} of the side the dissenting officer
  *                             wants the campaign to choose, or {@link #ROGUE_PREFERENCE} if they want it to go rogue.
  *                             They leave the campaign if the player chooses anything else
@@ -62,12 +63,19 @@ import megamek.logging.MMLogger;
  *                             character makes to follow the player's decision, so positive values make more characters
  *                             refuse. Between {@link #MINIMUM_DIVISIVENESS} and {@link #MAXIMUM_DIVISIVENESS}; absent
  *                             from a file means 0
+ * @param isIntroducedByThirdParty {@code true} if the opening offer is delivered by a third party. The third party is
+ *                             the first entry in {@code sides}: it is described like any other side (ID, name, role,
+ *                             and faction, which sets the logo shown beside them) but is not one of the sides the player
+ *                             can choose. Absent from a file means {@code false}
+ * @param hasNoDissent         {@code true} if nobody dissents: the dissenting officer's scene, the dissent strip,
+ *                             and the loyalty check are all skipped, so the whole campaign follows the player's
+ *                             choice. Absent from a file means {@code false}
  *
  * @author Illiani
  * @since 0.50.07
  */
 @JsonPropertyOrder({ "name", "date", "notes", "affectedFactionCodes", "sides", "dissenterPreference",
-                     "isViolentTransition", "divisiveness" })
+                     "isViolentTransition", "divisiveness", "isIntroducedByThirdParty", "hasNoDissent" })
 public record FactionStandingUltimatumData(
       @JsonProperty("name") String name,
       @JsonProperty("date") String date,
@@ -76,7 +84,9 @@ public record FactionStandingUltimatumData(
       @JsonProperty("sides") List<FactionStandingUltimatumSide> sides,
       @JsonProperty("dissenterPreference") String dissenterPreference,
       @JsonProperty("isViolentTransition") boolean isViolentTransition,
-      @JsonProperty("divisiveness") int divisiveness
+      @JsonProperty("divisiveness") int divisiveness,
+      @JsonProperty("isIntroducedByThirdParty") boolean isIntroducedByThirdParty,
+      @JsonProperty("hasNoDissent") boolean hasNoDissent
 ) {
     private static final MMLogger LOGGER = MMLogger.create(FactionStandingUltimatumData.class);
 
@@ -107,11 +117,40 @@ public record FactionStandingUltimatumData(
     }
 
     /**
-     * Finds one of this ultimatum's sides by its ID.
+     * Creates an ultimatum that is introduced by one of its own sides, rather than by a third party, and has a
+     * dissenter.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public FactionStandingUltimatumData(String name, String date, @Nullable String notes,
+          List<String> affectedFactionCodes, List<FactionStandingUltimatumSide> sides, String dissenterPreference,
+          boolean isViolentTransition, int divisiveness) {
+        this(name, date, notes, affectedFactionCodes, sides, dissenterPreference, isViolentTransition, divisiveness,
+              false, false);
+    }
+
+    /**
+     * Returns the sides the player can choose between: every side, except the third party that introduces the
+     * ultimatum, if there is one.
+     *
+     * @return the choosable sides, in picker order
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @JsonIgnore
+    public List<FactionStandingUltimatumSide> getChoosableSides() {
+        return isIntroducedByThirdParty && !sides.isEmpty() ? sides.subList(1, sides.size()) : sides;
+    }
+
+    /**
+     * Finds one of the sides the player can choose by its ID. The third party that introduces the ultimatum, if there
+     * is one, is not a side and is never found.
      *
      * @param sideId the side's ID
      *
-     * @return the side, or {@code null} if this ultimatum has no side with that ID
+     * @return the side, or {@code null} if this ultimatum has no choosable side with that ID
      *
      * @author Illiani
      * @since 0.51.01
@@ -120,7 +159,7 @@ public record FactionStandingUltimatumData(
         if (sideId == null) {
             return null;
         }
-        for (FactionStandingUltimatumSide side : sides) {
+        for (FactionStandingUltimatumSide side : getChoosableSides()) {
             // Sides from a hand-edited file may be missing their ID
             if (sideId.equals(side.id())) {
                 return side;

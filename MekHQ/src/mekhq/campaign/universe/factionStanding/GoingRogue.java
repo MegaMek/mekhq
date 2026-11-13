@@ -206,11 +206,41 @@ public class GoingRogue {
     public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
           @Nullable Person second, boolean isDefection, boolean isUltimatum, boolean isUsingFactionStandings,
           int divisiveness) {
+        processGoingRogue(campaign, chosenFaction, commander, second, isDefection, isUltimatum,
+              isUsingFactionStandings, divisiveness, false);
+    }
+
+    /**
+     * Carries out the narrative and data changes when the force goes rogue, optionally with the whole campaign
+     * following the decision.
+     *
+     * <p>Changes personnel statuses, mass-loyalty, and adjusts faction standings.</p>
+     *
+     * @param campaign                the current campaign context
+     * @param chosenFaction           the new faction may be the same or a new one
+     * @param commander               the force commander
+     * @param second                  secondary command personnel
+     * @param isDefection             whether the 'going rogue' action counts as defection
+     * @param isUltimatum             whether the 'going rogue' action was the result of an ultimatum
+     * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
+     * @param divisiveness            added to the loyalty check's target number; positive values make more personnel
+     *                                refuse to follow, negative values fewer
+     * @param isEveryoneFollowing     {@code true} if nobody refuses to follow, so no personnel are checked for loyalty,
+     *                                killed, or made to desert
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void processGoingRogue(Campaign campaign, Faction chosenFaction, Person commander,
+          @Nullable Person second, boolean isDefection, boolean isUltimatum, boolean isUsingFactionStandings,
+          int divisiveness, boolean isEveryoneFollowing) {
         Faction currentFaction = campaign.getPlayerForce().getFaction();
         String chosenFactionCode = chosenFaction.getShortName();
 
         if (isUsingFactionStandings) {
-            processPersonnel(campaign, isDefection, commander, second, divisiveness);
+            if (!isEveryoneFollowing) {
+                processPersonnel(campaign, isDefection, commander, second, divisiveness);
+            }
 
             if (currentFaction.equals(chosenFaction)) {
                 processRegardBump(campaign);

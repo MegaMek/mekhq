@@ -123,19 +123,24 @@ public class FactionStandingUltimatumDialog {
      *
      * @param campaign            the campaign context for the ultimatum event
      * @param sides               the sides the player can choose between, in picker order; the first side delivers
-     *                            the opening offer
+     *                            the opening offer, unless {@code thirdParty} does
+     * @param thirdParty          the person outside the sides who delivers the opening offer, or {@code null} if the
+     *                            first side delivers it
      * @param dissenterPreference the ID of the side the dissenting officer wants, or
      *                            {@link FactionStandingUltimatumData#ROGUE_PREFERENCE}
      * @param isViolentTransition {@code true} if the leadership change is violent
      * @param divisiveness        added to the loyalty check personnel make to follow the player's decision
+     * @param hasNoDissent        {@code true} if nobody dissents: the dissenting officer's scene, the dissent strip, and
+     *                            the loyalty check are skipped, and the whole campaign follows the player's decision
      * @param ultimatumName       the unique ultimatum name
      * @param date                the ultimatum's date
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public FactionStandingUltimatumDialog(Campaign campaign, List<UltimatumSide> sides, String dissenterPreference,
-          boolean isViolentTransition, int divisiveness, String ultimatumName, LocalDate date) {
+    public FactionStandingUltimatumDialog(Campaign campaign, List<UltimatumSide> sides, @Nullable Person thirdParty,
+          String dissenterPreference, boolean isViolentTransition, int divisiveness, boolean hasNoDissent, String ultimatumName,
+          LocalDate date) {
         this.campaign = campaign;
         PlayerForce playerForce = campaign.getPlayerForce();
         ForceHumanResources humanResources = playerForce.getHumanResources();
@@ -150,24 +155,29 @@ public class FactionStandingUltimatumDialog {
         Faction originalFaction = playerForce.getFaction();
         boolean isTrackingFactionStanding = campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING);
 
-        showDialog(ultimatumName, KEY_INITIAL_OFFER, commander, secondInCommand, sides.get(0).agitator(), null,
+        showDialog(ultimatumName, KEY_INITIAL_OFFER, commander, secondInCommand,
+              thirdParty == null ? sides.get(0).agitator() : thirdParty, null,
               campaignName, commanderAddress);
         showDialog(ultimatumName, KEY_SUPPORT_FOR, commander, secondInCommand, thirdInCommand, null, campaignName,
               commanderAddress);
-        showDialog(ultimatumName, KEY_SUPPORT_AGAINST, commander, secondInCommand, null, secondInCommand,
-              campaignName, commanderAddress);
+        if (!hasNoDissent) {
+            showDialog(ultimatumName, KEY_SUPPORT_AGAINST, commander, secondInCommand, null, secondInCommand,
+                  campaignName, commanderAddress);
+        }
 
         List<PickerChoice> choices = buildChoices(sides, ultimatumName, originalFaction, isViolentTransition,
               isTrackingFactionStanding, dissenterPreference, campaign.getGameYear(),
               pitchKey -> getInCharacterText(RESOURCE_BUNDLE, pitchKey, commander, secondInCommand, "",
                     campaignName, "", null, commanderAddress));
         PickerContent content = new PickerContent(choices,
+              campaign.getGameYear(),
               date.toString(),
               getTextAt(RESOURCE_BUNDLE, KEY_ROOT + "ultimatum"),
-              secondInCommand == null ? null : getFormattedTextAt(RESOURCE_BUNDLE, PICKER_PREFIX + "dissenter",
+              (secondInCommand == null || hasNoDissent) ? null : getFormattedTextAt(RESOURCE_BUNDLE, PICKER_PREFIX + "dissenter",
                     secondInCommand.getFullTitle()),
               isViolentTransition,
-              buildGameInformation(sides.size(), isViolentTransition, isTrackingFactionStanding));
+              buildGameInformation(sides.size(), isViolentTransition, isTrackingFactionStanding,
+                    hasNoDissent));
 
         PickerChoice choice = askForDecision(content);
         if (choice == null) {
@@ -180,10 +190,10 @@ public class FactionStandingUltimatumDialog {
 
         if (choice.kind().isGoingRogue()) {
             processBecomingMercenaryOrPirate(campaign, sides, choice, originalFaction, isViolentTransition,
-                  divisiveness, commander, secondInCommand, isTrackingFactionStanding);
+                  divisiveness, hasNoDissent, commander, secondInCommand, isTrackingFactionStanding);
         } else {
             processChoosingSide(campaign, sides, choice, originalFaction, isViolentTransition, divisiveness,
-                  secondInCommand, commander, campaignName, commanderAddress, ultimatumName,
+                  hasNoDissent, secondInCommand, commander, campaignName, commanderAddress, ultimatumName,
                   isTrackingFactionStanding);
         }
 
@@ -453,13 +463,19 @@ public class FactionStandingUltimatumDialog {
      * @since 0.51.01
      */
     private static String buildGameInformation(int sideCount, boolean isViolentTransition,
-          boolean isTrackingFactionStanding) {
+          boolean isTrackingFactionStanding, boolean hasNoDissent) {
         StringBuilder information = new StringBuilder();
         if (isTrackingFactionStanding) {
             information.append(getTextAt(RESOURCE_BUNDLE,
                   PICKER_PREFIX + (sideCount == 1 ? "info.standing.single" : "info.standing.multiple")));
             information.append(' ');
         }
+        if (hasNoDissent) {
+            // Nobody refuses, so there is no dissenter, loyalty check, or violence to explain
+            information.append(getTextAt(RESOURCE_BUNDLE, PICKER_PREFIX + "info.noDissent"));
+            return information.toString();
+        }
+
         information.append(getTextAt(RESOURCE_BUNDLE, PICKER_PREFIX + "info.dissenter"));
         // The loyalty check only runs alongside Faction Standing
         if (isTrackingFactionStanding) {
@@ -479,8 +495,8 @@ public class FactionStandingUltimatumDialog {
      * @since 0.51.01
      */
     private void processChoosingSide(Campaign campaign, List<UltimatumSide> sides, PickerChoice choice,
-          Faction originalFaction, boolean isViolentTransition, int divisiveness, @Nullable Person secondInCommand,
-          Person commander, String campaignName, String commanderAddress, String ultimatumName,
+          Faction originalFaction, boolean isViolentTransition, int divisiveness, boolean hasNoDissent,
+          @Nullable Person secondInCommand, Person commander, String campaignName, String commanderAddress, String ultimatumName,
           boolean isTrackingFactionStanding) {
         UltimatumSide side = sides.get(choice.sideIndex());
         Faction chosenFaction = side.faction();
@@ -505,9 +521,10 @@ public class FactionStandingUltimatumDialog {
               isDefection(isViolentTransition, chosenFaction, originalFaction),
               true,
               isTrackingFactionStanding,
-              divisiveness);
+              divisiveness,
+              hasNoDissent);
 
-        if (!choice.dissenterStays()) {
+        if (!hasNoDissent && !choice.dissenterStays()) {
             departIfPresent(campaign, secondInCommand, isViolentTransition);
         }
 
@@ -527,7 +544,7 @@ public class FactionStandingUltimatumDialog {
      */
     private static void processBecomingMercenaryOrPirate(Campaign campaign, List<UltimatumSide> sides,
           PickerChoice choice, Faction originalFaction, boolean isViolentTransition, int divisiveness,
-          Person commander, @Nullable Person secondInCommand, boolean isTrackingFactionStanding) {
+          boolean hasNoDissent, Person commander, @Nullable Person secondInCommand, boolean isTrackingFactionStanding) {
         new FactionJudgmentSceneDialog(campaign,
               commander,
               secondInCommand,
@@ -537,9 +554,9 @@ public class FactionStandingUltimatumDialog {
         Faction newFaction = getRogueFaction(choice.kind());
         // A violent transition is treated as a defection. processGoingRogue also lowers standing with the old faction.
         processGoingRogue(campaign, newFaction, commander, secondInCommand, isViolentTransition, true,
-              isTrackingFactionStanding, divisiveness);
+              isTrackingFactionStanding, divisiveness, hasNoDissent);
 
-        if (!choice.dissenterStays()) {
+        if (!hasNoDissent && !choice.dissenterStays()) {
             departIfPresent(campaign, secondInCommand, isViolentTransition);
         }
 
@@ -676,10 +693,29 @@ public class FactionStandingUltimatumDialog {
      * @since 0.51.01
      */
     public static List<String> getRequiredTextKeys(String ultimatumName, List<String> sideIds) {
+        return getRequiredTextKeys(ultimatumName, sideIds, false);
+    }
+
+    /**
+     * Lists every text key an ultimatum needs, leaving out the dissenter's scene when nobody dissents.
+     *
+     * @param ultimatumName the unique ultimatum name
+     * @param sideIds       the IDs of the ultimatum's sides
+     * @param hasNoDissent  {@code true} if the ultimatum has no dissenter, so the dissenter's scene is never shown
+     *
+     * @return the required keys, scenes first, then each side's keys in side order, then Mercenary and Pirate
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<String> getRequiredTextKeys(String ultimatumName, List<String> sideIds,
+          boolean hasNoDissent) {
         List<String> keys = new ArrayList<>();
         keys.add(getDialogKey(ultimatumName, KEY_INITIAL_OFFER));
         keys.add(getDialogKey(ultimatumName, KEY_SUPPORT_FOR));
-        keys.add(getDialogKey(ultimatumName, KEY_SUPPORT_AGAINST));
+        if (!hasNoDissent) {
+            keys.add(getDialogKey(ultimatumName, KEY_SUPPORT_AGAINST));
+        }
         for (String sideId : sideIds) {
             keys.add(getSideKey(ultimatumName, sideId, KEY_SIDE_PITCH));
             keys.add(getSideKey(ultimatumName, sideId, KEY_SIDE_NEWS));

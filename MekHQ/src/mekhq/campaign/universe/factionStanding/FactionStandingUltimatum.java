@@ -89,16 +89,23 @@ public final class FactionStandingUltimatum {
 
         Factions factions = Factions.getInstance();
         List<UltimatumSide> sides = new ArrayList<>();
-        for (FactionStandingUltimatumSide side : ultimatum.sides()) {
+        for (FactionStandingUltimatumSide side : ultimatum.getChoosableSides()) {
             sides.add(new UltimatumSide(side.id(), createAgitator(campaign, side),
                   factions.getFaction(side.factionCode())));
         }
 
+        // A third party is the first entry in the file's sides, but isn't a side the player can choose
+        Person thirdParty = ultimatum.isIntroducedByThirdParty() ?
+                                  createAgitator(campaign, ultimatum.sides().get(0)) :
+                                  null;
+
         new FactionStandingUltimatumDialog(campaign,
               sides,
+              thirdParty,
               ultimatum.dissenterPreference(),
               ultimatum.isViolentTransition(),
               ultimatum.getEffectiveDivisiveness(),
+              ultimatum.hasNoDissent(),
               ultimatum.name(),
               date);
         return true;
