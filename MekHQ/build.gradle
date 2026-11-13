@@ -937,7 +937,16 @@ test {
 
     minHeapSize = "1024m"
     maxHeapSize = "8192m"
-    jvmArgs = ["-XX:MaxMetaspaceSize=1024m"]
+    // Use a temporary directory for user prefs to isolate them to this task.
+    def tmpUserPrefs = File.createTempDir()
+    jvmArgs = [
+        "-XX:MaxMetaspaceSize=1024m",
+        "-Djava.util.prefs.userRoot=${tmpUserPrefs}",
+    ]
+    doLast {
+        // Clean up at end of task.
+        tmpUserPrefs.deleteDir()
+    }
 
     testLogging {
         events "failed"
