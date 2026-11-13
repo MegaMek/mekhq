@@ -1234,6 +1234,51 @@ public class ForceHumanResources {
     }
 
     /**
+     * Checks whether the campaign's rank restriction on automatic random portraits allows the given person to receive
+     * one.
+     *
+     * <p>When {@link CampaignOption#RANDOM_PORTRAITS_FOR_OFFICERS_ONLY} is disabled, every person passes. When it is
+     * enabled, only persons currently holding an officer rank pass. This does not check the per-role portrait
+     * settings, and it does not apply to portraits the player assigns manually.</p>
+     *
+     * @param campaignOptions the campaign options
+     * @param person          the person to check
+     *
+     * @return {@code true} if the person's rank permits an automatically assigned random portrait
+     */
+    public static boolean isRankEligibleForRandomPortrait(CampaignOptions campaignOptions, final Person person) {
+        return !campaignOptions.get(CampaignOption.RANDOM_PORTRAITS_FOR_OFFICERS_ONLY) ||
+                     person.getRank().isOfficer();
+    }
+
+    /**
+     * Assigns a random portrait to a person who has just changed rank, if the campaign is set to give random portraits
+     * to officers only.
+     *
+     * <p>This only has an effect when the officers-only option is enabled, the person now holds an officer rank, their
+     * primary role is enabled for random portraits, and they do not already have a portrait.</p>
+     *
+     * @param campaign the campaign
+     * @param person   the person whose rank has changed
+     */
+    public void assignRandomPortraitOnRankChange(Campaign campaign, final Person person) {
+        final CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (!campaignOptions.get(CampaignOption.RANDOM_PORTRAITS_FOR_OFFICERS_ONLY) ||
+                  !person.getRank().isOfficer() ||
+                  !person.getPortrait().hasDefaultFilename() ||
+                  !campaignOptions.isUsePortraitForRole(person.getPrimaryRole())) {
+            return;
+        }
+
+        if (campaignOptions.get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN) &&
+                  person.isChild(campaign.getLocalDate(), false)) {
+            return;
+        }
+
+        assignRandomPortraitFor(campaignOptions, person);
+    }
+
+    /**
      * Assigns a random origin to a {@link Person}.
      *
      * @param campaign        the campaign
@@ -1944,7 +1989,7 @@ public class ForceHumanResources {
         LocalDate currentDay = campaign.getLocalDate();
 
         // Assign a random portrait after we generate a new person
-        if (campaignOptions.isUsePortraitForRole(primaryRole)) {
+        if (campaignOptions.isUsePortraitForRole(primaryRole) && isRankEligibleForRandomPortrait(campaignOptions, person)) {
             if (!campaignOptions.get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN) || !person.isChild(currentDay, false)) {
                 assignRandomPortraitFor(campaignOptions, person);
             }

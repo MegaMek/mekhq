@@ -1789,7 +1789,8 @@ public class CampaignNewDayManager {
             boolean hasDefaultPortrait = person.getPortrait().isDefault();
             if (campaignOptions.get(CampaignOption.CHILD_PORTRAITS_WHEN_COMING_OF_AGE) &&
                       isUsePortraitForRole &&
-                      hasDefaultPortrait) {
+                      hasDefaultPortrait &&
+                      ForceHumanResources.isRankEligibleForRandomPortrait(campaignOptions, person)) {
                 campaign.getPlayerForce().getHumanResources().assignRandomPortraitFor(campaign.getCampaignOptions(),
                       person);
             }
