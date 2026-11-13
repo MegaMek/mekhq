@@ -70,12 +70,19 @@ import megamek.logging.MMLogger;
  * @param hasNoDissent         {@code true} if nobody dissents: the dissenting officer's scene, the dissent strip,
  *                             and the loyalty check are all skipped, so the whole campaign follows the player's
  *                             choice. Absent from a file means {@code false}
+ * @param offersMercenary      {@code true} if the player can go rogue as a Mercenary. Absent from a file means
+ *                             {@code true}
+ * @param offersPirate         {@code true} if the player can go rogue as a Pirate. Absent from a file means
+ *                             {@code true}
+ * @param offersBanditCaste    {@code true} if the player can go rogue as a Bandit Caste, the Clan version of a
+ *                             Pirate. Absent from a file means {@code false}
  *
  * @author Illiani
  * @since 0.50.07
  */
 @JsonPropertyOrder({ "name", "date", "notes", "affectedFactionCodes", "sides", "dissenterPreference",
-                     "isViolentTransition", "divisiveness", "isIntroducedByThirdParty", "hasNoDissent" })
+                     "isViolentTransition", "divisiveness", "isIntroducedByThirdParty", "hasNoDissent", "offersMercenary", "offersPirate",
+                     "offersBanditCaste" })
 public record FactionStandingUltimatumData(
       @JsonProperty("name") String name,
       @JsonProperty("date") String date,
@@ -86,7 +93,10 @@ public record FactionStandingUltimatumData(
       @JsonProperty("isViolentTransition") boolean isViolentTransition,
       @JsonProperty("divisiveness") int divisiveness,
       @JsonProperty("isIntroducedByThirdParty") boolean isIntroducedByThirdParty,
-      @JsonProperty("hasNoDissent") boolean hasNoDissent
+      @JsonProperty("hasNoDissent") boolean hasNoDissent,
+      @JsonProperty("offersMercenary") @Nullable Boolean offersMercenary,
+      @JsonProperty("offersPirate") @Nullable Boolean offersPirate,
+      @JsonProperty("offersBanditCaste") @Nullable Boolean offersBanditCaste
 ) {
     private static final MMLogger LOGGER = MMLogger.create(FactionStandingUltimatumData.class);
 
@@ -127,7 +137,51 @@ public record FactionStandingUltimatumData(
           List<String> affectedFactionCodes, List<FactionStandingUltimatumSide> sides, String dissenterPreference,
           boolean isViolentTransition, int divisiveness) {
         this(name, date, notes, affectedFactionCodes, sides, dissenterPreference, isViolentTransition, divisiveness,
-              false, false);
+              false, false, null, null, null);
+    }
+
+    /**
+     * @return {@code true} if the player can go rogue as a Mercenary; {@code true} unless the file says otherwise
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @JsonIgnore
+    public boolean isMercenaryOffered() {
+        return offersMercenary == null || offersMercenary;
+    }
+
+    /**
+     * @return {@code true} if the player can go rogue as a Pirate; {@code true} unless the file says otherwise
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @JsonIgnore
+    public boolean isPirateOffered() {
+        return offersPirate == null || offersPirate;
+    }
+
+    /**
+     * @return {@code true} if the player can go rogue as a Bandit Caste; {@code false} unless the file says otherwise
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @JsonIgnore
+    public boolean isBanditCasteOffered() {
+        return offersBanditCaste != null && offersBanditCaste;
+    }
+
+    /**
+     * @return {@code true} if the player can go rogue in at least one way
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @JsonIgnore
+    public boolean isGoingRogueOffered() {
+        return isMercenaryOffered() || isPirateOffered() || isBanditCasteOffered();
     }
 
     /**

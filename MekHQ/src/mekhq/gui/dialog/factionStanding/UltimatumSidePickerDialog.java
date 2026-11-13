@@ -94,7 +94,8 @@ public class UltimatumSidePickerDialog extends JDialog {
     public enum ChoiceKind {
         SIDE,
         MERCENARY,
-        PIRATE;
+        PIRATE,
+        BANDIT_CASTE;
 
         /**
          * @return {@code true} if this choice abandons every side to go rogue

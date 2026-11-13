@@ -207,7 +207,8 @@ public class FactionStandingUltimatumsLibrary {
     static boolean isValidDissenterPreference(FactionStandingUltimatumData ultimatum) {
         String preference = ultimatum.dissenterPreference();
         return ultimatum.hasNoDissent()
-                     || FactionStandingUltimatumData.ROGUE_PREFERENCE.equals(preference)
+                     || (FactionStandingUltimatumData.ROGUE_PREFERENCE.equals(preference)
+                               && ultimatum.isGoingRogueOffered())
                      || ultimatum.getSide(preference) != null;
     }
 

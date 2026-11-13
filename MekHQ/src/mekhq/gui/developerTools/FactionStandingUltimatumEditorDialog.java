@@ -63,6 +63,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumData;
 import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumSide;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.dialog.factionStanding.FactionStandingUltimatumDialog;
+import mekhq.gui.dialog.factionStanding.UltimatumSidePickerDialog.ChoiceKind;
 
 /**
  * A developer tool for editing Faction Standing ultimatum files (JSON). Each ultimatum is its own file; this editor
@@ -120,6 +121,9 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
     private final JComboBox<String> cboDissenterPreference = new JComboBox<>();
     private final JCheckBox chkIntroducedByThirdParty = new JCheckBox();
     private final JCheckBox chkNoDissent = new JCheckBox();
+    private final JCheckBox chkOffersMercenary = new JCheckBox();
+    private final JCheckBox chkOffersPirate = new JCheckBox();
+    private final JCheckBox chkOffersBanditCaste = new JCheckBox();
     private final JCheckBox chkViolentTransition = new JCheckBox();
     private final JSpinner spnDivisiveness = new JSpinner(new SpinnerNumberModel(0,
           FactionStandingUltimatumData.MINIMUM_DIVISIVENESS, FactionStandingUltimatumData.MAXIMUM_DIVISIVENESS, 1));
@@ -196,6 +200,9 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
         chkNoDissent.addActionListener(event -> cboDissenterPreference.setEnabled(!chkNoDissent.isSelected()));
         addRow(panel, constraints, "hasNoDissent", chkNoDissent);
         addRow(panel, constraints, "dissenterPreference", cboDissenterPreference);
+        addRow(panel, constraints, "offersMercenary", chkOffersMercenary);
+        addRow(panel, constraints, "offersPirate", chkOffersPirate);
+        addRow(panel, constraints, "offersBanditCaste", chkOffersBanditCaste);
         addRow(panel, constraints, "isViolentTransition", chkViolentTransition);
         addRow(panel, constraints, "divisiveness", spnDivisiveness);
         return panel;
@@ -376,6 +383,9 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
         showSide(-1);
         chkIntroducedByThirdParty.setSelected(false);
         chkNoDissent.setSelected(false);
+        chkOffersMercenary.setSelected(true);
+        chkOffersPirate.setSelected(true);
+        chkOffersBanditCaste.setSelected(false);
         cboDissenterPreference.setEnabled(true);
         refreshDissenterChoices();
         cboDissenterPreference.setSelectedItem(null);
@@ -400,6 +410,9 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
         }
         chkIntroducedByThirdParty.setSelected(source.isIntroducedByThirdParty());
         chkNoDissent.setSelected(source.hasNoDissent());
+        chkOffersMercenary.setSelected(source.isMercenaryOffered());
+        chkOffersPirate.setSelected(source.isPirateOffered());
+        chkOffersBanditCaste.setSelected(source.isBanditCasteOffered());
         cboDissenterPreference.setEnabled(!source.hasNoDissent());
         refreshDissenterChoices();
         cboDissenterPreference.setSelectedItem(source.dissenterPreference());
@@ -439,7 +452,10 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
               chkViolentTransition.isSelected(),
               (int) spnDivisiveness.getValue(),
               chkIntroducedByThirdParty.isSelected(),
-              chkNoDissent.isSelected());
+              chkNoDissent.isSelected(),
+              chkOffersMercenary.isSelected(),
+              chkOffersPirate.isSelected(),
+              chkOffersBanditCaste.isSelected());
     }
 
     /**
@@ -505,7 +521,7 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
     private void warnAboutMissingText(FactionStandingUltimatumData ultimatum) {
         List<String> missingKeys = new ArrayList<>();
         for (String key : FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), getSideIds(ultimatum),
-              ultimatum.hasNoDissent())) {
+              ultimatum.hasNoDissent(), getRogueKinds(ultimatum))) {
             if (!isResourceKeyValid(getTextAt(ULTIMATUM_RESOURCE_BUNDLE, key))) {
                 missingKeys.add(key);
             }
@@ -612,7 +628,7 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
         List<FactionStandingUltimatumSide> sides = ultimatum.sides();
         List<FactionStandingUltimatumSide> choosableSides = ultimatum.getChoosableSides();
         List<String> keys = FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), getSideIds(ultimatum),
-              ultimatum.hasNoDissent());
+              ultimatum.hasNoDissent(), getRogueKinds(ultimatum));
         String firstLeader = sides.isEmpty() ? "" : nullToEmpty(sides.get(0).name());
         String dissenterPreference = nullToEmpty(ultimatum.dissenterPreference());
 
@@ -628,8 +644,13 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
             purposes.add(getFormattedTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.pitch", sideLabel));
             purposes.add(getFormattedTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.news", sideLabel));
         }
-        purposes.add(getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.mercenary"));
-        purposes.add(getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.pirate"));
+        for (ChoiceKind rogueKind : getRogueKinds(ultimatum)) {
+            purposes.add(getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + switch (rogueKind) {
+                case MERCENARY -> "textKeys.purpose.mercenary";
+                case PIRATE -> "textKeys.purpose.pirate";
+                default -> "textKeys.purpose.banditCaste";
+            }));
+        }
 
         List<TextKeyRow> rows = new ArrayList<>();
         for (int index = 0; index < keys.size(); index++) {
@@ -676,6 +697,17 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
      */
     static String getBundleFilePath(String bundleName) {
         return "MekHQ/resources/" + bundleName.replace('.', '/') + ".properties";
+    }
+
+    /**
+     * @return the ways of going rogue the ultimatum offers, in picker order
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static List<ChoiceKind> getRogueKinds(FactionStandingUltimatumData ultimatum) {
+        return FactionStandingUltimatumDialog.getRogueKinds(ultimatum.isMercenaryOffered(),
+              ultimatum.isPirateOffered(), ultimatum.isBanditCasteOffered());
     }
 
     /**
@@ -759,6 +791,11 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
                             || !(FactionStandingUltimatumData.ROGUE_PREFERENCE.equals(dissenterPreference)
                                        || ultimatum.getSide(dissenterPreference) != null))) {
             problemKeys.add(KEY_PREFIX + "problem.dissenterPreference");
+        }
+
+        if (!ultimatum.hasNoDissent() && FactionStandingUltimatumData.ROGUE_PREFERENCE.equals(dissenterPreference)
+                  && !ultimatum.isGoingRogueOffered()) {
+            problemKeys.add(KEY_PREFIX + "problem.dissenterRogueNotOffered");
         }
 
         int divisiveness = ultimatum.divisiveness();
