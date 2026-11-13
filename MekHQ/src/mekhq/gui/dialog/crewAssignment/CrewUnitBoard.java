@@ -552,7 +552,8 @@ final class CrewUnitBoard extends JPanel {
         header.add(status, BorderLayout.EAST);
         card.add(leftAligned(header));
         card.add(leftAligned(Hud.hint(entry.formationName().isEmpty() ? entry.typeName() :
-                                            entry.typeName() + "  ·  " + entry.formationName())));
+                                            getFormattedTextAt(RESOURCE_BUNDLE, "board.unit.detail", entry.typeName(),
+                                                  entry.formationName()))));
         card.add(Box.createVerticalStrut(scaleForGUI(6)));
 
         if (SeatEligibility.takesTech(unit)) {
@@ -768,7 +769,7 @@ final class CrewUnitBoard extends JPanel {
 
     /** A small cross that removes whoever it follows; its tooltip and accessible name say who. */
     private static JLabel removeMark(String description, Runnable onChoose) {
-        JLabel mark = Hud.link("✕", onChoose);
+        JLabel mark = Hud.link(getTextAt(RESOURCE_BUNDLE, "board.remove.mark"), onChoose);
         mark.setToolTipText(description);
         mark.getAccessibleContext().setAccessibleName(description);
         return mark;

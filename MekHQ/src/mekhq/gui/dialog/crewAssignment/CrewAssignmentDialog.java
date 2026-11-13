@@ -62,6 +62,7 @@ import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Problem;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Reason;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StageResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTempCrew;
@@ -945,15 +946,21 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         AssignmentPlan plan = data.plan();
         Person person = state.selectedPerson;
         String seatName = CrewRowRenderers.seatLabel(unit, seat);
+        Reason refusal = null;
         if (person != null) {
+            refusal = plan.whyNotSeat(person, unit, seat);
             plan.fillSeats(List.of(person), List.of(unit), seat);
         }
-        // Asked of the plan rather than read from what it staged: going back to a seat held now cancels a change
-        if ((person != null) && unit.equals(plan.plannedUnitOf(person))) {
+        // Asked of the plan rather than read from what it staged: going back to the seat held now cancels a change.
+        // The seat is compared as well as the unit, as a second seat on the unit they are already on is refused.
+        if ((person != null) && unit.equals(plan.plannedUnitOf(person)) && (seat == plan.plannedSeatOf(person))) {
             // Once seated they are done with, so the selection is cleared for the next person
             state.selectedPerson = null;
             setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.seatStaged", person.getFullTitle(), seatName,
                   unit.getName()), false);
+        } else if (refusal != null) {
+            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.seatRefused.reason", seatName, unit.getName(),
+                  CrewRowRenderers.reasonText(refusal)), true);
         } else {
             setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.seatRefused", seatName, unit.getName()), true);
         }

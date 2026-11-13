@@ -393,7 +393,7 @@ public class AssignmentPlan {
     /**
      * Whether a person could be staged into a seat right now: they qualify for it, it has room once the staged changes
      * are counted, the unit is available, both are at the same location, and it is not the unit they will already
-     * crew.
+     * crew. A person who is no longer assignable (see {@link SeatEligibility#isAssignable}) cannot be staged either.
      *
      * @param person the person
      * @param unit   the unit
@@ -407,7 +407,7 @@ public class AssignmentPlan {
 
     /**
      * Whether a person could be staged into a seat once it has room: as {@link #canStage}, but a full seat does not
-     * rule them out.
+     * rule them out. As with {@link #canStage}, a person who is no longer assignable is ruled out.
      *
      * @param person the person
      * @param unit   the unit
@@ -1216,9 +1216,11 @@ public class AssignmentPlan {
     }
 
     /**
+     * @param person the person
+     *
      * @return the seat the person will hold once the plan is applied, or {@code null} if they will hold none
      */
-    private @Nullable SeatType plannedSeatOf(final Person person) {
+    public @Nullable SeatType plannedSeatOf(final Person person) {
         final StagedAssignment change = changes.get(person.getId());
         return (change == null) ? currentSeatOf(person) : change.toSeat();
     }
