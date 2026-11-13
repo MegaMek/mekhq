@@ -84,8 +84,8 @@ import megamek.logging.MMLogger;
  * @since 0.50.07
  */
 @JsonPropertyOrder({ "name", "date", "notes", "affectedFactionCodes", "sides", "dissenterPreference",
-                     "isViolentTransition", "divisiveness", "isIntroducedByThirdParty", "hasNoDissent", "offersMercenary", "offersPirate",
-                     "offersBanditCaste", "hasSharedResult" })
+                     "isViolentTransition", "divisiveness", "isIntroducedByThirdParty", "hasNoDissent",
+                     "offersMercenary", "offersPirate", "offersBanditCaste", "hasSharedResult" })
 public record FactionStandingUltimatumData(
       @JsonProperty("name") String name,
       @JsonProperty("date") String date,

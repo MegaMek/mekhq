@@ -225,8 +225,9 @@ public class GoingRogue {
      * @param isUsingFactionStandings {@code true} if the player has faction standings enabled
      * @param divisiveness            added to the loyalty check's target number; positive values make more personnel
      *                                refuse to follow, negative values fewer
-     * @param isEveryoneFollowing     {@code true} if nobody refuses to follow, so no personnel are checked for loyalty,
-     *                                killed, or made to desert
+     * @param isEveryoneFollowing     {@code true} if nobody refuses to follow, so no personnel are checked for loyalty or
+     *                                made to desert. A defection still kills the political roles, as they are removed
+     *                                whatever the rest of the campaign decides
      *
      * @author Illiani
      * @since 0.51.01
@@ -238,9 +239,7 @@ public class GoingRogue {
         String chosenFactionCode = chosenFaction.getShortName();
 
         if (isUsingFactionStandings) {
-            if (!isEveryoneFollowing) {
-                processPersonnel(campaign, isDefection, commander, second, divisiveness);
-            }
+            processPersonnel(campaign, isDefection, commander, second, divisiveness, isEveryoneFollowing);
 
             if (currentFaction.equals(chosenFaction)) {
                 processRegardBump(campaign);
@@ -289,12 +288,14 @@ public class GoingRogue {
      * @param commander   the commanding officer
      * @param second       the second-in-command
      * @param divisiveness added to the loyalty check's target number
+     * @param isEveryoneFollowing {@code true} to skip the loyalty check, so only the political roles of a defection
+     *                            are affected
      *
      * @author Illiani
      * @since 0.50.07
      */
     private static void processPersonnel(Campaign campaign, boolean isDefection, Person commander,
-          @Nullable Person second, int divisiveness) {
+          @Nullable Person second, int divisiveness, boolean isEveryoneFollowing) {
         final LocalDate today = campaign.getLocalDate();
         Collection<Person> allPersonnel = campaign.getPlayerForce().getHumanResources().getPersonnel();
         Set<Person> preProcessedPersonnel = new HashSet<>();
@@ -321,6 +322,10 @@ public class GoingRogue {
                     processGenealogicallyLinkedPersonnel(campaign, person, today, preProcessedPersonnel);
                     continue;
                 }
+            }
+
+            if (isEveryoneFollowing) {
+                continue;
             }
 
             // Loyalty check: personnel with low loyalty may leave or be killed (homicide/deserted), others remain

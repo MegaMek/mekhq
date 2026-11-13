@@ -493,7 +493,7 @@ public class UltimatumSidePickerDialog extends JDialog {
         boolean isRogue = choice.kind().isGoingRogue();
         JPanel card = cardShell(SURFACE, isRogue ? ROGUE_BORDER : BORDER_CYAN, isRogue ? AMBER : ACCENT);
 
-        card.add(leftAligned(identity(choice, content.gameYear(), FOCUSED_CODE_BOX_SIZE, 1.0f, TEXT, 1.05f)));
+        card.add(leftAligned(identity(choice, content.gameYear(), FOCUSED_CODE_BOX_SIZE, TEXT, 1.05f)));
         card.add(verticalGap(12));
 
         JLabel pitch = wrappedLabel("<i>" + choice.pitch() + "</i>", TEXT, 0.95f, PITCH_WIDTH);
@@ -538,7 +538,7 @@ public class UltimatumSidePickerDialog extends JDialog {
     private JPanel buildNeighborCard(int index) {
         PickerChoice choice = content.choices().get(index);
         JPanel card = cardShell(SURFACE_DEEP, BORDER, null);
-        card.add(leftAligned(identity(choice, content.gameYear(), NEIGHBOR_CODE_BOX_SIZE, 0.78f, TEXT_FAINT, 0.9f)));
+        card.add(leftAligned(identity(choice, content.gameYear(), NEIGHBOR_CODE_BOX_SIZE, TEXT_FAINT, 0.9f)));
         card.setToolTipText(wordWrap(choice.title()));
         card.addMouseListener(new MouseAdapter() {
             @Override
@@ -582,7 +582,7 @@ public class UltimatumSidePickerDialog extends JDialog {
      * @author Illiani
      * @since 0.51.01
      */
-    private static JPanel identity(PickerChoice choice, int gameYear, int codeBoxSize, float codeSize,
+    private static JPanel identity(PickerChoice choice, int gameYear, int codeBoxSize,
           Color titleColor, float titleSize) {
         JPanel identity = new JPanel(new BorderLayout(scaleForGUI(12), 0));
         identity.setOpaque(false);
@@ -602,7 +602,7 @@ public class UltimatumSidePickerDialog extends JDialog {
         // Held at the top, so the box stays square instead of stretching to the text's height
         JPanel codeHolder = new JPanel(new BorderLayout());
         codeHolder.setOpaque(false);
-        codeHolder.add(codeBox(choice, gameYear, codeBoxSize, codeSize), BorderLayout.NORTH);
+        codeHolder.add(codeBox(choice, gameYear, codeBoxSize), BorderLayout.NORTH);
 
         identity.add(codeHolder, BorderLayout.WEST);
         identity.add(text, BorderLayout.CENTER);
@@ -610,22 +610,18 @@ public class UltimatumSidePickerDialog extends JDialog {
     }
 
     /**
-     * A square box showing the faction's icon, tinted cyan for a side and amber for going rogue. If the faction has no
-     * icon that can be loaded, the box shows the faction's short name instead.
+     * A square box showing the faction's icon, tinted cyan for a side and amber for going rogue. A faction without an
+     * icon of its own shows the generic logo that {@link RATGenerator#getFactionLogoFile(int, String)} falls back to.
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private static JLabel codeBox(PickerChoice choice, int gameYear, int size, float codeSize) {
+    private static JLabel codeBox(PickerChoice choice, int gameYear, int size) {
         boolean isRogue = choice.kind().isGoingRogue();
         Color codeColor = isRogue ? AMBER : ACCENT_BRIGHT;
         ImageIcon factionIcon = getTintedFactionIcon(choice.code(), gameYear, codeColor, size - (ICON_PADDING * 2));
 
-        JLabel codeBox = factionIcon == null ?
-                               new JLabel(choice.code(), SwingConstants.CENTER) :
-                               new JLabel(factionIcon, SwingConstants.CENTER);
-        codeBox.setFont(hudFont(Font.BOLD, codeSize, 0.06f));
-        codeBox.setForeground(codeColor);
+        JLabel codeBox = new JLabel(factionIcon, SwingConstants.CENTER);
         codeBox.setOpaque(true);
         codeBox.setBackground(isRogue ? ROGUE_CODE_BOX : SURFACE_HIGHLIGHT);
         codeBox.setBorder(BorderFactory.createLineBorder(isRogue ? ROGUE_BORDER : BORDER_CYAN, scaleForGUI(1)));
@@ -643,22 +639,14 @@ public class UltimatumSidePickerDialog extends JDialog {
      * @param tint        the color to tint the icon with
      * @param size        the width and height of the square the icon has to fit in, before GUI scaling
      *
-     * @return the tinted and scaled icon, or {@code null} if the faction has no icon that can be loaded
+     * @return the tinted and scaled icon
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private static @Nullable ImageIcon getTintedFactionIcon(String factionCode, int gameYear, Color tint, int size) {
+    private static ImageIcon getTintedFactionIcon(String factionCode, int gameYear, Color tint, int size) {
         File iconFile = RATGenerator.getFactionLogoFile(gameYear, factionCode);
-        if (!iconFile.isFile()) {
-            return null;
-        }
-
         ImageIcon icon = new ImageIcon(iconFile.getPath());
-        if (icon.getIconWidth() <= 0 || icon.getIconHeight() <= 0) {
-            return null;
-        }
-
         ImageIcon tinted = ImageUtilities.addTintToImageIcon(icon.getImage(), tint, true, ICON_TINT_TRANSPARENCY);
         boolean isWiderThanTall = tinted.getIconWidth() >= tinted.getIconHeight();
         return ImageUtilities.scaleImageIcon(tinted, size, isWiderThanTall);
