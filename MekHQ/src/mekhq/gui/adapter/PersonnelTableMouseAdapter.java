@@ -107,6 +107,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.Kill;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -480,7 +481,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
                     if (getCampaignOptions().isUsePortraitForRole(role) &&
                               getCampaignOptions().get(CampaignOption.ASSIGN_PORTRAIT_ON_ROLE_CHANGE) &&
-                              person.getPortrait().hasDefaultFilename()) {
+                              person.getPortrait().hasDefaultFilename() &&
+                              ForceHumanResources.isRankEligibleForRandomPortrait(getCampaignOptions(), person)) {
                         Campaign campaign1 = getCampaign();
                         campaign1.getPlayerForce()
                               .getHumanResources()
