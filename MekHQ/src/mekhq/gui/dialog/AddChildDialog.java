@@ -168,20 +168,20 @@ public class AddChildDialog extends JDialog {
         spnAge = new JSpinner(new SpinnerNumberModel(0, 0, MAXIMUM_ARRIVING_CHILD_AGE, 1));
 
         final JPanel fieldsPanel = new JPanel(new GridBagLayout());
-        final GridBagConstraints gbc = new GridBagConstraints();
+        final GridBagConstraints constraints = new GridBagConstraints();
         final int fieldPadding = scaleForGUI(5);
-        gbc.insets = new Insets(fieldPadding, fieldPadding, fieldPadding, fieldPadding);
-        gbc.anchor = GridBagConstraints.WEST;
-        addRow(fieldsPanel, gbc, 0, "AddChildDialog.type", comboType);
-        addRow(fieldsPanel, gbc, 1, "AddChildDialog.coParent", comboCoParent);
-        addRow(fieldsPanel, gbc, 2, "AddChildDialog.age", spnAge);
+        constraints.insets = new Insets(fieldPadding, fieldPadding, fieldPadding, fieldPadding);
+        constraints.anchor = GridBagConstraints.WEST;
+        addRow(fieldsPanel, constraints, 0, "AddChildDialog.type", comboType);
+        addRow(fieldsPanel, constraints, 1, "AddChildDialog.coParent", comboCoParent);
+        addRow(fieldsPanel, constraints, 2, "AddChildDialog.age", spnAge);
 
         lblWarning = new JLabel(getTextAt(RESOURCE_BUNDLE, "AddChildDialog.tooYoung"));
         lblWarning.setVisible(false);
-        gbc.gridx = 0;
-        gbc.gridy = 3;
-        gbc.gridwidth = 2;
-        fieldsPanel.add(lblWarning, gbc);
+        constraints.gridx = 0;
+        constraints.gridy = 3;
+        constraints.gridwidth = 2;
+        fieldsPanel.add(lblWarning, constraints);
 
         getContentPane().add(fieldsPanel, BorderLayout.CENTER);
 
@@ -198,20 +198,20 @@ public class AddChildDialog extends JDialog {
         getContentPane().add(buttonPanel, BorderLayout.SOUTH);
     }
 
-    private static void addRow(final JPanel panel, final GridBagConstraints gbc, final int row,
+    private static void addRow(final JPanel panel, final GridBagConstraints constraints, final int row,
           final String labelKey, final Component field) {
-        gbc.gridy = row;
-        gbc.gridwidth = 1;
+        constraints.gridy = row;
+        constraints.gridwidth = 1;
 
-        gbc.gridx = 0;
-        gbc.fill = GridBagConstraints.NONE;
-        gbc.weightx = 0.0;
-        panel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey)), gbc);
+        constraints.gridx = 0;
+        constraints.fill = GridBagConstraints.NONE;
+        constraints.weightx = 0.0;
+        panel.add(new JLabel(getTextAt(RESOURCE_BUNDLE, labelKey)), constraints);
 
-        gbc.gridx = 1;
-        gbc.fill = GridBagConstraints.HORIZONTAL;
-        gbc.weightx = 1.0;
-        panel.add(field, gbc);
+        constraints.gridx = 1;
+        constraints.fill = GridBagConstraints.HORIZONTAL;
+        constraints.weightx = 1.0;
+        panel.add(field, constraints);
     }
 
     private ChildArrivalType getSelectedType() {

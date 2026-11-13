@@ -838,6 +838,30 @@ public abstract class AbstractProcreation {
      */
     public Person addChild(final Campaign campaign, final LocalDate today, final Person parent,
           final @Nullable Person coParent, final LocalDate dateOfBirth, final ChildArrivalType arrivalType) {
+        return addChild(campaign, today, parent, coParent, dateOfBirth, arrivalType, false);
+    }
+
+    /**
+     * Adds a child to the campaign, as {@link #addChild(Campaign, LocalDate, Person, Person, LocalDate,
+     * ChildArrivalType)}, optionally as part of a new command's simulated history.
+     *
+     * @param campaign             the campaign the child is joining
+     * @param today                the current date
+     * @param parent               the parent the child is joining
+     * @param coParent             the child's other parent, or {@code null} if there is none or they are unknown
+     * @param dateOfBirth          the child's date of birth
+     * @param arrivalType          how the child came to join the family
+     * @param isStartingSimulation true if the child arrives as part of a new command's simulated history, in which
+     *                             case no arrival report is shown or logged and the parents' loyalty is left alone
+     *
+     * @return the new child, who has been added to the campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Person addChild(final Campaign campaign, final LocalDate today, final Person parent,
+          final @Nullable Person coParent, final LocalDate dateOfBirth, final ChildArrivalType arrivalType,
+          final boolean isStartingSimulation) {
         final CampaignOptions campaignOptions = campaign.getCampaignOptions();
 
         // Surname styles are written around a mother, so a female parent fills that slot where there is one
@@ -883,12 +907,14 @@ public abstract class AbstractProcreation {
             applyHereditaryConditions(campaign, child, getParentInjuryTypes(parent, coParent), parent, coParent);
         }
 
-        reportChildArrival(campaign, today, parent, coParent, child, arrivalType);
+        if (!isStartingSimulation) {
+            reportChildArrival(campaign, today, parent, coParent, child, arrivalType);
 
-        // adjust parents' loyalty
-        parent.performRandomizedLoyaltyChange(campaign, false, true);
-        if (coParent != null) {
-            coParent.performRandomizedLoyaltyChange(campaign, false, true);
+            // adjust parents' loyalty
+            parent.performRandomizedLoyaltyChange(campaign, false, true);
+            if (coParent != null) {
+                coParent.performRandomizedLoyaltyChange(campaign, false, true);
+            }
         }
 
         // check desire for children
@@ -990,6 +1016,25 @@ public abstract class AbstractProcreation {
      * @since 0.51.01
      */
     public void processRandomPaternityCheck(final Campaign campaign, final LocalDate today, final Person person) {
+        processRandomPaternityCheck(campaign, today, person, false);
+    }
+
+    /**
+     * As {@link #processRandomPaternityCheck(Campaign, LocalDate, Person)}, optionally as part of a new command's
+     * simulated history.
+     *
+     * @param campaign             the campaign the person is part of
+     * @param today                the current date
+     * @param person               the person to check
+     * @param isStartingSimulation true if this check is part of a new command's simulated history; see
+     *                             {@link #addChild(Campaign, LocalDate, Person, Person, LocalDate, ChildArrivalType,
+     *                             boolean)}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void processRandomPaternityCheck(final Campaign campaign, final LocalDate today, final Person person,
+          final boolean isStartingSimulation) {
         if (!isEligibleForRandomPaternity(campaign, today, person) || !procreation(person)) {
             return;
         }
@@ -1001,7 +1046,8 @@ public abstract class AbstractProcreation {
               person,
               null,
               getRandomDateOfBirthUpToAge(today, maximumAge, getEarliestChildDateOfBirth(person)),
-              ChildArrivalType.PATERNITY);
+              ChildArrivalType.PATERNITY,
+              isStartingSimulation);
     }
 
     /**
@@ -1097,6 +1143,25 @@ public abstract class AbstractProcreation {
      * @since 0.51.01
      */
     public void processRandomAdoptionCheck(final Campaign campaign, final LocalDate today, final Person person) {
+        processRandomAdoptionCheck(campaign, today, person, false);
+    }
+
+    /**
+     * As {@link #processRandomAdoptionCheck(Campaign, LocalDate, Person)}, optionally as part of a new command's
+     * simulated history.
+     *
+     * @param campaign             the campaign the couple is part of
+     * @param today                the current date
+     * @param person               the spouse to check from
+     * @param isStartingSimulation true if this check is part of a new command's simulated history; see
+     *                             {@link #addChild(Campaign, LocalDate, Person, Person, LocalDate, ChildArrivalType,
+     *                             boolean)}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void processRandomAdoptionCheck(final Campaign campaign, final LocalDate today, final Person person,
+          final boolean isStartingSimulation) {
         if (!isEligibleForRandomAdoption(campaign, today, person) || !procreation(person)) {
             return;
         }
@@ -1108,7 +1173,8 @@ public abstract class AbstractProcreation {
               person,
               person.getGenealogy().getSpouse(),
               getRandomDateOfBirthUpToAge(today, maximumAge, null),
-              ChildArrivalType.ADOPTION);
+              ChildArrivalType.ADOPTION,
+              isStartingSimulation);
     }
     //endregion Children Joining Later in Life
 
@@ -1265,8 +1331,8 @@ public abstract class AbstractProcreation {
         // Male personnel can't become pregnant, but may learn of a child they didn't know they had, or adopt one
         // with their husband
         if (person.getGender().isMale()) {
-            processRandomPaternityCheck(campaign, today, person);
-            processRandomAdoptionCheck(campaign, today, person);
+            processRandomPaternityCheck(campaign, today, person, isStartingSimulation);
+            processRandomAdoptionCheck(campaign, today, person, isStartingSimulation);
             return;
         }
 
@@ -1297,7 +1363,7 @@ public abstract class AbstractProcreation {
         processRandomProcreationCheck(campaign, today, person, false);
 
         // Women married to women can't conceive together, but may adopt
-        processRandomAdoptionCheck(campaign, today, person);
+        processRandomAdoptionCheck(campaign, today, person, isStartingSimulation);
     }
 
     /**
