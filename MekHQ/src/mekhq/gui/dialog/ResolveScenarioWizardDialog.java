@@ -166,6 +166,7 @@ public class ResolveScenarioWizardDialog extends JDialog {
     private List<JCheckBox> salvageBoxes;
     private List<JCheckBox> soldUnitBoxes;
     private List<JCheckBox> escapeBoxes;
+    private List<JCheckBox> overrideUnsalvageableBoxes;
     private List<JButton> buttonsSalvageEditUnit;
     private final List<Unit> salvageableUnites;
 
@@ -696,14 +697,18 @@ public class ResolveScenarioWizardDialog extends JDialog {
         pnlSalvage.add(new JLabel(isSalvageDeferred ? "" : resourceMap.getString("lblSell.text")),
               gridBagConstraints);
 
-        gridBagConstraints.gridx = gridx;
+        gridBagConstraints.gridx = gridx++;
         pnlSalvage.add(new JLabel(resourceMap.getString("lblEscaped.text")), gridBagConstraints);
+
+        gridBagConstraints.gridx = gridx;
+        pnlSalvage.add(new JLabel(resourceMap.getString("lblOverrideUnsalvageable.text")), gridBagConstraints);
 
         // Initialize the tracking ArrayLists
         salvageUnitLabel = new ArrayList<>();
         salvageBoxes = new ArrayList<>();
         soldUnitBoxes = new ArrayList<>();
         escapeBoxes = new ArrayList<>();
+        overrideUnsalvageableBoxes = new ArrayList<>();
         buttonsSalvageEditUnit = new ArrayList<>();
 
         // Create the GridBagConstraint to use for the buttons
@@ -727,7 +732,9 @@ public class ResolveScenarioWizardDialog extends JDialog {
             boolean automaticallySelectSalvage = (isSalvageDeferred) ||
                                                        (!tracker.usesSalvageExchange() && maxSalvagePct >= 100);
 
-            JLabel salvageUnit = new JLabel(status.getDesc(true));
+            boolean unsalvageable = tracker.isUnsalvageable(unit);
+
+            JLabel salvageUnit = new JLabel(getSalvageDescription(status, unsalvageable));
             salvageUnitLabel.add(salvageUnit);
             gridBagConstraints.gridx = gridx++;
             pnlSalvage.add(salvageUnit, gridBagConstraints);
@@ -757,12 +764,31 @@ public class ResolveScenarioWizardDialog extends JDialog {
             escaped.setName("escaped");
             escaped.getAccessibleContext().setAccessibleName(resourceMap.getString("lblEscaped.text"));
             escaped.setEnabled(!(unit.getEntity().isDestroyed() || unit.getEntity().isDoomed()));
-            escaped.setSelected(!status.isLikelyCaptured());
+            escaped.setSelected(!unsalvageable && !status.isLikelyCaptured());
             escaped.addItemListener(evt -> checkSalvageRights());
             escaped.setActionCommand(unit.getEntity().getExternalIdAsString());
             escapeBoxes.add(escaped);
             gridBagConstraints.gridx = gridx++;
             pnlSalvage.add(escaped, gridBagConstraints);
+
+            // Units that are normally unsalvageable can have that status overridden. Every row gets a box, so the
+            // list stays aligned with the others, but only the unsalvageable rows show it.
+            JCheckBox overrideUnsalvageable = new JCheckBox("");
+            overrideUnsalvageable.setName("overrideUnsalvageable");
+            overrideUnsalvageable.getAccessibleContext()
+                  .setAccessibleName(resourceMap.getString("lblOverrideUnsalvageable.text"));
+            overrideUnsalvageable.setToolTipText(resourceMap.getString("overrideUnsalvageable.tooltip"));
+            overrideUnsalvageable.setVisible(unsalvageable);
+            int rowIndex = overrideUnsalvageableBoxes.size();
+            overrideUnsalvageable.addItemListener(evt -> {
+                if (overrideUnsalvageable.isSelected()) {
+                    salvageBoxes.get(rowIndex).setSelected(automaticallySelectSalvage);
+                }
+                checkSalvageRights();
+            });
+            overrideUnsalvageableBoxes.add(overrideUnsalvageable);
+            gridBagConstraints.gridx = gridx++;
+            pnlSalvage.add(overrideUnsalvageable, gridBagConstraints);
 
             JButton btnSalvageViewUnit = new JButton("View Unit");
             btnSalvageViewUnit.setActionCommand(unit.getId().toString());
@@ -1610,6 +1636,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
             JCheckBox salvaged = salvageBoxes.get(i);
             JCheckBox sold = soldUnitBoxes.get(i);
             JCheckBox escaped = escapeBoxes.get(i);
+            if (isUnsalvageableAndNotOverridden(i)) {
+                // Not recoverable, so it is neither salvaged, sold, nor left for the employer
+                continue;
+            }
             if (salvaged.isSelected()) {
                 tracker.salvageUnit(i);
             } else if (sold.isSelected()) {
@@ -1825,6 +1855,34 @@ public class ResolveScenarioWizardDialog extends JDialog {
     }
 
     /**
+     * Builds the text shown for a unit on the salvage panel, flagging it if it is normally unsalvageable.
+     *
+     * @param status        the unit's status
+     * @param unsalvageable whether the unit is normally unsalvageable
+     *
+     * @return the HTML description of the unit
+     */
+    private String getSalvageDescription(UnitStatus status, boolean unsalvageable) {
+        String description = status.getDesc(true);
+        if (!unsalvageable) {
+            return description;
+        }
+
+        String marker = "<br><b>" + resourceMap.getString("lblUnsalvageable.text") + "</b>";
+        return description.replace("</html>", marker + "</html>");
+    }
+
+    /**
+     * @param index the index of the unit on the salvage panel
+     *
+     * @return {@code true} if the unit is normally unsalvageable and the player has not overridden that
+     */
+    private boolean isUnsalvageableAndNotOverridden(int index) {
+        return tracker.isUnsalvageable(salvageableUnites.get(index)) &&
+                     !overrideUnsalvageableBoxes.get(index).isSelected();
+    }
+
+    /**
      * Updates the salvage percentages used and such. Event listener for salvage changes.
      */
     private void checkSalvageRights() {
@@ -1834,6 +1892,13 @@ public class ResolveScenarioWizardDialog extends JDialog {
             JCheckBox salvaged = salvageBoxes.get(i);
             JCheckBox sold = soldUnitBoxes.get(i);
             JCheckBox escaped = escapeBoxes.get(i);
+            if (isUnsalvageableAndNotOverridden(i)) {
+                salvaged.setSelected(false);
+                salvaged.setEnabled(false);
+                sold.setSelected(false);
+                sold.setEnabled(false);
+                continue;
+            }
             if (sold.isSelected()) {
                 salvaged.setSelected(false);
                 salvaged.setEnabled(false);
@@ -1865,8 +1930,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         salvageEmployer = tracker.getMission().getSalvagedByEmployerValue();
         salvageUnit = tracker.getMission().getSalvagedByUnitValue();
         for (int i = 0; i < salvageBoxes.size(); i++) {
-            // Skip the escaping units
-            if (escapeBoxes.get(i).isSelected()) {
+            // Skip the escaping units and those that cannot be recovered
+            if (escapeBoxes.get(i).isSelected() || isUnsalvageableAndNotOverridden(i)) {
                 continue;
             }
 
@@ -1881,8 +1946,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         currentSalvagePct = SalvageUtilities.calculateSalvagePercentage(salvageUnit, salvageEmployer);
 
         for (int i = 0; i < salvageBoxes.size(); i++) {
-            // Skip the escaping units
-            if (escapeBoxes.get(i).isSelected()) {
+            // Skip the escaping units and those that cannot be recovered
+            if (escapeBoxes.get(i).isSelected() || isUnsalvageableAndNotOverridden(i)) {
                 continue;
             }
 
@@ -1954,7 +2019,8 @@ public class ResolveScenarioWizardDialog extends JDialog {
         med.setVisible(true);
 
         if (isSalvage) {
-            salvageUnitLabel.get(unitIndex).setText(unitStatus.getDesc(true));
+            salvageUnitLabel.get(unitIndex)
+                  .setText(getSalvageDescription(unitStatus, tracker.isUnsalvageable(salvageableUnites.get(unitIndex))));
             checkSalvageRights();
         } else {
             labelsUnitName.get(unitIndex).setText(unitStatus.getDesc());

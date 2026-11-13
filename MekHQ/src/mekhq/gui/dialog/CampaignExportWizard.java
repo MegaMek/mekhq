@@ -755,6 +755,8 @@ public class CampaignExportWizard extends JDialog {
                 // if this level doesn't exist yet, add it to where we currently are
                 if (nextDestinationFormation == null) {
                     Formation formationCopy = new Formation(nextSourceFormation.getName());
+                    formationCopy.setFormationIcon(nextSourceFormation.getFormationIcon().clone());
+                    formationCopy.setCamouflage(nextSourceFormation.getCamouflage().clone());
                     destinationCampaign.getPlayerForce().addFormation(formationCopy,
                           currentDestinationFormation,
                           destinationCampaign);
