@@ -492,6 +492,13 @@ public class Faction {
     }
 
     /**
+     * @return {@code true} if this faction is the Bandit Caste ({@link #BANDIT_CASTE_FACTION_CODE})
+     */
+    public boolean isBanditCaste() {
+        return BANDIT_CASTE_FACTION_CODE.equals(shortName);
+    }
+
+    /**
      * Returns the faction code of the pirates appropriate to the given campaign faction: the Bandit Caste for a Clan
      * campaign faction, otherwise the generic pirates.
      *

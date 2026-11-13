@@ -63,7 +63,6 @@ import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionT
 import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
 import static mekhq.campaign.reputation.chaosReputation.ChaosReputation.STARTING_REPUTATION_SCORE;
 import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
-import static mekhq.campaign.universe.Faction.BANDIT_CASTE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.TORTUGA_DOMINIONS_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -6453,7 +6452,7 @@ public class Campaign implements ITechManager {
 
         // The Bandit Caste always begins at its capital (Strana Mechty); it has no territory to search for hiring
         // halls and no use for the mercenary/pirate starting-location choices.
-        if (getPlayerForce().getFaction().getShortName().equals(BANDIT_CASTE_FACTION_CODE)) {
+        if (getPlayerForce().getFaction().isBanditCaste()) {
             PlanetarySystem banditCasteCapital = getPlayerForce().getFaction().getStartingPlanet(this, currentDay);
             if (banditCasteCapital != null) {
                 return banditCasteCapital.getPrimaryPlanet();

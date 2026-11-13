@@ -35,7 +35,6 @@ package mekhq.gui.campaignOptions.contents;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
-import static mekhq.campaign.universe.Faction.BANDIT_CASTE_FACTION_CODE;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.campaignOptionsLegendEntries;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
@@ -708,7 +707,7 @@ public class GeneralPage {
                                   || (mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED);
         Faction selectedFaction = getFaction();
         // The Bandit Caste always starts at its capital, so the mercenary/pirate starting-location controls don't apply
-        boolean isBanditCaste = selectedFaction.getShortName().equals(BANDIT_CASTE_FACTION_CODE);
+        boolean isBanditCaste = selectedFaction.isBanditCaste();
         boolean isMercenaryOrPirate = selectedFaction.isMercenary() || (selectedFaction.isPirate() && !isBanditCaste);
 
         // The capital-vs-hiring-hall choice applies to every campaign
