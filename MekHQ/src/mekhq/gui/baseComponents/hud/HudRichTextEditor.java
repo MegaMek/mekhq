@@ -337,6 +337,15 @@ public class HudRichTextEditor extends JPanel {
             }
         }
 
+        /**
+         * {@link AbstractAction} is {@link Cloneable}, so this declares {@code clone} explicitly. A copy shares the
+         * wrapped action, which is the right behavior because that action holds no per-instance state.
+         */
+        @Override
+        protected Object clone() throws CloneNotSupportedException {
+            return super.clone();
+        }
+
         /** @return {@code true} if the paragraph is text with no tag of its own, outside any list item */
         private static boolean isLooseText(final Element paragraph) {
             Element parent = paragraph.getParentElement();
