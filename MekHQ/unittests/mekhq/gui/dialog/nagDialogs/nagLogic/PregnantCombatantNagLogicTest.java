@@ -45,6 +45,8 @@ import java.time.LocalDate;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
@@ -114,5 +116,19 @@ class PregnantCombatantNagLogicTest {
         when(unit.getFormationId()).thenReturn(FORMATION_ORIGIN);
 
         assertTrue(hasActivePregnantCombatant(true, List.of(personPregnant)));
+    }
+
+    @Test
+    void activeMissionsPregnancyYesUnitSupportFormation() {
+        Campaign campaign = mockCampaign();
+        Formation supportFormation = mock(Formation.class);
+        when(supportFormation.isFormationType(FormationType.SUPPORT)).thenReturn(true);
+        when(campaign.getPlayerForce().getFormation(FORMATION_ORIGIN)).thenReturn(supportFormation);
+
+        personPregnant.setUnit(unit);
+        when(unit.getFormationId()).thenReturn(FORMATION_ORIGIN);
+        when(unit.getCampaign()).thenReturn(campaign);
+
+        assertFalse(hasActivePregnantCombatant(true, List.of(personPregnant)));
     }
 }

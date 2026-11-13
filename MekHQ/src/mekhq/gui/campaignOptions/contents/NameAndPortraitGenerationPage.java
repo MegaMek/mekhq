@@ -95,6 +95,7 @@ class NameAndPortraitGenerationPage {
     private JCheckBox chkAllowDuplicatePortraits;
     private JCheckBox chkUseGenderedPortraitsOnly;
     private JCheckBox chkNoRandomPortraitsForChildren;
+    private JCheckBox chkRandomPortraitsForOfficersOnly;
     private JCheckBox chkChildPortraitsWhenComingOfAge;
 
     private boolean created;
@@ -131,6 +132,10 @@ class NameAndPortraitGenerationPage {
         chkNoRandomPortraitsForChildren = new CampaignOptionsCheckBox("NoRandomPortraitsForChildren",
                 getMetadata(new Version(0, 51, 0)));
         chkNoRandomPortraitsForChildren.addMouseListener(createTipPanelUpdater("NoRandomPortraitsForChildren"));
+
+        chkRandomPortraitsForOfficersOnly = new CampaignOptionsCheckBox("RandomPortraitsForOfficersOnly",
+                getMetadata(new Version(0, 51, 1)));
+        chkRandomPortraitsForOfficersOnly.addMouseListener(createTipPanelUpdater("RandomPortraitsForOfficersOnly"));
 
         chkChildPortraitsWhenComingOfAge = new CampaignOptionsCheckBox("ChildPortraitsWhenComingOfAge",
                 getMetadata(new Version(0, 51, 0)));
@@ -197,6 +202,7 @@ class NameAndPortraitGenerationPage {
             chkAllowDuplicatePortraits,
             chkUseGenderedPortraitsOnly,
             chkNoRandomPortraitsForChildren);
+        panel.addCheckBox(chkRandomPortraitsForOfficersOnly);
         panel.addCheckBox(chkChildPortraitsWhenComingOfAge);
 
         return panel;
@@ -311,6 +317,7 @@ class NameAndPortraitGenerationPage {
         chkAllowDuplicatePortraits.setSelected(model.allowDuplicatePortraits);
         chkUseGenderedPortraitsOnly.setSelected(model.useGenderedPortraitsOnly);
         chkNoRandomPortraitsForChildren.setSelected(model.noRandomPortraitsForChildren);
+        chkRandomPortraitsForOfficersOnly.setSelected(model.randomPortraitsForOfficersOnly);
         chkChildPortraitsWhenComingOfAge.setSelected(model.childPortraitsWhenComingOfAge);
 
         int portraitCount = Math.min(chkUsePortrait.length, model.usePortraitForRole.length);
@@ -360,6 +367,7 @@ class NameAndPortraitGenerationPage {
         model.allowDuplicatePortraits = chkAllowDuplicatePortraits.isSelected();
         model.useGenderedPortraitsOnly = chkUseGenderedPortraitsOnly.isSelected();
         model.noRandomPortraitsForChildren = chkNoRandomPortraitsForChildren.isSelected();
+        model.randomPortraitsForOfficersOnly = chkRandomPortraitsForOfficersOnly.isSelected();
         model.childPortraitsWhenComingOfAge = chkChildPortraitsWhenComingOfAge.isSelected();
 
         int portraitCount = Math.min(chkUsePortrait.length, model.usePortraitForRole.length);
