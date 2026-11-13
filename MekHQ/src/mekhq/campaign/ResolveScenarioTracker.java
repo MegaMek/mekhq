@@ -128,6 +128,8 @@ public class ResolveScenarioTracker {
     List<TestUnit> ransomedSalvage;
     List<TestUnit> leftoverSalvage;
     List<TestUnit> devastatedEnemyUnits;
+    /** IDs of units in {@link #potentialSalvage} that were destroyed beyond recovery (ammo explosion, etc.). */
+    Set<UUID> unsalvageableUnitIds;
     List<Unit> units;
     List<Loot> potentialLoot;
     List<Loot> actualLoot;
@@ -173,6 +175,7 @@ public class ResolveScenarioTracker {
         ransomedSalvage = new ArrayList<>();
         leftoverSalvage = new ArrayList<>();
         devastatedEnemyUnits = new ArrayList<>();
+        unsalvageableUnitIds = new HashSet<>();
         pilots = new Hashtable<>();
         mia = new Hashtable<>();
         units = new ArrayList<>();
@@ -558,7 +561,7 @@ public class ResolveScenarioTracker {
                     TestUnit nu = generateNewTestUnit(entity);
                     UnitStatus us = new UnitStatus(nu);
                     salvageStatus.put(nu.getId(), us);
-                    devastatedEnemyUnits.add(nu);
+                    addDevastatedEnemyUnit(nu, control);
                 }
             }
 
@@ -1098,7 +1101,10 @@ public class ResolveScenarioTracker {
         if (!campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE).isNone() &&
                   !voidsCombatDamage()) {
             processPrisonerCapture(potentialSalvage);
-            processPrisonerCapture(devastatedEnemyUnits);
+            // Devastated units that are listed as (unsalvageable) salvage were already handled above
+            processPrisonerCapture(devastatedEnemyUnits.stream()
+                                         .filter(unit -> !unsalvageableUnitIds.contains(unit.getId()))
+                                         .toList());
         }
     }
 
@@ -1514,6 +1520,25 @@ public class ResolveScenarioTracker {
     }
 
     /**
+     * Records an enemy unit that was utterly destroyed (for example by an uncontained ammunition explosion). Its crew
+     * may still be capturable, so it is always tracked. If the player has battlefield control, the unit is also listed
+     * as potential salvage - flagged as unsalvageable - so the player can see why it is unavailable and may choose to
+     * override that.
+     *
+     * @param unit    the destroyed enemy unit
+     * @param listAsSalvage whether the unit should also be listed (as unsalvageable) in the salvage panel
+     */
+    private void addDevastatedEnemyUnit(TestUnit unit, boolean listAsSalvage) {
+        devastatedEnemyUnits.add(unit);
+
+        // Under SIMULATED_DAMAGE nothing is left behind to salvage, so there is nothing to show
+        if (listAsSalvage && !voidsCombatDamage()) {
+            unsalvageableUnitIds.add(unit.getId());
+            potentialSalvage.add(unit);
+        }
+    }
+
+    /**
      * Helper function that contains the logic for processing prisoner capture. Copy and pasted from
      * checkStatusOfPersonnel, so the internal logic is kind of opaque.
      *
@@ -1871,7 +1896,7 @@ public class ResolveScenarioTracker {
                 TestUnit nu = generateNewTestUnit(e);
                 UnitStatus us = new UnitStatus(nu);
                 salvageStatus.put(nu.getId(), us);
-                devastatedEnemyUnits.add(nu);
+                addDevastatedEnemyUnit(nu, control && !(e instanceof EjectedCrew));
             }
         }
 
@@ -2023,6 +2048,20 @@ public class ResolveScenarioTracker {
 
     public List<TestUnit> getPotentialSalvage() {
         return potentialSalvage;
+    }
+
+    /**
+     * Returns whether the given unit was destroyed beyond recovery (for example by an uncontained ammunition explosion
+     * or by being buried) and so is not normally recoverable as salvage. Such units are still listed among the
+     * {@linkplain #getPotentialSalvage() potential salvage} so the player can see why they are unavailable, and may
+     * choose to override that status.
+     *
+     * @param unit the unit to check
+     *
+     * @return {@code true} if the unit is normally unsalvageable
+     */
+    public boolean isUnsalvageable(Unit unit) {
+        return (unit != null) && unsalvageableUnitIds.contains(unit.getId());
     }
 
     public Money getDropShipBonus() {
