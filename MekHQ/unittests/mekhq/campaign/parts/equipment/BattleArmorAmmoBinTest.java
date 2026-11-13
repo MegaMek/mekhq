@@ -32,10 +32,6 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import mekhq.campaign.campaignOptions.CampaignOption;
-
-import static org.mockito.Mockito.lenient;
-
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -46,6 +42,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -64,8 +61,11 @@ import megamek.common.battleArmor.BattleArmor;
 import megamek.common.equipment.AmmoMounted;
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.Mounted;
+import megamek.common.equipment.WeaponMounted;
+import megamek.common.equipment.WeaponType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.unit.Unit;
@@ -480,6 +480,76 @@ public class BattleArmorAmmoBinTest {
 
             // ... and the correct amount of ammo is left
             assertEquals(ammoType.getShots() * SQUAD_SIZE * 9, quartermaster.getAmmoAvailable(ammoType));
+        }
+
+        /**
+         * Issue #11031: a one-shot launcher keeps its fired mark after a battle. Reloading the squad must clear it, or
+         * the launcher cannot fire in the next scenario.
+         */
+        @Test
+        public void loadBinForOneShotResetsFiredState() {
+            // ARRANGE
+            // A one-shot bin holds one shot per trooper, and this one is empty ...
+            int shotsNeeded = SQUAD_SIZE;
+            BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0,
+                  ammoType,
+                  equipmentNum,
+                  shotsNeeded,
+                  true,
+                  mockCampaign);
+            ammoBin.setUnit(mockUnit);
+            when(mockMounted.getBaseShotsLeft()).thenReturn(0);
+
+            // ... its launcher fired in the last battle ...
+            WeaponMounted launcher = createFiredOneShotLauncher();
+
+            // ... and there is just enough ammo for the squad.
+            quartermaster.addAmmo(ammoType, SQUAD_SIZE);
+
+            // ACT
+            ammoBin.loadBin();
+
+            // ASSERT
+            assertEquals(0, ammoBin.getShotsNeeded());
+            verify(mockMounted, times(1)).setShotsLeft(eq(1));
+            assertFalse(launcher.isFired());
+        }
+
+        /**
+         * A reload that loads nothing leaves the launcher empty, so it must still count as fired.
+         */
+        @Test
+        public void loadBinForOneShotWithNoAmmoKeepsFiredState() {
+            // ARRANGE
+            int shotsNeeded = SQUAD_SIZE;
+            BattleArmorAmmoBin ammoBin = new BattleArmorAmmoBin(0,
+                  ammoType,
+                  equipmentNum,
+                  shotsNeeded,
+                  true,
+                  mockCampaign);
+            ammoBin.setUnit(mockUnit);
+            when(mockMounted.getBaseShotsLeft()).thenReturn(0);
+
+            WeaponMounted launcher = createFiredOneShotLauncher();
+
+            // The warehouse is empty.
+
+            // ACT
+            ammoBin.loadBin();
+
+            // ASSERT
+            assertEquals(shotsNeeded, ammoBin.getShotsNeeded());
+            assertTrue(launcher.isFired());
+        }
+
+        private WeaponMounted createFiredOneShotLauncher() {
+            WeaponType launcherType = (WeaponType) EquipmentUtilities.getEquipmentType("ISBASRM2OS");
+            WeaponMounted launcher = new WeaponMounted(mockEntity, launcherType);
+            launcher.setLinked(mockMounted);
+            when(mockMounted.getLinkedBy()).thenReturn((Mounted) launcher);
+            launcher.setFired(true);
+            return launcher;
         }
 
         /**
