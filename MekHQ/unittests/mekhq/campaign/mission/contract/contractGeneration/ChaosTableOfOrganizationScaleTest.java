@@ -62,8 +62,8 @@ import org.junit.jupiter.api.Test;
  * {@link ChaosContractDeterminationScale#generateScaleForTableOfOrganization} and its per-day cache,
  * {@link ChaosContractDeterminationScale#getScaleForTableOfOrganization}.
  *
- * <p>Unlike the contract Scale, every unit in a formation counts whatever the formation's type or role; only units
- * outside the TO&amp;E and mothballed units are left out.</p>
+ * <p>Unlike the contract Scale, every unit in a Frontline or Maneuver formation counts whatever the formation's
+ * type; only units outside the TO&amp;E, units in other roles and mothballed units are left out.</p>
  */
 class ChaosTableOfOrganizationScaleTest {
     /** Per-Scale Battle Value without the battlefield support point conversion */
@@ -73,6 +73,8 @@ class ChaosTableOfOrganizationScaleTest {
 
     private static final int FORMATION_ID = 7;
     private static final int OTHER_FORMATION_ID = 8;
+    private static final int RESERVE_FORMATION_ID = 9;
+    private static final int PATROL_FORMATION_ID = 10;
     private static final int UNASSIGNED_FORMATION_ID = -1;
 
     private PlayerForce playerForce;
@@ -86,10 +88,20 @@ class ChaosTableOfOrganizationScaleTest {
         units = new ArrayList<>();
         when(hangar.getUnits()).thenAnswer(invocation -> new ArrayList<>(units));
 
-        Formation reserveSupport = mock(Formation.class);
-        when(reserveSupport.getCombatRoleInMemory()).thenReturn(CombatRole.RESERVE);
-        when(reserveSupport.isFormationType(FormationType.STANDARD)).thenReturn(false);
-        when(playerForce.getFormation(FORMATION_ID)).thenReturn(reserveSupport);
+        Formation frontlineSupport = mock(Formation.class);
+        when(frontlineSupport.getCombatRoleInMemory()).thenReturn(CombatRole.FRONTLINE);
+        when(frontlineSupport.isFormationType(FormationType.STANDARD)).thenReturn(false);
+        when(playerForce.getFormation(FORMATION_ID)).thenReturn(frontlineSupport);
+
+        Formation reserve = mock(Formation.class);
+        when(reserve.getCombatRoleInMemory()).thenReturn(CombatRole.RESERVE);
+        when(reserve.isFormationType(FormationType.STANDARD)).thenReturn(true);
+        when(playerForce.getFormation(RESERVE_FORMATION_ID)).thenReturn(reserve);
+
+        Formation patrol = mock(Formation.class);
+        when(patrol.getCombatRoleInMemory()).thenReturn(CombatRole.PATROL);
+        when(patrol.isFormationType(FormationType.STANDARD)).thenReturn(true);
+        when(playerForce.getFormation(PATROL_FORMATION_ID)).thenReturn(patrol);
 
         Formation maneuver = mock(Formation.class);
         when(maneuver.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
@@ -175,9 +187,18 @@ class ChaosTableOfOrganizationScaleTest {
             assertEquals(1, scale(false));
         }
 
-        /** Upkeep covers the whole TO&amp;E, so reserve and non-standard formations count, unlike contract Scale. */
+        /** Frontline and Maneuver formations of any type count. */
         @Test
-        void reserveAndNonStandardFormationsCount() {
+        void nonStandardFormationsCount() {
+            addUnit(FORMATION_ID, false, BATTLE_VALUE_PER_SCALE);
+
+            assertEquals(1, scale(false));
+        }
+
+        @Test
+        void reserveAndPatrolFormationsDoNotCount() {
+            addUnit(RESERVE_FORMATION_ID, false, BATTLE_VALUE_PER_SCALE * 10);
+            addUnit(PATROL_FORMATION_ID, false, BATTLE_VALUE_PER_SCALE * 10);
             addUnit(FORMATION_ID, false, BATTLE_VALUE_PER_SCALE);
 
             assertEquals(1, scale(false));
@@ -312,6 +333,7 @@ class ChaosTableOfOrganizationScaleTest {
             when(otherUnit.getEntity()).thenReturn(otherEntity);
             when(otherUnit.getFormationId()).thenReturn(FORMATION_ID);
             Formation otherFormation = mock(Formation.class);
+            when(otherFormation.getCombatRoleInMemory()).thenReturn(CombatRole.FRONTLINE);
             when(otherForce.getFormation(FORMATION_ID)).thenReturn(otherFormation);
             List<Unit> otherUnits = List.of(otherUnit);
             when(otherHangar.getUnits()).thenReturn(otherUnits);

@@ -41,12 +41,14 @@ import javax.swing.JLabel;
 import megamek.common.event.Subscribe;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.CommandGenerationFinishedEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.events.assets.AssetEvent;
 import mekhq.campaign.events.loans.LoanEvent;
 import mekhq.campaign.events.transactions.TransactionEvent;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationScale;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.ActionScheduler;
@@ -71,6 +73,7 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
     private final JLabel lblFundsValue = new JLabel();
     private final JLabel lblUnitReputationValue = new JLabel();
     private final JLabel lblCombatStrengthValue = new JLabel();
+    private final JLabel lblScaleValue = new JLabel();
 
     /**
      * Scheduler used to debounce funds refreshing. Multiple rapid financial events will collapse into a single UI
@@ -105,6 +108,8 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
         add(new JLabel(getTextAt("reputation.label")), gridBagConstraints);
         gridBagConstraints.gridy++;
         add(new JLabel(getTextAt("combatStrength.label")), gridBagConstraints);
+        gridBagConstraints.gridy++;
+        add(new JLabel(getTextAt("scale.label")), gridBagConstraints);
 
         // Column 1: dynamic data values
         gridBagConstraints.gridx = 1;
@@ -118,6 +123,8 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
         add(lblUnitReputationValue, gridBagConstraints);
         gridBagConstraints.gridy++;
         add(lblCombatStrengthValue, gridBagConstraints);
+        gridBagConstraints.gridy++;
+        add(lblScaleValue, gridBagConstraints);
 
         refreshAll();
     }
@@ -154,6 +161,9 @@ public class CommandSummaryPanel extends ScalingWidthConstrainedPanel {
         lblUnitReputationValue.setText(getFormattedTextAt("reputation.text", campaign.getUnitRatingText(), experience));
         int totalBv = AtBDynamicScenarioFactory.getBVBudgetForStratConSingles(campaign, true);
         lblCombatStrengthValue.setText(getFormattedTextAt("combatStrength.text", totalBv));
+        lblScaleValue.setText(ChaosContractDeterminationScale.formatScale(
+              ChaosContractDeterminationScale.getScaleForTableOfOrganization(campaign),
+              campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE)));
         refreshFunds();
     }
 
