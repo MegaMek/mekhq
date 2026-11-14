@@ -87,6 +87,7 @@ import mekhq.gui.baseComponents.JScrollableMenu;
 import mekhq.gui.dialog.ForceTemplateAssignmentDialog;
 import mekhq.gui.dialog.MarkdownEditorDialog;
 import mekhq.gui.dialog.SupportCarrierDeploymentDialogs;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentDialog;
 import mekhq.gui.dialog.iconDialogs.LayeredFormationIconDialog;
 import mekhq.gui.menus.ExportUnitSpriteMenu;
 import mekhq.gui.menus.TransportAssignmentMenus;
@@ -1713,6 +1714,15 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                 menuItem.setEnabled(enable);
                 popup.add(menuItem);
             }
+
+            menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.crewAssignment.text"));
+            menuItem.setToolTipText(getTextAt(RESOURCE_BUNDLE, "TOEMouseAdapter.crewAssignment.toolTipText"));
+            final List<Unit> selectedUnits = List.copyOf(units);
+            menuItem.addActionListener(evt -> CrewAssignmentDialog.showFor(gui.getFrame(),
+                  gui.getCampaign(),
+                  selectedUnits,
+                  List.of()));
+            popup.add(menuItem);
 
             TransportAssignmentMenus.addTransportMenus(gui.getFrame(), popup, gui.getCampaign(), units, false);
 
