@@ -36,9 +36,6 @@ import java.io.PrintWriter;
 import java.util.List;
 import java.util.Map;
 import java.util.StringJoiner;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
 
 import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
@@ -56,52 +53,6 @@ import org.w3c.dom.Node;
 
 public class MHQXMLUtility extends MMXMLUtility {
     private static final MMLogger LOGGER = MMLogger.create(MHQXMLUtility.class);
-
-    private static DocumentBuilderFactory UNSAFE_DOCUMENT_BUILDER_FACTORY;
-
-    /**
-     * USE WITH CARE. Creates a DocumentBuilder safe from XML external entities attacks, but unsafe from XML entity
-     * expansion attacks.
-     *
-     * @return A DocumentBuilder less safe to use to read untrusted XML.
-     */
-    public static DocumentBuilder newUnsafeDocumentBuilder() throws ParserConfigurationException {
-        DocumentBuilderFactory dbf = UNSAFE_DOCUMENT_BUILDER_FACTORY;
-        if (null == dbf) {
-            // At worst, we may do this twice if multiple threads
-            // hit this method. It is Ok to have more than one
-            // instance of the builder factory, as long as it is
-            // XXE safe.
-
-            //
-            // For further background, see newSafeDocumentBuilder()
-            //
-            dbf = DocumentBuilderFactory.newInstance();
-            dbf.setXIncludeAware(false);
-            dbf.setExpandEntityReferences(false);
-
-            //
-            // "If you can't completely disable DTDs, then at least do the
-            // following:"
-            //
-
-            // Disable external entities
-            String FEATURE = "http://xml.org/sax/features/external-general-entities";
-            dbf.setFeature(FEATURE, false);
-
-            // Disable external parameters
-            FEATURE = "http://xml.org/sax/features/external-parameter-entities";
-            dbf.setFeature(FEATURE, false);
-
-            // Disable external DTDs as well
-            FEATURE = "http://apache.org/xml/features/nonvalidating/load-external-dtd";
-            dbf.setFeature(FEATURE, false);
-
-            UNSAFE_DOCUMENT_BUILDER_FACTORY = dbf;
-        }
-
-        return dbf.newDocumentBuilder();
-    }
 
     /**
      * TODO : This is dumb and we should just use EntityListFile.writeEntityList.
