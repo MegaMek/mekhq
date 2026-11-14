@@ -35,6 +35,7 @@ package mekhq.gui.dialog.factionStanding.factionJudgment;
 import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFallbackFactionKey;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getInCharacterText;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getJudgmentTextFaction;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -134,7 +135,7 @@ public class FactionJudgmentSceneDialog {
      */
     private static String getDialogKey(FactionJudgmentSceneType sceneType, Faction judgingFaction) {
         String judgmentTypeLookupName = sceneType.getLookUpName();
-        String judgingFactionCode = judgingFaction.getShortName();
+        String judgingFactionCode = getJudgmentTextFaction(judgingFaction).getShortName();
         String dialogKey = DIALOG_KEY_FORWARD +
                                  judgmentTypeLookupName + '.' +
                                  judgingFactionCode;

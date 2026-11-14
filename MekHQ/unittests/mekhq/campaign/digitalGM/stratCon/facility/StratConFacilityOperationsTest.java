@@ -289,7 +289,7 @@ class StratConFacilityOperationsTest {
         @Test
         void aBatchallForbidsRaidsAndSabotageButNotAssaults() {
             placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
-            when(contract.getEnemyFaction().isClan()).thenReturn(true);
+            when(contract.getEnemyFaction().performsBatchalls()).thenReturn(true);
             when(contract.isBatchallAccepted()).thenReturn(true);
 
             assertEquals("reason.batchall", reason(FacilityOperation.RAID));

@@ -64,7 +64,6 @@ import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
 import static mekhq.campaign.reputation.chaosReputation.ChaosReputation.STARTING_REPUTATION_SCORE;
 import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.TORTUGA_DOMINIONS_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -3810,7 +3809,7 @@ public class Campaign implements ITechManager {
      * @since 0.50.07
      */
     public boolean isPirateCampaign() {
-        return getPlayerForce().getFaction().getShortName().equals(PIRATE_FACTION_CODE);
+        return getPlayerForce().getFaction().isPirateOrBanditCaste();
     }
 
     /**
@@ -6450,6 +6449,15 @@ public class Campaign implements ITechManager {
         Factions factions = Factions.getInstance();
 
         final String CLAN_CODE = "CLAN";
+
+        // The Bandit Caste always begins at its capital (Strana Mechty); it has no territory to search for hiring
+        // halls and no use for the mercenary/pirate starting-location choices.
+        if (getPlayerForce().getFaction().isBanditCaste()) {
+            PlanetarySystem banditCasteCapital = getPlayerForce().getFaction().getStartingPlanet(this, currentDay);
+            if (banditCasteCapital != null) {
+                return banditCasteCapital.getPrimaryPlanet();
+            }
+        }
 
         if (isMercenaryCampaign() || isPirateCampaign()) {
             return getMercenaryOrPirateStartingPlanet(factions, choice);

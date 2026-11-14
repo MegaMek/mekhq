@@ -401,13 +401,13 @@ public final class StratConFacilityOperations {
 
     /**
      * Contracts default to an accepted Batchall even when no Batchall was ever offered, so the flag only means
-     * something against a Clan enemy.
+     * something against an enemy that performs Batchalls.
      *
      * @author Illiani
      * @since 0.51.01
      */
     private static boolean isBoundByBatchall(AbstractContract contract) {
-        return contract.getEnemyFaction().isClan() && contract.isBatchallAccepted();
+        return contract.getEnemyFaction().performsBatchalls() && contract.isBatchallAccepted();
     }
 
     private static @Nullable String getSabotageUnavailableReasonKey(StratConCampaignState campaignState,

@@ -81,7 +81,6 @@ import static mekhq.campaign.randomEvents.other.GrayMonday.GRAY_MONDAY_EVENTS_BE
 import static mekhq.campaign.randomEvents.other.GrayMonday.GRAY_MONDAY_EVENTS_END;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -1371,8 +1370,10 @@ public class CampaignNewDayManager {
                 Faction enemyFaction = contract.getEnemyFaction();
                 String enemyFactionCode = contract.getEnemyFactionCode();
 
+                // Clans always declare Batchalls against pirates and bandits, so the Faction Standing restriction only
+                // applies to everyone else
                 boolean allowBatchalls = true;
-                if (campaignOptions.isUseFactionStandingBatchallRestrictionsSafe()) {
+                if (!faction.isPirateOrBanditCaste() && campaignOptions.isUseFactionStandingBatchallRestrictionsSafe()) {
                     double regard = campaign.getPlayerForce()
                                           .getFactionStandings()
                                           .getRegardForFaction(enemyFactionCode, true);
@@ -2114,7 +2115,7 @@ public class CampaignNewDayManager {
      */
     private void processResupply(AbstractContract contract) {
         boolean isGuerrilla = contract.getObjectiveType().isGuerrillaType()
-                                    || PIRATE_FACTION_CODE.equals(contract.getEmployerFactionCode());
+                                    || Faction.isPirateOrBanditCaste(contract.getEmployerFactionCode());
 
         if (!isGuerrilla || randomInt(4) == 0) {
             Resupply.ResupplyType resupplyType = isGuerrilla ?

@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.mission.contract.contractGeneration;
 
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
@@ -244,7 +243,7 @@ public final class ChaosContractMarketAvailability {
         final HiringHallLevel level = campaign.getSystemHiringHallLevel();
         final Faction playerFaction = campaign.getPlayerForce().getFaction();
         final boolean governmentForce = isGovernmentFaction(playerFaction);
-        final boolean pirateForce = playerFaction.getShortName().equals(PIRATE_FACTION_CODE);
+        final boolean pirateForce = playerFaction.isPirateOrBanditCaste();
         final boolean uninhabited = isUninhabitedSystem(campaign);
 
         // The Networker SPA (senior-most Admin) grants one extra offer slot for the force's primary line of work.
@@ -284,7 +283,7 @@ public final class ChaosContractMarketAvailability {
 
     /** A government campaign is any player force that is neither a mercenary command nor the pirate band. */
     static boolean isGovernmentFaction(final Faction faction) {
-        return !faction.isMercenary() && !faction.getShortName().equals(PIRATE_FACTION_CODE);
+        return !faction.isMercenary() && !faction.isPirateOrBanditCaste();
     }
 
     /**
@@ -307,7 +306,7 @@ public final class ChaosContractMarketAvailability {
      * mercenary.
      */
     private static ContractSearchType primarySearchType(final Faction faction) {
-        if (faction.getShortName().equals(PIRATE_FACTION_CODE)) {
+        if (faction.isPirateOrBanditCaste()) {
             return ContractSearchType.PIRATE;
         }
         if (isGovernmentFaction(faction)) {

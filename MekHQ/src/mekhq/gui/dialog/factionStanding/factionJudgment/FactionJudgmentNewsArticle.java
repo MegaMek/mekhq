@@ -35,6 +35,7 @@ package mekhq.gui.dialog.factionStanding.factionJudgment;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFactionName;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getFallbackFactionKey;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getInCharacterText;
+import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.getJudgmentTextFaction;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
@@ -191,7 +192,7 @@ public class FactionJudgmentNewsArticle {
      */
     private static String getDialogKey(FactionStandingJudgmentType judgmentType, String judgmentLookupName,
           Faction judgingFaction) {
-        String censuringFactionCode = judgingFaction.getShortName();
+        String censuringFactionCode = getJudgmentTextFaction(judgingFaction).getShortName();
         String dialogKey = KEY_FORWARD +
                                  judgmentType.getLookupName() +
                                  '.' +

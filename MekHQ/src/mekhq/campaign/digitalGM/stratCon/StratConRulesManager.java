@@ -3310,10 +3310,10 @@ public class StratConRulesManager {
 
         boolean restrictAlliedModifiers = isClansObeyBiddingRules &&
                                                 isBatchallAccepted &&
-                                                contract.getEmployerFaction().isClan();
+                                                contract.getEmployerFaction().performsBatchalls();
         boolean restrictEnemyModifiers = isClansObeyBiddingRules &&
                                                isBatchallAccepted &&
-                                               contract.getEnemyFaction().isClan();
+                                               contract.getEnemyFaction().performsBatchalls();
 
         if (!campaign.getCampaignOptions().isUseStratConMaplessMode()) {
             int alliedFacilityModifierChance = campaignOptions.get(CampaignOption.ALLIED_FACILITY_MODIFIER_DIE_SIZE);
