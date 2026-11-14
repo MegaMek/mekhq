@@ -2103,8 +2103,7 @@ public class PersonViewPanel extends JScrollablePanel {
         // A senior post sits beside the role because it is a different fact about the person: the role
         // is the job they do, the post is the position they hold within the command.
         String appointmentTitles = person.getSeniorAppointmentTitles();
-        String roleWithSpecialization = person.getRoleDesc()
-                                              + TechSpecialization.describeAsRoleSuffix(person, campaign);
+        String roleWithSpecialization = person.getRoleDesc(TechSpecialization.describeAsRoleSuffix(person, campaign));
         String roleAndAppointment = appointmentTitles.isEmpty()
               ? roleWithSpecialization
               : roleWithSpecialization + " - " + appointmentTitles;
