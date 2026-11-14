@@ -32,17 +32,11 @@
  */
 package testUtilities.parts;
 
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.File;
 import java.util.List;
 
 import megamek.common.battleArmor.BattleArmor;
-import megamek.common.equipment.EquipmentType;
-import megamek.common.loaders.EntityLoadingException;
-import megamek.common.loaders.MekFileParser;
 import megamek.common.units.AeroSpaceFighter;
 import megamek.common.units.Dropship;
 import megamek.common.units.Entity;
@@ -57,199 +51,126 @@ import megamek.common.units.SupportTank;
 import megamek.common.units.Tank;
 import megamek.common.units.VTOL;
 import megamek.common.units.Warship;
-import testUtilities.MHQTestUtilities;
+import testUtilities.CanonUnits;
 
 /**
  * The library of canon units used by real-object parts, repair and refit tests: one or more per unit family, plus
  * refit pairs.
  *
- * <p>Every fixture is a pinned copy of an mm-data unit file kept in {@code testresources/data/mekfiles}. The mm-data
- * source path is noted on each constant so a copy can be refreshed deliberately. Loading a fixture that is missing or
- * cannot be parsed fails the test with a message naming the file; it never falls back to another unit.</p>
+ * <p>Every fixture is loaded from the game's own unit data through {@link CanonUnits}, found by the UUID in its file
+ * and checked against its name, so a test always uses the current version of the unit. Loading a fixture that cannot
+ * be found, has been renamed or cannot be parsed fails the test with a message saying why; it never falls back to
+ * another unit.</p>
  */
 public enum UnitFixture {
-    /** Locust LCT-1V, a light Mek. Source: {@code meks/3039u/Locust LCT-1V.mtf} (older pinned copy). */
-    LOCUST_LCT_1V("Locust LCT-1V", false, Mek.class),
-    /**
-     * Locust LCT-1E, the refit target of the LCT-1V. Source: {@code meks/3039u/Locust LCT-1E.mtf} (older pinned
-     * copy).
-     */
-    LOCUST_LCT_1E("Locust LCT-1E", false, Mek.class),
+    /** Locust LCT-1V, a light Mek. */
+    LOCUST_LCT_1V("Locust LCT-1V", "019f583e-c25b-7e1d-a2f6-f2b3763ac718", Mek.class),
+    /** Locust LCT-1E, the refit target of the LCT-1V. */
+    LOCUST_LCT_1E("Locust LCT-1E", "019f583e-c256-7157-8d3e-adf669917b96", Mek.class),
     /**
      * Locust LCT-5V, an LCT-1V with the same 160 engine but double heat sinks, so a refit into it changes the heat
-     * sinks built into the engine. Source: {@code meks/3085u/Phoenix/Locust LCT-5V.mtf}.
+     * sinks built into the engine.
      */
-    LOCUST_LCT_5V("Locust LCT-5V", false, Mek.class),
-    /** Wolverine WVR-6R, a medium Mek. Source: {@code meks/3039u/Wolverine WVR-6R.mtf}. */
-    WOLVERINE_WVR_6R("Wolverine WVR-6R", false, Mek.class),
-    /** Longbow LGB-8C, a heavy fire support Mek. Source: {@code meks/Rec Guides ilClan/Vol 20/Longbow LGB-8C.mtf}. */
-    LONGBOW_LGB_8C("Longbow LGB-8C", false, Mek.class),
-    /** Wolverine WVR-6M, the refit target of the WVR-6R. Source: {@code meks/3039u/Wolverine WVR-6M.mtf}. */
-    WOLVERINE_WVR_6M("Wolverine WVR-6M", false, Mek.class),
-    /** Hunchback HBK-4G, a medium Mek. Source: {@code meks/3039u/Hunchback HBK-4G.mtf}. */
-    HUNCHBACK_HBK_4G("Hunchback HBK-4G", false, Mek.class),
-    /** Hunchback HBK-4P, the refit target of the HBK-4G. Source: {@code meks/3039u/Hunchback HBK-4P.mtf}. */
-    HUNCHBACK_HBK_4P("Hunchback HBK-4P", false, Mek.class),
-    /** Griffin GRF-1A, a primitive Griffin. Source: {@code meks/XTRs/Primitives IV/Griffin GRF-1A.mtf}. */
-    GRIFFIN_GRF_1A("Griffin GRF-1A", false, Mek.class),
-    /** Griffin GRF-1N, the standard Griffin. Source: {@code meks/3039u/Griffin GRF-1N.mtf}. */
-    GRIFFIN_GRF_1N("Griffin GRF-1N", false, Mek.class),
-    /**
-     * Lumberjack LM1A, an IndustrialMek with a primitive engine rated above its walking MP times its tonnage. Source:
-     * {@code meks/3075/Lumberjack LM1A.mtf}.
-     */
-    LUMBERJACK_LM1A("Lumberjack LM1A", false, Mek.class),
-    /** Omega SHP-5R, a superheavy Mek with a superheavy gyro. Source: {@code meks/3145/NTNU RS/NTNU/Omega SHP-5R.mtf}. */
-    OMEGA_SHP_5R("Omega SHP-5R", false, Mek.class),
-    /** Omega SHP-4X, the earlier superheavy Omega. Source: {@code meks/Jihad Final Reckoning/OMEGA SHP-4X.mtf}. */
-    OMEGA_SHP_4X("OMEGA SHP-4X", false, Mek.class),
-    /**
-     * Skinwalker A, a Mek with an interface cockpit and no gyro. Source: {@code meks/Rec Guides ilClan/Vol 24/(Ryoken III) Skinwalker A.mtf}.
-     */
-    SKINWALKER_A("(Ryoken III) Skinwalker A", false, Mek.class),
-    /** Hoplite C, a Clan Mek (not an OmniMek) with Clan ferro-fibrous armor. Source: {@code meks/3050U/Hoplite C.mtf}. */
-    HOPLITE_C("Hoplite C", false, Mek.class),
-    /** Vedette Medium Tank, a tracked combat vehicle. Source: {@code vehicles/3039u/Vedette Medium Tank.blk}. */
-    VEDETTE_MEDIUM_TANK("Vedette Medium Tank", true, Tank.class),
-    /**
-     * Zephyros Infantry Support Vehicle (Dual Turret), a tank with front and rear turrets. Source:
-     * {@code vehicles/3085u/Cutting Edge/Zephyros Infantry Support Vehicle (Dual Turret).blk}.
-     */
-    ZEPHYROS_DUAL_TURRET("Zephyros Infantry Support Vehicle (Dual Turret)", true, Tank.class),
-    /**
-     * Burke II Superheavy Tank, a superheavy tank whose turret is its eighth location. Source:
-     * {@code vehicles/XTRs/Gunslingers/Burke II Superheavy Tank.blk}.
-     */
-    BURKE_II_SUPERHEAVY_TANK("Burke II Superheavy Tank", true, SuperHeavyTank.class),
-    /** Armored Personnel Carrier (Hover LRM), a hover APC without a turret. Source: {@code vehicles/3039u/APC (Hover LRM).blk}. */
-    APC_HOVER_LRM("APC (Hover LRM)", true, Tank.class),
-    /** Armored Personnel Carrier (Hover MG), the same APC with a turret. Source: {@code vehicles/3039u/APC (Hover MG).blk}. */
-    APC_HOVER_MG("APC (Hover MG)", true, Tank.class),
-    /**
-     * Cellco Ranger UPU-3000, a tracked support vehicle with BAR 8 armor. Source:
-     * {@code vehicles/TRO Vehicle Annex/Tracked/Cellco Ranger UPU-3000.blk}.
-     */
-    CELLCO_RANGER_UPU_3000("Cellco Ranger UPU-3000", true, SupportTank.class),
-    /**
-     * Epona Pursuit Tank Prime, a Clan hover OmniVehicle with its weapons in the turret. Source:
-     * {@code vehicles/3060u/Epona Pursuit Tank Prime.blk}.
-     */
-    EPONA_PURSUIT_TANK_PRIME("Epona Pursuit Tank Prime", true, Tank.class),
-    /**
-     * Epona Pursuit Tank A, another configuration of the same OmniVehicle, with weapons in the front and turret.
-     * Source: {@code vehicles/3060u/Epona Pursuit Tank A.blk}.
-     */
-    EPONA_PURSUIT_TANK_A("Epona Pursuit Tank A", true, Tank.class),
-    /** Warrior H-7 Attack Helicopter, a VTOL. Source: {@code vehicles/3039u/Warrior H-7 Attack Helicopter.blk}. */
-    WARRIOR_H_7_ATTACK_HELICOPTER("Warrior H-7 Attack Helicopter", true, VTOL.class),
-    /**
-     * Red Kite Attack VTOL, a VTOL with a chin turret. Source:
-     * {@code vehicles/3145/Marik/Red Kite Attack VTOL.blk}.
-     */
-    RED_KITE_ATTACK_VTOL("Red Kite Attack VTOL", true, VTOL.class),
-    /**
-     * Inner Sphere Standard battle armor, a squad of four. Source:
-     * {@code battlearmor/3058Uu/IS Standard BA [Laser] (Sqd4).blk}.
-     */
-    IS_STANDARD_BATTLE_ARMOR_LASER("IS Standard BA [Laser] (Sqd4)", true, BattleArmor.class),
-    /**
-     * Elemental battle armor, a Clan point of five. Source:
-     * {@code battlearmor/3058Uu/Elemental BA [Laser] (Sqd5).blk}.
-     */
-    ELEMENTAL_BATTLE_ARMOR_LASER("Elemental BA [Laser] (Sqd5)", true, BattleArmor.class),
-    /**
-     * Elemental battle armor with flamers instead of lasers, the same point of five. Source:
-     * {@code battlearmor/3058Uu/Elemental BA [Flamer] (Sqd5).blk}.
-     */
-    ELEMENTAL_BATTLE_ARMOR_FLAMER("Elemental BA [Flamer] (Sqd5)", true, BattleArmor.class),
-    /**
-     * Elemental battle armor with lasers in a squad of six, one trooper more than the point of five. Source:
-     * {@code battlearmor/3058Uu/Elemental BA [Laser] (Sqd6).blk}.
-     */
-    ELEMENTAL_BATTLE_ARMOR_LASER_SQUAD_OF_SIX("Elemental BA [Laser] (Sqd6)", true, BattleArmor.class),
-    /**
-     * A conventional foot platoon. Source: {@code infantry/DCMS/Foot Platoon (DCMS) (Laser 2620+).blk} (older pinned
-     * copy).
-     */
-    FOOT_PLATOON_LASER("Foot Platoon (DCMS) (Laser 2620+)", true, Infantry.class),
-    /** The same DCMS foot platoon armed with machine guns. Source: {@code infantry/Foot Platoon (DCMS) (MG 2620+).blk}. */
-    FOOT_PLATOON_MG("Foot Platoon (DCMS) (MG 2620+)", true, Infantry.class),
-    /**
-     * A motorized platoon towing three AC/5 field guns, each with its own ammunition. Source:
-     * {@code infantry/AFFS/Field Gun Platoon (AFFS) (Motorized AC5 3067+).blk}.
-     */
-    FIELD_GUN_PLATOON_AC5("Field Gun Platoon (AFFS) (Motorized AC5 3067+)", true, Infantry.class),
-    /** Minotaur, a ProtoMek. Source: {@code protomeks/3060/Minotaur.blk}. */
-    MINOTAUR_PROTOMEK("Minotaur", true, ProtoMek.class),
-    /** Shilone SL-17, an aerospace fighter. Source: {@code fighters/TRO3039u/Shilone SL-17.blk}. */
-    SHILONE_SL_17("Shilone SL-17", true, AeroSpaceFighter.class),
-    /**
-     * Shilone SL-17AC, the SL-17 with one heat sink fewer. Source: {@code fighters/TRO3039u/Shilone SL-17AC.blk}.
-     */
-    SHILONE_SL_17AC("Shilone SL-17AC", true, AeroSpaceFighter.class),
-    /**
-     * Shilone SL-17R, the SL-17 with double heat sinks instead of single ones, including those in the engine.
-     * Source: {@code fighters/TRO3039u/Shilone SL-17R.blk}.
-     */
-    SHILONE_SL_17R("Shilone SL-17R", true, AeroSpaceFighter.class),
-    /**
-     * Batu Prime, a Clan OmniFighter with two pod-mounted heat sinks. Source: {@code fighters/TRO3055U/Batu Prime.blk}.
-     */
-    BATU_PRIME("Batu Prime", true, AeroSpaceFighter.class),
-    /**
-     * Batu D, another configuration of the Batu with four pod-mounted heat sinks. Source:
-     * {@code fighters/TRO3055U/Batu D.blk}.
-     */
-    BATU_D("Batu D", true, AeroSpaceFighter.class),
-    /**
-     * Turk A, a Clan OmniFighter whose pod-mounted ammunition sits in the fuselage. Source:
-     * {@code fighters/TRO3055U/Turk A.blk}.
-     */
-    TURK_A("Turk A", true, AeroSpaceFighter.class),
-    /** Shuttle ST-46, a small craft. Source: {@code smallcraft/TRO 3057r/Shuttle ST-46.blk}. */
-    SHUTTLE_ST_46("Shuttle ST-46", true, SmallCraft.class),
-    /** Leopard (2537), a DropShip. Source: {@code dropships/TRO3057R/IS/Leopard (2537).blk}. */
-    LEOPARD_DROPSHIP("Leopard (2537)", true, Dropship.class),
-    /**
-     * Leopard (3056), the Leopard refitted with double heat sinks and newer weapons and ammunition. Source:
-     * {@code dropships/TRO3057R/IS/Leopard (3056).blk}.
-     */
-    LEOPARD_DROPSHIP_3056("Leopard (3056)", true, Dropship.class),
-    /**
-     * Leopard CV (2581), the carrier Leopard: three fighter bays in place of the BattleMek bay. Source:
-     * {@code dropships/TRO3057R/IS/Leopard CV (2581).blk}.
-     */
-    LEOPARD_CV_DROPSHIP("Leopard CV (2581)", true, Dropship.class),
-    /**
-     * Leopard PA, a pirate Leopard with guns in all six arcs where the standard Leopard has four. Source:
-     * {@code dropships/XTRs/Pirates/Leopard PA.blk}.
-     */
-    LEOPARD_PA_DROPSHIP("Leopard PA", true, Dropship.class),
-    /**
-     * Union (3055), a DropShip with Artemis LRM-20 ammunition in its nose and both side arcs. Source:
-     * {@code dropships/TRO3057R/IS/Union (3055).blk}.
-     */
-    UNION_3055_DROPSHIP("Union (3055)", true, Dropship.class),
-    /**
-     * Union (2708b), which carries the same Artemis LRM-20 ammunition in its nose and aft arcs instead. Source:
-     * {@code dropships/TRO3057R/IS/Union (2708b).blk}.
-     */
-    UNION_2708B_DROPSHIP("Union (2708b)", true, Dropship.class),
-    /**
-     * Invader JumpShip (2631), a JumpShip with docking collars and a grav deck. Source:
-     * {@code jumpships/3057R/IS/Invader Jumpship (2631).blk}.
-     */
-    INVADER_JUMPSHIP("Invader Jumpship (2631)", true, Jumpship.class),
-    /**
-     * Essex II Destroyer (2711), a WarShip with fighter and small craft bays. Source:
-     * {@code warship/3057/IS/Essex II Destroyer (2711).blk}.
-     */
-    ESSEX_II_WARSHIP("Essex II Destroyer (2711)", true, Warship.class),
-    /**
-     * Olympus Recharge Station (3072), a space station with docking collars. Source:
-     * {@code spacestation/TRO 3057R/Olympus Recharge Station (3072).blk}.
-     */
-    OLYMPUS_SPACE_STATION("Olympus Recharge Station (3072)", true, SpaceStation.class);
+    LOCUST_LCT_5V("Locust LCT-5V", "019f583e-d190-7093-8385-1e91f2f4f9d8", Mek.class),
+    /** Wolverine WVR-6R, a medium Mek. */
+    WOLVERINE_WVR_6R("Wolverine WVR-6R", "019f583e-c338-7203-9a51-f587c68e116c", Mek.class),
+    /** Longbow LGB-8C, a heavy fire support Mek. */
+    LONGBOW_LGB_8C("Longbow LGB-8C", "019f583e-da29-72ed-a3a8-bd2ed4599e81", Mek.class),
+    /** Wolverine WVR-6M, the refit target of the WVR-6R. */
+    WOLVERINE_WVR_6M("Wolverine WVR-6M", "019f583e-c337-7f18-8eec-2307e641a920", Mek.class),
+    /** Hunchback HBK-4G, a medium Mek. */
+    HUNCHBACK_HBK_4G("Hunchback HBK-4G", "019f583e-c22f-7b66-ba9e-06356dcc83f0", Mek.class),
+    /** Hunchback HBK-4P, the refit target of the HBK-4G. */
+    HUNCHBACK_HBK_4P("Hunchback HBK-4P", "019f583e-c235-7439-844e-e01901696cca", Mek.class),
+    /** Griffin GRF-1A, a primitive Griffin. */
+    GRIFFIN_GRF_1A("Griffin GRF-1A", "019f583e-dff7-7f4d-804d-6fda6a4428f4", Mek.class),
+    /** Griffin GRF-1N, the standard Griffin. */
+    GRIFFIN_GRF_1N("Griffin GRF-1N", "019f583e-c215-7a66-afd4-259f136b4ab0", Mek.class),
+    /** Lumberjack LM1A, an IndustrialMek with a primitive engine rated above its walking MP times its tonnage. */
+    LUMBERJACK_LM1A("Lumberjack LM1/A", "019f583e-cecc-7c4a-8d07-d6228115e73b", Mek.class),
+    /** Omega SHP-5R, a superheavy Mek with a superheavy gyro. */
+    OMEGA_SHP_5R("Omega SHP-5R", "019f583e-d4f4-7966-8c38-1ba20d38e192", Mek.class),
+    /** Omega SHP-4X, the earlier superheavy Omega. */
+    OMEGA_SHP_4X("Omega SHP-4X", "019f583e-d6e2-7e62-b316-ec8ea3c7e583", Mek.class),
+    /** Skinwalker A, a Mek with an interface cockpit and no gyro. */
+    SKINWALKER_A("Ryoken III (Skinwalker) A", "019f583e-dab7-7e19-8ccd-289f3f5bf365", Mek.class),
+    /** Hoplite C, a Clan Mek (not an OmniMek) with Clan ferro-fibrous armor. */
+    HOPLITE_C("Hoplite C", "019f583e-c541-7722-9251-7a8bfb55fed1", Mek.class),
+    /** Vedette Medium Tank, a tracked combat vehicle. */
+    VEDETTE_MEDIUM_TANK("Vedette Medium Tank", "019f583e-e326-74de-8b26-e3e4e58f06b8", Tank.class),
+    /** Zephyros Infantry Support Vehicle (Dual Turret), a tank with front and rear turrets. */
+    ZEPHYROS_DUAL_TURRET("Zephyros Infantry Support Vehicle (Dual Turret)",
+          "019f583e-e744-7ce3-9bd7-53e836368a02", Tank.class),
+    /** Burke II Superheavy Tank, a superheavy tank whose turret is its eighth location. */
+    BURKE_II_SUPERHEAVY_TANK("Burke II Superheavy Tank", "019f583e-ebe2-7d45-b348-f7f79619e0b7", SuperHeavyTank.class),
+    /** Armored Personnel Carrier (Hover LRM), a hover APC without a turret. */
+    APC_HOVER_LRM("Armored Personnel Carrier (Hover LRM)", "019f583e-e243-7aad-b8d9-5d9a23801dec", Tank.class),
+    /** Armored Personnel Carrier (Hover MG), the same APC with a turret. */
+    APC_HOVER_MG("Armored Personnel Carrier (Hover MG)", "019f583e-e245-745a-a418-61fb15658604", Tank.class),
+    /** Cellco Ranger UPU-3000, a tracked support vehicle with BAR 8 armor. */
+    CELLCO_RANGER_UPU_3000("Cellco Ranger UPU-3000", "019f583e-eadf-700b-aece-62f18cdb6b58", SupportTank.class),
+    /** Epona Pursuit Tank Prime, a Clan hover OmniVehicle with its weapons in the turret. */
+    EPONA_PURSUIT_TANK_PRIME("Epona Pursuit Tank Prime", "019f583e-e4e2-7e2f-9598-34f3a57c066b", Tank.class),
+    /** Epona Pursuit Tank A, another configuration of the same OmniVehicle, with weapons in the front and turret. */
+    EPONA_PURSUIT_TANK_A("Epona Pursuit Tank A", "019f583e-e4d7-71dd-869c-4edb92211530", Tank.class),
+    /** Warrior H-7 Attack Helicopter, a VTOL. */
+    WARRIOR_H_7_ATTACK_HELICOPTER("Warrior Attack Helicopter H-7", "019f583e-e32e-7053-85ce-1348db5f5195", VTOL.class),
+    /** Red Kite Attack VTOL, a VTOL with a chin turret. */
+    RED_KITE_ATTACK_VTOL("Red Kite Attack VTOL", "019f583e-e803-7d9b-ae2d-5ac44715526b", VTOL.class),
+    /** Inner Sphere Standard battle armor, a squad of four. */
+    IS_STANDARD_BATTLE_ARMOR_LASER("IS Standard Battle Armor [Laser](Sqd4)",
+          "019f583e-a288-7d7f-a635-6cf21746820c", BattleArmor.class),
+    /** Elemental battle armor, a Clan point of five. */
+    ELEMENTAL_BATTLE_ARMOR_LASER("Elemental Battle Armor [Laser](Sqd5)",
+          "019f583e-a1e0-785d-a983-829ca2dd427c", BattleArmor.class),
+    /** Elemental battle armor with flamers instead of lasers, the same point of five. */
+    ELEMENTAL_BATTLE_ARMOR_FLAMER("Elemental Battle Armor [Flamer](Sqd5)",
+          "019f583e-a1d3-70c5-afe8-17202c49c684", BattleArmor.class),
+    /** Elemental battle armor with lasers in a squad of six, one trooper more than the point of five. */
+    ELEMENTAL_BATTLE_ARMOR_LASER_SQUAD_OF_SIX("Elemental Battle Armor [Laser](Sqd6)",
+          "019f583e-a1e3-773e-aeb4-f468d1481fe8", BattleArmor.class),
+    /** A conventional foot platoon. */
+    FOOT_PLATOON_LASER("Foot Platoon (DCMS) (Laser 2620+)", "019f583e-bbcf-7edf-809f-865049255592", Infantry.class),
+    /** The same DCMS foot platoon armed with machine guns. */
+    FOOT_PLATOON_MG("Foot Platoon (DCMS) (MG 2620+)", "019f583e-bbd3-7699-8104-a8478ced0ea1", Infantry.class),
+    /** A motorized platoon towing three AC/5 field guns, each with its own ammunition. */
+    FIELD_GUN_PLATOON_AC5("Field Gun Platoon (AFFS) (Motorized AC5 3067+)",
+          "019f583e-b6a3-7dda-adcf-23634fb04508", Infantry.class),
+    /** Minotaur, a ProtoMek. */
+    MINOTAUR_PROTOMEK("Minotaur", "019f583e-e0c3-7912-acfd-3d50243f8d51", ProtoMek.class),
+    /** Shilone SL-17, an aerospace fighter. */
+    SHILONE_SL_17("Shilone SL-17", "019f583e-ad51-79dd-bfb0-19f2362bdf17", AeroSpaceFighter.class),
+    /** Shilone SL-17AC, the SL-17 with one heat sink fewer. */
+    SHILONE_SL_17AC("Shilone SL-17AC", "019f583e-ad53-7a2b-bc6b-ec2d5a22c96a", AeroSpaceFighter.class),
+    /** Shilone SL-17R, the SL-17 with double heat sinks instead of single ones, including those in the engine. */
+    SHILONE_SL_17R("Shilone SL-17R", "019f583e-ad54-7411-8749-cb05532c1a62", AeroSpaceFighter.class),
+    /** Batu Prime, a Clan OmniFighter with two pod-mounted heat sinks. */
+    BATU_PRIME("Batu Prime", "019f583e-ae04-73c0-b230-a6460db9b098", AeroSpaceFighter.class),
+    /** Batu D, another configuration of the Batu with four pod-mounted heat sinks. */
+    BATU_D("Batu D", "019f583e-ae01-7e35-906e-eede60a0c471", AeroSpaceFighter.class),
+    /** Turk A, a Clan OmniFighter whose pod-mounted ammunition sits in the fuselage. */
+    TURK_A("Turk A", "019f583e-ae55-7a98-ac36-abba31db757d", AeroSpaceFighter.class),
+    /** Shuttle ST-46, a small craft. */
+    SHUTTLE_ST_46("Shuttle ST-46", "019f583e-e158-7bdd-8050-3cd9c4fc6ec3", SmallCraft.class),
+    /** Leopard (2537), a DropShip. */
+    LEOPARD_DROPSHIP("Leopard (2537)", "019f583e-ab1e-7963-8d4e-5ffa82f1fbbf", Dropship.class),
+    /** Leopard (3056), the Leopard refitted with double heat sinks and newer weapons and ammunition. */
+    LEOPARD_DROPSHIP_3056("Leopard (3056)", "019f583e-ab20-71d5-b96d-4388ed07f17e", Dropship.class),
+    /** Leopard CV (2581), the carrier Leopard: three fighter bays in place of the BattleMek bay. */
+    LEOPARD_CV_DROPSHIP("Leopard CV (2581)", "019f583e-ab22-7832-bb5f-3845ce1e2151", Dropship.class),
+    /** Leopard PA, a pirate Leopard with guns in all six arcs where the standard Leopard has four. */
+    LEOPARD_PA_DROPSHIP("Leopard PA-Class Dropship", "019f583e-ac4d-7fb0-87c6-ec026c31e73f", Dropship.class),
+    /** Union (3055), a DropShip with Artemis LRM-20 ammunition in its nose and both side arcs. */
+    UNION_3055_DROPSHIP("Union (3055)", "019f583e-ab65-779e-a52e-65dea9e33327", Dropship.class),
+    /** Union (2708b), which carries the same Artemis LRM-20 ammunition in its nose and aft arcs instead. */
+    UNION_2708B_DROPSHIP("Union (2708b)", "019f583e-ab5e-72d0-918d-6d9253de1c0d", Dropship.class),
+    /** Invader JumpShip (2631), a JumpShip with docking collars and a grav deck. */
+    INVADER_JUMPSHIP("Invader JumpShip (2631)", "019f583e-c0e3-71ab-ab61-023aac9a9b33", Jumpship.class),
+    /** Essex II Destroyer (2711), a WarShip with fighter and small craft bays. */
+    ESSEX_II_WARSHIP("Essex II Destroyer (2711)", "019f583e-ece7-7dd1-93f6-7032e051221b", Warship.class),
+    /** Olympus Recharge Station (3072), a space station with docking collars. */
+    OLYMPUS_SPACE_STATION("Olympus Recharge Station (3072)",
+          "019f583e-e215-79b6-bd69-54d0c53b7c75", SpaceStation.class);
 
     /**
      * A canon refit: the unit a campaign starts with and the variant it is refitted into.
@@ -265,22 +186,14 @@ public enum UnitFixture {
           new RefitPair(WOLVERINE_WVR_6R, WOLVERINE_WVR_6M),
           new RefitPair(HUNCHBACK_HBK_4G, HUNCHBACK_HBK_4P));
 
-    private final String fileName;
-    private final boolean isBlk;
+    private final String unitName;
+    private final String unitFileUuid;
     private final Class<? extends Entity> unitFamily;
 
-    UnitFixture(String fileName, boolean isBlk, Class<? extends Entity> unitFamily) {
-        this.fileName = fileName;
-        this.isBlk = isBlk;
+    UnitFixture(String unitName, String unitFileUuid, Class<? extends Entity> unitFamily) {
+        this.unitName = unitName;
+        this.unitFileUuid = unitFileUuid;
         this.unitFamily = unitFamily;
-    }
-
-    /**
-     * @return the file this fixture is loaded from, relative to the MekHQ project directory
-     */
-    public File getFile() {
-        String extension = isBlk ? MHQTestUtilities.TEST_BLK : MHQTestUtilities.TEST_MTF;
-        return new File(MHQTestUtilities.TEST_UNIT_DATA_DIR + fileName + extension);
     }
 
     /**
@@ -291,31 +204,26 @@ public enum UnitFixture {
     }
 
     /**
-     * Loads a fresh entity from this fixture's unit file. Each call parses the file again, so tests never share an
-     * entity.
+     * Loads a fresh entity for this fixture from the game's unit data. Each call parses the file again, so tests never
+     * share an entity.
      *
-     * <p>Fails the calling test, naming the file and the reason, when the file is missing, cannot be parsed, or does
-     * not load as {@link #getUnitFamily()}. It never returns {@code null}.</p>
+     * <p>Fails the calling test when the unit cannot be found or parsed, has been renamed, or does not load as
+     * {@link #getUnitFamily()}. It never returns {@code null}.</p>
      *
      * @return the loaded entity
      */
     public Entity loadEntity() {
-        EquipmentType.initializeTypes();
-
-        File file = getFile();
-        assertTrue(file.isFile(), "Unit fixture " + name() + " file is missing: " + file.getAbsolutePath());
-
-        Entity entity = null;
-        try {
-            entity = new MekFileParser(file).getEntity();
-        } catch (EntityLoadingException exception) {
-            fail("Unit fixture " + name() + " could not be parsed from " + file.getAbsolutePath(), exception);
-        }
-
-        assertNotNull(entity, "Unit fixture " + name() + " parsed to no entity from " + file.getAbsolutePath());
+        Entity entity = CanonUnits.loadUnit(unitName, unitFileUuid);
         assertTrue(unitFamily.isInstance(entity),
               "Unit fixture " + name() + " loaded as " + entity.getClass().getSimpleName() + ", expected "
                     + unitFamily.getSimpleName());
         return entity;
+    }
+
+    /**
+     * @return the text of this fixture's unit file, for a test that edits the file before parsing it
+     */
+    public String readUnitFile() {
+        return CanonUnits.readUnitFile(unitName, unitFileUuid);
     }
 }

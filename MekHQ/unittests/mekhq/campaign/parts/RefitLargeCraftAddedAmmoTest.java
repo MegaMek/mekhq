@@ -35,9 +35,6 @@ package mekhq.campaign.parts;
 import static org.junit.jupiter.api.Assertions.assertDoesNotThrow;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import java.io.IOException;
-import java.nio.file.Files;
-
 import megamek.common.equipment.AmmoType;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.Mounted;
@@ -61,8 +58,8 @@ class RefitLargeCraftAddedAmmoTest {
     private static final String LRM_10_AMMO = "IS Ammo LRM-10";
 
     /** The Leopard CV as the player had it: LRM-10 launchers in the LRM bays and no LRM ammunition yet. */
-    private static Entity leopardWithLrm10Launchers() throws IOException, EntityLoadingException {
-        String unitFile = Files.readString(UnitFixture.LEOPARD_CV_DROPSHIP.getFile().toPath());
+    private static Entity leopardWithLrm10Launchers() throws EntityLoadingException {
+        String unitFile = UnitFixture.LEOPARD_CV_DROPSHIP.readUnitFile();
         String editedFile = unitFile.replaceAll("IS Ammo LRM-20:12\\R", "").replace("LRM 20", "LRM 10");
         return new MekFileParser(editedFile).getEntity();
     }
