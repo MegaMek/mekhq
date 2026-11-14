@@ -228,7 +228,7 @@ public class FactionCensureGoingRogueDialog {
         Faction pirates = factions.getFaction(PIRATE_FACTION_CODE);
 
         boolean isMerc = campaignFaction.equals(mercenaries);
-        boolean isPirate = campaignFaction.equals(pirates);
+        boolean isPirate = campaignFaction.isPirateOrBanditCaste();
 
         List<Faction> activeFactions = new ArrayList<>(factions.getActiveFactions(today));
         activeFactions.remove(campaignFaction);
@@ -241,7 +241,7 @@ public class FactionCensureGoingRogueDialog {
                                                  (faction.isClan() && removeClanFactions) ||
                                                  (!faction.isClan() && removeInnerSphereFactions) ||
                                                  faction.equals(mercenaries) ||
-                                                 faction.equals(pirates)
+                                                 faction.isPirateOrBanditCaste()
         );
 
         if (isMerc || isPirate) {

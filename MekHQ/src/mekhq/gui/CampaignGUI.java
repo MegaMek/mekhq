@@ -1319,6 +1319,18 @@ public class CampaignGUI extends JPanel {
             }
             logger.debug("[RefitStart] {}: new model named", refit.getUnit().getName());
         }
+        if (refit.isSavingNewDesign()) {
+            // Asked where to save the new design, as "Save For Later" does; cancelling backs out like cancelling the
+            // naming above, so nothing has started
+            File designFile = getMekLabTab().chooseDesignFile(refit.getNewEntity());
+            if (designFile == null) {
+                logger.debug("[RefitStart] {}: choosing the design file was cancelled", refit.getUnit().getName());
+                refit.setTech(null);
+                refit.setDesignFile(null);
+                return;
+            }
+            refit.setDesignFile(designFile);
+        }
         // TODO: allow overtime work?
         // The chosen tech briefs the commander on the refit class and why. Every dialog here has the main window as
         // its parent: a dialog without one can open behind MekHQ, which then looks frozen while it waits for an answer

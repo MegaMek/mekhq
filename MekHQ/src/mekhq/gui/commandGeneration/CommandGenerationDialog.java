@@ -80,6 +80,7 @@ import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.BulkGenerationCompletedEvent;
+import mekhq.campaign.events.CommandGenerationFinishedEvent;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractMarketAvailability;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
@@ -741,6 +742,8 @@ public class CommandGenerationDialog extends AbstractMHQValidationButtonDialog {
             LOGGER.info("[CompanyGen][PostGen] generating initial contract market offers");
             ChaosContractMarketAvailability.processNewMonth(campaign);
         }
+
+        MekHQ.triggerEvent(new CommandGenerationFinishedEvent(getCampaign()));
 
         long totalMs = (System.nanoTime() - startNanos) / 1_000_000;
         LOGGER.info("[CompanyGen][PostGen] DONE in {}ms", totalMs);

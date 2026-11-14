@@ -652,6 +652,14 @@ public final class CampaignOption<T> {
           of(Integer.class, 150, "randomProcreationRelationshipDiceSize");
     public static final CampaignOption<Integer> RANDOM_PROCREATION_RELATIONSHIPLESS_DICE_SIZE =
           of(Integer.class, 2000, "randomProcreationRelationshiplessDiceSize");
+    public static final CampaignOption<Boolean> USE_RANDOM_PATERNITY =
+          of(Boolean.class, false, "useRandomPaternity");
+    public static final CampaignOption<Integer> RANDOM_PATERNITY_MAXIMUM_CHILD_AGE =
+          of(Integer.class, 5, "randomPaternityMaximumChildAge");
+    public static final CampaignOption<Boolean> USE_RANDOM_SAME_SEX_ADOPTION =
+          of(Boolean.class, false, "useRandomSameSexAdoption");
+    public static final CampaignOption<Integer> RANDOM_ADOPTION_MAXIMUM_CHILD_AGE =
+          of(Integer.class, 10, "randomAdoptionMaximumChildAge");
     public static final CampaignOption<Integer> NO_INTEREST_IN_RELATIONSHIPS_DICE_SIZE =
           of(Integer.class, 100, "noInterestInMarriageDiceSize");
     public static final CampaignOption<Integer> INTERESTED_IN_BOTH_SEXES_DICE_SIZE =
@@ -1007,6 +1015,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "useGenderedPortraitsOnly");
     public static final CampaignOption<Boolean> NO_RANDOM_PORTRAITS_FOR_CHILDREN =
           of(Boolean.class, true, "noRandomPortraitsForChildren");
+    public static final CampaignOption<Boolean> RANDOM_PORTRAITS_FOR_OFFICERS_ONLY =
+          of(Boolean.class, false, "randomPortraitsForOfficersOnly");
     public static final CampaignOption<Boolean> CHILD_PORTRAITS_WHEN_COMING_OF_AGE =
           of(Boolean.class, true, "childPortraitsWhenComingOfAge");
     public static final CampaignOption<PersonnelMarketStyle> PERSONNEL_MARKET_STYLE =

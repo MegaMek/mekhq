@@ -63,6 +63,7 @@ import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumData;
 import mekhq.campaign.universe.factionStanding.FactionStandingUltimatumSide;
 import mekhq.gui.FileDialogs;
 import mekhq.gui.dialog.factionStanding.FactionStandingUltimatumDialog;
+import mekhq.gui.dialog.factionStanding.UltimatumSidePickerDialog.ChoiceKind;
 
 /**
  * A developer tool for editing Faction Standing ultimatum files (JSON). Each ultimatum is its own file; this editor
@@ -118,6 +119,12 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
     private final JTextField txtSideFactionCode = new JTextField(8);
 
     private final JComboBox<String> cboDissenterPreference = new JComboBox<>();
+    private final JCheckBox chkIntroducedByThirdParty = new JCheckBox();
+    private final JCheckBox chkNoDissent = new JCheckBox();
+    private final JCheckBox chkSharedResult = new JCheckBox();
+    private final JCheckBox chkOffersMercenary = new JCheckBox();
+    private final JCheckBox chkOffersPirate = new JCheckBox();
+    private final JCheckBox chkOffersBanditCaste = new JCheckBox();
     private final JCheckBox chkViolentTransition = new JCheckBox();
     private final JSpinner spnDivisiveness = new JSpinner(new SpinnerNumberModel(0,
           FactionStandingUltimatumData.MINIMUM_DIVISIVENESS, FactionStandingUltimatumData.MAXIMUM_DIVISIVENESS, 1));
@@ -164,6 +171,9 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
                   boolean isSelected, boolean cellHasFocus) {
                 FactionStandingUltimatumSide side = (FactionStandingUltimatumSide) value;
                 String shown = (index + 1) + ". " + nullToEmpty(side.id()) + " – " + nullToEmpty(side.name());
+                if (index == 0 && chkIntroducedByThirdParty.isSelected()) {
+                    shown += getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "sides.thirdParty");
+                }
                 return super.getListCellRendererComponent(list, shown, index, isSelected, cellHasFocus);
             }
         });
@@ -179,11 +189,22 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
         addRow(panel, constraints, "notes", new FastJScrollPane(txtNotes));
         addRow(panel, constraints, "affectedFactionCodes", new FastJScrollPane(txtAffectedFactionCodes));
         addRow(panel, constraints, "sides", buildSidesPanel());
+        chkIntroducedByThirdParty.addActionListener(event -> {
+            lstSides.repaint();
+            refreshDissenterChoices();
+        });
+        addRow(panel, constraints, "isIntroducedByThirdParty", chkIntroducedByThirdParty);
         addRow(panel, constraints, "sideId", txtSideId);
         addRow(panel, constraints, "sideName", txtSideName);
         addRow(panel, constraints, "sideRole", cboSideRole);
         addRow(panel, constraints, "sideFactionCode", txtSideFactionCode);
+        chkNoDissent.addActionListener(event -> cboDissenterPreference.setEnabled(!chkNoDissent.isSelected()));
+        addRow(panel, constraints, "hasNoDissent", chkNoDissent);
         addRow(panel, constraints, "dissenterPreference", cboDissenterPreference);
+        addRow(panel, constraints, "offersMercenary", chkOffersMercenary);
+        addRow(panel, constraints, "offersPirate", chkOffersPirate);
+        addRow(panel, constraints, "offersBanditCaste", chkOffersBanditCaste);
+        addRow(panel, constraints, "hasSharedResult", chkSharedResult);
         addRow(panel, constraints, "isViolentTransition", chkViolentTransition);
         addRow(panel, constraints, "divisiveness", spnDivisiveness);
         return panel;
@@ -296,7 +317,9 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
     private void refreshDissenterChoices() {
         Object current = cboDissenterPreference.getSelectedItem();
         cboDissenterPreference.removeAllItems();
-        for (int index = 0; index < sideModel.size(); index++) {
+        // A third party introduces the ultimatum, but isn't a side the dissenter can prefer
+        int firstChoosableIndex = chkIntroducedByThirdParty.isSelected() ? 1 : 0;
+        for (int index = firstChoosableIndex; index < sideModel.size(); index++) {
             String sideId = sideModel.get(index).id();
             if (sideId != null && !sideId.isBlank()) {
                 cboDissenterPreference.addItem(sideId);
@@ -360,6 +383,13 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
         editingSideIndex = -1;
         sideModel.clear();
         showSide(-1);
+        chkIntroducedByThirdParty.setSelected(false);
+        chkNoDissent.setSelected(false);
+        chkSharedResult.setSelected(false);
+        chkOffersMercenary.setSelected(true);
+        chkOffersPirate.setSelected(true);
+        chkOffersBanditCaste.setSelected(false);
+        cboDissenterPreference.setEnabled(true);
         refreshDissenterChoices();
         cboDissenterPreference.setSelectedItem(null);
         chkViolentTransition.setSelected(false);
@@ -381,6 +411,13 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
         for (FactionStandingUltimatumSide side : source.sides()) {
             sideModel.addElement(side);
         }
+        chkIntroducedByThirdParty.setSelected(source.isIntroducedByThirdParty());
+        chkNoDissent.setSelected(source.hasNoDissent());
+        chkSharedResult.setSelected(source.hasSharedResult());
+        chkOffersMercenary.setSelected(source.isMercenaryOffered());
+        chkOffersPirate.setSelected(source.isPirateOffered());
+        chkOffersBanditCaste.setSelected(source.isBanditCasteOffered());
+        cboDissenterPreference.setEnabled(!source.hasNoDissent());
         refreshDissenterChoices();
         cboDissenterPreference.setSelectedItem(source.dissenterPreference());
         if (sideModel.isEmpty()) {
@@ -417,7 +454,13 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
               sides,
               dissenterPreference == null ? null : emptyToNull(dissenterPreference.toString()),
               chkViolentTransition.isSelected(),
-              (int) spnDivisiveness.getValue());
+              (int) spnDivisiveness.getValue(),
+              chkIntroducedByThirdParty.isSelected(),
+              chkNoDissent.isSelected(),
+              chkOffersMercenary.isSelected(),
+              chkOffersPirate.isSelected(),
+              chkOffersBanditCaste.isSelected(),
+              chkSharedResult.isSelected());
     }
 
     /**
@@ -482,7 +525,8 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
      */
     private void warnAboutMissingText(FactionStandingUltimatumData ultimatum) {
         List<String> missingKeys = new ArrayList<>();
-        for (String key : FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), getSideIds(ultimatum))) {
+        for (String key : FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), getSideIds(ultimatum),
+              ultimatum.hasNoDissent(), ultimatum.hasSharedResult(), getRogueKinds(ultimatum))) {
             if (!isResourceKeyValid(getTextAt(ULTIMATUM_RESOURCE_BUNDLE, key))) {
                 missingKeys.add(key);
             }
@@ -587,22 +631,36 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
      */
     static List<TextKeyRow> buildTextKeyRows(FactionStandingUltimatumData ultimatum) {
         List<FactionStandingUltimatumSide> sides = ultimatum.sides();
-        List<String> keys = FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), getSideIds(ultimatum));
+        List<FactionStandingUltimatumSide> choosableSides = ultimatum.getChoosableSides();
+        List<String> keys = FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), getSideIds(ultimatum),
+              ultimatum.hasNoDissent(), ultimatum.hasSharedResult(), getRogueKinds(ultimatum));
         String firstLeader = sides.isEmpty() ? "" : nullToEmpty(sides.get(0).name());
         String dissenterPreference = nullToEmpty(ultimatum.dissenterPreference());
 
         List<String> purposes = new ArrayList<>();
         purposes.add(getFormattedTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.initialOffer", firstLeader));
         purposes.add(getFormattedTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.for", firstLeader));
-        purposes.add(getFormattedTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.against",
-              dissenterPreference));
-        for (FactionStandingUltimatumSide side : sides) {
+        if (!ultimatum.hasNoDissent()) {
+            purposes.add(getFormattedTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.against",
+                  dissenterPreference));
+        }
+        if (ultimatum.hasSharedResult()) {
+            purposes.add(getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.result"));
+        }
+        for (FactionStandingUltimatumSide side : choosableSides) {
             String sideLabel = nullToEmpty(side.id());
             purposes.add(getFormattedTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.pitch", sideLabel));
-            purposes.add(getFormattedTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.news", sideLabel));
+            if (!ultimatum.hasSharedResult()) {
+                purposes.add(getFormattedTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.news", sideLabel));
+            }
         }
-        purposes.add(getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.mercenary"));
-        purposes.add(getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + "textKeys.purpose.pirate"));
+        for (ChoiceKind rogueKind : getRogueKinds(ultimatum)) {
+            purposes.add(getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + switch (rogueKind) {
+                case MERCENARY -> "textKeys.purpose.mercenary";
+                case PIRATE -> "textKeys.purpose.pirate";
+                default -> "textKeys.purpose.banditCaste";
+            }));
+        }
 
         List<TextKeyRow> rows = new ArrayList<>();
         for (int index = 0; index < keys.size(); index++) {
@@ -652,14 +710,25 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
     }
 
     /**
-     * @return the IDs of the ultimatum's sides, in order
+     * @return the ways of going rogue the ultimatum offers, in picker order
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static List<ChoiceKind> getRogueKinds(FactionStandingUltimatumData ultimatum) {
+        return FactionStandingUltimatumDialog.getRogueKinds(ultimatum.isMercenaryOffered(),
+              ultimatum.isPirateOffered(), ultimatum.isBanditCasteOffered());
+    }
+
+    /**
+     * @return the IDs of the ultimatum's choosable sides, in order; a third party that introduces it has no ID here
      *
      * @author Illiani
      * @since 0.51.01
      */
     static List<String> getSideIds(FactionStandingUltimatumData ultimatum) {
         List<String> sideIds = new ArrayList<>();
-        for (FactionStandingUltimatumSide side : ultimatum.sides()) {
+        for (FactionStandingUltimatumSide side : ultimatum.getChoosableSides()) {
             sideIds.add(side.id());
         }
         return sideIds;
@@ -694,6 +763,8 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
         List<FactionStandingUltimatumSide> sides = ultimatum.sides();
         if (sides.isEmpty()) {
             problemKeys.add(KEY_PREFIX + "problem.noSides");
+        } else if (ultimatum.getChoosableSides().isEmpty()) {
+            problemKeys.add(KEY_PREFIX + "problem.noChoosableSides");
         }
 
         boolean hasIncompleteSide = false;
@@ -707,7 +778,11 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
                 continue;
             }
             hasDuplicateId |= !sideIds.add(side.id());
-            hasDuplicateFaction |= !factionCodes.add(side.factionCode());
+            // A third party isn't joined, so it may share a faction with one of the sides
+            boolean isThirdParty = ultimatum.isIntroducedByThirdParty() && side == sides.get(0);
+            if (!isThirdParty) {
+                hasDuplicateFaction |= !factionCodes.add(side.factionCode());
+            }
         }
         if (hasIncompleteSide) {
             problemKeys.add(KEY_PREFIX + "problem.side");
@@ -720,9 +795,17 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
         }
 
         String dissenterPreference = ultimatum.dissenterPreference();
-        if (dissenterPreference == null || !(FactionStandingUltimatumData.ROGUE_PREFERENCE.equals(dissenterPreference)
-                                                   || ultimatum.getSide(dissenterPreference) != null)) {
+        // Nobody dissents in an ultimatum with no dissent, so there is no preference to check
+        if (!ultimatum.hasNoDissent()
+                  && (dissenterPreference == null
+                            || !(FactionStandingUltimatumData.ROGUE_PREFERENCE.equals(dissenterPreference)
+                                       || ultimatum.getSide(dissenterPreference) != null))) {
             problemKeys.add(KEY_PREFIX + "problem.dissenterPreference");
+        }
+
+        if (!ultimatum.hasNoDissent() && FactionStandingUltimatumData.ROGUE_PREFERENCE.equals(dissenterPreference)
+                  && !ultimatum.isGoingRogueOffered()) {
+            problemKeys.add(KEY_PREFIX + "problem.dissenterRogueNotOffered");
         }
 
         int divisiveness = ultimatum.divisiveness();

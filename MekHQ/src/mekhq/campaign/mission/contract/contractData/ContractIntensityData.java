@@ -45,7 +45,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * without disturbing the rest (as {@link AbstractContract}'s scalar setters do).</p>
  *
  * @param scale                  the support-point/Battle-Value scale the contract is sized at, unrounded. Rules as
- *                               written use it rounded up to a whole number (see {@link AbstractContract#getScale()})
+ *                               written use it rounded to the nearest whole number (see
+ *                               {@link AbstractContract#getScale()})
  * @param requiredVictoryPoints  the victory points needed to win the contract
  * @param trackCount             the number of StratCon tracks the contract runs
  * @param monthlyTrackCounts     the scenario schedule: how those tracks are spread across the contract's months, rolled

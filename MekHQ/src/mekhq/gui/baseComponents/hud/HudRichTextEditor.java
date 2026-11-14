@@ -45,6 +45,7 @@ import java.awt.event.InputEvent;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
@@ -56,7 +57,9 @@ import javax.swing.TransferHandler;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
+import javax.swing.text.DefaultEditorKit;
 import javax.swing.text.Document;
+import javax.swing.text.Element;
 import javax.swing.text.StyledEditorKit;
 import javax.swing.text.html.HTML;
 import javax.swing.text.html.HTMLDocument;
@@ -107,6 +110,8 @@ public class HudRichTextEditor extends JPanel {
 
         editor.setEditorKit(kit);
         editor.setTransferHandler(new PlainTextPaste(editor.getTransferHandler()));
+        editor.getActionMap().put(DefaultEditorKit.insertBreakAction,
+              new LineBreakAction(editor.getActionMap().get(DefaultEditorKit.insertBreakAction)));
         editor.setBackground(SURFACE_DEEP);
         editor.setForeground(TEXT);
         editor.setCaretColor(ACCENT);
@@ -291,6 +296,62 @@ public class HudRichTextEditor extends JPanel {
         styles.addRule("blockquote { color: " + hex(TEXT_MUTED) + "; margin-left: 10px; margin-top: 2px; "
                              + "margin-bottom: 8px; padding-left: 8px; border-left: 2px solid " + hex(AMBER) + "; }");
         styles.addRule("a { color: " + hex(ACCENT_BRIGHT) + "; }");
+    }
+
+    /**
+     * Makes Enter write a line break the saved HTML can keep. In text that sits directly in the body, the kit's own
+     * Enter inserts a bare newline character, which the editor shows as a new line but which HTML treats as a space,
+     * so a note's paragraphs ran together once it was saved and loaded again. A {@code <br>} survives that trip.
+     * Enter in a list item or in a paragraph that already has its own tag is left to the kit, which splits those
+     * properly.
+     */
+    private final class LineBreakAction extends AbstractAction {
+        private final Action original;
+
+        private LineBreakAction(final Action original) {
+            this.original = original;
+        }
+
+        @Override
+        public void actionPerformed(final ActionEvent event) {
+            if (!editor.isEditable() || !(editor.getDocument() instanceof HTMLDocument document)) {
+                original.actionPerformed(event);
+                return;
+            }
+
+            editor.replaceSelection("");
+            int position = editor.getCaretPosition();
+            if (!isLooseText(document.getParagraphElement(position))) {
+                original.actionPerformed(event);
+                return;
+            }
+
+            int lengthBefore = document.getLength();
+            try {
+                kit.insertHTML(document, position, "<br>", 0, 0, HTML.Tag.BR);
+                // The caret stays put when text is inserted at its own position, so move it past the break.
+                editor.setCaretPosition(Math.min(document.getLength(), position + document.getLength() - lengthBefore));
+            } catch (BadLocationException | IOException exception) {
+                LOGGER.error("Failed to insert a line break into the editor", exception);
+                original.actionPerformed(event);
+            }
+        }
+
+        /**
+         * {@link AbstractAction} is {@link Cloneable}, so this declares {@code clone} explicitly. A copy shares the
+         * wrapped action, which is the right behavior because that action holds no per-instance state.
+         */
+        @Override
+        protected Object clone() throws CloneNotSupportedException {
+            return super.clone();
+        }
+
+        /** @return {@code true} if the paragraph is text with no tag of its own, outside any list item */
+        private static boolean isLooseText(final Element paragraph) {
+            Element parent = paragraph.getParentElement();
+            return HTML.Tag.IMPLIED.toString().equals(paragraph.getName())
+                         && (parent == null || !HTML.Tag.LI.toString().equals(parent.getName()));
+        }
     }
 
     /**

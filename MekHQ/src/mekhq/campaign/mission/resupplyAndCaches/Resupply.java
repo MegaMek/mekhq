@@ -40,7 +40,6 @@ import static megamek.common.equipment.MiscType.F_SPONSON_TURRET;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.FormationType.CONVOY;
 import static mekhq.campaign.force.FormationType.STANDARD;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.time.LocalDate;
@@ -895,7 +894,7 @@ public class Resupply {
         negotiatorSkill = NONE.ordinal();
 
         if (contract.getObjectiveType().isGuerrillaType() ||
-                  PIRATE_FACTION_CODE.equals(contract.getEmployerFactionCode())) {
+                  Faction.isPirateOrBanditCaste(contract.getEmployerFactionCode())) {
             negotiator = campaign.getPlayerForce().getHumanResources()
                                .getCommander(campaign.getCampaignOptions(),
                                      campaign.getPlayerForce().isClanForce(),

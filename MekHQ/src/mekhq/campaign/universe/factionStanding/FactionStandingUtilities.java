@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static mekhq.campaign.universe.Faction.BANDIT_CASTE_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -51,6 +53,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionHints.FactionHints;
 
@@ -891,18 +894,36 @@ public class FactionStandingUtilities {
      * @since 0.50.07
      */
     public static String getFallbackFactionKey(String dialogKey, Faction judgingFaction) {
+        // The Bandit Caste speaks with the pirates' voice, so it falls back the same way the pirates do
+        Faction textFaction = getJudgmentTextFaction(judgingFaction);
         String affixKey;
 
-        if (judgingFaction.isClan()) {
+        if (textFaction.isClan()) {
             affixKey = DIALOG_KEY_AFFIX_CLAN;
-        } else if (judgingFaction.isPeriphery()) {
+        } else if (textFaction.isPeriphery()) {
             affixKey = DIALOG_KEY_AFFIX_PERIPHERY;
         } else {
             affixKey = DIALOG_KEY_AFFIX_INNER_SPHERE;
         }
 
-        String judgingFactionCode = judgingFaction.getShortName();
+        String judgingFactionCode = textFaction.getShortName();
 
         return dialogKey.replace('.' + judgingFactionCode, '.' + affixKey);
+    }
+
+    /**
+     * Returns the faction whose dialog text should be used when a faction judges the player. The Bandit Caste is just
+     * another flavor of pirate, so it uses the pirates' text; every other faction speaks for itself.
+     *
+     * @param judgingFaction the faction issuing the judgment
+     *
+     * @return the pirate faction for the Bandit Caste (when it exists), otherwise {@code judgingFaction}
+     */
+    public static Faction getJudgmentTextFaction(Faction judgingFaction) {
+        if (!BANDIT_CASTE_FACTION_CODE.equals(judgingFaction.getShortName())) {
+            return judgingFaction;
+        }
+        Faction pirates = Factions.getInstance().getFaction(PIRATE_FACTION_CODE);
+        return (pirates != null) ? pirates : judgingFaction;
     }
 }

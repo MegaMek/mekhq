@@ -1318,7 +1318,7 @@ public class StratConDeploymentWizard extends JDialog {
         Faction enemy = contract.getEnemyFaction();
 
         boolean brokeBatchallTerms = false;
-        if (enemy.isClan() && contract.isBatchallAccepted()) {
+        if (enemy.performsBatchalls() && contract.isBatchallAccepted()) {
             if (backOutAtBatchallWarning()) {
                 return false;
             }

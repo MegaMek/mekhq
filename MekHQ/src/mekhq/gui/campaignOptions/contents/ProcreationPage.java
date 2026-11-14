@@ -48,10 +48,12 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -103,6 +105,12 @@ class ProcreationPage {
     private JSpinner spnRandomProcreationRelationshipDiceSize;
     private JLabel lblRandomProcreationRelationshiplessDiceSize;
     private JSpinner spnRandomProcreationRelationshiplessDiceSize;
+    private JCheckBox chkUseRandomPaternity;
+    private JLabel lblRandomPaternityMaximumChildAge;
+    private JSpinner spnRandomPaternityMaximumChildAge;
+    private JCheckBox chkUseRandomSameSexAdoption;
+    private JLabel lblRandomAdoptionMaximumChildAge;
+    private JSpinner spnRandomAdoptionMaximumChildAge;
 
     private JPanel pnlRandomSexualityPanel;
     private JLabel lblNoInterestInRelationshipsDiceSize;
@@ -284,6 +292,28 @@ class ProcreationPage {
                 1);
         spnRandomProcreationRelationshiplessDiceSize.addMouseListener(createTipPanelUpdater("RandomProcreationRelationshiplessDiceSize"));
 
+        chkUseRandomPaternity = new CampaignOptionsCheckBox("UseRandomPaternity",
+                getMetadata(new Version(0, 51, 1)));
+        chkUseRandomPaternity.addMouseListener(createTipPanelUpdater("UseRandomPaternity"));
+
+        lblRandomPaternityMaximumChildAge = new CampaignOptionsLabel("RandomPaternityMaximumChildAge",
+                getMetadata(new Version(0, 51, 1)));
+        lblRandomPaternityMaximumChildAge.addMouseListener(createTipPanelUpdater("RandomPaternityMaximumChildAge"));
+        spnRandomPaternityMaximumChildAge = new CampaignOptionsSpinner("RandomPaternityMaximumChildAge",
+                5, 0, AbstractProcreation.MAXIMUM_ARRIVING_CHILD_AGE, 1);
+        spnRandomPaternityMaximumChildAge.addMouseListener(createTipPanelUpdater("RandomPaternityMaximumChildAge"));
+
+        chkUseRandomSameSexAdoption = new CampaignOptionsCheckBox("UseRandomSameSexAdoption",
+                getMetadata(new Version(0, 51, 1)));
+        chkUseRandomSameSexAdoption.addMouseListener(createTipPanelUpdater("UseRandomSameSexAdoption"));
+
+        lblRandomAdoptionMaximumChildAge = new CampaignOptionsLabel("RandomAdoptionMaximumChildAge",
+                getMetadata(new Version(0, 51, 1)));
+        lblRandomAdoptionMaximumChildAge.addMouseListener(createTipPanelUpdater("RandomAdoptionMaximumChildAge"));
+        spnRandomAdoptionMaximumChildAge = new CampaignOptionsSpinner("RandomAdoptionMaximumChildAge",
+                10, 0, AbstractProcreation.MAXIMUM_ARRIVING_CHILD_AGE, 1);
+        spnRandomAdoptionMaximumChildAge.addMouseListener(createTipPanelUpdater("RandomAdoptionMaximumChildAge"));
+
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("RandomProcreationPanel",
                 LABEL_COLUMN_WIDTH,
@@ -295,6 +325,9 @@ class ProcreationPage {
                 chkUseRandomPrisonerProcreation);
         panel.addRow(lblRandomProcreationRelationshipDiceSize, spnRandomProcreationRelationshipDiceSize);
         panel.addRow(lblRandomProcreationRelationshiplessDiceSize, spnRandomProcreationRelationshiplessDiceSize);
+        panel.addCheckBoxGrid(2, chkUseRandomPaternity, chkUseRandomSameSexAdoption);
+        panel.addRow(lblRandomPaternityMaximumChildAge, spnRandomPaternityMaximumChildAge);
+        panel.addRow(lblRandomAdoptionMaximumChildAge, spnRandomAdoptionMaximumChildAge);
 
         return panel;
     }
@@ -362,6 +395,10 @@ class ProcreationPage {
         chkUseRandomPrisonerProcreation.setSelected(model.useRandomPrisonerProcreation);
         spnRandomProcreationRelationshipDiceSize.setValue(model.randomProcreationRelationshipDiceSize);
         spnRandomProcreationRelationshiplessDiceSize.setValue(model.randomProcreationRelationshiplessDiceSize);
+        chkUseRandomPaternity.setSelected(model.useRandomPaternity);
+        spnRandomPaternityMaximumChildAge.setValue(model.randomPaternityMaximumChildAge);
+        chkUseRandomSameSexAdoption.setSelected(model.useRandomSameSexAdoption);
+        spnRandomAdoptionMaximumChildAge.setValue(model.randomAdoptionMaximumChildAge);
         spnNoInterestInRelationshipsDiceSize.setValue(model.noInterestInRelationshipsDiceSize);
         spnPrefersSameSexDiceSize.setValue(model.interestedInSameSexDiceSize);
         spnPrefersBothSexesDiceSize.setValue(model.interestedInBothSexesDiceSize);
@@ -397,6 +434,10 @@ class ProcreationPage {
         model.randomProcreationRelationshipDiceSize = (int) spnRandomProcreationRelationshipDiceSize.getValue();
         model.randomProcreationRelationshiplessDiceSize = (int) spnRandomProcreationRelationshiplessDiceSize
                 .getValue();
+        model.useRandomPaternity = chkUseRandomPaternity.isSelected();
+        model.randomPaternityMaximumChildAge = (int) spnRandomPaternityMaximumChildAge.getValue();
+        model.useRandomSameSexAdoption = chkUseRandomSameSexAdoption.isSelected();
+        model.randomAdoptionMaximumChildAge = (int) spnRandomAdoptionMaximumChildAge.getValue();
         model.interestedInSameSexDiceSize = (int) spnPrefersSameSexDiceSize.getValue();
         model.noInterestInRelationshipsDiceSize = (int) spnNoInterestInRelationshipsDiceSize.getValue();
         model.interestedInBothSexesDiceSize = (int) spnPrefersBothSexesDiceSize.getValue();

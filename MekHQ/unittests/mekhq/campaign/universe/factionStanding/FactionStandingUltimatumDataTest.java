@@ -210,6 +210,69 @@ class FactionStandingUltimatumDataTest {
         assertThrows(DateTimeParseException.class, loaded::getDate);
     }
 
+    @Test
+    @DisplayName("A third party that introduces the ultimatum is not a choosable side")
+    void testChoosableSidesExcludeThirdParty() {
+        FactionStandingUltimatumSide thirdParty = new FactionStandingUltimatumSide("TH", "Envoy", PersonnelRole.NOBLE,
+              "TH");
+        FactionStandingUltimatumSide first = new FactionStandingUltimatumSide("LA", "Leader", PersonnelRole.NOBLE,
+              "LA");
+        FactionStandingUltimatumSide second = new FactionStandingUltimatumSide("FS", "Leader", PersonnelRole.NOBLE,
+              "FS");
+        List<FactionStandingUltimatumSide> sides = List.of(thirdParty, first, second);
+
+        FactionStandingUltimatumData withThirdParty = buildWithFlags(sides, true, false, null, null, null);
+        FactionStandingUltimatumData withoutThirdParty = buildWithFlags(sides, false, false, null, null, null);
+
+        assertEquals(List.of(first, second), withThirdParty.getChoosableSides());
+        assertNull(withThirdParty.getSide("TH"));
+        assertEquals(first, withThirdParty.getSide("LA"));
+        assertEquals(sides, withoutThirdParty.getChoosableSides());
+        assertEquals(thirdParty, withoutThirdParty.getSide("TH"));
+    }
+
+    @Test
+    @DisplayName("An ultimatum introduced by a third party with no sides has no choosable sides")
+    void testChoosableSidesWithNoSides() {
+        assertTrue(buildWithFlags(List.of(), true, false, null, null, null).getChoosableSides().isEmpty());
+    }
+
+    @Test
+    @DisplayName("An absent offersMercenary or offersPirate counts as offered, and an absent offersBanditCaste does not")
+    void testOfferedDefaults() {
+        FactionStandingUltimatumData defaults = buildWithFlags(List.of(), false, false, null, null, null);
+
+        assertTrue(defaults.isMercenaryOffered());
+        assertTrue(defaults.isPirateOffered());
+        assertFalse(defaults.isBanditCasteOffered());
+        assertTrue(defaults.isGoingRogueOffered());
+    }
+
+    @Test
+    @DisplayName("Explicit offers override the defaults, and going rogue is offered if any way is")
+    void testExplicitOffers() {
+        FactionStandingUltimatumData none = buildWithFlags(List.of(), false, false, false, false, false);
+        FactionStandingUltimatumData banditCasteOnly = buildWithFlags(List.of(), false, false, false, false, true);
+
+        assertFalse(none.isMercenaryOffered());
+        assertFalse(none.isPirateOffered());
+        assertFalse(none.isBanditCasteOffered());
+        assertFalse(none.isGoingRogueOffered());
+        assertTrue(banditCasteOnly.isBanditCasteOffered());
+        assertTrue(banditCasteOnly.isGoingRogueOffered());
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static FactionStandingUltimatumData buildWithFlags(List<FactionStandingUltimatumSide> sides,
+          boolean isIntroducedByThirdParty, boolean hasNoDissent, Boolean offersMercenary, Boolean offersPirate,
+          Boolean offersBanditCaste) {
+        return new FactionStandingUltimatumData("TEST", "3057-09-18", null, List.of("FC"), sides, "LA", false, 0,
+              isIntroducedByThirdParty, hasNoDissent, offersMercenary, offersPirate, offersBanditCaste, false);
+    }
+
     /**
      * @author Illiani
      * @since 0.51.01

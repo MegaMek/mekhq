@@ -100,8 +100,8 @@ public final class StratConFacilityEffectStatus {
                                               && contract.isBatchallAccepted();
             return new SupportRules(options.get(CampaignOption.ALLIED_FACILITY_MODIFIER_DIE_SIZE),
                   options.get(CampaignOption.ENEMY_FACILITY_MODIFIER_DIE_SIZE),
-                  isBiddingEnforced && contract.getEmployerFaction().isClan(),
-                  isBiddingEnforced && contract.getEnemyFaction().isClan());
+                  isBiddingEnforced && contract.getEmployerFaction().performsBatchalls(),
+                  isBiddingEnforced && contract.getEnemyFaction().performsBatchalls());
         }
 
         int getDieSize(boolean isAllied) {

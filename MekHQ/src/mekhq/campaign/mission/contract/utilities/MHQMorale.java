@@ -801,8 +801,11 @@ public class MHQMorale {
         // A Clan challenger issues a Batchall before battle.
         if (campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE) &&
                   newEnemyFaction.performsBatchalls()) {
+            // Clans always declare Batchalls against pirates and bandits, so the Faction Standing restriction only
+            // applies to everyone else
             boolean allowBatchalls = true;
-            if (campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictionsSafe()) {
+            if (!campaign.getPlayerForce().getFaction().isPirateOrBanditCaste()
+                      && campaign.getCampaignOptions().isUseFactionStandingBatchallRestrictionsSafe()) {
                 double regard = factionStandings.getRegardForFaction(newEnemyFaction.getShortName(), true);
                 allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
             }

@@ -43,6 +43,7 @@ import megamek.common.units.SmallCraft;
 import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
@@ -277,7 +278,10 @@ public final class MultiCrewAssembler {
             CrewDescriptorAdapter.apply(descriptor, person, entity, overrideName);
         }
         //The crew descriptor may have applied a new gender (to match the name) so generate a new portrait just in case
-        campaign.getPlayerForce().getHumanResources().assignRandomPortraitFor(campaign.getCampaignOptions(), person);
+        if (ForceHumanResources.isRankEligibleForRandomPortrait(campaign.getCampaignOptions(), person)) {
+            campaign.getPlayerForce().getHumanResources().assignRandomPortraitFor(campaign.getCampaignOptions(),
+                  person);
+        }
         //Also regenerate the personality description to match the character
         PersonalityController.writePersonalityDescription(person);
         return person;

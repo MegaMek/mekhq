@@ -50,12 +50,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
 
 import jakarta.annotation.Nullable;
+import megamek.client.ratgenerator.RATGenerator;
+import megamek.utilities.ImageUtilities;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCard.Tag;
 import mekhq.gui.baseComponents.hud.HudChip;
@@ -80,6 +83,8 @@ public class UltimatumSidePickerDialog extends JDialog {
 
     private static final int FOCUSED_CODE_BOX_SIZE = 72;
     private static final int NEIGHBOR_CODE_BOX_SIZE = 44;
+    private static final int ICON_PADDING = 6;
+    private static final double ICON_TINT_TRANSPARENCY = 0.25;
     private static final int PITCH_WIDTH = 360;
     private static final Color ROGUE_BORDER = translucent(AMBER, 115);
     private static final Color ROGUE_CODE_BOX = translucent(AMBER, 28);
@@ -89,7 +94,8 @@ public class UltimatumSidePickerDialog extends JDialog {
     public enum ChoiceKind {
         SIDE,
         MERCENARY,
-        PIRATE;
+        PIRATE,
+        BANDIT_CASTE;
 
         /**
          * @return {@code true} if this choice abandons every side to go rogue
@@ -124,6 +130,7 @@ public class UltimatumSidePickerDialog extends JDialog {
      * Everything the picker shows around the carousel.
      *
      * @param choices             the cards, in carousel order
+     * @param gameYear            the campaign's year, which decides the faction icons shown on the cards
      * @param dateLabel           the ultimatum's date, for the header
      * @param situationText       the situation briefing
      * @param dissenterLabel      the dissenting officer's name and position, or {@code null} if there is none
@@ -133,7 +140,7 @@ public class UltimatumSidePickerDialog extends JDialog {
      * @author Illiani
      * @since 0.51.01
      */
-    public record PickerContent(List<PickerChoice> choices, String dateLabel, String situationText,
+    public record PickerContent(List<PickerChoice> choices, int gameYear, String dateLabel, String situationText,
           @Nullable String dissenterLabel, boolean isViolentTransition, String gameInformation) {}
 
     private final PickerContent content;
@@ -322,18 +329,13 @@ public class UltimatumSidePickerDialog extends JDialog {
      * @since 0.51.01
      */
     private JPanel buildDecisionRow() {
-        // The dissent strip and the buttons share one row: the strip stretches, the buttons keep their size
-        JPanel row = new JPanel(new BorderLayout(scaleForGUI(14), 0));
+        // The dissent strip sits above the buttons, which are right-aligned on their own line
+        JPanel row = new JPanel(new BorderLayout(0, scaleForGUI(10)));
         row.setOpaque(false);
         if (content.dissenterLabel() != null) {
-            row.add(buildDissentStrip(), BorderLayout.CENTER);
+            row.add(buildDissentStrip(), BorderLayout.NORTH);
         }
-
-        // Centered vertically against the strip, which is usually taller than the buttons
-        JPanel buttonHolder = new JPanel(new GridBagLayout());
-        buttonHolder.setOpaque(false);
-        buttonHolder.add(buildButtons());
-        row.add(buttonHolder, BorderLayout.EAST);
+        row.add(buildButtons(), BorderLayout.CENTER);
         return row;
     }
 
@@ -491,7 +493,7 @@ public class UltimatumSidePickerDialog extends JDialog {
         boolean isRogue = choice.kind().isGoingRogue();
         JPanel card = cardShell(SURFACE, isRogue ? ROGUE_BORDER : BORDER_CYAN, isRogue ? AMBER : ACCENT);
 
-        card.add(leftAligned(identity(choice, FOCUSED_CODE_BOX_SIZE, 1.0f, TEXT, 1.05f)));
+        card.add(leftAligned(identity(choice, content.gameYear(), FOCUSED_CODE_BOX_SIZE, TEXT, 1.05f)));
         card.add(verticalGap(12));
 
         JLabel pitch = wrappedLabel("<i>" + choice.pitch() + "</i>", TEXT, 0.95f, PITCH_WIDTH);
@@ -536,7 +538,7 @@ public class UltimatumSidePickerDialog extends JDialog {
     private JPanel buildNeighborCard(int index) {
         PickerChoice choice = content.choices().get(index);
         JPanel card = cardShell(SURFACE_DEEP, BORDER, null);
-        card.add(leftAligned(identity(choice, NEIGHBOR_CODE_BOX_SIZE, 0.78f, TEXT_FAINT, 0.9f)));
+        card.add(leftAligned(identity(choice, content.gameYear(), NEIGHBOR_CODE_BOX_SIZE, TEXT_FAINT, 0.9f)));
         card.setToolTipText(wordWrap(choice.title()));
         card.addMouseListener(new MouseAdapter() {
             @Override
@@ -580,8 +582,8 @@ public class UltimatumSidePickerDialog extends JDialog {
      * @author Illiani
      * @since 0.51.01
      */
-    private static JPanel identity(PickerChoice choice, int codeBoxSize, float codeSize, Color titleColor,
-          float titleSize) {
+    private static JPanel identity(PickerChoice choice, int gameYear, int codeBoxSize,
+          Color titleColor, float titleSize) {
         JPanel identity = new JPanel(new BorderLayout(scaleForGUI(12), 0));
         identity.setOpaque(false);
 
@@ -600,7 +602,7 @@ public class UltimatumSidePickerDialog extends JDialog {
         // Held at the top, so the box stays square instead of stretching to the text's height
         JPanel codeHolder = new JPanel(new BorderLayout());
         codeHolder.setOpaque(false);
-        codeHolder.add(codeBox(choice, codeBoxSize, codeSize), BorderLayout.NORTH);
+        codeHolder.add(codeBox(choice, gameYear, codeBoxSize), BorderLayout.NORTH);
 
         identity.add(codeHolder, BorderLayout.WEST);
         identity.add(text, BorderLayout.CENTER);
@@ -608,16 +610,18 @@ public class UltimatumSidePickerDialog extends JDialog {
     }
 
     /**
-     * A square box showing the faction's short name, cyan for a side and amber for going rogue.
+     * A square box showing the faction's icon, tinted cyan for a side and amber for going rogue. A faction without an
+     * icon of its own shows the generic logo that {@link RATGenerator#getFactionLogoFile(int, String)} falls back to.
      *
      * @author Illiani
      * @since 0.51.01
      */
-    private static JLabel codeBox(PickerChoice choice, int size, float codeSize) {
+    private static JLabel codeBox(PickerChoice choice, int gameYear, int size) {
         boolean isRogue = choice.kind().isGoingRogue();
-        JLabel codeBox = new JLabel(choice.code(), SwingConstants.CENTER);
-        codeBox.setFont(hudFont(Font.BOLD, codeSize, 0.06f));
-        codeBox.setForeground(isRogue ? AMBER : ACCENT_BRIGHT);
+        Color codeColor = isRogue ? AMBER : ACCENT_BRIGHT;
+        ImageIcon factionIcon = getTintedFactionIcon(choice.code(), gameYear, codeColor, size - (ICON_PADDING * 2));
+
+        JLabel codeBox = new JLabel(factionIcon, SwingConstants.CENTER);
         codeBox.setOpaque(true);
         codeBox.setBackground(isRogue ? ROGUE_CODE_BOX : SURFACE_HIGHLIGHT);
         codeBox.setBorder(BorderFactory.createLineBorder(isRogue ? ROGUE_BORDER : BORDER_CYAN, scaleForGUI(1)));
@@ -625,6 +629,27 @@ public class UltimatumSidePickerDialog extends JDialog {
         codeBox.setPreferredSize(boxSize);
         codeBox.setMinimumSize(boxSize);
         return codeBox;
+    }
+
+    /**
+     * Loads a faction's icon, tints it, and scales it to fit inside a square of the given size.
+     *
+     * @param factionCode the faction's short name
+     * @param gameYear    the campaign's year, as faction icons can change over time
+     * @param tint        the color to tint the icon with
+     * @param size        the width and height of the square the icon has to fit in, before GUI scaling
+     *
+     * @return the tinted and scaled icon
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static ImageIcon getTintedFactionIcon(String factionCode, int gameYear, Color tint, int size) {
+        File iconFile = RATGenerator.getFactionLogoFile(gameYear, factionCode);
+        ImageIcon icon = new ImageIcon(iconFile.getPath());
+        ImageIcon tinted = ImageUtilities.addTintToImageIcon(icon.getImage(), tint, true, ICON_TINT_TRANSPARENCY);
+        boolean isWiderThanTall = tinted.getIconWidth() >= tinted.getIconHeight();
+        return ImageUtilities.scaleImageIcon(tinted, size, isWiderThanTall);
     }
 
     /**

@@ -85,13 +85,12 @@ class CrewAssignmentFiltersHiddenTest {
     @Test
     void startingFiltersCountAsNoneSet() {
         CrewAssignmentState state = new CrewAssignmentState();
-        assertEquals(0, state.activeRailFilters(CrewAssignmentPage.UNITS));
-        assertEquals(0, state.activeRailFilters(CrewAssignmentPage.PERSONNEL));
+        assertEquals(0, state.activeRailFilters(CrewAssignmentPage.ASSIGN));
         assertEquals(0, state.activeRailFilters(CrewAssignmentPage.REVIEW));
     }
 
     @Test
-    void eachPageCountsOnlyItsOwnRailFilters() {
+    void assignPageCountsEveryRailFilterAndReviewNone() {
         CrewAssignmentState state = new CrewAssignmentState();
         state.unitType = "Mek";
         state.formation = "D-1";
@@ -102,8 +101,8 @@ class CrewAssignmentFiltersHiddenTest {
         // The search box is above the list, not on the rail, so it stays in sight and is not counted
         state.peopleQuery = "Smith";
 
-        assertEquals(2, state.activeRailFilters(CrewAssignmentPage.UNITS));
-        assertEquals(4, state.activeRailFilters(CrewAssignmentPage.PERSONNEL));
+        // Two unit filters and four people filters, all on the Assign page's one rail
+        assertEquals(6, state.activeRailFilters(CrewAssignmentPage.ASSIGN));
         assertEquals(0, state.activeRailFilters(CrewAssignmentPage.REVIEW));
     }
 }

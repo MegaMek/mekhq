@@ -93,8 +93,8 @@ class MHQOptionsModelTest {
             preferenceStatic.when(PreferenceManager::getClientPreferences).thenReturn(clientPreferences);
 
             MHQOptions options = new MHQOptions();
-            // MHQOptions proxies the shared Preferences.userRoot() store; capture the current real state so it can be
-            // restored after the test mutates it.
+            // MHQOptions proxies the shared Preferences.userRoot() store (in memory under test, but shared by every test
+            // in this class); capture the current state so it can be restored after the test mutates it.
             MHQOptionsModel original = new MHQOptionsModel(options);
             try {
                 MHQOptionsModel model = new MHQOptionsModel(options);

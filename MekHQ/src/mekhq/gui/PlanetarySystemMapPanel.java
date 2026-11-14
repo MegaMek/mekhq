@@ -700,6 +700,13 @@ public class PlanetarySystemMapPanel extends JPanel {
      *
      * @return the currently selected planet
      */
+    public PlanetarySystem getPlanetarySystem() {
+        return system;
+    }
+
+    /**
+     * @return the position of the currently selected planet within {@link #getPlanetarySystem()}
+     */
     public int getSelectedPlanetPosition() {
         return selectedPlanet;
     }

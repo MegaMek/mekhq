@@ -34,7 +34,6 @@ package mekhq.gui.dialog.markets.contractMarket;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT_BRIGHT;
 import static mekhq.gui.baseComponents.hud.HudStyle.AMBER;
 import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
@@ -1007,7 +1006,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      */
     private static ContractSearchType defaultSearchType(Campaign campaign) {
         Faction faction = campaign.getPlayerForce().getFaction();
-        if (faction.getShortName().equals(PIRATE_FACTION_CODE)) {
+        if (faction.isPirateOrBanditCaste()) {
             return ContractSearchType.PIRATE;
         }
         if (faction.isMercenary()) {
@@ -1026,7 +1025,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      */
     private static List<ContractSearchType> allowedSearchTypes(Campaign campaign) {
         Faction faction = campaign.getPlayerForce().getFaction();
-        if (faction.getShortName().equals(PIRATE_FACTION_CODE)) {
+        if (faction.isPirateOrBanditCaste()) {
             return List.of(ContractSearchType.PIRATE);
         }
         if (faction.isMercenary()) {

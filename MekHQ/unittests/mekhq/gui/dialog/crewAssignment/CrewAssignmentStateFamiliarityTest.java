@@ -44,9 +44,7 @@ import java.util.Map;
 import megamek.common.units.Entity;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
-import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.FamiliarityBand;
-import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SeatFilter;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -100,20 +98,11 @@ class CrewAssignmentStateFamiliarityTest {
     }
 
     @Test
-    void chassisComesFromTheSeatBeingFilledFirst() {
+    void chassisComesFromTheSelectedUnit() {
         CrewAssignmentState state = new CrewAssignmentState();
-        state.selectedUnits.add(unitWithChassis("Locust"));
-        state.qualifiedFor = new SeatFilter(unitWithChassis("Atlas"), SeatType.PILOT);
-        assertEquals("Atlas", state.familiarityChassis());
-    }
-
-    @Test
-    void chassisComesFromASingleSelectedUnit() {
-        CrewAssignmentState state = new CrewAssignmentState();
-        state.selectedUnits.add(unitWithChassis("Locust"));
-        assertEquals("Locust", state.familiarityChassis());
-
-        state.selectedUnits.add(unitWithChassis("Atlas"));
         assertNull(state.familiarityChassis());
+
+        state.selectedUnit = unitWithChassis("Locust");
+        assertEquals("Locust", state.familiarityChassis());
     }
 }

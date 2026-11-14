@@ -706,7 +706,9 @@ public class GeneralPage {
         boolean isStartUp = (mode == CampaignOptionsDialogMode.STARTUP)
                                   || (mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED);
         Faction selectedFaction = getFaction();
-        boolean isMercenaryOrPirate = selectedFaction.isMercenary() || selectedFaction.isPirate();
+        // The Bandit Caste always starts at its capital, so the mercenary/pirate starting-location controls don't apply
+        boolean isBanditCaste = selectedFaction.isBanditCaste();
+        boolean isMercenaryOrPirate = selectedFaction.isMercenary() || (selectedFaction.isPirate() && !isBanditCaste);
 
         // The capital-vs-hiring-hall choice applies to every campaign
         lblStartingWorld.setVisible(isStartUp);

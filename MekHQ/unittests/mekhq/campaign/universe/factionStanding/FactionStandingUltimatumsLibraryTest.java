@@ -437,6 +437,47 @@ class FactionStandingUltimatumsLibraryTest {
     }
 
     @Test
+    @DisplayName("A ROGUE dissenter preference is invalid when no way of going rogue is offered")
+    void testRoguePreferenceInvalidWhenRogueNotOffered() {
+        FactionStandingUltimatumSide side = new FactionStandingUltimatumSide("LA", "Leader", PersonnelRole.NOBLE,
+              "LA");
+
+        FactionStandingUltimatumData noRogue = buildUltimatumWithFlags(List.of(side), "ROGUE", false, false, false,
+              false);
+        FactionStandingUltimatumData banditCasteOnly = buildUltimatumWithFlags(List.of(side), "ROGUE", false, false,
+              false, true);
+
+        assertFalse(FactionStandingUltimatumsLibrary.isValidDissenterPreference(noRogue));
+        assertTrue(FactionStandingUltimatumsLibrary.isValidDissenterPreference(banditCasteOnly));
+    }
+
+    @Test
+    @DisplayName("With no dissent, any dissenter preference is valid")
+    void testAnyPreferenceValidWithNoDissent() {
+        FactionStandingUltimatumSide side = new FactionStandingUltimatumSide("LA", "Leader", PersonnelRole.NOBLE,
+              "LA");
+
+        assertTrue(FactionStandingUltimatumsLibrary.isValidDissenterPreference(
+              buildUltimatumWithFlags(List.of(side), "DC", true, null, null, null)));
+        assertTrue(FactionStandingUltimatumsLibrary.isValidDissenterPreference(
+              buildUltimatumWithFlags(List.of(side), null, true, null, null, null)));
+        assertTrue(FactionStandingUltimatumsLibrary.isValidDissenterPreference(
+              buildUltimatumWithFlags(List.of(side), "ROGUE", true, false, false, false)));
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static FactionStandingUltimatumData buildUltimatumWithFlags(List<FactionStandingUltimatumSide> sides,
+          String dissenterPreference, boolean hasNoDissent, Boolean offersMercenary, Boolean offersPirate,
+          Boolean offersBanditCaste) {
+        return new FactionStandingUltimatumData("FLAGS", TEST_DATE.toString(), null, List.of("FC"), sides,
+              dissenterPreference, false, 0, false, hasNoDissent, offersMercenary, offersPirate, offersBanditCaste,
+              false);
+    }
+
+    @Test
     @DisplayName("A file with an unknown role is skipped without stopping the other files loading")
     void testUnknownRoleFileIsSkipped(@TempDir Path temporaryDirectory) throws IOException {
         Files.copy(new File(FIXTURE_DIRECTORY, "EXODUS.json").toPath(), temporaryDirectory.resolve("EXODUS.json"));

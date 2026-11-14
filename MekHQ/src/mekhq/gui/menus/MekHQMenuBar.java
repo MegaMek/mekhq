@@ -156,16 +156,21 @@ public class MekHQMenuBar extends JMenuBar {
     private JMenuItem miPlanetarySystemEditor;
 
     /**
-     * This is used to initialize the top menu bar. All the top level menu bar and {@link MHQTabType} mnemonics must be
-     * unique, as they are both accessed through the same GUI page. The following mnemonic keys are being used as of
-     * 30-MAR-2020: A, B, C, E, F, H, I, L, M, N, O, P, R, S, T, V, W, /
+     * This is used to initialize the top menu bar.
      * <p>
-     * Note 1: the slash is used for the help, as it is normally the same key as the ?
-     * <p>
-     * Note 2: the A mnemonic is used for the Advance Day button
-     * <p>
-     * Note 3: Only essential actions (Save, Load, New) have global Ctrl+key accelerators. All other menu items use
-     * mnemonics only (accessible via keyboard menu navigation) to avoid duplicate accelerator conflicts.
+     * <b>Keyboard shortcut policy:</b>
+     * <ul>
+     *   <li>Alt+key (mnemonic) is reserved for things reachable from the main window: the top-level menus, the
+     *   {@link MHQTabType} tabs and the Advance Day button. These must be unique. The keys in use are: A (Advance Day),
+     *   B, C, H, I, L, N, O, P, R, T, W (tabs), D, E, F, G, M, V (top-level menus, G being Manage Campaign) and
+     *   {@code /} (Help, as it is normally the same key as the ?).</li>
+     *   <li>Menu items and sub-menus deliberately have <i>no</i> mnemonics. They are only ever usable while their
+     *   parent menu is open, are rarely used, and reusing letters made them mislabelled and duplicated.</li>
+     *   <li>Frequently used actions instead get global accelerators, which work from the main window without opening a
+     *   menu: Ctrl+S/L/N (save, load, new), and Ctrl+Shift (Cmd+Shift on macOS) +O (Campaign Options), +H (MekHQ
+     *   Options), +M (MegaMek Options), +G (MegaMek Client Options), +P (Recruitment), +C (Contract Market), +U (Unit
+     *   Market) and +D (Historical Daily Report Log).</li>
+     * </ul>
      */
     public MekHQMenuBar(MekHQ app, CampaignGUI gui) {
         super();
@@ -216,14 +221,14 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The File menu uses the following Mnemonic keys as of 25-MAR-2022: C, E, H, I, L, M, N, R, S, T, U, X
+     * The File menu. Items have no mnemonics; see {@link #MekHQMenuBar(MekHQ, CampaignGUI)}.
      */
     private JMenu initFileMenu() {
         // TODO : Implement "Export All" versions for Personnel and Parts
         JMenu menuFile = new JMenu(getTextAt("fileMenu.text"));
         menuFile.setMnemonic(KeyEvent.VK_F);
 
-        JMenuItem menuLoad = createMenuItem("menuLoad.text", KeyEvent.VK_L, event -> {
+        JMenuItem menuLoad = createMenuItem("menuLoad.text", event -> {
             final File file = FileDialogs.openCampaign(getFrame()).orElse(null);
             if (file == null) {
                 return;
@@ -241,11 +246,11 @@ public class MekHQMenuBar extends JMenuBar {
         menuLoad.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_L, InputEvent.CTRL_DOWN_MASK));
         menuFile.add(menuLoad);
 
-        JMenuItem menuSave = createMenuItem("menuSave.text", KeyEvent.VK_S, getGui()::saveCampaign);
+        JMenuItem menuSave = createMenuItem("menuSave.text", getGui()::saveCampaign);
         menuSave.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_S, InputEvent.CTRL_DOWN_MASK));
         menuFile.add(menuSave);
 
-        JMenuItem menuNew = createMenuItem("menuNew.text", KeyEvent.VK_N, event -> handleInAppNewCampaign());
+        JMenuItem menuNew = createMenuItem("menuNew.text", event -> handleInAppNewCampaign());
         menuNew.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_N, InputEvent.CTRL_DOWN_MASK));
         menuFile.add(menuNew);
 
@@ -253,19 +258,17 @@ public class MekHQMenuBar extends JMenuBar {
         menuFile.add(initExportMenu());
         menuFile.add(initRefreshMenu());
 
-        JMenuItem menuOptions = createMenuItem("menuOptions.text", KeyEvent.VK_C, this::menuOptionsActionPerformed);
-        menuOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_O,
-              Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | InputEvent.SHIFT_DOWN_MASK));
+        JMenuItem menuOptions = createMenuItem("menuOptions.text", this::menuOptionsActionPerformed);
+        setShiftShortcut(menuOptions, KeyEvent.VK_O);
         menuFile.add(menuOptions);
 
-        JMenuItem miMHQOptions = createMenuItem("miMHQOptions.text", KeyEvent.VK_H,
+        JMenuItem miMHQOptions = createMenuItem("miMHQOptions.text",
               event -> new MHQOptionsTreeDialog(getFrame()).setVisible(true));
-        miMHQOptions.setAccelerator(KeyStroke.getKeyStroke(KeyEvent.VK_H,
-              Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | InputEvent.SHIFT_DOWN_MASK));
+        setShiftShortcut(miMHQOptions, KeyEvent.VK_H);
         miMHQOptions.setToolTipText(getTextAt("miMHQOptions.toolTipText"));
         menuFile.add(miMHQOptions);
 
-        final JMenuItem miGameOptions = createMenuItem("miGameOptions.text", KeyEvent.VK_M, event -> {
+        final JMenuItem miGameOptions = createMenuItem("miGameOptions.text", event -> {
             final GameOptionsDialog god = new GameOptionsDialog(getFrame(), getCampaign().getGameOptions(), false);
             god.setEditable(true);
             if (god.showDialog().isConfirmed()) {
@@ -273,35 +276,34 @@ public class MekHQMenuBar extends JMenuBar {
                 getGui().refreshWindowTitle();
             }
         });
+        setShiftShortcut(miGameOptions, KeyEvent.VK_M);
         miGameOptions.setToolTipText(getTextAt("miGameOptions.toolTipText"));
         menuFile.add(miGameOptions);
 
-        final JMenuItem miMMClientOptions = createMenuItem("miMMClientOptions.text", KeyEvent.VK_O,
+        final JMenuItem miMMClientOptions = createMenuItem("miMMClientOptions.text",
               event -> new CommonSettingsDialog(getFrame(), null).setVisible(true));
+        setShiftShortcut(miMMClientOptions, KeyEvent.VK_G);
         miMMClientOptions.setToolTipText(getTextAt("miMMClientOptions.toolTipText"));
         menuFile.add(miMMClientOptions);
 
         menuThemes = new JMenu(getTextAt("menuThemes.text"));
-        menuThemes.setMnemonic(KeyEvent.VK_T);
         refreshThemeChoices();
         menuFile.add(menuThemes);
 
-        menuFile.add(createMenuItem("menuExit.text", KeyEvent.VK_E, event -> getApplication().exit(true)));
+        menuFile.add(createMenuItem("menuExit.text", event -> getApplication().exit(true)));
 
         return menuFile;
     }
 
     /**
-     * The Import menu uses the following Mnemonic keys as of 25-MAR-2022: A, C, F, I, P
+     * The Import menu. Items have no mnemonics.
      */
     private JMenu initImportMenu() {
         JMenu menuImport = new JMenu(getTextAt("menuImport.text"));
-        menuImport.setMnemonic(KeyEvent.VK_I);
 
-        menuImport.add(createMenuItem("miImportPerson.text", KeyEvent.VK_P, event -> loadPersonFile()));
+        menuImport.add(createMenuItem("miImportPerson.text", event -> loadPersonFile()));
 
-        JMenuItem miImportIndividualRankSystem = createMenuItem("miImportIndividualRankSystem.text", KeyEvent.VK_I,
-              event -> {
+        JMenuItem miImportIndividualRankSystem = createMenuItem("miImportIndividualRankSystem.text", event -> {
                   Campaign campaign = getCampaign();
                   final RankSystem rankSystem = RankSystem.generateIndividualInstanceFromXML(
                         FileDialogs.openIndividualRankSystem(getFrame()).orElse(null));
@@ -310,34 +312,30 @@ public class MekHQMenuBar extends JMenuBar {
         miImportIndividualRankSystem.setToolTipText(getTextAt("miImportIndividualRankSystem.toolTipText"));
         menuImport.add(miImportIndividualRankSystem);
 
-        menuImport.add(createMenuItem("miImportParts.text", KeyEvent.VK_A, event -> loadPartsFile()));
-        menuImport.add(createMenuItem("miLoadForces.text", KeyEvent.VK_F, event -> loadListFile(true)));
+        menuImport.add(createMenuItem("miImportParts.text", event -> loadPartsFile()));
+        menuImport.add(createMenuItem("miLoadForces.text", event -> loadListFile(true)));
 
         return menuImport;
     }
 
     /**
-     * The Export menu uses the following Mnemonic keys as of 25-MAR-2022: C, X, S The CSV menu uses the following
-     * Mnemonic keys as of 25-MAR-2022: F, P, U The XML menu uses the following Mnemonic keys as of 25-MAR-2022: C, I,
-     * P, R
+     * The Export menu. Items have no mnemonics.
      */
     private JMenu initExportMenu() {
         JMenu menuExport = new JMenu(getTextAt("menuExport.text"));
-        menuExport.setMnemonic(KeyEvent.VK_X);
 
         // region CSV Export
         JMenu miExportCSVFile = new JMenu(getTextAt("menuExportCSV.text"));
-        miExportCSVFile.setMnemonic(KeyEvent.VK_C);
 
-        JMenuItem miExportPersonnel = createMenuItem("miExportPersonnel.text", KeyEvent.VK_P, event -> exportPersonnel());
+        JMenuItem miExportPersonnel = createMenuItem("miExportPersonnel.text", event -> exportPersonnel());
         miExportPersonnel.setToolTipText(getTextAt("miExportPersonnel.toolTipText"));
         miExportCSVFile.add(miExportPersonnel);
 
-        JMenuItem miExportUnit = createMenuItem("miExportUnit.text", KeyEvent.VK_U, event -> exportUnits());
+        JMenuItem miExportUnit = createMenuItem("miExportUnit.text", event -> exportUnits());
         miExportUnit.setToolTipText(getTextAt("miExportUnit.toolTipText"));
         miExportCSVFile.add(miExportUnit);
 
-        JMenuItem miExportFinances = createMenuItem("miExportFinances.text", KeyEvent.VK_F, event -> exportFinances());
+        JMenuItem miExportFinances = createMenuItem("miExportFinances.text", event -> exportFinances());
         miExportFinances.setToolTipText(getTextAt("miExportFinances.toolTipText"));
         miExportCSVFile.add(miExportFinances);
 
@@ -346,19 +344,17 @@ public class MekHQMenuBar extends JMenuBar {
 
         // region XML Export
         JMenu miExportXMLFile = new JMenu(getTextAt("menuExportXML.text"));
-        miExportXMLFile.setMnemonic(KeyEvent.VK_X);
 
-        miExportXMLFile.add(createMenuItem("miExportRankSystems.text", KeyEvent.VK_R,
+        miExportXMLFile.add(createMenuItem("miExportRankSystems.text",
               event -> mekhq.campaign.personnel.ranks.Ranks.exportRankSystemsToFile(mekhq.gui.FileDialogs.saveRankSystems(
                           getFrame()).orElse(null),
                     getCampaign().getPlayerForce().getRankSystem())));
 
-        miExportXMLFile.add(createMenuItem("miExportIndividualRankSystem.text", KeyEvent.VK_I,
-              event -> getCampaign().getPlayerForce()
+        miExportXMLFile.add(createMenuItem("miExportIndividualRankSystem.text", event -> getCampaign().getPlayerForce()
                            .getRankSystem()
                            .writeToFile(FileDialogs.saveIndividualRankSystem(getFrame()).orElse(null))));
 
-        JMenuItem miExportPlanetsXML = createMenuItem("miExportPlanets.text", KeyEvent.VK_P, event -> {
+        JMenuItem miExportPlanetsXML = createMenuItem("miExportPlanets.text", event -> {
             try {
                 exportPlanets(FileType.XML,
                       getTextAt("dlgSavePlanetsXML.text"),
@@ -376,7 +372,7 @@ public class MekHQMenuBar extends JMenuBar {
         menuExport.add(miExportXMLFile);
         // endregion XML Export
 
-        JMenuItem miExportCampaignSubset = createMenuItem("miExportCampaignSubset.text", KeyEvent.VK_S, event -> {
+        JMenuItem miExportCampaignSubset = createMenuItem("miExportCampaignSubset.text", event -> {
             CampaignExportWizard cew = new CampaignExportWizard(getApplication(), getCampaign());
             cew.display(CampaignExportWizard.CampaignExportWizardState.ForceSelection);
         });
@@ -386,39 +382,36 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Refresh menu uses the following Mnemonic keys as of 12-APR-2022: A, C, D, F, P, R, U
+     * The Refresh menu. Items have no mnemonics.
      */
     private JMenu initRefreshMenu() {
         JMenu menuRefresh = new JMenu(getTextAt("menuRefresh.text"));
-        menuRefresh.setMnemonic(KeyEvent.VK_R);
 
-        menuRefresh.add(createMenuItem("miRefreshUnitCache.text", KeyEvent.VK_U,
-              event -> MekSummaryCache.refreshUnitData(false)));
-        menuRefresh.add(createMenuItem("miRefreshCamouflage.text", KeyEvent.VK_C, event -> {
+        menuRefresh.add(createMenuItem("miRefreshUnitCache.text", event -> MekSummaryCache.refreshUnitData(false)));
+        menuRefresh.add(createMenuItem("miRefreshCamouflage.text", event -> {
             MHQStaticDirectoryManager.refreshCamouflageDirectory();
             getGui().refreshAllTabs();
         }));
-        menuRefresh.add(createMenuItem("miRefreshPortraits.text", KeyEvent.VK_P, event -> {
+        menuRefresh.add(createMenuItem("miRefreshPortraits.text", event -> {
             MHQStaticDirectoryManager.refreshPortraitDirectory();
             getGui().refreshAllTabs();
         }));
-        menuRefresh.add(createMenuItem("miRefreshFormationIcons.text", KeyEvent.VK_F, event -> {
+        menuRefresh.add(createMenuItem("miRefreshFormationIcons.text", event -> {
             MHQStaticDirectoryManager.refreshFormationIcons();
             getGui().refreshAllTabs();
         }));
-        menuRefresh.add(createMenuItem("miRefreshAwards.text", KeyEvent.VK_A, event -> {
+        menuRefresh.add(createMenuItem("miRefreshAwards.text", event -> {
             MHQStaticDirectoryManager.refreshAwardIcons();
             getGui().refreshAllTabs();
         }));
-        menuRefresh.add(createMenuItem("miRefreshStoryIcons.text", KeyEvent.VK_A, event -> {
+        menuRefresh.add(createMenuItem("miRefreshStoryIcons.text", event -> {
             MHQStaticDirectoryManager.refreshStorySplash();
             getGui().refreshAllTabs();
         }));
-        menuRefresh.add(createMenuItem("miRefreshRanks.text", KeyEvent.VK_R,
-              event -> Ranks.reinitializeRankSystems(getCampaign())));
+        menuRefresh.add(createMenuItem("miRefreshRanks.text", event -> Ranks.reinitializeRankSystems(getCampaign())));
 
         JMenuItem miRefreshFinancialInstitutions = createMenuItem("miRefreshFinancialInstitutions.text",
-              KeyEvent.VK_UNDEFINED, event -> FinancialInstitutions.initializeFinancialInstitutions());
+              event -> FinancialInstitutions.initializeFinancialInstitutions());
         miRefreshFinancialInstitutions.setToolTipText(getTextAt("miRefreshFinancialInstitutions.toolTipText"));
         menuRefresh.add(miRefreshFinancialInstitutions);
 
@@ -426,25 +419,36 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Marketplace menu uses the following Mnemonic keys as of 19-March-2020: A, B, C, H, M, N, P, R, S, U
+     * The Marketplace menu. Items have no mnemonics, but the main markets have global accelerators.
      */
     private JMenu initMarketMenu() {
         JMenu menuMarket = new JMenu(getTextAt("menuMarket.text"));
         menuMarket.setMnemonic(KeyEvent.VK_M);
 
-        menuMarket.add(createMenuItem("miRecruitment.text", KeyEvent.VK_R,
-              event -> getGui().openRecruitmentDialog()));
+        JMenuItem miRecruitment = createMenuItem("miRecruitment.text", event -> getGui().openRecruitmentDialog());
+        setShiftShortcut(miRecruitment, KeyEvent.VK_P);
+        menuMarket.add(miRecruitment);
 
-        JMenuItem miContractMarket = createMenuItem("miContractMarket.text", KeyEvent.VK_C,
-              event -> getGui().showContractMarket());
+        // The accelerator stays active while the item is hidden, so the action re-checks the campaign options
+        JMenuItem miContractMarket = createMenuItem("miContractMarket.text", event -> {
+            if (getCampaign().getCampaignOptions().isUseStratCon()) {
+                getGui().showContractMarket();
+            }
+        });
+        setShiftShortcut(miContractMarket, KeyEvent.VK_C);
         miContractMarket.setVisible(getCampaign().getCampaignOptions().isUseStratCon());
         menuMarket.add(miContractMarket);
 
-        JMenuItem miUnitMarket = createMenuItem("miUnitMarket.text", KeyEvent.VK_U, event -> getGui().showUnitMarket());
+        JMenuItem miUnitMarket = createMenuItem("miUnitMarket.text", event -> {
+            if (!getCampaign().getUnitMarket().getMethod().isNone()) {
+                getGui().showUnitMarket();
+            }
+        });
+        setShiftShortcut(miUnitMarket, KeyEvent.VK_U);
         miUnitMarket.setVisible(!getCampaign().getUnitMarket().getMethod().isNone());
         menuMarket.add(miUnitMarket);
 
-        JMenuItem miPurchaseUnit = createMenuItem("miPurchaseUnit.text", KeyEvent.VK_N, event -> {
+        JMenuItem miPurchaseUnit = createMenuItem("miPurchaseUnit.text", event -> {
             UnitLoadingDialog unitLoadingDialog = new UnitLoadingDialog(getFrame());
             if (!MekSummaryCache.getInstance().isInitialized()) {
                 unitLoadingDialog.setVisible(true);
@@ -455,16 +459,14 @@ public class MekHQMenuBar extends JMenuBar {
         });
         menuMarket.add(miPurchaseUnit);
 
-        menuMarket.add(createMenuItem("miBuyParts.text", KeyEvent.VK_P,
+        menuMarket.add(createMenuItem("miBuyParts.text",
               event -> new PartsStoreDialog(true, getGui()).setVisible(true)));
 
-        menuMarket.add(createMenuItem("miBulkRecruitment.text", KeyEvent.VK_B,
-              event -> getGui().openBulkRecruitmentDialog()));
+        menuMarket.add(createMenuItem("miBulkRecruitment.text", event -> getGui().openBulkRecruitmentDialog()));
 
         JMenu menuRecruitment = new JMenu(getTextAt("menuRecruitment.text"));
-        menuRecruitment.setMnemonic(KeyEvent.VK_H);
 
-        menuRecruitment.add(createMenuItem("menuRecruitment.blank.text", KeyEvent.VK_UNDEFINED, this::addBlankPerson));
+        menuRecruitment.add(createMenuItem("menuRecruitment.blank.text", this::addBlankPerson));
 
         JMenu menuCombatRecruitment = new JMenu(getTextAt("menuRecruitment.combat"));
         JMenu menuSupportRecruitment = new JMenu(getTextAt("menuRecruitment.support"));
@@ -473,10 +475,6 @@ public class MekHQMenuBar extends JMenuBar {
         PersonnelRole[] roles = PersonnelRole.getValuesSortedAlphabetically(getCampaign().getPlayerForce().isClanForce());
         for (PersonnelRole role : roles) {
             JMenuItem miRoleRecruitment = new JMenuItem(role.getLabel(getCampaign().getPlayerForce().getFaction().isClan()));
-            if (role.getMnemonic() != KeyEvent.VK_UNDEFINED) {
-                miRoleRecruitment.setMnemonic(role.getMnemonic());
-            }
-
             miRoleRecruitment.setToolTipText(role.getDescription(getCampaign().getPlayerForce().isClanForce()));
             miRoleRecruitment.setActionCommand(role.name());
             miRoleRecruitment.addActionListener(this::hirePerson);
@@ -509,39 +507,38 @@ public class MekHQMenuBar extends JMenuBar {
 
 
     /**
-     * The Reports menu uses the following Mnemonic keys as of 19-March-2020: C, H, P, T, U
+     * The Reports menu. Items have no mnemonics.
      */
     private JMenu initReportsMenu() {
         JMenu menuReports = new JMenu(getTextAt("menuReports.text"));
         menuReports.setMnemonic(KeyEvent.VK_E);
-        menuReports.add(createMenuItem("miDragoonsRating.text", KeyEvent.VK_U, event -> {
+        menuReports.add(createMenuItem("miDragoonsRating.text", event -> {
             if (getCampaign().getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION)) {
                 new ChaosReputationReportDialog(getFrame(), getCampaign()).setVisible(true);
             } else {
                 new ReputationReportDialog(getFrame(), getCampaign()).setVisible(true);
             }
         }));
-        menuReports.add(createMenuItem("miPersonnelReport.text", KeyEvent.VK_P,
+        menuReports.add(createMenuItem("miPersonnelReport.text",
               event -> new PersonnelReportDialog(getFrame(), new PersonnelReport(getCampaign())).setVisible(true)));
-        menuReports.add(createMenuItem("miHangarBreakdown.text", KeyEvent.VK_H,
+        menuReports.add(createMenuItem("miHangarBreakdown.text",
               event -> new HangarReportDialog(getFrame(), new HangarReport(getCampaign())).setVisible(true)));
-        menuReports.add(createMenuItem("miTransportReport.text", KeyEvent.VK_T,
+        menuReports.add(createMenuItem("miTransportReport.text",
               event -> new TransportReportDialog(getFrame(), new TransportReport(getCampaign())).setVisible(true)));
-        menuReports.add(createMenuItem("miCargoReport.text", KeyEvent.VK_C,
+        menuReports.add(createMenuItem("miCargoReport.text",
               event -> new CargoReportDialog(getFrame(), new CargoReport(getCampaign())).setVisible(true)));
-        menuReports.add(createMenuItem("miAlmanac.text", KeyEvent.VK_A,
-              event -> new WarriorsAlmanacDialog(getCampaign(), false)));
+        menuReports.add(createMenuItem("miAlmanac.text", event -> new WarriorsAlmanacDialog(getCampaign(), false)));
         return menuReports;
     }
 
     /**
-    * The View menu uses the following Mnemonic keys: H, N, R
+     * The View menu. Items have no mnemonics, but the Historical Daily Report Log has a global accelerator.
      */
     private JMenu initViewMenu() {
         JMenu menuView = new JMenu(getTextAt("menuView.text"));
         menuView.setMnemonic(KeyEvent.VK_V);
 
-        JMenuItem miNavigationMap = createMenuItem("miNavigationMap.text", KeyEvent.VK_N, evt -> {
+        JMenuItem miNavigationMap = createMenuItem("miNavigationMap.text", evt -> {
             getGui().setSelectedTab(getGui().getNavigationTab());
             getGui().getNavigationTab().showInterstellarMap();
         });
@@ -551,23 +548,22 @@ public class MekHQMenuBar extends JMenuBar {
         menuView.add(miNavigationMap);
         menuView.addSeparator();
 
-        JMenuItem miHistoricalDailyReportDialog = createMenuItem("miShowHistoricalReportLog.text",
-              KeyEvent.VK_H,
-              event -> {
-                  HistoricalDailyReportDialog histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(),
-                        getGui());
-                  histDailyReportDialog.setModal(true);
-                  histDailyReportDialog.setVisible(true);
-                  histDailyReportDialog.dispose();
-              });
+        JMenuItem miHistoricalDailyReportDialog = createMenuItem("miShowHistoricalReportLog.text", event -> {
+            HistoricalDailyReportDialog histDailyReportDialog = new HistoricalDailyReportDialog(getFrame(),
+                  getGui());
+            histDailyReportDialog.setModal(true);
+            histDailyReportDialog.setVisible(true);
+            histDailyReportDialog.dispose();
+        });
+        setShiftShortcut(miHistoricalDailyReportDialog, KeyEvent.VK_D);
         menuView.add(miHistoricalDailyReportDialog);
 
-        miRetirementDefectionDialog = createMenuItem("miRetirementDefectionDialog.text", KeyEvent.VK_R,
+        miRetirementDefectionDialog = createMenuItem("miRetirementDefectionDialog.text",
               event -> getGui().showRetirementDefectionDialog());
         miRetirementDefectionDialog.setVisible(getCampaign().getCampaignOptions().get(CampaignOption.USE_RANDOM_RETIREMENT));
         menuView.add(miRetirementDefectionDialog);
 
-        miAwardEligibilityDialog = createMenuItem("miAwardEligibilityDialog.text", KeyEvent.VK_R,
+        miAwardEligibilityDialog = createMenuItem("miAwardEligibilityDialog.text",
               event -> showAwardEligibilityDialog());
         miAwardEligibilityDialog.setVisible(getCampaign().getCampaignOptions().get(CampaignOption.ENABLE_AUTO_AWARDS));
         menuView.add(miAwardEligibilityDialog);
@@ -577,19 +573,19 @@ public class MekHQMenuBar extends JMenuBar {
 
     private JMenu initManageCampaignMenu() {
         JMenu menuManage = new JMenu(getTextAt("menuManageCampaign.text"));
-        menuManage.setMnemonic(KeyEvent.VK_C);
+        menuManage.setMnemonic(KeyEvent.VK_G);
         menuManage.setName("manageMenu");
 
-        JMenuItem miGMToolsDialog = createMenuItem("miGMToolsDialog.text", KeyEvent.VK_G,
+        JMenuItem miGMToolsDialog = createMenuItem("miGMToolsDialog.text",
               event -> new GMToolsDialog(getFrame(), getGui(), null).setVisible(true));
         menuManage.add(miGMToolsDialog);
 
-        miPlanetarySystemEditor = createMenuItem("miPlanetarySystemEditor.text", KeyEvent.VK_P,
+        miPlanetarySystemEditor = createMenuItem("miPlanetarySystemEditor.text",
               event -> new PlanetarySystemEditorDialog(getFrame(), getCampaign()).setVisible(true));
         miPlanetarySystemEditor.setVisible(getCampaign().isGM());
         menuManage.add(miPlanetarySystemEditor);
 
-        JMenuItem miBloodnames = createMenuItem("miRandomBloodnames.text", KeyEvent.VK_B, event -> {
+        JMenuItem miBloodnames = createMenuItem("miRandomBloodnames.text", event -> {
             for (final Person person : getCampaign().getPlayerForce().getHumanResources().getPersonnel()) {
                 Campaign campaign = getCampaign();
                 campaign.getPlayerForce().getHumanResources().checkBloodnameAdd(campaign, person, false);
@@ -597,14 +593,12 @@ public class MekHQMenuBar extends JMenuBar {
         });
         menuManage.add(miBloodnames);
 
-        miCommandGenerator = createMenuItem("miCommandGenerator.text", KeyEvent.VK_C,
+        miCommandGenerator = createMenuItem("miCommandGenerator.text",
               event -> new CommandGenerationDialog(getFrame(), getCampaign()).setVisible(true));
         miCommandGenerator.setVisible(MekHQ.getMHQOptions().getShowCommandGenerator());
         menuManage.add(miCommandGenerator);
 
-        JMenuItem miAutoResolveBehaviorEditor = createMenuItem("miAutoResolveBehaviorSettings.text",
-              KeyEvent.VK_T,
-              event -> {
+        JMenuItem miAutoResolveBehaviorEditor = createMenuItem("miAutoResolveBehaviorSettings.text", event -> {
                   var autoResolveBehaviorSettingsDialog = new AutoResolveBehaviorSettingsDialog(getFrame(),
                         getCampaign());
                   autoResolveBehaviorSettingsDialog.setVisible(true);
@@ -625,32 +619,31 @@ public class MekHQMenuBar extends JMenuBar {
         menuDeveloperTools.setMnemonic(KeyEvent.VK_D);
         menuDeveloperTools.setName("developerToolsMenu");
 
-        JMenuItem miScenarioEditor = createMenuItem("miScenarioEditor.text", KeyEvent.VK_S,
+        JMenuItem miScenarioEditor = createMenuItem("miScenarioEditor.text",
               event -> new ScenarioTemplateEditorDialog(getFrame()).setVisible(true));
         menuDeveloperTools.add(miScenarioEditor);
 
-        JMenuItem miScenarioModifierEditor = createMenuItem("miScenarioModifierEditor.text", KeyEvent.VK_M,
+        JMenuItem miScenarioModifierEditor = createMenuItem("miScenarioModifierEditor.text",
               event -> new ScenarioModifierEditorDialog(getFrame()).setVisible(true));
         menuDeveloperTools.add(miScenarioModifierEditor);
 
-        JMenuItem miContractDefinitionEditor = createMenuItem("miContractDefinitionEditor.text", KeyEvent.VK_C,
+        JMenuItem miContractDefinitionEditor = createMenuItem("miContractDefinitionEditor.text",
               event -> new ContractDefinitionEditorDialog(getFrame()).setVisible(true));
         menuDeveloperTools.add(miContractDefinitionEditor);
 
-        JMenuItem miFacilityEditor = createMenuItem("miFacilityEditor.text", KeyEvent.VK_F,
+        JMenuItem miFacilityEditor = createMenuItem("miFacilityEditor.text",
               event -> new StratConFacilityEditorDialog(getFrame()).setVisible(true));
         menuDeveloperTools.add(miFacilityEditor);
 
-        JMenuItem miPointOfInterestEditor = createMenuItem("miPointOfInterestEditor.text", KeyEvent.VK_P,
+        JMenuItem miPointOfInterestEditor = createMenuItem("miPointOfInterestEditor.text",
               event -> new StratConPointOfInterestEditorDialog(getFrame()).setVisible(true));
         menuDeveloperTools.add(miPointOfInterestEditor);
 
         JMenuItem miFactionStandingUltimatumEditor = createMenuItem("miFactionStandingUltimatumEditor.text",
-              KeyEvent.VK_U,
               event -> new FactionStandingUltimatumEditorDialog(getFrame()).setVisible(true));
         menuDeveloperTools.add(miFactionStandingUltimatumEditor);
 
-        JMenuItem miLifePathBuilder = createMenuItem("miLifePathBuilder.text", KeyEvent.VK_L,
+        JMenuItem miLifePathBuilder = createMenuItem("miLifePathBuilder.text",
               event -> new LifePathBuilderDialog(getCampaign(), getFrame()));
         menuDeveloperTools.add(miLifePathBuilder);
 
@@ -658,7 +651,7 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * The Help menu uses the following Mnemonic keys as of 19-March-2020: A
+     * The Help menu. Items have no mnemonics.
      */
     private JMenu initHelpMenu() {
         JMenu menuHelp = new JMenu(getTextAt("menuHelp.text"));
@@ -667,18 +660,16 @@ public class MekHQMenuBar extends JMenuBar {
 
         menuHelp.addSeparator();
 
-        menuHelp.add(createMenuItem("menuReportBug.text", KeyEvent.VK_UNDEFINED,
-              event -> new EasyBugReportDialog(getFrame(), getCampaign())));
+        menuHelp.add(createMenuItem("menuReportBug.text", event -> new EasyBugReportDialog(getFrame(), getCampaign())));
         menuHelp.add(new CopySystemDataAction(MHQConstants.PROJECT_NAME));
 
         menuHelp.addSeparator();
 
-        JMenuItem releaseNotes = createMenuItem("menuReleaseNotes.text", KeyEvent.VK_UNDEFINED,
+        JMenuItem releaseNotes = createMenuItem("menuReleaseNotes.text",
               event -> ReleaseNotesConsole.showReleaseNotes(getFrame()));
         releaseNotes.setToolTipText(getTextAt("menuReleaseNotes.toolTipText"));
         menuHelp.add(releaseNotes);
-        menuHelp.add(createMenuItem("menuAbout.text", KeyEvent.VK_A,
-              event -> new MekHQAboutDialog(getFrame()).show()));
+        menuHelp.add(createMenuItem("menuAbout.text", event -> new MekHQAboutDialog(getFrame()).show()));
 
         return menuHelp;
     }
@@ -956,25 +947,33 @@ public class MekHQMenuBar extends JMenuBar {
     }
 
     /**
-     * Creates and configures a {@link JMenuItem} with localized text, an optional keyboard mnemonic, and an action
+     * Gives a menu item a global accelerator of the platform's menu shortcut key (Ctrl, or Cmd on macOS) plus Shift
+     * plus the given key.
+     *
+     * @param item    the menu item
+     * @param keyCode the {@link KeyEvent} key code
+     */
+    private static void setShiftShortcut(final JMenuItem item, final int keyCode) {
+        item.setAccelerator(KeyStroke.getKeyStroke(keyCode,
+              Toolkit.getDefaultToolkit().getMenuShortcutKeyMaskEx() | InputEvent.SHIFT_DOWN_MASK));
+    }
+
+    /**
+     * Creates and configures a {@link JMenuItem} with localized text and an action
      * listener. Component's name is generated by removing {@code ".text"} suffix from {@code textKey} parameter.
      *
-     * @param textKey  the resource key with the menu item's localized display text, must end with {@code ".text"}
-     * @param mnemonic the keyboard shortcut or {@code KeyEvent.VK_UNDEFINED} if no mnemonic is required
-     * @param action   the {@link ActionListener} to trigger when the menu item is selected
+     * @param textKey the resource key with the menu item's localized display text, must end with {@code ".text"}
+     * @param action  the {@link ActionListener} to trigger when the menu item is selected
      *
      * @return the initialized {@code JMenuItem}
      */
-    private static JMenuItem createMenuItem(String textKey, int mnemonic, ActionListener action) {
+    private static JMenuItem createMenuItem(String textKey, ActionListener action) {
         if (!textKey.endsWith(MENU_ITEM_TEXT_SUFFIX)) {
             throw new IllegalArgumentException(String.format("Text key must end with '%s', actual: '%s'",
                   MENU_ITEM_TEXT_SUFFIX, textKey));
         }
         JMenuItem item = new JMenuItem(getTextAt(textKey));
         item.setName(textKey.substring(0, textKey.length() - MENU_ITEM_TEXT_SUFFIX.length()));
-        if (mnemonic != KeyEvent.VK_UNDEFINED) {
-            item.setMnemonic(mnemonic);
-        }
         item.addActionListener(action);
         return item;
     }

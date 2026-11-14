@@ -35,7 +35,6 @@ package mekhq.campaign.mission.contract;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MINIMUM_MORALE_LEVEL;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
@@ -1246,7 +1245,7 @@ public abstract class AbstractContract {
 
     private boolean isPirateBackedPirateRaid() {
         return getObjectiveType().isPirateRaid() &&
-                     PIRATE_FACTION_CODE.equals(getStandingEmployerFaction().getShortName());
+                     Faction.isPirateOrBanditCaste(getStandingEmployerFaction().getShortName());
     }
 
     /**

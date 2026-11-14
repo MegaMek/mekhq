@@ -44,6 +44,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.equipment.EquipmentType;
+import megamek.common.equipment.MiscType;
 import megamek.common.game.Game;
 import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.AtmosphericTaint;
@@ -178,6 +179,111 @@ class InfantryEnvironmentalKitTest {
               "the platoon should gain XCT without losing its mountain troops specialization");
     }
 
+    /** Extreme cold (below -30) and extreme heat (above 50), as MegaMek defines them. */
+    static List<Arguments> extremeTemperatures() {
+        return List.of(Arguments.of(-40), Arguments.of(-31), Arguments.of(51), Arguments.of(56));
+    }
+
+    @ParameterizedTest(name = "{0} degrees C")
+    @MethodSource("extremeTemperatures")
+    @DisplayName("A platoon that lost its kit on reload is re-dressed before deployment")
+    void kitlessInfantryAreDressedForExtremeTemperatureBeforeDeployment(int temperature) {
+        // A scenario's bot forces are saved as MUL data, which keeps a kit's flags but not the kit itself. A platoon
+        // that was handed a snow suit or heat suit comes back from a save with no kit, which MegaMek treats as
+        // unprotected. This is the state of the platoon the player sees die in the Wolf Brigade report.
+        PlanetaryConditions conditions = new PlanetaryConditions();
+        conditions.setTemperature(temperature);
+        ConvInfantry platoon = new ConvInfantry();
+
+        assertNotNull(conditions.whyDoomed(platoon, new Game()),
+              "a platoon with no kit should be doomed at " + temperature + " degrees C");
+
+        AtBDynamicScenarioFactory.ensureInfantryProtection(platoon, conditions);
+
+        String reasonDoomed = conditions.whyDoomed(platoon, new Game());
+        assertNull(reasonDoomed,
+              "the platoon should survive deployment at " + temperature + " degrees C, but MegaMek still dooms it: " +
+                    reasonDoomed);
+    }
+
+    @Test
+    @DisplayName("Infantry already wearing a kit are not re-dressed before deployment")
+    void dressedInfantryAreLeftAloneBeforeDeployment() {
+        PlanetaryConditions conditions = new PlanetaryConditions();
+        conditions.setTemperature(MILD_TEMPERATURE);
+        ConvInfantry platoon = new ConvInfantry();
+        platoon.setArmorKit(MiscType.createSnowSuitInfArmor());
+        EquipmentType kitBefore = platoon.getArmorKit();
+
+        AtBDynamicScenarioFactory.ensureInfantryProtection(platoon, conditions);
+
+        assertEquals(kitBefore, platoon.getArmorKit(), "an existing kit should not be replaced");
+    }
+
+    @Test
+    @DisplayName("Infantry are not dressed before deployment when the weather is mild")
+    void infantryAreNotDressedInMildWeatherBeforeDeployment() {
+        PlanetaryConditions conditions = new PlanetaryConditions();
+        conditions.setTemperature(MILD_TEMPERATURE);
+        ConvInfantry platoon = new ConvInfantry();
+
+        AtBDynamicScenarioFactory.ensureInfantryProtection(platoon, conditions);
+
+        assertNull(platoon.getArmorKit(), "mild weather in breathable air should not issue a kit");
+    }
+
+    @Test
+    @DisplayName("Re-rolling cold weather to mild strips the snow suit from enemy infantry")
+    void rerollingColdToMildRemovesSnowSuit() {
+        AtBDynamicScenario scenario = createScenario(AtmosphericTaint.BREATHABLE, Atmosphere.STANDARD);
+        ConvInfantry enemyPlatoon = new ConvInfantry();
+        AtBDynamicScenarioFactory.changeInfantryKit(enemyPlatoon, false, false, -40);
+        assertNotNull(enemyPlatoon.getArmorKit(), "the platoon should start in a snow suit");
+        scenario.getBotForces().add(new BotForce("Enemy", 2, 0, List.of(enemyPlatoon)));
+
+        // The re-roll has produced a mild temperature
+        scenario.setTemperature(MILD_TEMPERATURE);
+        AtBDynamicScenarioFactory.redressInfantryForWeather(scenario, createCampaignOptions());
+
+        assertNull(enemyPlatoon.getArmorKit(), "the snow suit should be removed once the weather is mild");
+        assertFalse(enemyPlatoon.isArmorEncumbering(), "the snow suit's encumbering flag should be cleared");
+    }
+
+    @Test
+    @DisplayName("Re-rolling mild weather to extreme heat issues a heat suit to enemy and allied infantry")
+    void rerollingMildToHotIssuesHeatSuit() {
+        AtBDynamicScenario scenario = createScenario(AtmosphericTaint.BREATHABLE, Atmosphere.STANDARD);
+        ConvInfantry enemyPlatoon = new ConvInfantry();
+        ConvInfantry alliedPlatoon = new ConvInfantry();
+        AtBDynamicScenarioFactory.changeInfantryKit(enemyPlatoon, false, false, -40);
+        AtBDynamicScenarioFactory.changeInfantryKit(alliedPlatoon, false, false, -40);
+        scenario.getBotForces().add(new BotForce("Enemy", 2, 0, List.of(enemyPlatoon)));
+        scenario.getAlliesPlayer().add(alliedPlatoon);
+
+        scenario.setTemperature(56);
+        AtBDynamicScenarioFactory.redressInfantryForWeather(scenario, createCampaignOptions());
+
+        for (ConvInfantry platoon : List.of(enemyPlatoon, alliedPlatoon)) {
+            assertEquals(MiscType.createISHeatSuitInfArmor().getInternalName(),
+                  platoon.getArmorKit().getInternalName(),
+                  "the cold-weather kit should be replaced with a heat suit");
+        }
+    }
+
+    @Test
+    @DisplayName("Re-rolling the weather leaves kits that MekHQ did not issue alone")
+    void rerollingWeatherKeepsOtherKits() {
+        AtBDynamicScenario scenario = createScenario(AtmosphericTaint.BREATHABLE, Atmosphere.STANDARD);
+        ConvInfantry marines = new ConvInfantry();
+        marines.setArmorKit(MiscType.createISEnvironmentSuitMarineInfArmor());
+        EquipmentType kitBefore = marines.getArmorKit();
+        scenario.getBotForces().add(new BotForce("Enemy", 2, 0, List.of(marines)));
+
+        AtBDynamicScenarioFactory.redressInfantryForWeather(scenario, createCampaignOptions());
+
+        assertEquals(kitBefore, marines.getArmorKit(), "a marine suit should survive a weather re-roll");
+    }
+
     private static AtBDynamicScenario createScenario(AtmosphericTaint atmosphericTaint, Atmosphere atmosphere) {
         AtBDynamicScenario scenario = new AtBDynamicScenario();
         scenario.setAtmosphericTaint(atmosphericTaint);
@@ -189,6 +295,7 @@ class InfantryEnvironmentalKitTest {
     private static CampaignOptions createCampaignOptions() {
         CampaignOptions campaignOptions = mock(CampaignOptions.class);
         when(campaignOptions.get(CampaignOption.USE_WEATHER_CONDITIONS)).thenReturn(false);
+        when(campaignOptions.get(CampaignOption.USE_PLANETARY_MODIFIERS)).thenReturn(true);
         return campaignOptions;
     }
 }

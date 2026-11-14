@@ -102,6 +102,7 @@ class BiographyOptionsModel {
     boolean allowDuplicatePortraits;
     boolean useGenderedPortraitsOnly;
     boolean noRandomPortraitsForChildren;
+    boolean randomPortraitsForOfficersOnly;
     boolean childPortraitsWhenComingOfAge;
     final boolean[] usePortraitForRole;
 
@@ -162,6 +163,7 @@ class BiographyOptionsModel {
         allowDuplicatePortraits = options.get(CampaignOption.ALLOW_DUPLICATE_PORTRAITS);
         useGenderedPortraitsOnly = options.get(CampaignOption.USE_GENDERED_PORTRAITS_ONLY);
         noRandomPortraitsForChildren = options.get(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN);
+        randomPortraitsForOfficersOnly = options.get(CampaignOption.RANDOM_PORTRAITS_FOR_OFFICERS_ONLY);
         childPortraitsWhenComingOfAge = options.get(CampaignOption.CHILD_PORTRAITS_WHEN_COMING_OF_AGE);
         usePortraitForRole = options.get(CampaignOption.USE_PORTRAIT_FOR_ROLE).clone();
     }
@@ -228,6 +230,7 @@ class BiographyOptionsModel {
         options.set(CampaignOption.ALLOW_DUPLICATE_PORTRAITS, allowDuplicatePortraits);
         options.set(CampaignOption.USE_GENDERED_PORTRAITS_ONLY, useGenderedPortraitsOnly);
         options.set(CampaignOption.NO_RANDOM_PORTRAITS_FOR_CHILDREN, noRandomPortraitsForChildren);
+        options.set(CampaignOption.RANDOM_PORTRAITS_FOR_OFFICERS_ONLY, randomPortraitsForOfficersOnly);
         options.set(CampaignOption.CHILD_PORTRAITS_WHEN_COMING_OF_AGE, childPortraitsWhenComingOfAge);
         options.set(CampaignOption.NAME_GENERATOR_FACTION, factionNames);
         for (int i = 0; i < usePortraitForRole.length; i++) {

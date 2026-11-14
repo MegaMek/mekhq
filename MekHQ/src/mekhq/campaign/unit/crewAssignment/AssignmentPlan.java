@@ -198,8 +198,10 @@ public class AssignmentPlan {
      */
     public record TempCrewProblem(StagedTempCrew change, Reason reason) {}
 
-    /** Why a staged change cannot be applied. */
+    /** Why a staged change cannot be applied, or why a change cannot be staged in the first place. */
     public enum Reason {
+        /** The person already crews the unit, or is already its tech, once the plan is applied. */
+        ALREADY_ABOARD,
         /** The person is no longer active, employed and free, or has been deployed. */
         NOT_ASSIGNABLE,
         /** The person is not qualified for the seat, or cannot maintain the unit. */
@@ -391,7 +393,7 @@ public class AssignmentPlan {
     /**
      * Whether a person could be staged into a seat right now: they qualify for it, it has room once the staged changes
      * are counted, the unit is available, both are at the same location, and it is not the unit they will already
-     * crew.
+     * crew. A person who is no longer assignable (see {@link SeatEligibility#isAssignable}) cannot be staged either.
      *
      * @param person the person
      * @param unit   the unit
@@ -400,12 +402,12 @@ public class AssignmentPlan {
      * @return {@code true} if staging them there would succeed
      */
     public boolean canStage(final Person person, final Unit unit, final SeatType type) {
-        return couldTake(person, unit, type) && (openSeats(unit, type) > 0);
+        return whyNotSeat(person, unit, type) == null;
     }
 
     /**
      * Whether a person could be staged into a seat once it has room: as {@link #canStage}, but a full seat does not
-     * rule them out.
+     * rule them out. As with {@link #canStage}, a person who is no longer assignable is ruled out.
      *
      * @param person the person
      * @param unit   the unit
@@ -414,10 +416,7 @@ public class AssignmentPlan {
      * @return {@code true} if they could take the seat once a place in it is free
      */
     public boolean couldTake(final Person person, final Unit unit, final SeatType type) {
-        return !Objects.equals(plannedUnitOf(person), unit)
-                     && unit.isAvailable()
-                     && SeatEligibility.canTake(person, unit, type, useAltAdvancedMedical, useImplants)
-                     && LocationUtils.areSameEffectiveLocation(unit, person);
+        return whyCannotTake(person, unit, type) == null;
     }
 
     /**
@@ -507,7 +506,7 @@ public class AssignmentPlan {
      *       {@link Person#getMaintenanceTimeUsing()} counts them: none while the unit is in salvage mode, or while the
      *       tech is refitting it
      */
-    private static int techMinutesFor(final Person tech, final Unit unit) {
+    public int techMinutesNeeded(final Person tech, final Unit unit) {
         if (unit.isSalvage() || (unit.isRefitting() && (unit.getRefit() != null)
                                        && tech.equals(unit.getRefit().getTech()))) {
             return 0;
@@ -535,12 +534,7 @@ public class AssignmentPlan {
      * @return {@code true} if staging them there would succeed
      */
     public boolean canStageTech(final Person tech, final Unit unit) {
-        return !tech.equals(plannedTechOf(unit))
-                     && unit.isAvailable()
-                     && SeatEligibility.canTech(tech, unit)
-                     && !isTechBusy.test(tech)
-                     && LocationUtils.areSameEffectiveLocation(unit, tech)
-                     && ((plannedTechMinutes(tech) + techMinutesFor(tech, unit)) <= techMinutesAvailable(tech));
+        return whyNotTech(tech, unit) == null;
     }
 
     // endregion Reading techs
@@ -984,7 +978,7 @@ public class AssignmentPlan {
         }
         final Person fromTech = change.fromTech();
         if ((fromTech != null)
-                  && ((plannedTechMinutes(fromTech) + techMinutesFor(fromTech, unit))
+                  && ((plannedTechMinutes(fromTech) + techMinutesNeeded(fromTech, unit))
                             > techMinutesAvailable(fromTech))) {
             return false;
         }
@@ -1100,6 +1094,138 @@ public class AssignmentPlan {
     }
 
     // endregion Changing temporary crew
+
+    // region Explaining and replacing
+
+    /**
+     * Why a person cannot be staged into a seat right now. This is {@code null} exactly when {@link #canStage} is
+     * {@code true}.
+     *
+     * @param person the person
+     * @param unit   the unit
+     * @param type   the seat
+     *
+     * @return the first thing in the way, or {@code null} if they can be staged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable Reason whyNotSeat(final Person person, final Unit unit, final SeatType type) {
+        final Reason reason = whyCannotTake(person, unit, type);
+        if (reason != null) {
+            return reason;
+        }
+        return (openSeats(unit, type) < 1) ? Reason.SEAT_FULL : null;
+    }
+
+    /**
+     * The first thing, other than the seat being full, in the way of a person taking a seat.
+     *
+     * @return the reason, or {@code null} if they could take the seat once a place in it is free
+     */
+    private @Nullable Reason whyCannotTake(final Person person, final Unit unit, final SeatType type) {
+        if (!unit.isAvailable()) {
+            return Reason.UNIT_UNAVAILABLE;
+        } else if (Objects.equals(plannedUnitOf(person), unit)) {
+            return Reason.ALREADY_ABOARD;
+        } else if (!SeatEligibility.isAssignable(person)) {
+            return Reason.NOT_ASSIGNABLE;
+        } else if (!SeatEligibility.canTake(person, unit, type, useAltAdvancedMedical, useImplants)) {
+            return Reason.NOT_QUALIFIED;
+        } else if (!LocationUtils.areSameEffectiveLocation(unit, person)) {
+            return Reason.DIFFERENT_LOCATION;
+        }
+        return null;
+    }
+
+    /**
+     * Why a tech cannot be staged to maintain a unit right now. This is {@code null} exactly when
+     * {@link #canStageTech} is {@code true}.
+     *
+     * @param tech a person
+     * @param unit the unit
+     *
+     * @return the first thing in the way, or {@code null} if they can be staged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable Reason whyNotTech(final Person tech, final Unit unit) {
+        if (!unit.isAvailable()) {
+            return Reason.UNIT_UNAVAILABLE;
+        } else if (tech.equals(plannedTechOf(unit))) {
+            return Reason.ALREADY_ABOARD;
+        } else if (!SeatEligibility.isAssignable(tech) || isTechBusy.test(tech)) {
+            return Reason.NOT_ASSIGNABLE;
+        } else if (!SeatEligibility.canTech(tech, unit)) {
+            return Reason.NOT_QUALIFIED;
+        } else if (!LocationUtils.areSameEffectiveLocation(unit, tech)) {
+            return Reason.DIFFERENT_LOCATION;
+        } else if ((plannedTechMinutes(tech) + techMinutesNeeded(tech, unit)) > techMinutesAvailable(tech)) {
+            return Reason.NO_TECH_TIME;
+        }
+        return null;
+    }
+
+    /**
+     * Whether one person could take the seat another will hold, sending that other person out of the unit: the
+     * occupant can be taken out, the newcomer could take the seat once it has room, and the seat is not already over
+     * its size.
+     *
+     * @param newcomer the person to bring in
+     * @param occupant the person who will hold the seat once the plan is applied
+     *
+     * @return {@code true} if {@link #stageReplacement} would succeed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean canReplace(final Person newcomer, final Person occupant) {
+        final Unit unit = plannedUnitOf(occupant);
+        final SeatType seat = plannedSeatOf(occupant);
+        return (unit != null) && (seat != null)
+                     && !newcomer.equals(occupant)
+                     && canUnassign(occupant)
+                     && (openSeats(unit, seat) >= 0)
+                     && couldTake(newcomer, unit, seat);
+    }
+
+    /**
+     * Stages one person into the seat another will hold, and that other person out of the unit, as one step of
+     * history, so a single undo puts both back.
+     *
+     * @param newcomer the person to bring in
+     * @param occupant the person who will hold the seat once the plan is applied
+     *
+     * @return {@code true} if the replacement was staged; {@code false} if {@link #canReplace} says it cannot be
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean stageReplacement(final Person newcomer, final Person occupant) {
+        if (!canReplace(newcomer, occupant)) {
+            return false;
+        }
+        final Unit unit = plannedUnitOf(occupant);
+        final SeatType seat = plannedSeatOf(occupant);
+        final List<Runnable> reverts = new ArrayList<>();
+        put(occupant, null, null, reverts);
+        put(newcomer, unit, seat, reverts);
+        record(reverts);
+        return true;
+    }
+
+    /**
+     * @param person the person
+     *
+     * @return the seat the person will hold once the plan is applied, or {@code null} if they will hold none
+     */
+    public @Nullable SeatType plannedSeatOf(final Person person) {
+        final StagedAssignment change = changes.get(person.getId());
+        return (change == null) ? currentSeatOf(person) : change.toSeat();
+    }
+
+    // endregion Explaining and replacing
 
     // region History
 
@@ -1230,11 +1356,11 @@ public class AssignmentPlan {
     /** Moves a tech change's minutes from the old tech to the new one, or back again when {@code sign} is -1. */
     private void adjustTechMinutes(final StagedTech change, final int sign) {
         if (change.fromTech() != null) {
-            techMinuteChanges.merge(change.fromTech().getId(), -sign * techMinutesFor(change.fromTech(),
+            techMinuteChanges.merge(change.fromTech().getId(), -sign * techMinutesNeeded(change.fromTech(),
                   change.unit()), Integer::sum);
         }
         if (change.toTech() != null) {
-            techMinuteChanges.merge(change.toTech().getId(), sign * techMinutesFor(change.toTech(), change.unit()),
+            techMinuteChanges.merge(change.toTech().getId(), sign * techMinutesNeeded(change.toTech(), change.unit()),
                   Integer::sum);
         }
     }

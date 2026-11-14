@@ -96,12 +96,20 @@ public class InfantryAmmoStorage extends AmmoStorage {
 
     @Override
     public double getTonnage() {
-        return getWeaponType().getAmmoWeight() * getShots() / getWeaponType().getShots();
+        int weaponShots = getWeaponType().getShots();
+        if (weaponShots <= 0) {
+            return 0;
+        }
+        return getWeaponType().getAmmoWeight() * getShots() / weaponShots;
     }
 
     @Override
     public Money getStickerPrice() {
-        return Money.of(getWeaponType().getAmmoCost() * (double) getShots() / getWeaponType().getShots());
+        int weaponShots = getWeaponType().getShots();
+        if (weaponShots <= 0) {
+            return Money.zero();
+        }
+        return Money.of(getWeaponType().getAmmoCost() * (double) getShots() / weaponShots);
     }
 
     @Override

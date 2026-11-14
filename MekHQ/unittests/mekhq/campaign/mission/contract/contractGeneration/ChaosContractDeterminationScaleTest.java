@@ -52,7 +52,7 @@ import org.junit.jupiter.api.Test;
 /**
  * Tests {@link ChaosContractDeterminationScale#generateScaleForDetachment}. Scale is the detachment's combat Battle
  * Value divided by a fixed per-scale figure (4500 + 32*500 = 20500), rounded to the nearest whole number. Only
- * STANDARD formations in a combat role count.
+ * STANDARD formations in a Frontline or Maneuver role count.
  */
 class ChaosContractDeterminationScaleTest {
     private static final double DELTA = 1e-9;
@@ -130,6 +130,17 @@ class ChaosContractDeterminationScaleTest {
     void nonCombatRolesDoNotContribute() {
         assertEquals(0, scaleFor(unit(1, CombatRole.RESERVE, true, BATTLE_VALUE_PER_SCALE)),
               "a reserve formation is not committed to the detachment");
+    }
+
+    @Test
+    void patrolFormationsDoNotContribute() {
+        assertEquals(0, scaleFor(unit(1, CombatRole.PATROL, true, BATTLE_VALUE_PER_SCALE)),
+              "only Frontline and Maneuver formations count toward scale");
+    }
+
+    @Test
+    void frontlineFormationsContribute() {
+        assertEquals(1, scaleFor(unit(1, CombatRole.FRONTLINE, true, BATTLE_VALUE_PER_SCALE)));
     }
 
     @Test

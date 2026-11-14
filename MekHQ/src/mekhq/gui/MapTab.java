@@ -1558,10 +1558,12 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
         panSystem.repaint();
         updateRouteStrip();
         refreshRouteView();
-        int pos = panSystem.getSelectedPlanetPosition();
         PlanetarySystem system = panMap.getSelectedSystem();
         if (null != system) {
-            showDossier(system, pos);
+            if (!Objects.equals(panSystem.getPlanetarySystem(), system)) {
+                panSystem.updatePlanetarySystem(system);
+            }
+            showDossier(system, panSystem.getSelectedPlanetPosition());
         }
     }
 

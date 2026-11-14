@@ -39,16 +39,10 @@ import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
 import java.util.ResourceBundle;
-import javax.swing.BorderFactory;
-import javax.swing.BoxLayout;
-import javax.swing.JButton;
-import javax.swing.JLabel;
-import javax.swing.JOptionPane;
-import javax.swing.JPanel;
-import javax.swing.JSplitPane;
-import javax.swing.JTabbedPane;
-import javax.swing.SwingUtilities;
+import javax.swing.*;
+import javax.swing.filechooser.FileNameExtensionFilter;
 
+import jakarta.annotation.Nullable;
 import megamek.common.MPCalculationSetting;
 import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.Faction;
@@ -58,6 +52,7 @@ import megamek.common.loaders.EntityLoadingException;
 import megamek.common.loaders.MekFileParser;
 import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
+import megamek.common.preference.PreferenceManager;
 import megamek.common.ui.FastJScrollPane;
 import megamek.common.units.Aero;
 import megamek.common.units.ConvInfantry;
@@ -79,6 +74,7 @@ import megameklab.ui.battleArmor.BAStructureTab;
 import megameklab.ui.combatVehicle.CVBuildTab;
 import megameklab.ui.combatVehicle.CVEquipmentTab;
 import megameklab.ui.combatVehicle.CVStructureTab;
+import megameklab.ui.dialog.MMLFileChooser;
 import megameklab.ui.fighterAero.ASBuildTab;
 import megameklab.ui.fighterAero.ASEquipmentTab;
 import megameklab.ui.fighterAero.ASStructureTab;
@@ -150,16 +146,73 @@ public class MekLabTab extends CampaignGuiTab {
     private JLabel lblTons;
 
     private JPanel shoppingPanel;
-    private final MegaMekLabFileSaver fileSaver;
 
     // region Constructors
     public MekLabTab(CampaignGUI gui, String name) {
         super(gui, name);
         this.campaignGUI = gui;
-        this.fileSaver = new MegaMekLabFileSaver(LOGGER, resources.getString("dialog.saveAs.title"));
         this.repaint();
     }
     // endregion Constructors
+
+    /**
+     * Creates the file saver used by "Save For Later". If the player has set a user directory (where custom units are
+     * loaded from), the save dialog opens there instead of the working directory, so units are not accidentally saved
+     * to the wrong location. A fresh saver is needed because its file chooser reads the starting directory only when
+     * it is constructed.
+     *
+     * @return a file saver whose save dialog starts in the user directory when one is set
+     */
+    private MegaMekLabFileSaver createFileSaver() {
+        startSaveDialogsInUserDirectory();
+        return new MegaMekLabFileSaver(LOGGER, resources.getString("dialog.saveAs.title"));
+    }
+
+    /**
+     * Makes the next save dialog open in the player's user directory, when one is set.
+     */
+    private static void startSaveDialogsInUserDirectory() {
+        String userDirectory = PreferenceManager.getClientPreferences().getUserDir();
+        if ((userDirectory != null) && !userDirectory.isBlank() && new File(userDirectory).isDirectory()) {
+            CConfig.setParam(CConfig.FILE_LAST_DIRECTORY, userDirectory);
+        }
+    }
+
+    /**
+     * Asks the player where to save the design a refit from the lab creates, with the same save dialog "Save For Later"
+     * uses. The player is asked before an existing file is replaced.
+     *
+     * @param entity the new design
+     *
+     * @return the file to save the design to, or {@code null} if the player cancelled or declined to replace a file
+     */
+    public @Nullable File chooseDesignFile(Entity entity) {
+        startSaveDialogsInUserDirectory();
+        String extension = (entity instanceof Mek) ? "mtf" : "blk";
+        MMLFileChooser chooser = new MMLFileChooser();
+        chooser.setDialogTitle(resources.getString("dialog.saveAs.title"));
+        chooser.setFileFilter(new FileNameExtensionFilter(extension.toUpperCase() + " files", extension));
+        chooser.setSelectedFile(new File(MegaMekLabFileSaver.createUnitFilename(entity)));
+        if ((chooser.showSaveDialog(getFrame()) != JFileChooser.APPROVE_OPTION)
+              || (chooser.getSelectedFile() == null)) {
+            return null;
+        }
+
+        File chosen = chooser.getSelectedFile();
+        if (!chosen.getName().toLowerCase().endsWith('.' + extension)) {
+            chosen = new File(chosen.getParentFile(), chosen.getName() + '.' + extension);
+        }
+        if (chosen.exists()) {
+            int response = JOptionPane.showConfirmDialog(getFrame(),
+                  String.format(resources.getString("dialog.overwrite.text"), chosen.getName()),
+                  resources.getString("dialog.overwrite.title"), JOptionPane.YES_NO_OPTION,
+                  JOptionPane.WARNING_MESSAGE);
+            if (response != JOptionPane.YES_OPTION) {
+                return null;
+            }
+        }
+        return chosen;
+    }
 
     @Override
     public void initTab() {
@@ -176,7 +229,7 @@ public class MekLabTab extends CampaignGuiTab {
             Entity entity = labPanel.getEntity();
             UnitUtil.compactCriticalSlots(entity);
             labPanel.refreshAll(); // The crits may have moved
-            fileSaver.saveUnitAs(this.getFrame(), entity);
+            createFileSaver().saveUnitAs(this.getFrame(), entity);
             // Refresh unit cache so newly-saved file is available for refits.
             MekSummaryCache.refreshUnitData(false);
         });

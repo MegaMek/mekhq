@@ -44,10 +44,12 @@ import java.util.List;
 
 import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
 import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationScale;
 import mekhq.campaign.personnel.Person;
 import org.apache.commons.lang3.StringUtils;
 import org.commonmark.parser.Parser;
@@ -144,7 +146,10 @@ public record ContractReadout(String employerLine, String title, String statusLi
               badges,
               speaker,
               briefing,
-              List.of(terms(contract, estimate), intel(contract, currentDate), money(contract, estimate)),
+              List.of(terms(contract, estimate),
+                    intel(contract, currentDate,
+                          campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE)),
+                    money(contract, estimate)),
               getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.caveat"));
     }
 
@@ -173,7 +178,7 @@ public record ContractReadout(String employerLine, String title, String statusLi
         return new Section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.terms"), rows, notes);
     }
 
-    private static Section intel(AbstractContract contract, LocalDate currentDate) {
+    private static Section intel(AbstractContract contract, LocalDate currentDate, boolean useFractionalScale) {
         List<Row> rows = new ArrayList<>();
         rows.add(row("dossier.contractMarket.intel.alliedCommand",
               ContractMarketFormatting.intel(contract, ObfuscatableIntel.ALLIED_COMMAND, alliedCommand(contract))));
@@ -185,7 +190,8 @@ public record ContractReadout(String employerLine, String title, String statusLi
         rows.add(row("dossier.contractMarket.intel.morale",
               ContractMarketFormatting.intel(contract, ObfuscatableIntel.MORALE,
                     contract.getMoraleLevel().toString())));
-        rows.add(row("dossier.contractMarket.intel.intensity", String.valueOf(contract.getTrackCount())));
+        rows.add(row("dossier.contractMarket.intel.intensity",
+              ChaosContractDeterminationScale.formatScale(contract.getExactScale(), useFractionalScale)));
 
         // The same one-line advisory the dossier shows for a contract with a special nature.
         List<String> notes = new ArrayList<>();
