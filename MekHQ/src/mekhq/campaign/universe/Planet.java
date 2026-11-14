@@ -34,7 +34,15 @@
 package mekhq.campaign.universe;
 
 import java.time.LocalDate;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+import java.util.TreeMap;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -163,7 +171,8 @@ public class Planet {
     /**
      * This is a cache of the current event data based on the latest date given.
      */
-    CurrentEvents currentEvents;
+    private final CurrentEvents<PlanetaryEvent> currentEvents = new CurrentEvents<>(() -> events,
+          PlanetaryEvent::new, PlanetaryEvent::copyDataFrom);
 
     // For import only; lists are easier than maps in YAML.
     private List<Planet.PlanetaryEvent> eventList;
@@ -426,7 +435,7 @@ public class Planet {
             events = new TreeMap<>();
         }
         events.put(event.date, event);
-        currentEvents = null;
+        currentEvents.invalidate();
     }
 
     public boolean removeEvent(LocalDate when) {
@@ -438,7 +447,7 @@ public class Planet {
             if (events.isEmpty()) {
                 events = null;
             }
-            currentEvents = null;
+            currentEvents.invalidate();
         }
         return removed;
     }
@@ -455,91 +464,11 @@ public class Planet {
         if (events.isEmpty()) {
             events = null;
         }
-        currentEvents = null;
+        currentEvents.invalidate();
     }
 
-    protected <T> T getEventData(LocalDate when, T defaultValue, EventGetter<T> getter) {
-        if ((null == when) || (null == events) || (null == getter)) {
-            return defaultValue;
-        }
-
-        PlanetaryEvent event = getCurrentEvent(when);
-
-        T result = getter.get(event);
-
-        return ObjectUtility.nonNull(result, defaultValue);
-    }
-
-    private synchronized PlanetaryEvent getCurrentEvent(LocalDate now) {
-        if (currentEvents == null) {
-            currentEvents = new CurrentEvents();
-        }
-
-        return currentEvents.getCurrentEvent(now);
-    }
-
-    /**
-     * This class tracks the current {@link PlanetaryEvent}.
-     */
-    class CurrentEvents {
-        private LocalDate lastUpdated;
-        private PlanetaryEvent planetaryEvent;
-        private Map.Entry<LocalDate, PlanetaryEvent> nextEvent;
-        private Iterator<Map.Entry<LocalDate, PlanetaryEvent>> eventStream;
-
-        private void initialize(LocalDate now) {
-            planetaryEvent = new PlanetaryEvent();
-            lastUpdated = now;
-            if (events != null) {
-                eventStream = events.entrySet().iterator();
-                if (eventStream.hasNext()) {
-                    nextEvent = eventStream.next();
-                }
-            }
-        }
-
-        /**
-         * Gets the current {@link PlanetaryEvent} for the time.
-         *
-         * <p>{@code planetaryEvent} is a single shared, mutable accumulator: fast-forwarding merges every event up to
-         * {@code now} into it via {@link PlanetaryEvent#copyDataFrom}, and nothing ever unmerges them.
-         * {@code lastUpdated} must therefore track the date this accumulator actually reflects (the most recent
-         * {@code now} resolved, not just the date passed to the original {@link #initialize}), or a later
-         * out-of-order query (e.g., a caller checking a future date) would fast-forward the accumulator past a
-         * subsequent, earlier-dated query without tripping the "went back in time" reset below, silently returning
-         * already-future state for a query that asked about the present or past.</p>
-         *
-         * @param now The current time.
-         *
-         * @return The up-to-date {@link PlanetaryEvent} as of {@code now}.
-         */
-        public @Nonnull PlanetaryEvent getCurrentEvent(LocalDate now) {
-            if ((lastUpdated == null) || lastUpdated.isAfter(now)) {
-                // initialize ourselves if we're fresh or if we went back in time (which breaks how the event stream
-                // works)
-                initialize(now);
-            }
-            lastUpdated = now;
-
-            // if we have no more events for this planet, or if our current date is before the next date, return our
-            // cached event
-            if ((nextEvent == null) || now.isBefore(nextEvent.getKey())) {
-                return planetaryEvent;
-            }
-
-            // fast-forward to the next event
-            do {
-                planetaryEvent.copyDataFrom(nextEvent.getValue());
-                if (eventStream.hasNext()) {
-                    nextEvent = eventStream.next();
-                } else {
-                    nextEvent = null;
-                }
-
-            } while ((nextEvent != null) && !now.isBefore(nextEvent.getKey()));
-
-            return planetaryEvent;
-        }
+    protected <T> T getEventData(LocalDate when, T defaultValue, Function<PlanetaryEvent, T> getter) {
+        return currentEvents.getEventData(when, defaultValue, getter);
     }
 
     public @Nonnull String getName(LocalDate when) {
@@ -1101,11 +1030,6 @@ public class Planet {
         }
     }
 
-    // @FunctionalInterface in Java 8, or just use Function<PlanetaryEvent, T>
-    protected interface EventGetter<T> {
-        T get(PlanetaryEvent e);
-    }
-
     /**
      * This class is used to do some additional work after a planet file is loaded with Jackson
      **/
@@ -1131,6 +1055,7 @@ public class Planet {
                 planet.eventList.clear();
             }
             planet.eventList = null;
+            planet.currentEvents.invalidate();
 
             return planet;
         }
