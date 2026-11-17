@@ -136,10 +136,11 @@ final class PeopleList extends JPanel {
      * @param isSelected    whether a person is selected
      * @param pendingCount  how many purchases are staged for a person
      * @param availableXp   a person's XP once everything staged for them is paid for
+     * @param onViewRecord  called with a person when the player asks for their full record from a row's context menu
      */
     PeopleList(Consumer<String> onSearch, RowAction onRow, Runnable onSelectShown, Runnable onClear,
           Consumer<Sort> onSort, Predicate<Person> isSelected, Function<Person, Integer> pendingCount,
-          Function<Person, Integer> availableXp) {
+          Function<Person, Integer> availableXp, Consumer<Person> onViewRecord) {
         super(new BorderLayout());
         this.onSort = onSort;
         setOpaque(true);
@@ -191,12 +192,24 @@ final class PeopleList extends JPanel {
         list.addMouseListener(new MouseAdapter() {
             @Override
             public void mousePressed(MouseEvent event) {
+                if (event.isPopupTrigger()) {
+                    showRowMenu(event, onViewRecord);
+                    return;
+                }
                 if (!SwingUtilities.isLeftMouseButton(event)) {
                     return;
                 }
-                int index = list.locationToIndex(event.getPoint());
-                if ((index >= 0) && list.getCellBounds(index, index).contains(event.getPoint())) {
+                int index = rowAt(event);
+                if (index >= 0) {
                     onRow.act(model.getElementAt(index), index, event.isShiftDown());
+                }
+            }
+
+            @Override
+            public void mouseReleased(MouseEvent event) {
+                // Windows opens a context menu on release rather than on press
+                if (event.isPopupTrigger()) {
+                    showRowMenu(event, onViewRecord);
                 }
             }
         });
@@ -229,6 +242,30 @@ final class PeopleList extends JPanel {
 
         add(head, BorderLayout.NORTH);
         add(scroll, BorderLayout.CENTER);
+    }
+
+    /** @return the row under the mouse, or -1 if it is below the last row */
+    private int rowAt(MouseEvent event) {
+        int index = list.locationToIndex(event.getPoint());
+        return ((index >= 0) && list.getCellBounds(index, index).contains(event.getPoint())) ? index : -1;
+    }
+
+    /**
+     * Opens a row's context menu, which offers the person's full record. It leaves the selection alone, so a record
+     * can be read without losing a selection of many people.
+     */
+    private void showRowMenu(MouseEvent event, Consumer<Person> onViewRecord) {
+        int index = rowAt(event);
+        if (index < 0) {
+            return;
+        }
+        Person person = model.getElementAt(index).person();
+        JMenuItem viewRecord = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "people.viewRecord"));
+        viewRecord.setToolTipText(getTextAt(RESOURCE_BUNDLE, "people.viewRecord.toolTipText"));
+        viewRecord.addActionListener(action -> onViewRecord.accept(person));
+        JPopupMenu menu = new JPopupMenu();
+        menu.add(viewRecord);
+        menu.show(list, event.getX(), event.getY());
     }
 
     /** Draws the column headers, marking the sorted one. */
