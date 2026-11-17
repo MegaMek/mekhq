@@ -91,7 +91,7 @@ class RepairBayStockLineTest {
         Unit locust = locustBeingStripped();
         mediumLasersOnTheirWay(locust, 8);
 
-        assertEquals("None in stock (8 in transit)", plainText(mediumLaser(locust).countStock().describe()));
+        assertEquals("None in stock (8 arriving in 5 days)", plainText(mediumLaser(locust).countStock().describe()));
     }
 
     @Test
@@ -121,7 +121,8 @@ class RepairBayStockLineTest {
         campaign.getQuartermaster()
               .addPart(new AmmoStorage(0, machineGunAmmo.getType(), 100, campaign), DAYS_TO_ARRIVE, false);
 
-        assertEquals("None in stock (100 shots in transit)", plainText(machineGunAmmo.countStock().describe()));
+        assertEquals("None in stock (100 shots arriving in 5 days)",
+              plainText(machineGunAmmo.countStock().describe()));
     }
 
     @Test

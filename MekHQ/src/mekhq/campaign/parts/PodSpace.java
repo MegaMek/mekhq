@@ -598,6 +598,7 @@ public class PodSpace implements IPartWork {
         int replacementsInStock = 0;
         int podsWithOneInTransit = 0;
         int podsWithOneOnOrder = 0;
+        PartInventory coming = new PartInventory();
         for (UUID id : childPartIds) {
             Part part = findChildPart(id);
             boolean isReplacementNeeded = (part != null) && !(part instanceof AmmoBin) && part.needsFixing();
@@ -614,12 +615,12 @@ public class PodSpace implements IPartWork {
             PartInventory inventory = missing.getPartInventory(missing.getNewPart());
             if (inventory.getTransit() > 0) {
                 podsWithOneInTransit++;
+                coming.recordArrival(inventory.getDaysToFirstArrival());
             }
             if (inventory.getOrdered() > 0) {
                 podsWithOneOnOrder++;
             }
         }
-        PartInventory coming = new PartInventory();
         coming.setTransit(podsWithOneInTransit);
         coming.setOrdered(podsWithOneOnOrder);
         return new StockCount(replacementsInStock, podsNeeded, coming);

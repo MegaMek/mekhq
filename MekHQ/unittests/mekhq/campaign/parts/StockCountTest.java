@@ -45,26 +45,29 @@ class StockCountTest {
         return html.replaceAll("<[^>]*>", "");
     }
 
-    private static PartInventory coming(int inTransit, int onOrder, String unit) {
+    private static PartInventory coming(int inTransit, int onOrder, String unit, int... daysToEachArrival) {
         PartInventory inventory = new PartInventory();
         inventory.setTransit(inTransit);
         inventory.setOrdered(onOrder);
         inventory.setCountModifier(unit);
+        for (int daysToArrival : daysToEachArrival) {
+            inventory.recordArrival(daysToArrival);
+        }
         return inventory;
     }
 
     @Test
     void nothingOnTheShelfStillSaysWhatIsOnItsWay() {
-        StockCount stock = new StockCount(0, 0, coming(8, 0, ""));
+        StockCount stock = new StockCount(0, 0, coming(8, 0, "", 3));
 
-        assertEquals("None in stock (8 in transit)", plainText(stock.describe()));
+        assertEquals("None in stock (8 arriving in 3 days)", plainText(stock.describe()));
     }
 
     @Test
     void fewerThanTheJobNeedsIsShort() {
         StockCount stock = new StockCount(3, 5, coming(0, 0, ""));
 
-        assertEquals("Only 3 in stock", plainText(stock.describe()));
+        assertEquals("3 of 5 in stock", plainText(stock.describe()));
     }
 
     @Test
@@ -76,15 +79,29 @@ class StockCountTest {
 
     @Test
     void partsInTransitAndOnOrderAreListedSeparately() {
-        StockCount stock = new StockCount(0, 1, coming(2, 3, ""));
+        StockCount stock = new StockCount(0, 1, coming(2, 3, "", 1));
 
-        assertEquals("None in stock (2 in transit, 3 on order)", plainText(stock.describe()));
+        assertEquals("None in stock (2 arriving in 1 day, 3 on order)", plainText(stock.describe()));
     }
 
     @Test
     void ammunitionOnItsWayIsCountedInShots() {
         StockCount stock = new StockCount(8, 20, coming(0, 16, "shots"));
 
-        assertEquals("Only 8 in stock (16 shots on order)", plainText(stock.describe()));
+        assertEquals("8 of 20 shots in stock (16 shots on order)", plainText(stock.describe()));
+    }
+
+    @Test
+    void armorOnTheShelfIsCountedInPoints() {
+        StockCount stock = new StockCount(12, 0, coming(0, 0, "points"));
+
+        assertEquals("12 points in stock", plainText(stock.describe()));
+    }
+
+    @Test
+    void lotsArrivingOnDifferentDaysGiveTheSoonest() {
+        StockCount stock = new StockCount(0, 1, coming(8, 0, "", 5, 2));
+
+        assertEquals("None in stock (8 arriving, the first in 2 days)", plainText(stock.describe()));
     }
 }
