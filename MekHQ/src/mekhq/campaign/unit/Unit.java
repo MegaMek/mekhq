@@ -8776,6 +8776,10 @@ public class Unit implements ITechnology, ILocatable {
      * adjustments. Entity types not specifically handled by this method are considered self-maintaining and return 0.
      * </p>
      *
+     * <p>Conventional infantry return 0 when they maintain themselves. When
+     * {@link CampaignOption#TECHS_MAINTAIN_CONVENTIONAL_INFANTRY} is enabled they take a Mechanic's time like any
+     * other unit, based on their movement mode.</p>
+     *
      * @return the total maintenance time in minutes required per day, or 0 if no maintenance is needed
      */
     public int getMaintenanceTime() {
@@ -8797,34 +8801,27 @@ public class Unit implements ITechnology, ILocatable {
             return 10 * battleArmor.getSquadSize() * maintenanceMultiplier;
         }
 
-        if (entity instanceof Infantry) {
-            return 0;
-        }
+        if (entity instanceof Infantry infantry) {
+            // Infantry that looks after itself uses its own soldiers' time, not a Tech's
+            if (isSelfMaintainedInfantry()) {
+                return 0;
+            }
 
-        // This should remain commented out until we have implemented infantry-as-techs
-        //        if (entity instanceof Infantry infantry) {
-        //            if (infantry.getMovementMode().isJumpInfantry()) {
-        //                return 30 * maintenanceMultiplier;
-        //            }
-        //
-        //            if (infantry.getMovementMode().isTrackedWheeledOrHover()) {
-        //                return 30 * maintenanceMultiplier;
-        //            }
-        //
-        //            if (infantry.getMovementMode().isMotorizedInfantry()) {
-        //                return 20 * maintenanceMultiplier;
-        //            }
-        //
-        //            if (infantry.getMovementMode().isVTOL()) {
-        //                return 40 * maintenanceMultiplier;
-        //            }
-        //
-        //            if (infantry.getMovementMode().isSubmarine()) {
-        //                return 20 * maintenanceMultiplier;
-        //            }
-        //
-        //            return 10 * maintenanceMultiplier;
-        //        }
+            EntityMovementMode movementMode = infantry.getMovementMode();
+            if (movementMode.isVTOL()) {
+                return 40 * maintenanceMultiplier;
+            }
+
+            if (movementMode.isJumpInfantry() || movementMode.isTrackedWheeledOrHover()) {
+                return 30 * maintenanceMultiplier;
+            }
+
+            if (movementMode.isMotorizedInfantry() || movementMode.isUMUInfantry() || movementMode.isSubmarine()) {
+                return 20 * maintenanceMultiplier;
+            }
+
+            return 10 * maintenanceMultiplier;
+        }
 
         if (entity instanceof SupportTank || entity instanceof SupportVTOL) {
             return switch (entity.getWeightClass()) {
