@@ -34,12 +34,9 @@
 package mekhq.campaign.parts.equipment;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
-import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
 import java.util.EnumSet;
@@ -67,6 +64,7 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
+import mekhq.campaign.parts.StockCount;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -822,43 +820,23 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
             return super.getDetails(includeRepairDetails);
         }
         if (null != unit) {
-            int shotsAvailable = getAmountAvailable();
-            PartInventory inventories = getPartInventory(getNewPart());
-
-            StringBuilder toReturn = new StringBuilder();
-            toReturn.append(getType().getDesc())
-                  .append(", ")
-                  .append(getShotsNeeded())
-                  .append(" shots needed")
-                  .append("<br/>");
-
-            if (shotsAvailable == 0) {
-                toReturn.append(messageSurroundedBySpanWithColor(getNegativeColor(), "None in stock"));
-            } else if (shotsAvailable < getShotsNeeded()) {
-                toReturn.append(spanOpeningWithCustomColor(getNegativeColor()))
-                      .append("Only ")
-                      .append(shotsAvailable)
-                      .append(" in stock")
-                      .append(CLOSING_SPAN_TAG);
-            } else {
-                toReturn.append(spanOpeningWithCustomColor(getPositiveColor()))
-                      .append(shotsAvailable)
-                      .append(" in stock")
-                      .append(CLOSING_SPAN_TAG);
-            }
-
-            String orderTransitString = inventories.getTransitOrderedDetails();
-            if (!orderTransitString.isEmpty()) {
-                toReturn.append(spanOpeningWithCustomColor(getWarningColor()))
-                      .append(" (")
-                      .append(orderTransitString)
-                      .append(")")
-                      .append(CLOSING_SPAN_TAG);
-            }
-            return toReturn.toString();
+            return getType().getDesc() + ", " + getShotsNeeded() + " shots needed<br/>" + countStock().describe();
         } else {
             return "";
         }
+    }
+
+    /**
+     * Counts the spare ammunition this bin can use, in shots: with ammunition by type on, compatible ammunition is
+     * converted to this bin's shots. A reload is short when there are fewer shots here than the bin needs; salvaging
+     * needs none.
+     *
+     * @return the shots here now, the shots needed, and the shots on their way or on order
+     */
+    @Override
+    public StockCount countStock() {
+        int shotsToLoad = isSalvaging() ? 0 : Math.max(0, getShotsNeeded());
+        return new StockCount(getAmountAvailable(), shotsToLoad, getPartInventory(getNewPart()));
     }
 
     @Override
