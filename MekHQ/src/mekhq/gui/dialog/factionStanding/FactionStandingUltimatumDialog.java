@@ -321,8 +321,8 @@ public class FactionStandingUltimatumDialog {
             }
             List<Tag> standingTags = new ArrayList<>();
             if (isTrackingFactionStanding) {
-                standingTags.add(new Tag(getFormattedTextAt(RESOURCE_BUNDLE, PICKER_PREFIX + "tag.standingUp",
-                      faction.getShortName()), HudStyle.READY));
+                standingTags.add(new Tag(getTextAt(RESOURCE_BUNDLE, PICKER_PREFIX + "tag.standingUp"),
+                      HudStyle.READY));
                 addStandingLossTag(standingTags, getStandingLossCodes(sides, faction, originalFaction));
             }
 
@@ -419,8 +419,7 @@ public class FactionStandingUltimatumDialog {
      */
     private static void addStandingLossTag(List<Tag> tags, List<String> lostFactionCodes) {
         if (!lostFactionCodes.isEmpty()) {
-            tags.add(new Tag(getFormattedTextAt(RESOURCE_BUNDLE, PICKER_PREFIX + "tag.standingDown",
-                  String.join(", ", lostFactionCodes)), HudStyle.CAUTION));
+            tags.add(new Tag(getTextAt(RESOURCE_BUNDLE, PICKER_PREFIX + "tag.standingDown"), HudStyle.CAUTION));
         }
     }
 
