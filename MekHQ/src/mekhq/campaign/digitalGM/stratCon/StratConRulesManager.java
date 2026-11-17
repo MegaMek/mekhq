@@ -1961,9 +1961,14 @@ public class StratConRulesManager {
         scanNeighboringCoords(coords, forceID, campaign, track);
         StratConReconnaissance.updateObjectives(track);
 
+        // A force already holding this hex - caught there by a new scenario, say - stays until its current deployment
+        // is over, if that runs longer than the new one
+        LocalDate currentReturnDate = track.getReturnDateIfDeployedTo(forceID, coords);
+
         // the force may be located in other places on the track - clear it out
         track.unassignFormation(forceID);
         track.assignForce(forceID, coords, campaign.getLocalDate(), sticky);
+        track.keepLaterReturnDate(forceID, currentReturnDate);
         MekHQ.triggerEvent(new StratConDeploymentEvent(campaign.getPlayerForce().getFormation(forceID)));
     }
 

@@ -52,6 +52,7 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.FormationType;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.utilities.CombatRole;
@@ -104,6 +105,7 @@ class AccountantHotSpotsUpkeepTest {
         when(playerForce.getHangar()).thenReturn(hangar);
         Formation formation = mock(Formation.class);
         when(formation.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
+        when(formation.isFormationType(FormationType.STANDARD)).thenReturn(true);
         when(playerForce.getFormation(FORMATION_ID)).thenReturn(formation);
 
         accountant = new Accountant(campaign);
