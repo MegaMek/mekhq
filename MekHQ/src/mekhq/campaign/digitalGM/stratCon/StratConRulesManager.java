@@ -3681,11 +3681,20 @@ public class StratConRulesManager {
         boolean isAnyApplied = false;
         for (String modifierID : relevantModifiers) {
             AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierID);
+            if (modifier == null) {
+                LOGGER.error("Modifier {} not found for facility {}",
+                      modifierID,
+                      facility.getFormattedDisplayableName());
+                continue;
+            }
+
+            // Resolved before the blocking check, so that check sees the side the force will actually fight on
+            assignPlanetOwnerForceToFacilityOwner(modifier, facility);
             if (scenarioModifierShouldBeBlocked(restrictAlliedModifiers, restrictEnemyModifiers, modifier)) {
                 continue;
             }
 
-            applyModifierToScenario(scenario, facility, modifierID);
+            applyModifierToScenario(scenario, facility, modifier);
             isAnyApplied = true;
         }
 
@@ -3694,30 +3703,55 @@ public class StratConRulesManager {
     }
 
     /**
-     * Resolves a scenario modifier by identifier and applies it to the scenario.
+     * Gives a facility modifier's planet-owner force to the side holding the facility.
+     *
+     * <p>A force set to {@link ForceAlignment#PlanetOwner} would otherwise take the side of the planet's first listed
+     * owner, and be a third party when that owner's faction code matches neither the employer's nor the enemy's. Forces
+     * a facility brings, such as concealed defences, belong to whoever holds that facility instead. The modifier's
+     * {@code benefitsPlayer} flag is updated to match, so modifier restrictions treat the force by its new side.</p>
+     *
+     * <p>Modifiers without a force, forces with a fixed alignment, and facilities without a definite owner are left
+     * unchanged.</p>
+     *
+     * @param modifier the modifier being applied; a copy, as {@link AtBScenarioModifier#getScenarioModifier} returns
+     * @param facility the facility the modifier comes from
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void assignPlanetOwnerForceToFacilityOwner(AtBScenarioModifier modifier, StratConFacility facility) {
+        ScenarioForceTemplate force = modifier.getForceDefinition();
+        ForceAlignment owner = facility.getOwner();
+        if ((force == null) || (owner == null) || (owner == ForceAlignment.PlanetOwner)) {
+            return;
+        }
+
+        if (ForceAlignment.getForceAlignment(force.getForceAlignment()) != ForceAlignment.PlanetOwner) {
+            return;
+        }
+
+        // Bot forces cannot be player-controlled, so a player-held facility's force fights as an ally
+        boolean isOwnerAlliedToPlayer = facility.isOwnerAlliedToPlayer();
+        ForceAlignment side = isOwnerAlliedToPlayer ? Allied : owner;
+        force.setForceAlignment(side.ordinal());
+        modifier.setBenefitsPlayer(isOwnerAlliedToPlayer);
+    }
+
+    /**
+     * Applies a resolved scenario modifier to the scenario.
      *
      * <p>The modifier briefing text is prefixed with the facility display name to indicate the source of the effect
      * before being attached to the backing scenario.</p>
      *
-     * <p>If the modifier identifier cannot be resolved, an error is logged and no modifier is applied.</p>
-     *
-     * @param scenario   the scenario receiving the modifier
-     * @param facility   the facility responsible for the modifier effect
-     * @param modifierID the identifier of the modifier to resolve and apply
+     * @param scenario the scenario receiving the modifier
+     * @param facility the facility responsible for the modifier effect
+     * @param modifier the modifier to apply
      *
      * @author Illiani
      * @since 0.51.0
      */
     private static void applyModifierToScenario(StratConScenario scenario, StratConFacility facility,
-          String modifierID) {
-        AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierID);
-        if (modifier == null) {
-            LOGGER.error("Modifier {} not found for facility {}",
-                  modifierID,
-                  facility.getFormattedDisplayableName());
-            return;
-        }
-
+          AtBScenarioModifier modifier) {
         modifier.setAdditionalBriefingText('(' +
                                                  facility.getDisplayableName() +
                                                  ") " +
