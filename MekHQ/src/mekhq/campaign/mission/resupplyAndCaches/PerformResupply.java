@@ -479,6 +479,11 @@ public class PerformResupply {
             } else {
                 int roll = randomInt(2);
 
+                // There is no Scattered text: a Scattered enemy reads as a Critical one
+                if (morale.isScattered()) {
+                    morale = CRITICAL;
+                }
+
                 if (morale.isAdvancing() || morale.isWeakened()) {
                     morale = roll == 0 ? (morale.isAdvancing() ? DOMINATING : CRITICAL) : STALEMATE;
                 }

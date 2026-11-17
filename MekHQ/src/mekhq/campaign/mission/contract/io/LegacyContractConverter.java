@@ -342,6 +342,28 @@ public final class LegacyContractConverter {
         return new MoraleData(level, isPeaceful, finalPayout);
     }
 
+    /**
+     * Works out whether the enemy has already raided a Garrison Duty or Retainer contract saved under the old rout
+     * model, which began such a contract with the enemy routed. An enemy that is active had come back from a rout, so
+     * it has raided - and brought any Batchall - already. One that is routed has too, unless this is still the rout the
+     * contract began with, which always ended within three months of the start.
+     *
+     * @param startDate         the contract's start date, or {@code null} if unknown
+     * @param legacyRoutEndDate the end date of the rout in progress, or {@code null} if the enemy was active
+     *
+     * @return {@code true} if the enemy has already raided
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean hasRaidedBeforeRaidModel(@Nullable LocalDate startDate, @Nullable LocalDate legacyRoutEndDate) {
+        if (legacyRoutEndDate == null) {
+            return true;
+        }
+
+        return (startDate != null) && legacyRoutEndDate.isAfter(startDate.plusMonths(3));
+    }
+
     /** Credits a closed-out legacy contract's outstanding lump sum (its routed payout) to the player. */
     private static void settle(final Campaign campaign, final AbstractContract contract, final Money settlementAmount) {
         campaign.getPlayerForce()

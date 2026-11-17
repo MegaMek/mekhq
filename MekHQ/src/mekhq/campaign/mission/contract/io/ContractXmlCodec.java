@@ -516,8 +516,7 @@ public final class ContractXmlCodec {
         readers.put("activeNegotiationData",
               (contract, node, campaign, version) -> contract.setActiveNegotiationData(
                     parseActiveNegotiationData(node)));
-        readers.put("moraleData", (contract, node, campaign, version) -> contract.setMoraleData(parseMoraleData(node,
-              (contract.getObjectiveData() == null) ? null : contract.getObjectiveType())));
+        readers.put("moraleData", (contract, node, campaign, version) -> readMoraleData(contract, node, version));
         readers.put("negotiationData",
               (contract, node, campaign, version) -> contract.setNegotiationData(parseNegotiationData(node)));
         readers.put(StratConCampaignState.ROOT_XML_ELEMENT_NAME,
@@ -1003,10 +1002,13 @@ public final class ContractXmlCodec {
               builder.transportDelta, builder.salvageDelta, builder.commandDelta, builder.attempts);
     }
 
+    /** The version that brought in the garrison raid model, and with it the record of a contract's first raid. */
+    private static final Version RAID_MODEL_VERSION = new Version("0.51.01");
+
     private static final class MoraleDataBuilder {
         ContractMoraleLevel moraleLevel;
         boolean peaceful;
-        boolean hasLegacyRoutEndDate;
+        LocalDate legacyRoutEndDate;
         Money finalPayout;
     }
 
@@ -1019,8 +1021,9 @@ public final class ContractXmlCodec {
                                          builder.moraleLevel = ContractMoraleLevel.parseFromString(text(node)));
         binders.put("peaceful",
               (builder, node, campaign, version) -> builder.peaceful = Boolean.parseBoolean(text(node)));
-        // Saves from before 0.51.01 gave a rout an end date; see parseMoraleData for how it is read
-        binders.put("routEndDate", (builder, node, campaign, version) -> builder.hasLegacyRoutEndDate = true);
+        // Saves from before 0.51.01 gave a rout an end date; see readMoraleData for how it is read
+        binders.put("routEndDate",
+              (builder, node, campaign, version) -> builder.legacyRoutEndDate = MHQXMLUtility.parseDate(text(node)));
         // Saves written before the final payout became nullable stored a zero payout on every contract under this
         // tag, meaning "not set", so a zero here is read back as unset rather than as a deliberate "pay nothing".
         binders.put("routedPayout", (builder, node, campaign, version) -> {
@@ -1035,16 +1038,40 @@ public final class ContractXmlCodec {
     }
 
     /**
-     * @param objectiveType the contract's objective, read from the {@code objectiveData} written before this element,
-     *                      or {@code null} if none has been read
+     * Reads the contract's morale data. It relies on the {@code objectiveData} and {@code scheduleData} written before
+     * it, for the contract's objective and start date.
+     *
+     * <p>A save from before the raid model (one from before 0.51.01, or any with a rout end date) records no first
+     * raid on a Garrison Duty or Retainer contract, so whether the enemy has already raided - and so whether its
+     * Batchall has already come - is worked out from the old rout instead (see
+     * {@link LegacyContractConverter#hasRaidedBeforeRaidModel}).</p>
+     *
+     * @param contract the contract being read
+     * @param wn       the {@code moraleData} element
+     * @param version  the version the save was written by, or {@code null} if unknown
      */
-    private static MoraleData parseMoraleData(final Node wn, final @Nullable ContractObjectiveType objectiveType) {
+    private static void readMoraleData(final AbstractContract contract, final Node wn,
+          final @Nullable Version version) {
+        final ContractObjectiveType objectiveType = (contract.getObjectiveData() == null)
+                                                          ? null
+                                                          : contract.getObjectiveType();
         final MoraleDataBuilder builder = readFields(wn, new MoraleDataBuilder(), MORALE_BINDERS, null, null,
               "moraleData");
-        if (builder.hasLegacyRoutEndDate) {
-            return LegacyContractConverter.convertLegacyRout(builder.moraleLevel, objectiveType, builder.finalPayout);
+
+        final boolean hasLegacyRout = builder.legacyRoutEndDate != null;
+        if (hasLegacyRout) {
+            contract.setMoraleData(LegacyContractConverter.convertLegacyRout(builder.moraleLevel, objectiveType,
+                  builder.finalPayout));
+        } else {
+            contract.setMoraleData(new MoraleData(builder.moraleLevel, builder.peaceful, builder.finalPayout));
         }
-        return new MoraleData(builder.moraleLevel, builder.peaceful, builder.finalPayout);
+
+        final boolean isBeforeRaidModel = hasLegacyRout
+                                                || ((version != null) && version.isLowerThan(RAID_MODEL_VERSION));
+        if (isBeforeRaidModel && (objectiveType != null) && objectiveType.hasGarrisonRaids()) {
+            contract.setHasBeenRaided(LegacyContractConverter.hasRaidedBeforeRaidModel(contract.getStartDate(),
+                  builder.legacyRoutEndDate));
+        }
     }
 
     private static final class NegotiationDataBuilder {
