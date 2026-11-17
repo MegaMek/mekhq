@@ -126,6 +126,12 @@ final class CrewUnitBoard extends JPanel {
 
         void removeTempCrewOnShown();
 
+        /** Takes every crew member out of every unit shown. Their techs and temp crew stay. */
+        void removeCrewOnShown();
+
+        /** Leaves every unit shown without a tech. */
+        void removeTechsOnShown();
+
         /** Puts one person in the seat another holds, taking that other person out of the unit. */
         void replaceOccupant(Person newcomer, Person occupant);
 
@@ -149,7 +155,8 @@ final class CrewUnitBoard extends JPanel {
 
     /**
      * What the units shown still need, and so what the bulk actions can do: the open places by seat type, how many
-     * units lack a tech, and whether temporary crew can be added or removed.
+     * units lack a tech, whether temporary crew can be added or removed, and whether there is crew or a tech to take
+     * off.
      *
      * @param openBySeat  the open places on the units shown, by seat type, in seat order
      * @param sampleOf    a unit that has each of those seats, to name it by: a Driver seat is a Pilot seat on anything
@@ -157,15 +164,19 @@ final class CrewUnitBoard extends JPanel {
      * @param needTech    how many of the units shown take a tech and have none
      * @param canFillTemp {@code true} if a unit shown has real crew aboard to lead temporary crew
      * @param hasTemp     {@code true} if a unit shown has temporary crew
+     * @param hasCrew     {@code true} if a unit shown has crew aboard
+     * @param hasTech     {@code true} if a unit shown has a tech
      */
     record Work(Map<SeatType, Integer> openBySeat, Map<SeatType, Unit> sampleOf, int needTech, boolean canFillTemp,
-          boolean hasTemp) {
+          boolean hasTemp, boolean hasCrew, boolean hasTech) {
         static Work of(List<UnitEntry> shown, AssignmentPlan plan, boolean techsOnly) {
             Map<SeatType, Integer> openBySeat = new EnumMap<>(SeatType.class);
             Map<SeatType, Unit> sampleOf = new EnumMap<>(SeatType.class);
             int needTech = 0;
             boolean canFillTemp = false;
             boolean hasTemp = false;
+            boolean hasCrew = false;
+            boolean hasTech = false;
             for (UnitEntry entry : shown) {
                 Unit unit = entry.unit();
                 if (!techsOnly) {
@@ -178,12 +189,15 @@ final class CrewUnitBoard extends JPanel {
                     }
                     canFillTemp |= plan.plannedRealCrew(unit) > 0;
                     hasTemp |= plan.plannedTotalTempCrew(unit) > 0;
+                    hasCrew |= !plan.plannedCrewOf(unit).isEmpty();
                 }
-                if (SeatEligibility.takesTech(unit) && (plan.plannedTechOf(unit) == null)) {
+                if (plan.plannedTechOf(unit) != null) {
+                    hasTech = true;
+                } else if (SeatEligibility.takesTech(unit)) {
                     needTech++;
                 }
             }
-            return new Work(openBySeat, sampleOf, needTech, canFillTemp, hasTemp);
+            return new Work(openBySeat, sampleOf, needTech, canFillTemp, hasTemp, hasCrew, hasTech);
         }
     }
 
@@ -204,7 +218,7 @@ final class CrewUnitBoard extends JPanel {
     private CrewAssignmentState state;
     private CrewAssignmentData data;
     private List<UnitEntry> shown = List.of();
-    private Work work = new Work(Map.of(), Map.of(), 0, false, false);
+    private Work work = new Work(Map.of(), Map.of(), 0, false, false, false, false);
 
     CrewUnitBoard(Actions actions) {
         super(new BorderLayout());
@@ -437,6 +451,11 @@ final class CrewUnitBoard extends JPanel {
                   actions::fillTempCrewOnShown));
             row.add(bulkButton(text("board.removeTempCrew"), "board.removeTempCrew.shown.toolTipText", work.hasTemp(),
                   actions::removeTempCrewOnShown));
+            row.add(bulkButton(text("board.unassignCrew"), "board.unassignCrew.toolTipText", work.hasCrew(),
+                  actions::removeCrewOnShown));
+        } else {
+            row.add(bulkButton(text("board.unassignTechs"), "board.unassignTechs.toolTipText", work.hasTech(),
+                  actions::removeTechsOnShown));
         }
         bulk.add(leftAligned(row));
     }

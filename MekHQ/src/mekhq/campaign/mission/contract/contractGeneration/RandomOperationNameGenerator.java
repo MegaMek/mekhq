@@ -36,11 +36,14 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collections;
 import java.util.EnumMap;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.Scanner;
+import java.util.concurrent.CountDownLatch;
+import java.util.concurrent.TimeUnit;
 
 import jakarta.annotation.Nullable;
 import megamek.common.util.weightedMaps.WeightedIntMap;
@@ -56,39 +59,62 @@ import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
  * pool, so a pool of {@code D} descriptors and {@code N} nouns yields {@code D * N} distinct names per objective.
  *
  * <p>Structured after {@link mekhq.campaign.personnel.backgrounds.RandomCompanyNameGenerator}: a lazily created,
- * double-checked singleton whose pools are populated on background threads from {@code word,weight} CSV files (a base
- * file plus an optional {@code userdata/} override merged on top). The file paths are the explicit per-pool constants
- * in {@link MHQConstants}.</p>
+ * double-checked singleton whose pools are loaded from {@code word,weight} CSV files (a base file plus an optional
+ * {@code userdata/} override merged on top). The file paths are the explicit per-pool constants in
+ * {@link MHQConstants}. The singleton is created during startup data loading so the pools are normally ready long
+ * before the first contract is generated.</p>
+ *
+ * <p>Thread safety: a single background thread builds every pool into local maps that no other thread can see, then
+ * publishes them all at once through {@code volatile} fields before marking the generator initialized. Published
+ * pools are never modified afterwards, so readers only ever see complete pools. A draw that arrives while loading is
+ * still in progress waits (up to {@link #LOAD_WAIT_SECONDS}) for it to finish rather than failing straight away.</p>
  *
  * <p>Save File Formatting: {@code word,weight}. The word is a {@link String} that does not include a {@code ','};
  * weight is an integer weight used during generation. The first line of each file is a header and is skipped.</p>
  */
 public class RandomOperationNameGenerator {
     //region Variable Declarations
-    /** The shared, objective-agnostic pool of leading modifier words (e.g. RED, FALLEN, IRON). */
-    private static WeightedIntMap<String> weightedDescriptor;
+    /**
+     * How long a draw waits for the pools to finish loading before giving up and returning {@code null} (which the
+     * caller turns into the fallback codename). Loading normally completes during startup, so this is a safety net.
+     */
+    static final long LOAD_WAIT_SECONDS = 5;
 
-    /** The per-objective pools of head nouns (e.g. EAGLE, BULWARK). Keys cover every {@link ContractObjectiveType}. */
-    private static final Map<ContractObjectiveType, WeightedIntMap<String>> weightedNouns =
-          new EnumMap<>(ContractObjectiveType.class);
+    /** The shared, objective-agnostic pool of leading modifier words (e.g. RED, FALLEN, IRON). */
+    private static volatile WeightedIntMap<String> weightedDescriptor;
+
+    /**
+     * The per-objective pools of head nouns (e.g. EAGLE, BULWARK). Replaced as a whole with a fully built, unmodifiable
+     * map once loading finishes; empty until then.
+     */
+    private static volatile Map<ContractObjectiveType, WeightedIntMap<String>> weightedNouns = emptyNouns();
 
     private static volatile RandomOperationNameGenerator randomOperationNameGenerator;
+
+    /** Set only after every pool has been published (or loading has failed), never before. */
     private static volatile boolean initialized = false;
 
     private static final MMLogger logger = MMLogger.create(RandomOperationNameGenerator.class);
+
+    /** Released once loading has finished, so draws made during loading can wait for it. */
+    private final CountDownLatch loadingComplete = new CountDownLatch(1);
     //endregion Variable Declarations
 
     //region Constructors
     private RandomOperationNameGenerator() {}
     //endregion Constructors
 
+    /**
+     * @return an empty, unmodifiable noun-pool map. Backed by an {@link EnumMap} so a {@code null} key lookup returns
+     *       {@code null} instead of throwing, matching the loaded maps.
+     */
+    private static Map<ContractObjectiveType, WeightedIntMap<String>> emptyNouns() {
+        return Collections.unmodifiableMap(new EnumMap<>(ContractObjectiveType.class));
+    }
+
     //region Getters/Setters
     public static WeightedIntMap<String> getWeightedDescriptor() {
         return weightedDescriptor;
-    }
-
-    public static void setWeightedDescriptor(final WeightedIntMap<String> weightedDescriptor) {
-        RandomOperationNameGenerator.weightedDescriptor = weightedDescriptor;
     }
 
     public static WeightedIntMap<String> getWeightedNoun(final ContractObjectiveType objectiveType) {
@@ -97,8 +123,8 @@ public class RandomOperationNameGenerator {
     //endregion Getters/Setters
 
     /**
-     * Returns the singleton instance, creating and kicking off initialization of every word pool on first use. Applies
-     * the double-checked locking pattern so only one instance is ever created.
+     * Returns the singleton instance, creating it and starting the background load of every word pool on first use.
+     * Applies the double-checked locking pattern so only one instance is ever created.
      *
      * @return the {@link RandomOperationNameGenerator} instance
      */
@@ -110,19 +136,7 @@ public class RandomOperationNameGenerator {
                 instance = randomOperationNameGenerator;
                 if (instance == null) { // Double check
                     instance = new RandomOperationNameGenerator();
-
-                    // Pre-create every pool map under the lock, before any loader thread starts, so background threads
-                    // only fill their own already-inserted map and never structurally modify the shared EnumMap
-                    // concurrently.
-                    setWeightedDescriptor(new WeightedIntMap<>());
-                    for (final ContractObjectiveType objectiveType : ContractObjectiveType.values()) {
-                        weightedNouns.put(objectiveType, new WeightedIntMap<>());
-                    }
-
-                    instance.runDescriptorLoader();
-                    for (final ContractObjectiveType objectiveType : ContractObjectiveType.values()) {
-                        instance.runNounLoader(objectiveType);
-                    }
+                    instance.runLoader();
 
                     // Publish only after the fully constructed instance has kicked off initialization, so no other
                     // thread can observe a partially-initialized instance through the field.
@@ -132,6 +146,23 @@ public class RandomOperationNameGenerator {
         }
         return instance;
     }
+
+    /**
+     * Waits for loading to finish if it has not yet, for at most {@link #LOAD_WAIT_SECONDS}.
+     *
+     * @return {@code true} if the pools are loaded and ready to draw from
+     */
+    private boolean awaitInitialization() {
+        if (initialized) {
+            return true;
+        }
+        try {
+            loadingComplete.await(LOAD_WAIT_SECONDS, TimeUnit.SECONDS);
+        } catch (InterruptedException e) {
+            Thread.currentThread().interrupt();
+        }
+        return initialized;
+    }
     //endregion Synchronization
 
     //region Generation
@@ -139,10 +170,10 @@ public class RandomOperationNameGenerator {
     /**
      * Draws a random descriptor (the leading modifier word).
      *
-     * @return a weighted-random descriptor, or {@code null} if the pool is not yet initialized or is empty
+     * @return a weighted-random descriptor, or {@code null} if the pool did not finish loading in time or is empty
      */
     public @Nullable String generateDescriptor() {
-        if (!initialized) {
+        if (!awaitInitialization()) {
             logger.warn("Attempted to generate an operation descriptor before the pools were initialized.");
             return null;
         }
@@ -157,64 +188,82 @@ public class RandomOperationNameGenerator {
      *
      * @param objectiveType the contract's objective, selecting the noun pool
      *
-     * @return a weighted-random noun, or {@code null} if no pool is available or initialized
+     * @return a weighted-random noun, or {@code null} if no pool is available or the pools did not finish loading in
+     *       time
      */
     public @Nullable String generateNoun(final ContractObjectiveType objectiveType) {
-        if (!initialized) {
+        if (!awaitInitialization()) {
             logger.warn("Attempted to generate an operation noun before the pools were initialized.");
             return null;
         }
 
-        WeightedIntMap<String> pool = weightedNouns.get(objectiveType);
+        // Read the published map once so both lookups below see the same snapshot.
+        final Map<ContractObjectiveType, WeightedIntMap<String>> nouns = weightedNouns;
+        WeightedIntMap<String> pool = nouns.get(objectiveType);
         String noun = (pool == null) ? null : pool.randomItem();
         if (noun != null) {
             return noun;
         }
 
         // Objective pool empty (e.g. missing data file) - fall back to the generic UNDEFINED pool.
-        WeightedIntMap<String> fallbackPool = weightedNouns.get(ContractObjectiveType.UNDEFINED);
+        WeightedIntMap<String> fallbackPool = nouns.get(ContractObjectiveType.UNDEFINED);
         return (fallbackPool == null) ? null : fallbackPool.randomItem();
     }
     //endregion Generation
 
     //region Initialization
-    private void runDescriptorLoader() {
-        Thread loader = new Thread(this::populateDescriptor, "Random Operation Name Generator initializer");
+    private void runLoader() {
+        Thread loader = new Thread(this::populatePools, "Random Operation Name Generator initializer");
         loader.setPriority(Thread.NORM_PRIORITY - 1);
         loader.start();
     }
 
-    private void runNounLoader(final ContractObjectiveType objectiveType) {
-        Thread loader = new Thread(() -> populateNoun(objectiveType), "Random Operation Name Generator initializer");
-        loader.setPriority(Thread.NORM_PRIORITY - 1);
-        loader.start();
-    }
+    /**
+     * Builds every pool into local maps, then publishes them all and marks the generator initialized. The pools are
+     * small, so loading them one after another on one thread is quick and avoids sharing half-built maps between
+     * threads. Initialization is always marked complete (even if loading throws) so waiting draws are released and
+     * fall back instead of hanging.
+     */
+    private void populatePools() {
+        try {
+            final WeightedIntMap<String> descriptor = buildPool(MHQConstants.OPERATION_NAME_DESCRIPTOR,
+                  MHQConstants.OPERATION_NAME_DESCRIPTOR_USER);
 
-    private void populateDescriptor() {
-        final Map<String, Integer> nameSegments = new HashMap<>();
-        loadNameSegments(new File(MHQConstants.OPERATION_NAME_DESCRIPTOR), nameSegments);
-        loadNameSegments(new File(MHQConstants.OPERATION_NAME_DESCRIPTOR_USER), nameSegments);
+            final Map<ContractObjectiveType, WeightedIntMap<String>> nouns =
+                  new EnumMap<>(ContractObjectiveType.class);
+            for (final ContractObjectiveType objectiveType : ContractObjectiveType.values()) {
+                final String[] paths = nounFilePaths(objectiveType);
+                nouns.put(objectiveType, buildPool(paths[0], paths[1]));
+            }
 
-        for (final Entry<String, Integer> entry : nameSegments.entrySet()) {
-            getWeightedDescriptor().add(entry.getValue(), entry.getKey());
+            weightedDescriptor = descriptor;
+            weightedNouns = Collections.unmodifiableMap(nouns);
+        } catch (Exception e) {
+            logger.error("Failed to load the operation name pools", e);
+        } finally {
+            initialized = true;
+            loadingComplete.countDown();
         }
-
-        initialized = true;
     }
 
-    private void populateNoun(final ContractObjectiveType objectiveType) {
-        final String[] paths = nounFilePaths(objectiveType);
-
+    /**
+     * Builds one weighted pool from its base file, with the optional user override file merged on top.
+     *
+     * @param basePath the bundled data file
+     * @param userPath the optional {@code userdata/} override file
+     *
+     * @return the populated pool (empty if neither file could be read)
+     */
+    private WeightedIntMap<String> buildPool(final String basePath, final String userPath) {
         final Map<String, Integer> nameSegments = new HashMap<>();
-        loadNameSegments(new File(paths[0]), nameSegments);
-        loadNameSegments(new File(paths[1]), nameSegments);
+        loadNameSegments(new File(basePath), nameSegments);
+        loadNameSegments(new File(userPath), nameSegments);
 
-        final WeightedIntMap<String> pool = weightedNouns.get(objectiveType);
+        final WeightedIntMap<String> pool = new WeightedIntMap<>();
         for (final Entry<String, Integer> entry : nameSegments.entrySet()) {
             pool.add(entry.getValue(), entry.getKey());
         }
-
-        initialized = true;
+        return pool;
     }
 
     /**
@@ -324,11 +373,14 @@ public class RandomOperationNameGenerator {
           final @Nullable Map<ContractObjectiveType, WeightedIntMap<String>> nouns) {
         final RandomOperationNameGenerator instance = new RandomOperationNameGenerator();
         weightedDescriptor = descriptor;
-        weightedNouns.clear();
+        final Map<ContractObjectiveType, WeightedIntMap<String>> seededNouns =
+              new EnumMap<>(ContractObjectiveType.class);
         if (nouns != null) {
-            weightedNouns.putAll(nouns);
+            seededNouns.putAll(nouns);
         }
+        weightedNouns = Collections.unmodifiableMap(seededNouns);
         initialized = true;
+        instance.loadingComplete.countDown();
         randomOperationNameGenerator = instance;
         return instance;
     }
@@ -340,7 +392,7 @@ public class RandomOperationNameGenerator {
     static void resetForTesting() {
         randomOperationNameGenerator = null;
         weightedDescriptor = null;
-        weightedNouns.clear();
+        weightedNouns = emptyNouns();
         initialized = false;
     }
     //endregion Testing
