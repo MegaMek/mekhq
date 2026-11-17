@@ -39,6 +39,7 @@ import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimat
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.BorderLayout;
@@ -425,7 +426,8 @@ public class MissionViewPanel extends JScrollablePanel {
 
     /**
      * Builds the battle record shown in the briefing room: the rating the next morale check would give, followed by
-     * the victory and defeat points behind it, for example "Victory (6–4)".
+     * the victory and defeat points behind it, for example "Victory (6–4)". While the enemy's morale would cost the
+     * employer a monthly setback at that check (see {@link MHQMorale#isSetbackDue}), a warning follows.
      *
      * @param today    the current date
      * @param contract the contract on show
@@ -435,12 +437,18 @@ public class MissionViewPanel extends JScrollablePanel {
     static String getBattleRecordText(LocalDate today, AbstractContract contract) {
         final PerformanceTally tally = MHQMorale.getPerformanceTally(today, contract);
         final PerformanceOutcome outcome = tally.outcome();
+        final String setbackWarning = MHQMorale.isSetbackDue(contract)
+                                            ? getFormattedTextAt(RESOURCE_BUNDLE, "txtBattleRecord.setback",
+                                                    spanOpeningWithCustomColor(getNegativeColor()),
+                                                    CLOSING_SPAN_TAG)
+                                            : "";
         return getFormattedTextAt(RESOURCE_BUNDLE, "txtBattleRecord.text",
               spanOpeningWithCustomColor(outcome.getColor()),
               outcome.getLabel(),
               CLOSING_SPAN_TAG,
               tally.victoryPoints(),
-              tally.defeatPoints());
+              tally.defeatPoints(),
+              setbackWarning);
     }
 
     static boolean shouldShowContractTimeline(Campaign campaign, AbstractContract contract) {

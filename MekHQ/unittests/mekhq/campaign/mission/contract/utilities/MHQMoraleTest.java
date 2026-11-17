@@ -41,6 +41,8 @@ import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.S
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.WEAKENED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
@@ -57,6 +59,7 @@ import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
@@ -775,5 +778,143 @@ class MHQMoraleTest {
         MHQMorale.checkMorale(campaign, contract, false);
 
         assertFalse(contract.isPeaceful(), "the surge behind the extension keeps the enemy raiding");
+    }
+
+    // Monthly setback
+
+    private static final int STARTING_VICTORY_POINTS = 5;
+    private static final int STARTING_SUPPORT_POINTS = 6;
+
+    /**
+     * A StratCon contract of scale 2 with a target of 25 Contract Victory Points, so a setback costs 3 CVP and 2
+     * support points.
+     */
+    private static AbstractContract stratConContractAt(ContractMoraleLevel moraleLevel) {
+        StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.setVictoryPoints(STARTING_VICTORY_POINTS);
+        campaignState.setSupportPoints(STARTING_SUPPORT_POINTS);
+
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getStratConCampaignState()).thenReturn(campaignState);
+        when(contract.getMoraleLevel()).thenReturn(moraleLevel);
+        when(contract.getRequiredVictoryPoints()).thenReturn(25);
+        when(contract.getScale()).thenReturn(2);
+        return contract;
+    }
+
+    private static int victoryPoints(AbstractContract contract) {
+        return contract.getStratConCampaignState().getVictoryPoints();
+    }
+
+    private static int supportPoints(AbstractContract contract) {
+        return contract.getStratConCampaignState().getSupportPoints();
+    }
+
+    @Test
+    void anOverwhelmingEnemyCostsBothVictoryPointsAndSupport() {
+        AbstractContract contract = stratConContractAt(OVERWHELMING);
+
+        assertNotNull(MHQMorale.applyMonthlySetback(contract, false, false));
+
+        assertEquals(STARTING_VICTORY_POINTS - 3, victoryPoints(contract), "10% of 25, rounded up");
+        assertEquals(STARTING_SUPPORT_POINTS - 2, supportPoints(contract), "one point per combat team");
+    }
+
+    @Test
+    void aDominatingEnemyCostsVictoryPointsWhenTheyArePicked() {
+        AbstractContract contract = stratConContractAt(DOMINATING);
+
+        MHQMorale.applyMonthlySetback(contract, false, true);
+
+        assertEquals(STARTING_VICTORY_POINTS - 3, victoryPoints(contract));
+        assertEquals(STARTING_SUPPORT_POINTS, supportPoints(contract));
+    }
+
+    @Test
+    void aDominatingEnemyCostsSupportOtherwise() {
+        AbstractContract contract = stratConContractAt(DOMINATING);
+
+        MHQMorale.applyMonthlySetback(contract, false, false);
+
+        assertEquals(STARTING_VICTORY_POINTS, victoryPoints(contract));
+        assertEquals(STARTING_SUPPORT_POINTS - 2, supportPoints(contract));
+    }
+
+    @ParameterizedTest
+    @MethodSource("levelsWithoutSetback")
+    void anEnemyBelowDominatingCostsNothing(ContractMoraleLevel moraleLevel) {
+        AbstractContract contract = stratConContractAt(moraleLevel);
+
+        assertNull(MHQMorale.applyMonthlySetback(contract, false, true));
+
+        assertEquals(STARTING_VICTORY_POINTS, victoryPoints(contract));
+        assertEquals(STARTING_SUPPORT_POINTS, supportPoints(contract));
+    }
+
+    private static Stream<ContractMoraleLevel> levelsWithoutSetback() {
+        return Stream.of(SCATTERED, CRITICAL, WEAKENED, STALEMATE, ADVANCING);
+    }
+
+    @Test
+    void inMaplessModeOnlySupportIsLost() {
+        AbstractContract overwhelming = stratConContractAt(OVERWHELMING);
+        AbstractContract dominating = stratConContractAt(DOMINATING);
+
+        MHQMorale.applyMonthlySetback(overwhelming, true, true);
+        MHQMorale.applyMonthlySetback(dominating, true, true);
+
+        assertEquals(STARTING_VICTORY_POINTS, victoryPoints(overwhelming));
+        assertEquals(STARTING_SUPPORT_POINTS - 2, supportPoints(overwhelming));
+        assertEquals(STARTING_VICTORY_POINTS, victoryPoints(dominating), "mapless keeps no CVP to lose");
+        assertEquals(STARTING_SUPPORT_POINTS - 2, supportPoints(dominating));
+    }
+
+    @Test
+    void supportNeverFallsBelowZero() {
+        AbstractContract contract = stratConContractAt(OVERWHELMING);
+        contract.getStratConCampaignState().setSupportPoints(1);
+
+        MHQMorale.applyMonthlySetback(contract, false, false);
+
+        assertEquals(0, supportPoints(contract));
+    }
+
+    @Test
+    void aSetbackWithNothingLeftToLoseReportsNothing() {
+        AbstractContract contract = stratConContractAt(DOMINATING);
+        contract.getStratConCampaignState().setSupportPoints(0);
+
+        assertNull(MHQMorale.applyMonthlySetback(contract, false, false));
+    }
+
+    @Test
+    void aSmallTargetStillCostsAtLeastOneVictoryPoint() {
+        AbstractContract contract = stratConContractAt(OVERWHELMING);
+        when(contract.getRequiredVictoryPoints()).thenReturn(0);
+
+        assertEquals(1, MHQMorale.getSetbackVictoryPoints(contract));
+    }
+
+    @Test
+    void aContractWithoutStratConSuffersNoSetback() {
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getMoraleLevel()).thenReturn(OVERWHELMING);
+
+        assertNull(MHQMorale.applyMonthlySetback(contract, false, true));
+    }
+
+    @Test
+    void aSetbackIsDueWhileTheEnemyIsDominatingOrOverwhelming() {
+        assertTrue(MHQMorale.isSetbackDue(stratConContractAt(DOMINATING)));
+        assertTrue(MHQMorale.isSetbackDue(stratConContractAt(OVERWHELMING)));
+        assertFalse(MHQMorale.isSetbackDue(stratConContractAt(ADVANCING)));
+    }
+
+    @Test
+    void noSetbackIsDueOnAContractWithoutStratCon() {
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getMoraleLevel()).thenReturn(OVERWHELMING);
+
+        assertFalse(MHQMorale.isSetbackDue(contract));
     }
 }

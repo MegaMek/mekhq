@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.mission.contract.utilities;
 
+import static java.lang.Math.max;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
 import static megamek.common.enums.SkillLevel.ELITE;
@@ -55,6 +56,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractMechanics;
 import mekhq.campaign.digitalGM.stratCon.StratConEscalation;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -95,6 +97,12 @@ public class MHQMorale {
      * chance.
      */
     public static final int RAID_DIE_SIZE = 4;
+
+    /**
+     * The share of a contract's Contract Victory Point target a monthly setback costs (see
+     * {@link #applyMonthlySetback}).
+     */
+    public static final double SETBACK_VICTORY_POINT_SHARE = 0.1;
 
     /** The scenario modifier for an enemy fighting short of ammunition. */
     public static final String LOW_AMMUNITION_MODIFIER = "EnemyLowAmmunition.json";
@@ -661,14 +669,36 @@ public class MHQMorale {
      * then a {@link #RAID_DIE_SIZE 1 in 4} chance of a raid (see {@link #applyRaidRoll}). Throughout an emergency
      * extension (see {@link #isInEmergencyExtension}) the enemy raids every month.</p>
      *
+     * <p>After the check, an enemy left Dominating or Overwhelming costs the employer a setback (see
+     * {@link #applyMonthlySetback}). It is shown with the check, and returned for the daily report, so the caller can
+     * place it after its own report of the morale change.</p>
+     *
      * @param campaign   the current campaign
      * @param contract   the contract whose morale is updated
      * @param showDialog whether to show the player the morale check and any raid that begins
+     *
+     * @return the report of the month's setback, or {@code null} if there was none
      */
-    public static void checkMorale(Campaign campaign, AbstractContract contract, boolean showDialog) {
+    public static @Nullable String checkMorale(Campaign campaign, AbstractContract contract, boolean showDialog) {
+        String setbackReport = null;
         // A garrison between raids saw no fighting last month, so there is nothing to test its enemy's morale against
         if (!contract.isPeaceful()) {
-            rollMorale(campaign, contract, showDialog);
+            String moraleReport = rollMorale(campaign, contract);
+
+            // An enemy left Dominating or Overwhelming by the check costs the employer ground
+            setbackReport = applyMonthlySetback(contract, campaign.getCampaignOptions().isUseStratConMaplessMode(),
+                  randomInt(2) == 0);
+            if (setbackReport != null) {
+                moraleReport += "<br><br>" + setbackReport;
+            }
+
+            if (showDialog) {
+                String flavorText = MHQMorale.getFormattedTitle()
+                                          + "<h2 style='text-align:center;'>" + contract.getName() + "</h2>"
+                                          + MoraleBar.getMoraleDisplay(contract).tooltip();
+                new ImmersiveDialogNotification(campaign, flavorText, moraleReport,
+                      MoraleBar.createDialogPanel(contract), true);
+            }
         }
 
         if (contract.getObjectiveType().hasGarrisonRaids()) {
@@ -677,6 +707,8 @@ public class MHQMorale {
                                    || (randomInt(RAID_DIE_SIZE) == 0);
             applyRaidRoll(campaign, contract, isRaid, showDialog);
         }
+
+        return setbackReport;
     }
 
     /**
@@ -701,11 +733,12 @@ public class MHQMorale {
      * Performs the morale check (see {@link #performMoraleCheck}) with the campaign's morale options, followed by
      * Escalation's roll for morale (see {@link StratConEscalation#rollForMorale}).
      *
-     * @param campaign   the current campaign
-     * @param contract   the contract whose morale is checked
-     * @param showDialog whether to show the player the result
+     * @param campaign the current campaign
+     * @param contract the contract whose morale is checked
+     *
+     * @return the report of the check
      */
-    private static void rollMorale(Campaign campaign, AbstractContract contract, boolean showDialog) {
+    private static String rollMorale(Campaign campaign, AbstractContract contract) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         String moraleReport = MHQMorale.performMoraleCheck(campaign.getLocalDate(), contract,
               campaignOptions.get(CampaignOption.MORALE_DECISIVE_VICTORY_EFFECT),
@@ -719,13 +752,106 @@ public class MHQMorale {
             moraleReport += "<br><br>" + escalationReport;
         }
 
-        if (showDialog) {
-            String flavorText = MHQMorale.getFormattedTitle()
-                                      + "<h2 style='text-align:center;'>" + contract.getName() + "</h2>"
-                                      + MoraleBar.getMoraleDisplay(contract).tooltip();
-            new ImmersiveDialogNotification(campaign, flavorText, moraleReport, MoraleBar.createDialogPanel(contract),
-                  true);
+        return moraleReport;
+    }
+
+    /**
+     * Applies the monthly setback an employer suffers while the enemy has the upper hand, judged on the enemy's morale
+     * once the month's morale check is done:
+     *
+     * <ul>
+     *     <li>{@link ContractMoraleLevel#OVERWHELMING}: the contract loses Contract Victory Points and employer
+     *     support.</li>
+     *     <li>{@link ContractMoraleLevel#DOMINATING}: the contract loses one or the other, picked at random.</li>
+     * </ul>
+     *
+     * <p>The Contract Victory Points lost are 10% of the contract's target, rounded up, and always at least 1. The
+     * support lost is one point per combat team of the contract's scale, but never more than the contract has left. In
+     * mapless mode, where Contract Victory Points are worked out from the contract's scenarios rather than kept, only
+     * support is lost. A contract run without StratCon has neither, so it suffers no setback.</p>
+     *
+     * @param contract                   the contract whose enemy's morale was just checked
+     * @param isMaplessMode              whether StratCon runs in mapless mode
+     * @param isVictoryPointsPickedFirst on a Dominating enemy, whether the setback falls on Contract Victory Points
+     *                                   rather than support (ignored in mapless mode)
+     *
+     * @return the report of the setback, or {@code null} if the contract lost nothing
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable String applyMonthlySetback(AbstractContract contract, boolean isMaplessMode,
+          boolean isVictoryPointsPickedFirst) {
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        if (campaignState == null) {
+            return null;
         }
+
+        ContractMoraleLevel moraleLevel = contract.getMoraleLevel();
+        boolean isLosingVictoryPoints;
+        boolean isLosingSupport;
+        if (moraleLevel.isOverwhelming()) {
+            isLosingVictoryPoints = !isMaplessMode;
+            isLosingSupport = true;
+        } else if (moraleLevel.isDominating()) {
+            isLosingVictoryPoints = !isMaplessMode && isVictoryPointsPickedFirst;
+            isLosingSupport = !isLosingVictoryPoints;
+        } else {
+            return null;
+        }
+
+        int victoryPointsLost = isLosingVictoryPoints ? getSetbackVictoryPoints(contract) : 0;
+        int supportLost = isLosingSupport
+                                ? Math.clamp(contract.getScale(), 0, max(0, campaignState.getSupportPoints()))
+                                : 0;
+
+        campaignState.changeVictoryPoints(-victoryPointsLost);
+        campaignState.changeSupportPoints(-supportLost);
+
+        if ((victoryPointsLost == 0) && (supportLost == 0)) {
+            return null;
+        }
+
+        String key;
+        if ((victoryPointsLost > 0) && (supportLost > 0)) {
+            key = "MHQMorale.setback.both";
+        } else if (victoryPointsLost > 0) {
+            key = "MHQMorale.setback.victoryPoints";
+        } else {
+            key = "MHQMorale.setback.support";
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, key, spanOpeningWithCustomColor(getNegativeColor()),
+              CLOSING_SPAN_TAG, moraleLevel, victoryPointsLost, supportLost);
+    }
+
+    /**
+     * Whether the next monthly morale check would bring a setback (see {@link #applyMonthlySetback}) if the enemy's
+     * morale stays where it is: the enemy is Dominating or Overwhelming on a contract run with StratCon.
+     *
+     * @param contract the contract
+     *
+     * @return {@code true} if a setback is due
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isSetbackDue(AbstractContract contract) {
+        ContractMoraleLevel moraleLevel = contract.getMoraleLevel();
+        return (contract.getStratConCampaignState() != null)
+                     && (moraleLevel.isDominating() || moraleLevel.isOverwhelming());
+    }
+
+    /**
+     * @param contract the contract
+     *
+     * @return the Contract Victory Points a monthly setback costs: 10% of the contract's target, rounded up, and always
+     *       at least 1
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int getSetbackVictoryPoints(AbstractContract contract) {
+        return max(1, (int) Math.ceil(contract.getRequiredVictoryPoints() * SETBACK_VICTORY_POINT_SHARE));
     }
 
     /**
@@ -785,7 +911,7 @@ public class MHQMorale {
      * @param campaign the current campaign
      */
     public static void determineStartingMorale(AbstractContract contract, Campaign campaign) {
-        rollMorale(campaign, contract, false);
+        rollMorale(campaign, contract);
 
         if (contract.getMoraleLevel().isScattered()) {
             contract.changeMorale(ContractMoraleLevel.CRITICAL);

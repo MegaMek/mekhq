@@ -1295,7 +1295,7 @@ public class CampaignNewDayManager {
                 ContractMoraleLevel oldMorale = contract.getMoraleLevel();
                 boolean wasPeaceful = contract.isPeaceful();
 
-                MHQMorale.checkMorale(campaign, contract, true);
+                String setbackReport = MHQMorale.checkMorale(campaign, contract, true);
                 ContractMoraleLevel newMorale = contract.getMoraleLevel();
 
                 String report = "";
@@ -1314,6 +1314,11 @@ public class CampaignNewDayManager {
 
                 if (!report.isBlank()) {
                     campaign.addReport(GENERAL, report);
+                }
+
+                // Logged after the morale it follows from
+                if (setbackReport != null) {
+                    campaign.addReport(GENERAL, contract.getHyperlinkedName() + ": " + setbackReport);
                 }
 
                 ContractRandomEvent.processMonthlyEvent(campaign, contract);

@@ -45,8 +45,10 @@ import java.util.List;
 
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ShellContract;
+import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -165,6 +167,28 @@ class MissionViewPanelTest {
 
         assertTrue(text.contains("<b>Victory</b>"), text);
         assertTrue(text.contains("(3 \u2013 2)"), text);
+    }
+
+    @Test
+    void battleRecordWarnsOfADueSetbackAgainstAnOverwhelmingEnemy() {
+        final AbstractContract contract = contractAt(CONTRACT_SYSTEM, true);
+        when(contract.getStratConCampaignState()).thenReturn(new StratConCampaignState());
+        when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.OVERWHELMING);
+
+        final String text = MissionViewPanel.getBattleRecordText(CAMPAIGN_DATE, contract);
+
+        assertTrue(text.contains("Setback due"), text);
+    }
+
+    @Test
+    void battleRecordGivesNoWarningAgainstAnEnemyBelowDominating() {
+        final AbstractContract contract = contractAt(CONTRACT_SYSTEM, true);
+        when(contract.getStratConCampaignState()).thenReturn(new StratConCampaignState());
+        when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.ADVANCING);
+
+        final String text = MissionViewPanel.getBattleRecordText(CAMPAIGN_DATE, contract);
+
+        assertFalse(text.contains("Setback due"), text);
     }
 
     private static List<Scenario> scenariosWithStatuses(ScenarioStatus... statuses) {
