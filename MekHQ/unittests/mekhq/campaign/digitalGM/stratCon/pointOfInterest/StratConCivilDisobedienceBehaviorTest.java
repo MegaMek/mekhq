@@ -180,7 +180,7 @@ class StratConCivilDisobedienceBehaviorTest {
         assertEquals("Crowd Control.json", behavior.getScenarioTemplateName());
         assertTrue(behavior.isScenarioPossibleWhilePeaceful(), "civil unrest does not answer to the enemy");
         assertFalse(DATA_CACHE.createBehavior().isScenarioPossibleWhilePeaceful(),
-              "with no enemy activity between raids, nothing else is contested"
+              "with no enemy activity between raids, nothing else is contested");
     }
 
     @Test
