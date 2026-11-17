@@ -700,9 +700,10 @@ public class SpecialAbility {
             return;
         }
 
-        // Ensure that the weapon's tech level is lower than that of the specified tech
-        // level
-        int simpleTechLevel = equipmentType.getTechLevel(year, isClanCharacter);
+        // Ensure that the weapon's rules level is no higher than the specified tech level. Both use the simple rules
+        // level scale (Intro = 0 through Unofficial = 4); getTechLevel would return a compound TechConstants value that
+        // also encodes tech base, which cannot be compared against the campaign's tech level.
+        int simpleTechLevel = equipmentType.getSimpleLevel(year, isClanCharacter, megamekFaction).ordinal();
         if (techLevel < simpleTechLevel) {
             return;
         }

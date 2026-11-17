@@ -42,6 +42,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -85,6 +86,7 @@ import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.RankGroup;
 import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.SkillGroup;
 import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.Sort;
 import mekhq.gui.dialog.trainingConsole.TrainingRoster.PersonEntry;
+import mekhq.gui.view.PersonViewPanel;
 
 /**
  * The Training Console: one place to spend XP for any number of people at once, replacing the Spend XP menu, Mass
@@ -238,7 +240,7 @@ public class TrainingConsole extends JDialog {
             state.query = text;
             refreshList();
         }, this::onRow, this::selectShown, this::clearSelection, this::sortBy, state.selected::contains,
-              person -> plan.purchaseCountOf(person), person -> plan.availableXpOf(person));
+              person -> plan.purchaseCountOf(person), person -> plan.availableXpOf(person), this::viewRecord);
 
         for (Person person : people) {
             PersonEntry entry = roster.entryFor(person);
@@ -714,7 +716,16 @@ public class TrainingConsole extends JDialog {
         JPanel top = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         top.add(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "basket.title")), BorderLayout.WEST);
         if (!selection.isEmpty()) {
-            top.add(Hud.link(getTextAt(RESOURCE_BUNDLE, "people.clear"), this::clearSelection), BorderLayout.EAST);
+            JPanel links = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+            if (selection.size() == 1) {
+                Person person = selection.get(0);
+                JLabel view = Hud.link(getTextAt(RESOURCE_BUNDLE, "basket.viewRecord"), () -> viewRecord(person));
+                view.setToolTipText(getTextAt(RESOURCE_BUNDLE, "basket.viewRecord.toolTipText"));
+                links.add(view);
+                links.add(Box.createHorizontalStrut(scaleForGUI(14)));
+            }
+            links.add(Hud.link(getTextAt(RESOURCE_BUNDLE, "people.clear"), this::clearSelection));
+            top.add(links, BorderLayout.EAST);
         }
         top.setAlignmentX(Component.LEFT_ALIGNMENT);
         basket.add(top);
@@ -979,6 +990,34 @@ public class TrainingConsole extends JDialog {
         } else {
             refreshPanel();
         }
+    }
+
+    /**
+     * Shows a person's full record, as the Personnel tab shows it, in a window of its own. It is read-only, and modal
+     * over the console, so the staged plan cannot change while it is open; it shows the person as they are, without
+     * the training staged for them.
+     *
+     * @param person the person
+     */
+    private void viewRecord(Person person) {
+        JDialog view = new JDialog(this, person.getFullTitle(), true);
+        JScrollPane scroll = new JScrollPane(new PersonViewPanel(person, campaign, campaign.getGUI()),
+              ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
+        JButton close = new JButton(getTextAt(RESOURCE_BUNDLE, "recordView.close"));
+        close.addActionListener(event -> view.dispose());
+        JPanel buttons = new JPanel();
+        buttons.add(close);
+
+        JPanel content = new JPanel(new BorderLayout());
+        content.add(scroll, BorderLayout.CENTER);
+        content.add(buttons, BorderLayout.SOUTH);
+        view.setContentPane(content);
+        view.getRootPane().setDefaultButton(close);
+        view.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        view.setSize(scaleForGUI(760, 720));
+        view.setLocationRelativeTo(this);
+        view.setVisible(true);
     }
 
     private void sortBy(Sort sort) {
