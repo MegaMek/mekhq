@@ -337,10 +337,10 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
      * type is no longer defined (its data renamed or removed) can never be placed, so it is dropped at once. In mapless
      * play, where there is no map to place them on, due points of interest are simply dropped.
      *
-     * <p>Unlike strategic-objective scenarios, points of interest still appear while a garrison-type contract is
-     * peaceful, between raids: they are features of the ground, not attacks the enemy has to mount. Deployment Orders
-     * are the exception: with no enemy activity, the employer has no deployment to order, so a Deployment Order due
-     * while the contract is peaceful is dropped.</p>
+     * <p>Unlike strategic-objective scenarios, points of interest still appear while a Garrison Duty or Retainer
+     * contract is peaceful, between raids: they are features of the ground, not attacks the enemy has to mount.
+     * Deployment Orders are the exception: with no enemy activity, the employer has no deployment to order, so a
+     * Deployment Order due while the contract is peaceful is dropped.</p>
      *
      * @author Illiani
      * @since 0.51.01
@@ -440,9 +440,9 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
         spawnDates.removeIf(spawnDate -> !spawnDate.isAfter(today));
         int dueCount = before - spawnDates.size();
 
-        // The due dates are consumed above whatever happens. While a garrison-type contract is peaceful, between
-        // raids, those scenarios are simply skipped rather than spawned - there is no enemy activity to contest the
-        // objective - matching how the ambient weekly scenarios are discarded while peaceful.
+        // The due dates are consumed above whatever happens. While a Garrison Duty or Retainer contract is peaceful,
+        // between raids, those scenarios are simply skipped rather than spawned - there is no enemy activity to contest
+        // the objective - matching how the ambient weekly scenarios are discarded while peaceful.
         if ((dueCount > 0) && !contract.isPeaceful()) {
             StratConContractInitializer.spawnScheduledStrategicScenarios(campaign, contract, dueCount);
         }

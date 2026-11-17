@@ -93,6 +93,12 @@ public class ContractEmergencyExtension {
             return false;
         }
 
+        // Recorded before the end date moves, since moving it also recomputes the length: nothing else would remember
+        // where the agreed term ended. A second extension keeps the first one's start.
+        if (contract.getEmergencyExtensionStartDate() == null) {
+            contract.setEmergencyExtensionStartDate(endingDate.plusDays(1));
+        }
+
         LocalDate newEndDate = endingDate.plusMonths(extension);
         contract.updateScheduleData(null, newEndDate);
 
@@ -113,7 +119,7 @@ public class ContractEmergencyExtension {
         roll = d6(2) / 2;
         moraleOrdinal = min(moraleOrdinal + roll, OVERWHELMING.ordinal());
         contract.changeMorale(ContractMoraleLevel.values()[moraleOrdinal]);
-        // The enemy surge that prompts the clause ends any peace a garrison-type contract was enjoying
+        // The enemy surge that prompts the clause ends any peace a Garrison Duty or Retainer contract was enjoying
         contract.setPeaceful(false);
 
         MekHQ.triggerEvent(new MissionChangedEvent(contract));

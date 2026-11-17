@@ -50,8 +50,8 @@ public enum PointOfInterestDeploymentOutcome {
 
     /**
      * The roll is certain to spawn a scenario. The usual limits still apply: nothing spawns under the "Essential
-     * Scenarios Only" option, on a facility's hex (where the facility's own rules decide), or while a garrison-type
-     * contract is peaceful, between raids.
+     * Scenarios Only" option, on a facility's hex (where the facility's own rules decide), or while a Garrison Duty or
+     * Retainer contract is peaceful, between raids.
      */
     FORCE_SCENARIO(1),
 

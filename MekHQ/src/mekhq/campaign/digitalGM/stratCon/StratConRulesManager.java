@@ -2023,9 +2023,9 @@ public class StratConRulesManager {
      *
      * <p>No random scenario is ever rolled under "Essential Scenarios Only", or on a hex already held - by a facility,
      * whose own rules decide there, or by a point of interest the formation could not follow up. Otherwise a point of
-     * interest on the hex may rule the roll out, or make it certain - but not while a garrison-type contract is
-     * peaceful, between raids, when there is no enemy to field a scenario at all. Without a point of interest's say, it
-     * is the usual roll against the sector's scenario odds.</p>
+     * interest on the hex may rule the roll out, or make it certain - but not while a Garrison Duty or Retainer
+     * contract is peaceful, between raids, when there is no enemy to field a scenario at all. Without a point of
+     * interest's say, it is the usual roll against the sector's scenario odds.</p>
      *
      * @param pointOfInterestOutcome what the points of interest on the hex want done to the roll
      * @param essentialScenariosOnly whether the "Essential Scenarios Only" option is on
@@ -4646,7 +4646,7 @@ public class StratConRulesManager {
      *
      * <p>The calculation follows these rules:</p>
      * <ul>
-     *   <li>If the contract is peaceful (a garrison-type contract between raids, see
+     *   <li>If the contract is peaceful (a Garrison Duty or Retainer contract between raids, see
      *   {@link AbstractContract#isPeaceful()}), the method immediately returns {@code -1}, indicating that no scenarios
      *   can occur.</li>
      *   <li>If {@code isReinforcements} is {@code true}, a morale-based modifier is applied:

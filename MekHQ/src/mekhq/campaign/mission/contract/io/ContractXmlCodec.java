@@ -146,6 +146,10 @@ public final class ContractXmlCodec {
             MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "mandatedCompletionStatus",
                   contract.getMandatedCompletionStatus().name());
         }
+        if (contract.getEmergencyExtensionStartDate() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "emergencyExtensionStartDate",
+                  contract.getEmergencyExtensionStartDate());
+        }
         // Running salvage totals, accumulated across the contract's scenarios.
         MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, "salvagedByUnitValue", contract.getSalvagedByUnitValue());
         MHQXMLUtility.writeSimpleXMLTag(printWriter,
@@ -461,6 +465,9 @@ public final class ContractXmlCodec {
         readers.put("mandatedCompletionStatus",
               (contract, node, campaign, version) -> contract.setMandatedCompletionStatus(
                     MissionStatus.parseFromString(text(node))));
+        readers.put("emergencyExtensionStartDate",
+              (contract, node, campaign, version) -> contract.setEmergencyExtensionStartDate(
+                    MHQXMLUtility.parseDate(text(node))));
         readers.put("salvagedByUnitValue",
               (contract, node, campaign, version) -> contract.setSalvagedByUnitValue(Money.fromXmlString(text(node))));
         readers.put("salvagedByEmployerValue",

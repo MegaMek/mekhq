@@ -39,8 +39,8 @@ import mekhq.campaign.finances.Money;
  * The enemy's morale on a contract.
  *
  * @param moraleLevel  the enemy's morale level
- * @param peaceful     whether a garrison-type contract is between raids, with no enemy activity in the Area of
- *                     Operations. Only garrison-type contracts are ever peaceful (see
+ * @param peaceful     whether a Garrison Duty or Retainer contract is between raids, with no enemy activity in the
+ *                     Area of Operations. Only Garrison Duty and Retainer contracts are ever peaceful (see
  *                     {@link mekhq.campaign.mission.contract.AbstractContract#isPeaceful()}).
  * @param finalPayout  the lump sum paid on a successful completion in place of the remaining escrow, or {@code null}
  *                     when none has been set and the remaining escrow is paid as normal. A zero payout is deliberate

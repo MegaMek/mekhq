@@ -686,33 +686,56 @@ class MHQMoraleTest {
 
     // Emergency extensions
 
-    private static AbstractContract scheduledGarrison(LocalDate startDate, LocalDate endDate, int lengthInMonths) {
+    /**
+     * A garrison that began six months ago on a six-month term, so its agreed term ends today.
+     */
+    private static AbstractContract garrisonEndingToday() {
         AbstractContract contract = garrison();
-        contract.setScheduleData(new ContractScheduleData(startDate, endDate, lengthInMonths));
+        LocalDate start = TODAY.minusMonths(6);
+        contract.setScheduleData(new ContractScheduleData(start, TODAY, 6));
         return contract;
     }
 
-    @Test
-    void aContractPastItsAgreedLengthIsInAnEmergencyExtension() {
-        LocalDate start = TODAY.minusMonths(6);
-        AbstractContract contract = scheduledGarrison(start, start.plusMonths(9), 6);
-
-        assertTrue(MHQMorale.isInEmergencyExtension(contract, TODAY));
+    /**
+     * Extends the contract three months as an emergency extension does: the first day past the agreed term is
+     * recorded, then the end date is moved - which recomputes the length, so the schedule alone no longer shows it.
+     */
+    private static void extendAsTheEmergencyClauseDoes(AbstractContract contract) {
+        contract.setEmergencyExtensionStartDate(contract.getEndingDate().plusDays(1));
+        contract.updateScheduleData(null, contract.getEndingDate().plusMonths(3));
     }
 
     @Test
-    void aContractWithinItsAgreedLengthIsNotInAnEmergencyExtension() {
-        LocalDate start = TODAY.minusMonths(3);
-        AbstractContract contract = scheduledGarrison(start, start.plusMonths(9), 6);
+    void aContractPastItsAgreedTermIsInAnEmergencyExtension() {
+        AbstractContract contract = garrisonEndingToday();
+        extendAsTheEmergencyClauseDoes(contract);
+
+        assertEquals(9, contract.getLengthInMonths(), "moving the end date recomputes the length");
+        assertTrue(MHQMorale.isInEmergencyExtension(contract, TODAY.plusDays(1)));
+        assertTrue(MHQMorale.isInEmergencyExtension(contract, TODAY.plusMonths(2)));
+    }
+
+    @Test
+    void anExtendedContractIsNotInTheExtensionUntilItsAgreedTermHasRun() {
+        AbstractContract contract = garrisonEndingToday();
+        extendAsTheEmergencyClauseDoes(contract);
 
         assertFalse(MHQMorale.isInEmergencyExtension(contract, TODAY),
-              "an extended contract only enters the extension once its agreed length has run");
+              "the last day of the agreed term is not yet part of the extension");
     }
 
     @Test
     void anUnextendedContractIsNeverInAnEmergencyExtension() {
-        LocalDate start = TODAY.minusMonths(6);
-        AbstractContract contract = scheduledGarrison(start, start.plusMonths(6), 6);
+        assertFalse(MHQMorale.isInEmergencyExtension(garrisonEndingToday(), TODAY.plusDays(1)));
+    }
+
+    @Test
+    void anEndDateThatIsNotAWholeNumberOfMonthsAwayIsNotAnEmergencyExtension() {
+        // As a GM might set in the contract editor: 2 months and 20 days, so the recomputed length is 2
+        AbstractContract contract = garrison();
+        LocalDate start = TODAY.minusMonths(2).minusDays(10);
+        contract.setScheduleData(new ContractScheduleData(start, start.plusMonths(2), 2));
+        contract.updateScheduleData(null, start.plusMonths(2).plusDays(20));
 
         assertFalse(MHQMorale.isInEmergencyExtension(contract, TODAY));
     }
@@ -720,13 +743,13 @@ class MHQMoraleTest {
     @Test
     void aGarrisonInAnEmergencyExtensionRaidsEveryMonth() {
         Campaign campaign = moraleCheckCampaign();
-        LocalDate start = TODAY.minusMonths(6);
-        AbstractContract contract = scheduledGarrison(start, start.plusMonths(9), 6);
+        AbstractContract contract = garrisonEndingToday();
+        extendAsTheEmergencyClauseDoes(contract);
         contract.setPeaceful(true);
+        when(campaign.getLocalDate()).thenReturn(TODAY.plusMonths(1));
 
         MHQMorale.checkMorale(campaign, contract, false);
 
         assertFalse(contract.isPeaceful(), "the surge behind the extension keeps the enemy raiding");
     }
-
 }

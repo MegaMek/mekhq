@@ -185,9 +185,9 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
     }
 
     /**
-     * @return {@code true} if a scenario can break out here even while a garrison-type contract is peaceful, between
-     *       raids, rolled against the usual odds as if it were not; by default, it cannot - with no enemy activity,
-     *       nothing is fought over. Civil unrest, which does not answer to the enemy, can.
+     * @return {@code true} if a scenario can break out here even while a Garrison Duty or Retainer contract is
+     *       peaceful, between raids, rolled against the usual odds as if it were not; by default, it cannot - with no
+     *       enemy activity, nothing is fought over. Civil unrest, which does not answer to the enemy, can.
      *
      * @author Illiani
      * @since 0.51.01
@@ -331,8 +331,8 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
         // Finalized without auto-assignment, which also puts it on the track and takes the formation back out of the
         // backing scenario. Clear it from the primary forces too, so that assigning it to the scenario found on the hex
         // - as the deployment does next - does not list it twice.
-        // Civil unrest, which can break out whether or not the enemy is active, is not the enemy's fight, so the enemy's
-        // morale does not shape it
+        // Civil unrest, which can break out whether or not the enemy is active, is not the enemy's fight, so the
+        // enemy's morale does not shape it
         StratConRulesManager.finalizeBackingScenario(campaign, contract, track, false, scenario,
               !isScenarioPossibleWhilePeaceful());
         scenario.getPrimaryForceIDs().remove(Integer.valueOf(formationId));

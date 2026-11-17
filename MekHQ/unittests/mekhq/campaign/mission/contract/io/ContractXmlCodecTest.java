@@ -324,6 +324,26 @@ class ContractXmlCodecTest {
     }
 
     @Test
+    void anEmergencyExtensionStartSurvivesARoundTrip() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setEmergencyExtensionStartDate(START.plusMonths(6).plusDays(1));
+
+        AbstractContract reloaded = reparse(write(contract));
+
+        assertEquals(START.plusMonths(6).plusDays(1), reloaded.getEmergencyExtensionStartDate());
+    }
+
+    @Test
+    void aContractNeverExtendedHasNoEmergencyExtensionStart() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+
+        String xml = write(contract);
+
+        assertFalse(xml.contains("<emergencyExtensionStartDate>"));
+        assertNull(reparse(xml).getEmergencyExtensionStartDate());
+    }
+
+    @Test
     void aContractThatIsNotPeacefulWritesNoPeacefulTag() throws Exception {
         AbstractContract contract = fullyPopulatedContract();
         contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING));

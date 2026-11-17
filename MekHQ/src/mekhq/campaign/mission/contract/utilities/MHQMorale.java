@@ -90,7 +90,10 @@ public class MHQMorale {
      */
     public static final int DECISIVE_MARGIN = 3;
 
-    /** A garrison-type contract's enemy raids on a roll of 0 on a die of this size each month: a 1 in 4 chance. */
+    /**
+     * A Garrison Duty or Retainer contract's enemy raids on a roll of 0 on a die of this size each month: a 1 in 4
+     * chance.
+     */
     public static final int RAID_DIE_SIZE = 4;
 
     /** The scenario modifier for an enemy fighting short of ammunition. */
@@ -677,8 +680,9 @@ public class MHQMorale {
     }
 
     /**
-     * Whether a contract has run past its agreed length, which only an emergency extension does (see
-     * {@link ContractEmergencyExtension#contractExtended}): the extension moves the end date but keeps the length.
+     * Whether a contract has run past its agreed term into an emergency extension. The extension records its first day
+     * when it is granted (see {@link ContractEmergencyExtension#contractExtended}); the schedule cannot tell, since
+     * moving the end date also recomputes the contract's length.
      *
      * @param contract the contract
      * @param today    the current date
@@ -689,14 +693,8 @@ public class MHQMorale {
      * @since 0.51.01
      */
     static boolean isInEmergencyExtension(AbstractContract contract, @Nullable LocalDate today) {
-        LocalDate startDate = contract.getStartDate();
-        LocalDate endDate = contract.getEndingDate();
-        if ((today == null) || (startDate == null) || (endDate == null)) {
-            return false;
-        }
-
-        LocalDate agreedEndDate = startDate.plusMonths(contract.getLengthInMonths());
-        return endDate.isAfter(agreedEndDate) && !today.isBefore(agreedEndDate);
+        LocalDate extensionStartDate = contract.getEmergencyExtensionStartDate();
+        return (today != null) && (extensionStartDate != null) && !today.isBefore(extensionStartDate);
     }
 
     /**
@@ -731,9 +729,9 @@ public class MHQMorale {
     }
 
     /**
-     * Applies a garrison-type contract's monthly raid roll. A raid ends the peace: the enemy, at whatever morale it held
-     * after its last raid, is active in the Area of Operations for the month. Otherwise the contract is peaceful for
-     * the month, with no enemy activity at all.
+     * Applies a Garrison Duty or Retainer contract's monthly raid roll. A raid ends the peace: the enemy, at whatever
+     * morale it held after its last raid, is active in the Area of Operations for the month. Otherwise the contract is
+     * peaceful for the month, with no enemy activity at all.
      *
      * <p>Only the start of a raid is announced; a raid carrying on into another month needs no warning.</p>
      *

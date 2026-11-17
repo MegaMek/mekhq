@@ -116,6 +116,13 @@ public abstract class AbstractContract {
      * would otherwise recommend. {@code null} when the contract's performance decides.
      */
     private @Nullable MissionStatus mandatedCompletionStatus;
+    /**
+     * The first day of the contract's emergency extension (see
+     * {@link mekhq.campaign.mission.contract.utilities.ContractEmergencyExtension}), or {@code null} if it has never
+     * been extended. An extension moves the end date and recomputes the length, so this is the only record of where the
+     * agreed term ended. Extended more than once, it keeps the first.
+     */
+    private @Nullable LocalDate emergencyExtensionStartDate;
     private ContractScheduleData scheduleData;
     private SystemsTargetData systemsTargetData;
 
@@ -428,6 +435,27 @@ public abstract class AbstractContract {
     }
 
     /**
+     * @return the first day of the contract's emergency extension, or {@code null} if it has never been extended
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable LocalDate getEmergencyExtensionStartDate() {
+        return emergencyExtensionStartDate;
+    }
+
+    /**
+     * @param emergencyExtensionStartDate the first day of the contract's emergency extension, or {@code null} if it has
+     *                                    never been extended
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setEmergencyExtensionStartDate(@Nullable LocalDate emergencyExtensionStartDate) {
+        this.emergencyExtensionStartDate = emergencyExtensionStartDate;
+    }
+
+    /**
      * @return the player's pending response to their employer losing control of this contract's planet, or
      *       {@code null} when there is none
      *
@@ -524,7 +552,7 @@ public abstract class AbstractContract {
 
     /**
      * Sets whether this contract is between raids, with no enemy activity in the Area of Operations. Only has an effect
-     * on garrison-type contracts (see {@link #isPeaceful()}).
+     * on Garrison Duty and Retainer contracts (see {@link #isPeaceful()}).
      *
      * @param isPeaceful {@code true} if the contract is now between raids
      *
