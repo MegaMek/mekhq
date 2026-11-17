@@ -418,6 +418,7 @@ public class MekLabTab extends CampaignGuiTab {
             LOGGER.error("", ex);
             return;
         }
+        entity.putInLab();
         entity.setYear(unit.getCampaign().getGameYear());
         UnitUtil.updateLoadedUnit(entity);
         removeAll();
