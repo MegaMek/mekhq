@@ -573,51 +573,57 @@ public class PodSpace implements IPartWork {
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        int allParts = 0;
-        int replacements = 0;
-        int inTransit = 0;
-        int onOrder = 0;
+        if (!isSalvaging()) {
+            return countStock().describe();
+        }
+        int partsRemaining = 0;
         for (UUID id : childPartIds) {
             Part part = findChildPart(id);
-            if (part != null) {
-                if (!isSalvaging() && !(part instanceof AmmoBin) && part.needsFixing()) {
-                    allParts++;
-                    MissingPart missing;
-                    if (part instanceof MissingPart) {
-                        missing = (MissingPart) part;
-                    } else {
-                        missing = part.getMissingPart();
-                    }
-                    if (missing.isReplacementAvailable()) {
-                        replacements++;
-                    } else {
-                        //FIXME: This won't work if there are multiple items of the same type that need replacing and the number on order or in transit is less than the required number
-                        PartInventory inventories = missing.getPartInventory(missing.getNewPart());
-                        if (inventories.getTransit() > 0) {
-                            inTransit++;
-                        }
-                        if (inventories.getOrdered() > 0) {
-                            onOrder++;
-                        }
-                    }
-                } else if (isSalvaging() && !(part instanceof MissingPart)) {
-                    allParts++;
-                }
-                //TODO: add string for reconfiguring
+            if ((part != null) && !(part instanceof MissingPart)) {
+                partsRemaining++;
+            }
+            //TODO: add string for reconfiguring
+        }
+        return partsRemaining + " parts remaining";
+    }
+
+    /**
+     * Counts the pods this location needs replaced, how many of them have a replacement in stock, and how many have
+     * one on its way or on order. Ammunition bins are reloaded, not replaced, so they are left out.
+     *
+     * @return the pods with a replacement here now, the pods needing one, and those with one coming
+     */
+    public StockCount countStock() {
+        int podsNeeded = 0;
+        int replacementsInStock = 0;
+        int podsWithOneInTransit = 0;
+        int podsWithOneOnOrder = 0;
+        PartInventory coming = new PartInventory();
+        for (UUID id : childPartIds) {
+            Part part = findChildPart(id);
+            boolean isReplacementNeeded = (part != null) && !(part instanceof AmmoBin) && part.needsFixing();
+            if (!isReplacementNeeded) {
+                continue;
+            }
+            podsNeeded++;
+            MissingPart missing = (part instanceof MissingPart missingPart) ? missingPart : part.getMissingPart();
+            if (missing.isReplacementAvailable()) {
+                replacementsInStock++;
+                continue;
+            }
+            //FIXME: This won't work if there are multiple items of the same type that need replacing and the number on order or in transit is less than the required number
+            PartInventory inventory = missing.getPartInventory(missing.getNewPart());
+            if (inventory.getTransit() > 0) {
+                podsWithOneInTransit++;
+                coming.recordArrival(inventory.getDaysToFirstArrival());
+            }
+            if (inventory.getOrdered() > 0) {
+                podsWithOneOnOrder++;
             }
         }
-        if (isSalvaging()) {
-            return allParts + " parts remaining";
-        } else {
-            return replacements +
-                         "/" +
-                         allParts +
-                         " available<br />" +
-                         inTransit +
-                         " in transit, " +
-                         onOrder +
-                         " on order";
-        }
+        coming.setTransit(podsWithOneInTransit);
+        coming.setOrdered(podsWithOneOnOrder);
+        return new StockCount(replacementsInStock, podsNeeded, coming);
     }
 
     @Override

@@ -576,49 +576,14 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                         getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"));
         }
 
+        // Each line ends with its own break, so the task reads without a blank line between details and stock
+        toReturn.append("</b><br>");
         String details = getDetails();
-
-        if (details != null && !details.isBlank()) {
-            toReturn.append("</b><br>").append(getDetails()).append("<br>");
+        if ((details != null) && !details.isBlank()) {
+            toReturn.append(details).append("<br>");
         }
-
-        if (this.isSalvaging()) {
-            int inStock = 0;
-            if (this instanceof mekhq.campaign.parts.equipment.AmmoBin ammoBin) {
-                LocalWarehouse localWarehouse = getWarehouse();
-                if (localWarehouse != null) {
-                    megamek.common.equipment.AmmoType ammoType = ammoBin.getType();
-                    boolean useAmmoByType = campaign.getCampaignOptions().get(CampaignOption.USE_AMMO_BY_TYPE);
-                    inStock = localWarehouse.streamSpareParts()
-                                    .filter(p -> p instanceof AmmoStorage
-                                                       && p.isPresent()
-                                                       && !p.isReservedForRefit())
-                                    .mapToInt(p -> {
-                                        AmmoStorage spare = (AmmoStorage) p;
-                                        if (spare.isSameAmmoType(ammoType)) {
-                                            return spare.getShots();
-                                        } else if (useAmmoByType && spare.isCompatibleAmmo(ammoType)) {
-                                            return mekhq.campaign.ForceQuartermaster.convertShots(
-                                                  spare.getType(), spare.getShots(), ammoType);
-                                        }
-                                        return 0;
-                                    })
-                                    .sum();
-                }
-            } else if (getWarehouse() != null) {
-                inStock = getWarehouse().getSparePartsCount(this);
-            }
-            String inStockText = inStock == 0 ?
-                                       ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                                 .getFontColorNegativeHexColor(),
-                                             "None in stock") :
-                                       ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                                 .getFontColorPositiveHexColor(),
-                                             inStock + " in stock");
-
-            toReturn.append("<br>").append(inStockText).append("<br>");
-        } else {
-            toReturn.append("<br>");
+        if (isSalvaging()) {
+            toReturn.append(countStock().describe()).append("<br>");
         }
 
         if (!isDamagedBeyondRepair()) {
@@ -630,6 +595,18 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         }
         toReturn.append("</html>");
         return toReturn.toString();
+    }
+
+    /**
+     * Counts the spares like this part for its Repair Bay task: those here now, and those on their way or on order.
+     * Salvaging needs none, so it is never short. Parts whose job uses something else, such as a reload's ammunition,
+     * count that instead.
+     *
+     * @return the stock this task can draw on
+     */
+    public StockCount countStock() {
+        PartInventory inventory = getPartInventory(this);
+        return new StockCount(inventory.getSupply(), 0, inventory);
     }
 
     /**
