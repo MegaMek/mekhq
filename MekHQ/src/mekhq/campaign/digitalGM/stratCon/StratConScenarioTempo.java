@@ -77,7 +77,57 @@ public final class StratConScenarioTempo {
     /** How much more often the table is rolled when battlefield support points are factored into scale. */
     static final int SUPPORT_POINT_SCALE_ROLL_MULTIPLIER = 3;
 
+    /**
+     * How many days late an ordinary scenario's date may be and still bring its scenario. Older dates are discarded, so
+     * a long backlog - from a save made before overdue dates were caught up - does not arrive all at once.
+     */
+    static final int MAXIMUM_SCENARIO_CATCH_UP_DAYS = 7;
+
     private StratConScenarioTempo() {}
+
+    /**
+     * Takes every ordinary scenario date on or before today off the schedule and counts the scenarios now due.
+     *
+     * <p>A date is due if it falls today, or at most {@link #MAXIMUM_SCENARIO_CATCH_UP_DAYS} days before. That way a
+     * date rolled for a day the new day has already processed - by editing or extending the contract - still brings
+     * its scenario the next day, instead of sitting on the schedule forever. Older dates are discarded.</p>
+     *
+     * @param scheduledDates the contract's scheduled ordinary scenario dates; due and stale dates are removed from it
+     * @param today          the current campaign date
+     *
+     * @return how many scenarios are due today
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int takeDueScenarioDates(List<LocalDate> scheduledDates, LocalDate today) {
+        LocalDate oldestDueDate = today.minusDays(MAXIMUM_SCENARIO_CATCH_UP_DAYS);
+        int dueCount = 0;
+        int staleCount = 0;
+        for (LocalDate scheduledDate : scheduledDates) {
+            if (scheduledDate.isAfter(today)) {
+                continue;
+            }
+
+            if (scheduledDate.isBefore(oldestDueDate)) {
+                staleCount++;
+            } else {
+                dueCount++;
+            }
+        }
+
+        if ((dueCount + staleCount) > 0) {
+            scheduledDates.removeIf(scheduledDate -> !scheduledDate.isAfter(today));
+        }
+
+        if (staleCount > 0) {
+            LOGGER.info("Discarded {} StratCon scenario date(s) more than {} days overdue.",
+                  staleCount,
+                  MAXIMUM_SCENARIO_CATCH_UP_DAYS);
+        }
+
+        return dueCount;
+    }
 
     /**
      * Works out how many times the Track Intensity Tables are rolled for a contract's ordinary scenarios.

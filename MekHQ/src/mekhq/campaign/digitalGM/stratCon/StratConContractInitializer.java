@@ -2849,19 +2849,20 @@ public class StratConContractInitializer {
                     continue;
                 }
 
-                if (forceCoords.contains(coords)) {
-                    if (allowPlayerForces) {
-                        weightedMap.add(strategicEmphasis, coords);
-                    }
+                boolean hasPlayerForces = forceCoords.contains(coords);
+                if (hasPlayerForces && !allowPlayerForces) {
                     continue;
                 }
 
+                // Both rules must hold: a formation standing on an enemy facility does not make the facility a place
+                // for a scenario to spawn, or the enemy's scenario would become an assault the player never ordered.
                 StratConFacility facility = trackState.getFacility(coords);
-                if (facility == null) {
-                    weightedMap.add(defaultWeight, coords);
-                } else if (allowPlayerFacilities && facility.isOwnerAlliedToPlayer()) {
-                    weightedMap.add(strategicEmphasis, coords);
+                if ((facility != null) && !(allowPlayerFacilities && facility.isOwnerAlliedToPlayer())) {
+                    continue;
                 }
+
+                boolean isStrategicTarget = hasPlayerForces || (facility != null);
+                weightedMap.add(isStrategicTarget ? strategicEmphasis : defaultWeight, coords);
             }
         }
 

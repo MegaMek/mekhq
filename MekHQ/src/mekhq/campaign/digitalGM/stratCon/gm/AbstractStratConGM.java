@@ -281,17 +281,13 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 }
             }
 
-            List<LocalDate> scheduledScenarioDates = campaignState.getScheduledScenarioDates();
+            // Every date on or before today is taken off the schedule, so a date rolled for a day already processed (by a
+            // contract edit or extension) is caught up the next day rather than lost. Under Essential-only play they are
+            // taken off and discarded, so they do not pile up.
+            int scenarioCount = StratConScenarioTempo.takeDueScenarioDates(campaignState.getScheduledScenarioDates(),
+                  today);
 
-            if (!essentialScenariosOnly && scheduledScenarioDates.contains(today)) {
-                int scenarioCount = 0;
-                for (LocalDate date : scheduledScenarioDates) {
-                    if (date.equals(today)) {
-                        scenarioCount++;
-                    }
-                }
-                scheduledScenarioDates.removeIf(date -> date.equals(today));
-
+            if (!essentialScenariosOnly && (scenarioCount > 0)) {
                 // A garrison between raids sees no enemy activity, so any scheduled scenarios are simply discarded
                 if (!contract.isPeaceful()) {
                     // Some may be counterattacks on facilities held by the player or their employer instead.

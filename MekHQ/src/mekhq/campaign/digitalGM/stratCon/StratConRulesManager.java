@@ -329,7 +329,9 @@ public class StratConRulesManager {
             if (track.getAssignedCoordForces().containsKey(scenarioCoords)) {
                 Set<Integer> assignedForceIDs = track.getAssignedCoordForces().get(scenarioCoords);
 
-                if (!assignedForceIDs.isEmpty()) {
+                // On a facility the scenario is fought over the facility, in a facility template (see
+                // setupScenario), so it is not an ambush.
+                if (!assignedForceIDs.isEmpty() && (track.getFacility(scenarioCoords) == null)) {
                     ambushTemplate = getAmbushTemplateForForce(campaign, track, assignedForceIDs.iterator().next());
                 }
 
@@ -555,14 +557,12 @@ public class StratConRulesManager {
 
         // If we haven't generated a scenario yet, it's because we need to pick a random force.
         if (scenario == null) {
-            int availableForces = availableForceIDs.size();
-            int randomForceID = FORMATION_NONE;
-
-            if (availableForces > 0) {
-                int randomForceIndex = randomInt(availableForces);
-                randomForceID = availableForceIDs.get(randomForceIndex);
-            }
-
+            List<Integer> candidateForceIDs = getExternalScenarioCandidateForceIDs(availableForceIDs,
+                  sortedAvailableForceIDs,
+                  template != null);
+            int randomForceID = candidateForceIDs.isEmpty() ?
+                                      FORMATION_NONE :
+                                      candidateForceIDs.get(randomInt(candidateForceIDs.size()));
 
             scenario = setupScenario(scenarioCoords,
                   randomForceID,
@@ -583,6 +583,41 @@ public class StratConRulesManager {
 
         // We return the scenario in case we want to make specific changes.
         return scenario;
+    }
+
+    /**
+     * Picks the forces an external scenario may be seeded with. When a template was asked for, only forces suited to
+     * its map location are - those left in {@code sortedAvailableForceIDs} once the unsuitable locations were cleared -
+     * so the opposition is not sized against, say, an aerospace force for a ground fight. If none suits it, any
+     * available force is used, as before, rather than none.
+     *
+     * @param availableForceIDs       every available force
+     * @param sortedAvailableForceIDs the available forces by map location, with locations the template rules out
+     *                                already cleared
+     * @param isTemplateSpecified     whether a template was asked for
+     *
+     * @return the forces to pick the seed from; empty if there are none at all
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static List<Integer> getExternalScenarioCandidateForceIDs(List<Integer> availableForceIDs,
+          Map<MapLocation, List<Integer>> sortedAvailableForceIDs, boolean isTemplateSpecified) {
+        if (!isTemplateSpecified) {
+            return availableForceIDs;
+        }
+
+        List<Integer> suitableForceIDs = new ArrayList<>();
+        for (List<Integer> forceIDs : sortedAvailableForceIDs.values()) {
+            for (int forceID : forceIDs) {
+                if (!suitableForceIDs.contains(forceID)) {
+                    suitableForceIDs.add(forceID);
+                }
+            }
+        }
+        Collections.sort(suitableForceIDs);
+
+        return suitableForceIDs.isEmpty() ? availableForceIDs : suitableForceIDs;
     }
 
     /**
@@ -5597,12 +5632,49 @@ public class StratConRulesManager {
 
         // Fail the objective if no facility is found. Only a counterattack, handled above, costs a facility: an
         // ordinary scenario left unplayed on one no longer does. A siege fight is on the besiegers' hex, and stands
-        // for no objective there.
-        if ((localFacility == null) && (scenario.getFacilityOperation() != FacilityOperation.SIEGE)) {
+        // for no objective there. An Essential scenario fought over a facility of its own still fails its objective:
+        // that objective is the scenario, not the facility, and nothing else would ever settle it.
+        if (isIgnoredScenarioObjectiveFailed(track, scenario.getCoords(), localFacility,
+              scenario.getFacilityOperation())) {
             track.failObjective(scenario.getCoords());
         }
 
         // Remove the scenario from the track
         track.removeScenario(scenario);
+    }
+
+    /**
+     * Decides whether an ignored scenario fails the strategic objective on its hex.
+     *
+     * <ul>
+     *     <li>A fight over a siege never does: it is on the besiegers' hex, and stands for no objective there.</li>
+     *     <li>A scenario on a hex with no facility does.</li>
+     *     <li>A scenario on a facility does only when the objective on its hex is a
+     *     {@link StrategicObjectiveType#SpecificScenarioVictory}: an Essential scenario that brought its own facility.
+     *     A facility objective is settled by what becomes of the facility instead.</li>
+     * </ul>
+     *
+     * @param track             the scenario's sector
+     * @param coords            the scenario's hex
+     * @param localFacility     the facility on the hex, or {@code null} if there is none
+     * @param facilityOperation the order that started the scenario, or {@code null} if none did
+     *
+     * @return {@code true} if the objective on the hex should be failed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isIgnoredScenarioObjectiveFailed(StratConTrackState track, StratConCoords coords,
+          @Nullable StratConFacility localFacility, @Nullable FacilityOperation facilityOperation) {
+        if (facilityOperation == FacilityOperation.SIEGE) {
+            return false;
+        }
+
+        if (localFacility == null) {
+            return true;
+        }
+
+        StratConStrategicObjective objective = track.getObjectivesByCoords().get(coords);
+        return (objective != null) && (objective.getObjectiveType() == StrategicObjectiveType.SpecificScenarioVictory);
     }
 }
