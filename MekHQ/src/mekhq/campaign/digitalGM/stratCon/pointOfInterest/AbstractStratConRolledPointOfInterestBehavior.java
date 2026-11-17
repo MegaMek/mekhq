@@ -331,7 +331,10 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
         // Finalized without auto-assignment, which also puts it on the track and takes the formation back out of the
         // backing scenario. Clear it from the primary forces too, so that assigning it to the scenario found on the hex
         // - as the deployment does next - does not list it twice.
-        StratConRulesManager.finalizeBackingScenario(campaign, contract, track, false, scenario);
+        // Civil unrest, which can break out whether or not the enemy is active, is not the enemy's fight, so the enemy's
+        // morale does not shape it
+        StratConRulesManager.finalizeBackingScenario(campaign, contract, track, false, scenario,
+              !isScenarioPossibleWhilePeaceful());
         scenario.getPrimaryForceIDs().remove(Integer.valueOf(formationId));
 
         onScenarioFinalized(scenario, contract, campaign);

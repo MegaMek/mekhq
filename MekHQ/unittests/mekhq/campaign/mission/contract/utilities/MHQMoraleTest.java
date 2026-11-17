@@ -62,6 +62,7 @@ import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveData;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
+import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
 import mekhq.campaign.mission.scenarios.ScenarioType;
@@ -236,7 +237,7 @@ class MHQMoraleTest {
      * Rates the contract's last month and looks up the modifier for that rating, as the morale check does.
      */
     private static int getPerformanceModifier(AbstractContract contract) {
-        return MHQMorale.getPerformanceModifier(MHQMorale.getPerformanceOutcome(TODAY, contract),
+        return MHQMorale.getPerformanceModifier(MHQMorale.getPerformanceTally(TODAY, contract).outcome(),
               DECISIVE_VICTORY_MODIFIER, VICTORY_MODIFIER, DECISIVE_DEFEAT_MODIFIER, DEFEAT_MODIFIER);
     }
 
@@ -355,7 +356,7 @@ class MHQMoraleTest {
         AbstractContract mockContract = mock(AbstractContract.class);
         when(mockContract.getScenarios()).thenReturn(buildScenarioArray(7, 1, 1, 0, 0, 2, 0, 0));
 
-        MHQMorale.PerformanceOutcome outcome = MHQMorale.getPerformanceOutcome(TODAY, mockContract);
+        MHQMorale.PerformanceOutcome outcome = MHQMorale.getPerformanceTally(TODAY, mockContract).outcome();
 
         assertEquals(MHQMorale.PerformanceOutcome.VICTORY, outcome);
         // With both victory options set to 1, the modifier alone could not tell the two apart
@@ -404,7 +405,7 @@ class MHQMoraleTest {
         AbstractContract mockContract = mock(AbstractContract.class);
         when(mockContract.getScenarios()).thenReturn(buildScenarioArray(7, 0, 1, 0, 0, 1, 0, 0));
 
-        assertEquals(MHQMorale.PerformanceOutcome.DRAW, MHQMorale.getPerformanceOutcome(TODAY, mockContract));
+        assertEquals(MHQMorale.PerformanceOutcome.DRAW, MHQMorale.getPerformanceTally(TODAY, mockContract).outcome());
     }
 
     @ParameterizedTest
@@ -652,8 +653,8 @@ class MHQMoraleTest {
     }
 
     @ParameterizedTest
-    @MethodSource("garrisonTypes")
-    void aGarrisonTypeContractStartsPeaceful(ContractObjectiveType objectiveType) {
+    @MethodSource("raidedGarrisonTypes")
+    void aGarrisonDutyOrRetainerContractStartsPeaceful(ContractObjectiveType objectiveType) {
         AbstractContract contract = newContractOfType(objectiveType);
 
         MHQMorale.determineStartingMorale(contract, moraleCheckCampaign());
@@ -661,21 +662,71 @@ class MHQMoraleTest {
         verify(contract).setPeaceful(true);
     }
 
-    private static Stream<ContractObjectiveType> garrisonTypes() {
-        return Stream.of(ContractObjectiveType.GARRISON_DUTY,
-              ContractObjectiveType.CADRE_DUTY,
-              ContractObjectiveType.SECURITY_DUTY,
-              ContractObjectiveType.RIOT_DUTY,
-              ContractObjectiveType.RETAINER);
+    private static Stream<ContractObjectiveType> raidedGarrisonTypes() {
+        return Stream.of(ContractObjectiveType.GARRISON_DUTY, ContractObjectiveType.RETAINER);
     }
 
-    @Test
-    void anyOtherContractStartsWithTheEnemyActive() {
-        AbstractContract contract = newContractOfType(ContractObjectiveType.PLANETARY_ASSAULT);
+    @ParameterizedTest
+    @MethodSource("contractsWithAnActiveEnemy")
+    void anyOtherContractStartsWithTheEnemyActive(ContractObjectiveType objectiveType) {
+        AbstractContract contract = newContractOfType(objectiveType);
 
         MHQMorale.determineStartingMorale(contract, moraleCheckCampaign());
 
         verify(contract).setPeaceful(false);
+    }
+
+    private static Stream<ContractObjectiveType> contractsWithAnActiveEnemy() {
+        // Cadre, Security, and Riot Duty are garrison-type contracts, but face an active enemy throughout
+        return Stream.of(ContractObjectiveType.PLANETARY_ASSAULT,
+              ContractObjectiveType.CADRE_DUTY,
+              ContractObjectiveType.SECURITY_DUTY,
+              ContractObjectiveType.RIOT_DUTY);
+    }
+
+    // Emergency extensions
+
+    private static AbstractContract scheduledGarrison(LocalDate startDate, LocalDate endDate, int lengthInMonths) {
+        AbstractContract contract = garrison();
+        contract.setScheduleData(new ContractScheduleData(startDate, endDate, lengthInMonths));
+        return contract;
+    }
+
+    @Test
+    void aContractPastItsAgreedLengthIsInAnEmergencyExtension() {
+        LocalDate start = TODAY.minusMonths(6);
+        AbstractContract contract = scheduledGarrison(start, start.plusMonths(9), 6);
+
+        assertTrue(MHQMorale.isInEmergencyExtension(contract, TODAY));
+    }
+
+    @Test
+    void aContractWithinItsAgreedLengthIsNotInAnEmergencyExtension() {
+        LocalDate start = TODAY.minusMonths(3);
+        AbstractContract contract = scheduledGarrison(start, start.plusMonths(9), 6);
+
+        assertFalse(MHQMorale.isInEmergencyExtension(contract, TODAY),
+              "an extended contract only enters the extension once its agreed length has run");
+    }
+
+    @Test
+    void anUnextendedContractIsNeverInAnEmergencyExtension() {
+        LocalDate start = TODAY.minusMonths(6);
+        AbstractContract contract = scheduledGarrison(start, start.plusMonths(6), 6);
+
+        assertFalse(MHQMorale.isInEmergencyExtension(contract, TODAY));
+    }
+
+    @Test
+    void aGarrisonInAnEmergencyExtensionRaidsEveryMonth() {
+        Campaign campaign = moraleCheckCampaign();
+        LocalDate start = TODAY.minusMonths(6);
+        AbstractContract contract = scheduledGarrison(start, start.plusMonths(9), 6);
+        contract.setPeaceful(true);
+
+        MHQMorale.checkMorale(campaign, contract, false);
+
+        assertFalse(contract.isPeaceful(), "the surge behind the extension keeps the enemy raiding");
     }
 
 }

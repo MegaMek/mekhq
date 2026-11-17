@@ -504,7 +504,8 @@ public final class ContractXmlCodec {
         readers.put("activeNegotiationData",
               (contract, node, campaign, version) -> contract.setActiveNegotiationData(
                     parseActiveNegotiationData(node)));
-        readers.put("moraleData", (contract, node, campaign, version) -> contract.setMoraleData(parseMoraleData(node)));
+        readers.put("moraleData", (contract, node, campaign, version) -> contract.setMoraleData(parseMoraleData(node,
+              (contract.getObjectiveData() == null) ? null : contract.getObjectiveType())));
         readers.put("negotiationData",
               (contract, node, campaign, version) -> contract.setNegotiationData(parseNegotiationData(node)));
         readers.put(StratConCampaignState.ROOT_XML_ELEMENT_NAME,
@@ -993,6 +994,7 @@ public final class ContractXmlCodec {
     private static final class MoraleDataBuilder {
         ContractMoraleLevel moraleLevel;
         boolean peaceful;
+        boolean hasLegacyRoutEndDate;
         Money finalPayout;
     }
 
@@ -1005,10 +1007,8 @@ public final class ContractXmlCodec {
                                          builder.moraleLevel = ContractMoraleLevel.parseFromString(text(node)));
         binders.put("peaceful",
               (builder, node, campaign, version) -> builder.peaceful = Boolean.parseBoolean(text(node)));
-        // Saves from before 0.51.01 gave a rout an end date. On a garrison-type contract that rout was a lull with no
-        // enemy activity, which is now a peaceful spell between raids; on any other contract the flag is ignored (see
-        // AbstractContract#isPeaceful), and the lull simply ends.
-        binders.put("routEndDate", (builder, node, campaign, version) -> builder.peaceful = true);
+        // Saves from before 0.51.01 gave a rout an end date; see parseMoraleData for how it is read
+        binders.put("routEndDate", (builder, node, campaign, version) -> builder.hasLegacyRoutEndDate = true);
         // Saves written before the final payout became nullable stored a zero payout on every contract under this
         // tag, meaning "not set", so a zero here is read back as unset rather than as a deliberate "pay nothing".
         binders.put("routedPayout", (builder, node, campaign, version) -> {
@@ -1022,9 +1022,16 @@ public final class ContractXmlCodec {
         return binders;
     }
 
-    private static MoraleData parseMoraleData(final Node wn) {
+    /**
+     * @param objectiveType the contract's objective, read from the {@code objectiveData} written before this element,
+     *                      or {@code null} if none has been read
+     */
+    private static MoraleData parseMoraleData(final Node wn, final @Nullable ContractObjectiveType objectiveType) {
         final MoraleDataBuilder builder = readFields(wn, new MoraleDataBuilder(), MORALE_BINDERS, null, null,
               "moraleData");
+        if (builder.hasLegacyRoutEndDate) {
+            return LegacyContractConverter.convertLegacyRout(builder.moraleLevel, objectiveType, builder.finalPayout);
+        }
         return new MoraleData(builder.moraleLevel, builder.peaceful, builder.finalPayout);
     }
 

@@ -118,8 +118,10 @@ public final class NewContractFactory {
               ContractObjectiveType.UNDEFINED));
         contract.setContractFinanceData(new ContractFinanceData(Money.zero(), Money.zero(), Money.zero()));
         contract.setRentedFacilitiesData(new RentedFacilitiesData(0, 0, 0));
-        // A new contract is Garrison Duty, and a garrison-type contract begins peaceful, between raids
-        contract.setMoraleData(new MoraleData(ContractMoraleLevel.STALEMATE, true, Money.zero()));
+        // A new contract begins peaceful if its objective follows the garrison raid model. No final payout is set, so
+        // the remaining escrow is paid as normal if it ends early.
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.STALEMATE,
+              contract.getObjectiveType().hasGarrisonRaids(), null));
 
         return contract;
     }

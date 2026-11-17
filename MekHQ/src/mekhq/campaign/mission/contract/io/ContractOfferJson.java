@@ -316,8 +316,8 @@ public record ContractOfferJson(@Nullable String type, @Nullable ContractSearchT
         if ((nonNegotiableTerms != null) && nonNegotiableTerms.anyLocked()) {
             contract.setNonNegotiableTermsData(nonNegotiableTerms);
         }
-        // An offer is always a contract not yet begun, and a garrison-type contract begins peaceful, between raids
-        boolean isPeaceful = contract.getObjectiveType().isGarrisonType();
+        // An offer is always a contract not yet begun, and a Garrison Duty or Retainer contract begins peaceful
+        boolean isPeaceful = contract.getObjectiveType().hasGarrisonRaids();
         contract.setMoraleData(new MoraleData(Objects.requireNonNullElse(morale, ContractMoraleLevel.STALEMATE),
               isPeaceful, null));
 

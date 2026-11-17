@@ -1371,14 +1371,15 @@ public abstract class AbstractContract {
     }
 
     /**
-     * A garrison-type contract is peaceful between raids: there is no enemy activity in the Area of Operations. Each
-     * month there is a chance of a raid (see
+     * A contract that follows the garrison raid model (see {@link ContractObjectiveType#hasGarrisonRaids()}) is
+     * peaceful between raids: there is no enemy activity in the Area of Operations. Each month there is a chance of a
+     * raid (see
      * {@link mekhq.campaign.mission.contract.utilities.MHQMorale#checkMorale(Campaign, AbstractContract, boolean)}).
      *
-     * @return {@code true} if this is a garrison-type contract between raids
+     * @return {@code true} if this is a Garrison Duty or Retainer contract between raids
      */
     public boolean isPeaceful() {
-        return getObjectiveType().isGarrisonType() && moraleData.peaceful();
+        return getObjectiveType().hasGarrisonRaids() && moraleData.peaceful();
     }
 
     /**

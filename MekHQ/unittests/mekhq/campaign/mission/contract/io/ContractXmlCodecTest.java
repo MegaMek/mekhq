@@ -292,18 +292,35 @@ class ContractXmlCodecTest {
     }
 
     /**
-     * Saves from before the raid model gave a rout an end date. On a garrison-type contract that rout was a lull with
-     * no enemy activity, so it now reads as a peaceful spell between raids.
+     * Writes a contract with the given player objective as a save from before the raid model would: routed, with a
+     * rout end date.
+     */
+    private static String legacyRoutedXml(ContractObjectiveType objectiveType) throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setObjectiveData(new ContractObjectiveData(objectiveType, ContractObjectiveType.PLANETARY_ASSAULT));
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.SCATTERED, true, null));
+        return write(contract).replace("<moraleLevel>SCATTERED</moraleLevel>", "<moraleLevel>ROUTED</moraleLevel>")
+                     .replace("<peaceful>true</peaceful>", "<routEndDate>3051-02-01</routEndDate>");
+    }
+
+    /**
+     * Saves from before the raid model gave a rout an end date. On a Garrison Duty contract that rout was a lull with
+     * no enemy activity, so it now reads as a peaceful spell between raids, and the enemy returns from it at Stalemate.
      */
     @Test
-    void aLegacyRoutEndDateIsReadAsPeaceful() throws Exception {
-        AbstractContract contract = fullyPopulatedContract();
-        contract.setMoraleData(new MoraleData(ContractMoraleLevel.SCATTERED, true, null));
-        String legacyXml = write(contract).replace("<peaceful>true</peaceful>", "<routEndDate>3051-02-01</routEndDate>");
-
-        AbstractContract reloaded = reparse(legacyXml);
+    void aLegacyGarrisonRoutEndDateIsReadAsPeacefulAtStalemate() throws Exception {
+        AbstractContract reloaded = reparse(legacyRoutedXml(ContractObjectiveType.GARRISON_DUTY));
 
         assertTrue(reloaded.getMoraleData().peaceful());
+        assertEquals(ContractMoraleLevel.STALEMATE, reloaded.getMoraleLevel());
+    }
+
+    @Test
+    void aLegacyRoutEndDateOnAnyOtherContractEndsTheLull() throws Exception {
+        AbstractContract reloaded = reparse(legacyRoutedXml(ContractObjectiveType.OBJECTIVE_RAID));
+
+        assertFalse(reloaded.getMoraleData().peaceful(), "only a raided garrison keeps a peaceful flag");
+        assertEquals(ContractMoraleLevel.STALEMATE, reloaded.getMoraleLevel());
     }
 
     @Test

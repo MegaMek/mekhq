@@ -236,7 +236,7 @@ public class MHQMorale {
 
         // The outcome is settled first and the modifier read from it, so the report names the outcome actually earned
         // even when campaign options give two outcomes the same modifier.
-        PerformanceOutcome performanceOutcome = getPerformanceOutcome(today, contract);
+        PerformanceOutcome performanceOutcome = getPerformanceTally(today, contract).outcome();
         int performanceModifier = getPerformanceModifier(performanceOutcome, decisiveVictoryModifier, victoryModifier,
               decisiveDefeatModifier, defeatModifier);
         targetNumber.addModifier(performanceModifier, getTextAt(RESOURCE_BUNDLE, "MHQMorale.modifier.performance"));
@@ -482,22 +482,6 @@ public class MHQMorale {
     }
 
     /**
-     * Rates the player's performance over the contract's scenarios within the last month. Considers victories,
-     * defeats, and special outcome scenarios.
-     *
-     * @param today    The current date for the evaluation.
-     * @param contract The contract to evaluate scenarios for.
-     *
-     * @return The performance outcome over the last month.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    static PerformanceOutcome getPerformanceOutcome(LocalDate today, AbstractContract contract) {
-        return getPerformanceTally(today, contract).outcome();
-    }
-
-    /**
      * Tallies the victory and defeat points the contract's scenarios within the last month count for in the morale
      * check.
      *
@@ -667,10 +651,12 @@ public class MHQMorale {
     /**
      * Runs the monthly morale update for a contract.
      *
-     * <p>On most contracts this is the morale check (see {@link #rollMorale}). A garrison-type contract follows a raid
-     * model instead: the enemy is only tested after a month in which it raided, so between raids its morale holds where
-     * it was, and each month there is then a {@link #RAID_DIE_SIZE 1 in 4} chance of a raid (see
-     * {@link #applyRaidRoll}).</p>
+     * <p>On most contracts this is the morale check (see {@link #rollMorale}). A Garrison Duty or Retainer contract
+     * follows a raid model instead (see
+     * {@link mekhq.campaign.mission.contract.contractData.ContractObjectiveType#hasGarrisonRaids()}): the enemy is only
+     * tested after a month in which it raided, so between raids its morale holds where it was, and each month there is
+     * then a {@link #RAID_DIE_SIZE 1 in 4} chance of a raid (see {@link #applyRaidRoll}). Throughout an emergency
+     * extension (see {@link #isInEmergencyExtension}) the enemy raids every month.</p>
      *
      * @param campaign   the current campaign
      * @param contract   the contract whose morale is updated
@@ -682,9 +668,35 @@ public class MHQMorale {
             rollMorale(campaign, contract, showDialog);
         }
 
-        if (contract.getObjectiveType().isGarrisonType()) {
-            applyRaidRoll(campaign, contract, randomInt(RAID_DIE_SIZE) == 0, showDialog);
+        if (contract.getObjectiveType().hasGarrisonRaids()) {
+            // The surge that prompted an emergency extension keeps the enemy raiding until the contract ends
+            boolean isRaid = isInEmergencyExtension(contract, campaign.getLocalDate())
+                                   || (randomInt(RAID_DIE_SIZE) == 0);
+            applyRaidRoll(campaign, contract, isRaid, showDialog);
         }
+    }
+
+    /**
+     * Whether a contract has run past its agreed length, which only an emergency extension does (see
+     * {@link ContractEmergencyExtension#contractExtended}): the extension moves the end date but keeps the length.
+     *
+     * @param contract the contract
+     * @param today    the current date
+     *
+     * @return {@code true} if the contract is in an emergency extension today
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isInEmergencyExtension(AbstractContract contract, @Nullable LocalDate today) {
+        LocalDate startDate = contract.getStartDate();
+        LocalDate endDate = contract.getEndingDate();
+        if ((today == null) || (startDate == null) || (endDate == null)) {
+            return false;
+        }
+
+        LocalDate agreedEndDate = startDate.plusMonths(contract.getLengthInMonths());
+        return endDate.isAfter(agreedEndDate) && !today.isBefore(agreedEndDate);
     }
 
     /**
@@ -752,8 +764,10 @@ public class MHQMorale {
 
     /**
      * Sets a newly generated contract's starting morale with a morale check. The enemy never starts
-     * {@link ContractMoraleLevel#SCATTERED}, and on a Relief Duty contract it starts a level higher. A garrison-type
-     * contract also starts peaceful, so its first raid roll comes at the start of the next month.
+     * {@link ContractMoraleLevel#SCATTERED}, and on a Relief Duty contract it starts a level higher. A Garrison Duty or
+     * Retainer contract also starts peaceful (see
+     * {@link mekhq.campaign.mission.contract.contractData.ContractObjectiveType#hasGarrisonRaids()}), so its first raid
+     * roll comes at the start of the next month.
      *
      * @param contract the newly generated contract
      * @param campaign the current campaign
@@ -769,6 +783,6 @@ public class MHQMorale {
             contract.changeMorale(1);
         }
 
-        contract.setPeaceful(contract.getObjectiveType().isGarrisonType());
+        contract.setPeaceful(contract.getObjectiveType().hasGarrisonRaids());
     }
 }

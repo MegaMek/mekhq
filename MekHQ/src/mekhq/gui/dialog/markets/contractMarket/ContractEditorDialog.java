@@ -1801,6 +1801,7 @@ public class ContractEditorDialog extends JDialog {
               salvageNonNegotiableCheck.isSelected(), commandNonNegotiableCheck.isSelected()));
 
         // Objectives
+        final ContractObjectiveType previousObjectiveType = contract.getObjectiveType();
         contract.setObjectiveData(new ContractObjectiveData(objectiveValue(playerObjectiveCombo),
               objectiveValue(opposingObjectiveCombo)));
 
@@ -1838,14 +1839,17 @@ public class ContractEditorDialog extends JDialog {
         // Morale. The final payout is only written when editable (an accepted contract); on an unstarted offer it is
         // disabled and the contract's existing payout is preserved. A zero payout from the spinner means none has been
         // set, so the remaining escrow is paid as normal. Whether a garrison is between raids is left to the monthly
-        // raid roll.
+        // raid roll, unless the objective changed: then it starts afresh, as a new contract with that objective would.
         Money finalPayout = contract.getFinalPayout();
         if (finalPayoutEditable) {
             Money spinnerPayout = moneyValue(finalPayoutSpinner);
             finalPayout = spinnerPayout.isZero() ? null : spinnerPayout;
         }
-        contract.setMoraleData(new MoraleData(selectedOr(moralePicker, contract.getMoraleLevel()),
-              contract.getMoraleData().peaceful(), finalPayout));
+        boolean isPeaceful = (contract.getObjectiveType() == previousObjectiveType)
+                                   ? contract.getMoraleData().peaceful()
+                                   : contract.getObjectiveType().hasGarrisonRaids();
+        contract.setMoraleData(new MoraleData(selectedOr(moralePicker, contract.getMoraleLevel()), isPeaceful,
+              finalPayout));
 
         // Personnel. Create mode generates the NPCs now (from the just-applied factions) and layers the GM's overrides
         // on top; edit mode mutates the existing NPCs in place (their references are preserved by the rebuilds above).

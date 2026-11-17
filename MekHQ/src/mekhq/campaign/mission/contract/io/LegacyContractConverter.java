@@ -157,8 +157,8 @@ public final class LegacyContractConverter {
         int difficulty = 0;
 
         ContractMoraleLevel moraleLevel = ContractMoraleLevel.STALEMATE;
-        // A legacy rout end date marks a lull, which on a garrison-type contract is now a peaceful spell between raids
-        boolean peaceful = false;
+        // A legacy rout end date marks a lull (see convertLegacyRout)
+        boolean hasRoutEnd = false;
         Money routedPayout = null;
 
         // Matches the legacy default: a contract that never involved a Batchall counts as accepted.
@@ -216,7 +216,7 @@ public final class LegacyContractConverter {
                     case "requiredCombatTeams" -> scale = MathUtility.parseInt(value);
                     case "difficulty" -> difficulty = MathUtility.parseInt(value);
                     case "moraleLevel" -> moraleLevel = ContractMoraleLevel.parseFromString(value);
-                    case "routEnd" -> peaceful = true;
+                    case "routEnd" -> hasRoutEnd = true;
                     case "routedPayout" -> routedPayout = Money.fromXmlString(value);
                     case "batchallAccepted" -> batchallAccepted = Boolean.parseBoolean(value);
                     case "sharesPct" -> sharesPercent = MathUtility.parseInt(value);
@@ -287,7 +287,9 @@ public final class LegacyContractConverter {
         contract.setObjectiveData(new ContractObjectiveData(objective, ContractObjectiveType.UNDEFINED));
         contract.setContractFinanceData(new ContractFinanceData(transportAmount, baseAmount, Money.zero()));
         contract.setRentedFacilitiesData(new RentedFacilitiesData(hospitalBeds, kitchens, holdingCells));
-        contract.setMoraleData(new MoraleData(moraleLevel, peaceful, routedPayout));
+        contract.setMoraleData(hasRoutEnd
+                                     ? convertLegacyRout(moraleLevel, objective, routedPayout)
+                                     : new MoraleData(moraleLevel, false, routedPayout));
 
         // Point any restored StratCon state back at its new contract.
         if (contract.getStratConCampaignState() != null) {
@@ -314,6 +316,30 @@ public final class LegacyContractConverter {
             }
         }
         return contract;
+    }
+
+    /**
+     * Reads a rout from a save from before 0.51.01, which gave the rout an end date. On a Garrison Duty or Retainer
+     * contract (see {@link ContractObjectiveType#hasGarrisonRaids()}) that rout was a lull with no enemy activity, which
+     * is now a peaceful spell between raids; on any other contract the lull simply ends. Either way the enemy does not
+     * stay at its lowest level: as when a lull used to end, it returns no lower than Stalemate.
+     *
+     * @param moraleLevel   the morale level read from the save, or {@code null} if none was
+     * @param objectiveType the contract's objective, or {@code null} if unknown
+     * @param finalPayout   the final payout read from the save, or {@code null} if none was
+     *
+     * @return the contract's morale data
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static MoraleData convertLegacyRout(@Nullable ContractMoraleLevel moraleLevel,
+          @Nullable ContractObjectiveType objectiveType, @Nullable Money finalPayout) {
+        boolean isPeaceful = (objectiveType != null) && objectiveType.hasGarrisonRaids();
+        ContractMoraleLevel level = ((moraleLevel == null) || moraleLevel.isScattered())
+                                          ? ContractMoraleLevel.STALEMATE
+                                          : moraleLevel;
+        return new MoraleData(level, isPeaceful, finalPayout);
     }
 
     /** Credits a closed-out legacy contract's outstanding lump sum (its routed payout) to the player. */

@@ -657,6 +657,27 @@ public class StratConRulesManager {
      */
     public static void finalizeBackingScenario(Campaign campaign, AbstractContract contract,
           @Nullable StratConTrackState track, boolean autoAssignLances, StratConScenario scenario) {
+        finalizeBackingScenario(campaign, contract, track, autoAssignLances, scenario, true);
+    }
+
+    /**
+     * Finalizes the backing scenario as {@link #finalizeBackingScenario(Campaign, AbstractContract, StratConTrackState,
+     * boolean, StratConScenario)} does.
+     *
+     * @param campaign                 The current campaign.
+     * @param contract                 The contract associated with the scenario.
+     * @param track                    The relevant {@link StratConTrackState}.
+     * @param autoAssignLances         Flag indicating whether lances are to be auto-assigned.
+     * @param scenario                 The {@link StratConScenario} scenario to be finalized.
+     * @param isOpposedByContractEnemy whether the scenario's opposition is the contract's enemy, whose morale then
+     *                                 shapes it (see {@link #addMoraleScenarioModifiers}); civil unrest is not
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void finalizeBackingScenario(Campaign campaign, AbstractContract contract,
+          @Nullable StratConTrackState track, boolean autoAssignLances, StratConScenario scenario,
+          boolean isOpposedByContractEnemy) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         final AtBDynamicScenario backingScenario = scenario.getBackingScenario();
 
@@ -674,7 +695,9 @@ public class StratConRulesManager {
         }
 
         // Added before the OpFor is generated, so they take effect once its units exist
-        addMoraleScenarioModifiers(contract.getMoraleLevel(), backingScenario);
+        if (isOpposedByContractEnemy) {
+            addMoraleScenarioModifiers(contract.getMoraleLevel(), backingScenario);
+        }
 
         // Finally, finish scenario set up
         StratConGMs.mapGeneration(campaignOptions)
