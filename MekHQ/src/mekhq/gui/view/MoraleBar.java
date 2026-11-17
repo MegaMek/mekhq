@@ -186,4 +186,3 @@ public class MoraleBar extends JPanel {
         return new MoraleDisplay(level.toString(), level.getToolTipText(), level);
     }
 }
-
