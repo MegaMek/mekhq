@@ -1687,8 +1687,11 @@ public class ContractEditorDialog extends JDialog {
 
         // Identity
         String name = nameField.getText().trim();
-        if (!name.isBlank()) {
+        if (!name.isBlank() && !name.equals(contract.getName())) {
             contract.setContractName(name);
+            // A hand-typed name may well name the opposition, so it no longer counts as an opposition-free operation
+            // codename (which the market would otherwise show even while the opposition is hidden).
+            contract.setNameOperationCodename(false);
         }
         contract.setDescription(descriptionArea.getText());
         // Only write status back when the field was editable; otherwise leave the contract's status as-is (an offer's

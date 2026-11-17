@@ -1014,6 +1014,20 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     }
 
     @Override
+    public void removeCrewOnShown() {
+        int staged = data.plan().clearUnits(shownUnitList());
+        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.unassigned", staged), staged == 0);
+        refresh();
+    }
+
+    @Override
+    public void removeTechsOnShown() {
+        int staged = data.plan().unassignTechs(shownUnitList());
+        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.techsRemoved", staged), staged == 0);
+        refresh();
+    }
+
+    @Override
     public void autoFill() {
         List<Person> candidates = new ArrayList<>();
         for (PersonEntry entry : data.people()) {

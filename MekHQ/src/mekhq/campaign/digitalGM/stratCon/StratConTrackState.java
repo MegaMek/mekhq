@@ -308,6 +308,8 @@ public class StratConTrackState {
      * Handles the assignment of a force to the given coordinates on this track on the given date.
      */
     public void assignForce(int forceID, StratConCoords coords, LocalDate date, boolean sticky) {
+        LocalDate currentReturnDate = getReturnDateIfDeployedTo(forceID, coords);
+
         assignedForceCoords.put(forceID, coords);
         assignedCoordForces.putIfAbsent(coords, new HashSet<>());
         assignedCoordForces.get(coords).add(forceID);
@@ -328,6 +330,48 @@ public class StratConTrackState {
         }
 
         setReturnDate(forceID, returnDate);
+        keepLaterReturnDate(forceID, currentReturnDate);
+    }
+
+    /**
+     * Gets the date a force is due to return, if it's deployed to the given coordinates on this track.
+     *
+     * @param forceID the force's ID
+     * @param coords  the coordinates to check
+     *
+     * @return the force's return date, or {@code null} if it isn't deployed to {@code coords}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable LocalDate getReturnDateIfDeployedTo(int forceID, StratConCoords coords) {
+        if (!coords.equals(assignedForceCoords.get(forceID))) {
+            return null;
+        }
+
+        return assignedForceReturnDates.get(forceID);
+    }
+
+    /**
+     * Pushes a deployed force's return date back to the given date, if that date is later. A force that was already
+     * holding a hex when it was deployed there again - caught there by a new scenario, say - stays until its earlier
+     * deployment is over, rather than coming home early.
+     *
+     * @param forceID    the deployed force's ID
+     * @param returnDate the date to keep, or {@code null} to keep the current return date
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void keepLaterReturnDate(int forceID, @Nullable LocalDate returnDate) {
+        if ((returnDate == null) || !assignedForceCoords.containsKey(forceID)) {
+            return;
+        }
+
+        LocalDate currentReturnDate = assignedForceReturnDates.get(forceID);
+        if ((currentReturnDate == null) || returnDate.isAfter(currentReturnDate)) {
+            setReturnDate(forceID, returnDate);
+        }
     }
 
     /**

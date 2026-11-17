@@ -57,8 +57,10 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
@@ -164,13 +166,11 @@ public class Maintenance {
 
                 if (maintained) {
                     tech.setMinutesLeft(availableMinutes - minutesUsed);
-                    asTechsUsed = campaign.getPlayerForce().getHumanResources().getAvailableAsTechs(minutesUsed,
-                          false,
-                          campaign.isOvertimeAllowed(),
+                    ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+                    asTechsUsed = getAsTechsForMaintenance(humanResources, minutesUsed, campaign.isOvertimeAllowed(),
                           campaign.getCampaignOptions());
-                    int minutes = campaign.getPlayerForce().getHumanResources().getAsTechPoolMinutes() -
-                                        (asTechsUsed * minutesUsed);
-                    campaign.getPlayerForce().getHumanResources().setAsTechPoolMinutes(minutes);
+                    int minutes = humanResources.getAsTechPoolMinutes() - (asTechsUsed * minutesUsed);
+                    humanResources.setAsTechPoolMinutes(minutes);
                 }
                 if (!maintained) {
                     // A tech who could not do the work does not make the check: the unit is checked as unmaintained
@@ -686,6 +686,28 @@ public class Maintenance {
         }
 
         return partReport;
+    }
+
+    /**
+     * Works out how many AsTechs help a tech with a maintenance job.
+     *
+     * <p>A job that takes no time draws nothing from the AsTech pool, so a full team helps as long as the campaign has
+     * that many AsTechs. Every other job takes its helpers from the pool's remaining minutes as normal.</p>
+     *
+     * @param humanResources    the force's personnel, which holds the AsTech pool
+     * @param minutesUsed       the minutes the maintenance job takes
+     * @param isOvertimeAllowed whether the campaign allows overtime
+     * @param campaignOptions   the campaign options
+     *
+     * @return how many AsTechs help with the job, at most {@link MHQConstants#AS_TECH_TEAM_SIZE}
+     */
+    static int getAsTechsForMaintenance(ForceHumanResources humanResources, int minutesUsed,
+          boolean isOvertimeAllowed, CampaignOptions campaignOptions) {
+        if (minutesUsed <= 0) {
+            return Math.min(MHQConstants.AS_TECH_TEAM_SIZE, humanResources.getNumberAsTechs(campaignOptions));
+        }
+
+        return humanResources.getAvailableAsTechs(minutesUsed, false, isOvertimeAllowed, campaignOptions);
     }
 
     public static TargetRoll getTargetForMaintenance(Campaign campaign, IPartWork partWork, Person tech,
