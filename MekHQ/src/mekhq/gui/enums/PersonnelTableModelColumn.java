@@ -132,8 +132,7 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
                 campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(), false, true),
           level -> "<html>" + SkillType.getColoredExperienceLevelName(level) + "</html>"),
     PERSONNEL_ROLE("Column.PERSONNEL_ROLE.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
-          (person, campaign) -> person.getFormatedRoleDescriptions(campaign.getLocalDate(),
-                TechSpecialization.describeAsRoleSuffix(person, campaign))),
+          PersonnelTableModelColumn::getPersonnelRole),
     UNIT_ASSIGNMENT("Column.UNIT_ASSIGNMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
           PersonnelTableModelColumn::getUnitAssignment),
     UNIT_ASSIGNMENT_GRAPHICAL("Column.UNIT_ASSIGNMENT.title", Comparators.NATURAL_ORDER_STRING_COMPARATOR,
@@ -778,6 +777,21 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
         return "-";
     }
 
+    /**
+     * The person's professions, followed by any senior posts they hold - "Administrator - Chief Administrator" -
+     * matching the role line in the person view.
+     *
+     * @param person   the person to describe
+     * @param campaign the campaign, for the date and the tech specialization
+     *
+     * @return the role description, with the senior post titles appended when the person holds any
+     */
+    private static String getPersonnelRole(Person person, Campaign campaign) {
+        String roles = person.getFormatedRoleDescriptions(campaign.getLocalDate(),
+              TechSpecialization.describeAsRoleSuffix(person, campaign));
+        String appointmentTitles = person.getSeniorAppointmentTitles();
+        return appointmentTitles.isEmpty() ? roles : roles + " - " + appointmentTitles;
+    }
 
     private static String getUnitAssignment(Person person) {
         Unit unit = person.getUnit();
