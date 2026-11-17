@@ -33,12 +33,7 @@
  */
 package mekhq.campaign.parts;
 
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
-import static mekhq.utilities.ReportingUtilities.getNegativeColor;
-import static mekhq.utilities.ReportingUtilities.getPositiveColor;
-import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
 import java.text.DecimalFormat;
@@ -203,35 +198,10 @@ public class Armor extends Part implements IAcquisitionWork {
                       .append("<br/>");
             }
 
-            int amountAvailable = getAmountAvailable();
-            if (amountAvailable == 0) {
-                toReturn.append(messageSurroundedBySpanWithColor(getNegativeColor(),
-                      "None in stock"));
-            } else if (!isSalvaging()) {
-                if (amountAvailable < getAmountNeededInWarehousePoints()) {
-                    toReturn.append(spanOpeningWithCustomColor(getNegativeColor()))
-                          .append("Only ")
-                          .append(amountAvailable)
-                          .append(" in stock")
-                          .append(CLOSING_SPAN_TAG);
-                } else {
-                    toReturn.append(spanOpeningWithCustomColor(getPositiveColor()))
-                          .append(amountAvailable)
-                          .append(" in stock")
-                          .append(CLOSING_SPAN_TAG);
-                }
+            // Salvage tasks have their stock line added below the details, as every salvage task does
+            if (!isSalvaging()) {
+                toReturn.append(countStock().describe());
             }
-
-            PartInventory inventories = getPartInventory(getNewPart());
-            String orderTransitString = inventories.getTransitOrderedDetails();
-            if (!orderTransitString.isEmpty()) {
-                toReturn.append(spanOpeningWithCustomColor(getWarningColor()))
-                      .append(" (")
-                      .append(orderTransitString)
-                      .append(")")
-                      .append(CLOSING_SPAN_TAG);
-            }
-
         } else {
             toReturn.append(amount).append(" points");
         }
@@ -443,6 +413,18 @@ public class Armor extends Part implements IAcquisitionWork {
      */
     public static int toWarehousePoints(Entity entity, int armorPoints) {
         return entity.isCapitalScale() ? (armorPoints * 10) : armorPoints;
+    }
+
+    /**
+     * Counts the spare armor of this kind, in points. Replacing armor is short when there are fewer points here than
+     * the location needs; salvaging needs none.
+     *
+     * @return the points here now, the points needed, and the points on their way or on order
+     */
+    @Override
+    public StockCount countStock() {
+        int pointsNeeded = isSalvaging() ? 0 : getAmountNeededInWarehousePoints();
+        return new StockCount(getAmountAvailable(), pointsNeeded, getPartInventory(getNewPart()));
     }
 
     /**

@@ -2304,6 +2304,8 @@ class MekLocationTest {
     @Test
     void getDescSimpleTest() {
         Campaign mockCampaign = mockCampaign();
+        // A salvage task shows its stock line, which asks the campaign for the spares on hand
+        lenient().when(mockCampaign.getPartInventory(any())).thenReturn(new PartInventory());
         CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);

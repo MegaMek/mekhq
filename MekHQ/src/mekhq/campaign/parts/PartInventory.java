@@ -1,5 +1,5 @@
 /*
- * Copyright (C) 2018-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2018-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -39,6 +39,9 @@ public class PartInventory {
     private int supply;
     private int transit;
     private int ordered;
+    private boolean hasArrivals;
+    private int daysToFirstArrival;
+    private int daysToLastArrival;
     private String countModifier = "";
 
     /**
@@ -93,6 +96,36 @@ public class PartInventory {
      */
     public String transitAsString() {
         return this.transit + this.countModifier;
+    }
+
+    /**
+     * Notes when one lot of the parts in transit arrives, so the soonest and latest arrivals are known.
+     *
+     * @param daysToArrival the days until that lot arrives
+     */
+    public void recordArrival(int daysToArrival) {
+        if (!hasArrivals) {
+            daysToFirstArrival = daysToArrival;
+            daysToLastArrival = daysToArrival;
+            hasArrivals = true;
+            return;
+        }
+        daysToFirstArrival = Math.min(daysToFirstArrival, daysToArrival);
+        daysToLastArrival = Math.max(daysToLastArrival, daysToArrival);
+    }
+
+    /**
+     * @return the days until the first parts in transit arrive, or {@code 0} when none are in transit
+     */
+    public int getDaysToFirstArrival() {
+        return daysToFirstArrival;
+    }
+
+    /**
+     * @return the days until the last parts in transit arrive, or {@code 0} when none are in transit
+     */
+    public int getDaysToLastArrival() {
+        return daysToLastArrival;
     }
 
     /**
