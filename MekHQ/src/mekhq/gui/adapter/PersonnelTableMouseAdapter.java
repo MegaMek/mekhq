@@ -81,6 +81,7 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -320,6 +321,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private final PersonnelTableModel personnelModel;
 
     private static final String GUI_RESOURCE_BUNDLE = "mekhq.resources.GUI";
+    private static final String PERSONNEL_RESOURCE_BUNDLE = "mekhq.resources.Personnel";
     @Deprecated(since = "0.50.11", forRemoval = true)
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
@@ -3543,6 +3545,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             });
             menu.add(miSecondInCommand);
+
+            addSeniorAppointmentsMenu(menu, person);
         }
 
         addFlagMenuItem(menu, selected, "blockMaternityLeave", null, Person::isBlockMaternityLeave,
@@ -4302,6 +4306,93 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
         JMenuHelpers.addMenuIfNonEmpty(menu, deprecatedRoles);
+    }
+
+    /**
+     * Adds a submenu for the senior posts the company generator hands out, so the player can move a post to
+     * someone else or take it away. Each post has one holder, so appointing someone removes it from whoever held
+     * it before. A department head is one per department, so only the head of the same primary role is replaced.
+     *
+     * @param menu   the Flags menu to add the submenu to
+     * @param person the single selected person
+     */
+    private void addSeniorAppointmentsMenu(JMenu menu, Person person) {
+        JMenu appointmentsMenu = new JMenu(resources.getString("miSeniorAppointments.text"));
+        appointmentsMenu.setName("miSeniorAppointments");
+
+        addSeniorAppointmentMenuItem(appointmentsMenu, person, "miChiefMedicalOfficer",
+              Person::isChiefMedicalOfficer, Person::setChiefMedicalOfficer,
+              holder -> getTextAt(PERSONNEL_RESOURCE_BUNDLE, "seniorAppointment.chiefMedicalOfficer.title"));
+        addSeniorAppointmentMenuItem(appointmentsMenu, person, "miHeadTechnician",
+              Person::isHeadTechnician, Person::setHeadTechnician,
+              holder -> getTextAt(PERSONNEL_RESOURCE_BUNDLE, "seniorAppointment.headTechnician.title"));
+        addSeniorAppointmentMenuItem(appointmentsMenu, person, "miChiefAdministrator",
+              Person::isChiefAdministrator, Person::setChiefAdministrator,
+              holder -> getTextAt(PERSONNEL_RESOURCE_BUNDLE, "seniorAppointment.chiefAdministrator.title"));
+
+        // The generator only heads tech departments. The item still shows for anyone already flagged, so a head
+        // who has since changed role can have the post taken away.
+        PersonnelRole department = person.getPrimaryRole();
+        if (department.isTech() || person.isDepartmentHead()) {
+            addSeniorAppointmentMenuItem(appointmentsMenu, person, "miDepartmentHead",
+                  holder -> holder.isDepartmentHead() && (holder.getPrimaryRole() == department),
+                  Person::setDepartmentHead, Person::getDepartmentHeadTitle);
+        }
+
+        menu.add(appointmentsMenu);
+    }
+
+    /**
+     * Adds a checkbox for one senior post. Ticking it appoints the person and removes the post from every other
+     * holder; unticking it removes the post from the person. Each change is written to the daily report.
+     *
+     * @param menu        the menu to add the item to
+     * @param person      the single selected person
+     * @param resourceKey the resource bundle key for the item text and tooltip
+     * @param holdsPost   whether a given person holds this post
+     * @param setter      sets or clears the post on a person
+     * @param postTitle   the post's display name for a holder, read while they still hold it
+     */
+    private void addSeniorAppointmentMenuItem(JMenu menu, Person person, String resourceKey,
+          Predicate<Person> holdsPost, BiConsumer<Person, Boolean> setter, Function<Person, String> postTitle) {
+        JCheckBoxMenuItem item = new JCheckBoxMenuItem(resources.getString(resourceKey + ".text"));
+        item.setToolTipText(resources.getString(resourceKey + ".toolTipText"));
+        item.setName(resourceKey);
+        boolean alreadyHoldsPost = holdsPost.test(person);
+        item.setSelected(alreadyHoldsPost);
+        item.addActionListener(event -> {
+            if (alreadyHoldsPost) {
+                removeSeniorAppointment(person, setter, postTitle);
+                return;
+            }
+            for (Person incumbent : getCampaign().getPlayerForce().getPersonnel().values()) {
+                if ((incumbent != person) && holdsPost.test(incumbent)) {
+                    removeSeniorAppointment(incumbent, setter, postTitle);
+                }
+            }
+            setter.accept(person, true);
+            getCampaign().addReport(PERSONNEL, getFormattedText("appointedSeniorPost.format",
+                  person.getHyperlinkedFullTitle(), postTitle.apply(person)));
+            MekHQ.triggerEvent(new PersonChangedEvent(person));
+        });
+        menu.add(item);
+    }
+
+    /**
+     * Takes a senior post away from its holder and writes the change to the daily report.
+     *
+     * @param holder    the person losing the post
+     * @param setter    clears the post on a person
+     * @param postTitle the post's display name, read before the post is cleared because a department head's title
+     *                  is empty once the flag is off
+     */
+    private void removeSeniorAppointment(Person holder, BiConsumer<Person, Boolean> setter,
+          Function<Person, String> postTitle) {
+        String title = postTitle.apply(holder);
+        setter.accept(holder, false);
+        getCampaign().addReport(PERSONNEL, getFormattedText("removedSeniorPost.format",
+              holder.getHyperlinkedFullTitle(), title));
+        MekHQ.triggerEvent(new PersonChangedEvent(holder));
     }
 
     /**
