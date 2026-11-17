@@ -334,6 +334,24 @@ class ContractXmlCodecTest {
     }
 
     @Test
+    void aRaidedContractStaysRaidedAcrossARoundTrip() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setHasBeenRaided(true);
+
+        assertTrue(reparse(write(contract)).hasBeenRaided());
+    }
+
+    @Test
+    void aContractNeverRaidedWritesNoRaidedTag() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+
+        String xml = write(contract);
+
+        assertFalse(xml.contains("<hasBeenRaided>"));
+        assertFalse(reparse(xml).hasBeenRaided());
+    }
+
+    @Test
     void aContractNeverExtendedHasNoEmergencyExtensionStart() throws Exception {
         AbstractContract contract = fullyPopulatedContract();
 

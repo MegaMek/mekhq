@@ -123,6 +123,11 @@ public abstract class AbstractContract {
      * agreed term ended. Extended more than once, it keeps the first.
      */
     private @Nullable LocalDate emergencyExtensionStartDate;
+    /**
+     * Whether the enemy has raided this Garrison Duty or Retainer contract yet (see
+     * {@link mekhq.campaign.mission.contract.utilities.MHQMorale#checkMorale}). The first raid brings a Batchall.
+     */
+    private boolean hasBeenRaided = false;
     private ContractScheduleData scheduleData;
     private SystemsTargetData systemsTargetData;
 
@@ -453,6 +458,26 @@ public abstract class AbstractContract {
      */
     public void setEmergencyExtensionStartDate(@Nullable LocalDate emergencyExtensionStartDate) {
         this.emergencyExtensionStartDate = emergencyExtensionStartDate;
+    }
+
+    /**
+     * @return {@code true} if the enemy has raided this Garrison Duty or Retainer contract yet
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean hasBeenRaided() {
+        return hasBeenRaided;
+    }
+
+    /**
+     * @param hasBeenRaided whether the enemy has raided this Garrison Duty or Retainer contract yet
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setHasBeenRaided(boolean hasBeenRaided) {
+        this.hasBeenRaided = hasBeenRaided;
     }
 
     /**

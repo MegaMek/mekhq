@@ -133,8 +133,8 @@ import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
-import mekhq.campaign.mission.contract.contractData.EnemyData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractMarketAvailability;
+import mekhq.campaign.mission.contract.utilities.ContractBatchall;
 import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.mission.contract.utilities.ContractScore;
 import mekhq.campaign.mission.contract.utilities.EmployerLostPlanet;
@@ -206,8 +206,6 @@ import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
 import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUltimatum;
-import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
-import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
 import mekhq.gui.CommandCenterTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
@@ -1368,43 +1366,10 @@ public class CampaignNewDayManager {
                 continue;
             }
 
-            if (campaignOptions.get(CampaignOption.USE_GENERIC_BATTLE_VALUE) &&
-                      !contract.getObjectiveType().isGarrisonType() &&
-                      today.equals(contract.getStartDate())) {
-                // Batchalls
-                Faction enemyFaction = contract.getEnemyFaction();
-                String enemyFactionCode = contract.getEnemyFactionCode();
-
-                // Clans always declare Batchalls against pirates and bandits, so the Faction Standing restriction only
-                // applies to everyone else
-                boolean allowBatchalls = true;
-                if (!faction.isPirateOrBanditCaste() && campaignOptions.isUseFactionStandingBatchallRestrictionsSafe()) {
-                    double regard = campaign.getPlayerForce()
-                                          .getFactionStandings()
-                                          .getRegardForFaction(enemyFactionCode, true);
-                    allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
-                }
-
-                if (enemyFaction.performsBatchalls() && allowBatchalls) {
-                    PerformBatchall batchallDialog = new PerformBatchall(campaign,
-                          contract.getEnemyData().opposingCommander(),
-                          contract.getEnemyFactionCode());
-
-                    boolean batchallAccepted = batchallDialog.isBatchallAccepted();
-                    contract.setEnemyData(new EnemyData(contract.getEnemyData(), batchallAccepted));
-
-                    if (!batchallAccepted && campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
-                        List<String> reports = campaign.getPlayerForce().getFactionStandings()
-                                                     .processRefusedBatchall(faction.getShortName(),
-                                                           enemyFactionCode,
-                                                           today.getYear(),
-                                                           campaignOptions.get(CampaignOption.REGARD_MULTIPLIER));
-
-                        for (String report : reports) {
-                            campaign.addReport(POLITICS, report);
-                        }
-                    }
-                }
+            // Batchalls. Garrison-type contracts get none as they begin: on Garrison Duty and Retainer contracts the
+            // enemy issues one when it first raids instead (see MHQMorale#checkMorale)
+            if (!contract.getObjectiveType().isGarrisonType() && today.equals(contract.getStartDate())) {
+                ContractBatchall.offerBatchall(campaign, contract);
             }
 
             // Early Contract End (StratCon Only)

@@ -733,21 +733,31 @@ public class MHQMorale {
      * morale it held after its last raid, is active in the Area of Operations for the month. Otherwise the contract is
      * peaceful for the month, with no enemy activity at all.
      *
-     * <p>Only the start of a raid is announced; a raid carrying on into another month needs no warning.</p>
+     * <p>Only the start of a raid is announced; a raid carrying on into another month needs no warning. As these
+     * contracts get no Batchall when they begin, the enemy's first raid brings one instead (see
+     * {@link ContractBatchall#offerBatchall}).</p>
      *
      * @param campaign   the current campaign
-     * @param contract   the garrison-type contract
+     * @param contract   the Garrison Duty or Retainer contract
      * @param isRaid     whether the enemy raids this month
-     * @param showDialog whether to announce a raid that begins
+     * @param showDialog whether to show the player a raid that begins, and the Batchall the first one brings
      *
      * @author Illiani
      * @since 0.51.01
      */
     static void applyRaidRoll(Campaign campaign, AbstractContract contract, boolean isRaid, boolean showDialog) {
         boolean wasPeaceful = contract.isPeaceful();
+        boolean isFirstRaid = isRaid && !contract.hasBeenRaided();
         contract.setPeaceful(!isRaid);
+        if (isRaid) {
+            contract.setHasBeenRaided(true);
+        }
 
-        if (isRaid && wasPeaceful && showDialog) {
+        if (!showDialog) {
+            return;
+        }
+
+        if (isRaid && wasPeaceful) {
             new ImmersiveDialogSimple(campaign,
                   contract.getEmployerLiaison(),
                   null,
@@ -757,6 +767,10 @@ public class MHQMorale {
                   null,
                   null,
                   false);
+        }
+
+        if (isFirstRaid) {
+            ContractBatchall.offerBatchall(campaign, contract);
         }
     }
 

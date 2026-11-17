@@ -619,6 +619,26 @@ class MHQMoraleTest {
     }
 
     @Test
+    void aRaidMarksTheContractAsRaided() {
+        AbstractContract contract = garrison();
+        contract.setPeaceful(true);
+
+        MHQMorale.applyRaidRoll(mock(Campaign.class), contract, true, false);
+
+        assertTrue(contract.hasBeenRaided(), "the first raid has now come, so no later raid brings a Batchall");
+    }
+
+    @Test
+    void aMonthWithoutARaidLeavesTheContractUnraided() {
+        AbstractContract contract = garrison();
+        contract.setPeaceful(true);
+
+        MHQMorale.applyRaidRoll(mock(Campaign.class), contract, false, false);
+
+        assertFalse(contract.hasBeenRaided(), "the first raid, and its Batchall, are still to come");
+    }
+
+    @Test
     void aPeacefulGarrisonsEnemyIsNotCheckedAndKeepsItsMorale() {
         Campaign campaign = mock(Campaign.class);
         AbstractContract contract = garrison();

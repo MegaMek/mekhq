@@ -361,6 +361,7 @@ public final class EmployerLostPlanet {
         contract.setConsecutiveTrackResultTally(0);
         contract.setMandatedCompletionStatus(null);
         contract.setEmergencyExtensionStartDate(null);
+        contract.setHasBeenRaided(false);
 
         // Staying behind to lead the resistance makes the unit's name: Career Maker replaces whatever unit-reputation
         // characteristic the contract carried, as a contract carries at most one per category.
