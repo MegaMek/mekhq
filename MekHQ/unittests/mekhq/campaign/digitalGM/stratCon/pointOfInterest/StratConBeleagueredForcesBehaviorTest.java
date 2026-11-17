@@ -226,8 +226,9 @@ class StratConBeleagueredForcesBehaviorTest {
     }
 
     @Test
-    void aRoutedEnemyCannotStopTheRelief() {
-        Campaign campaign = deploymentCampaign(MEK, ContractMoraleLevel.ROUTED, false);
+    void noEnemyCanStopTheReliefWhileTheContractIsPeaceful() {
+        Campaign campaign = deploymentCampaign(MEK, ContractMoraleLevel.STALEMATE, false);
+        when(contract.isPeaceful()).thenReturn(true);
 
         assertEquals(PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO, deploy(campaign));
         assertRelieved();

@@ -124,6 +124,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractCommandRights;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.utilities.MHQMorale;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.scenarios.AtBScenario;
@@ -254,9 +255,8 @@ public class StratConRulesManager {
      */
     public static void generateScenariosDatesForWeek(Campaign campaign, StratConCampaignState campaignState,
           AbstractContract contract, StratConTrackState track, boolean isUseStratConSingles) {
-        // Important note: we don't check to see whether the OpFor has been routed when scheduling scenario dates.
-        // This is because it's possible the OpFor will rally between the start of the week and when the scenario is
-        // scheduled.
+        // Important note: we don't check to see whether the contract is peaceful when scheduling scenario dates. This is
+        // because a raid may begin between the start of the week and when the scenario is scheduled.
         if (!isUseStratConSingles) {
             return;
         }
@@ -673,6 +673,9 @@ public class StratConRulesManager {
             determineIfCrisisScenario(contract.getMoraleLevel(), backingScenario, isCombatChallenge);
         }
 
+        // Added before the OpFor is generated, so they take effect once its units exist
+        addMoraleScenarioModifiers(contract.getMoraleLevel(), backingScenario);
+
         // Finally, finish scenario set up
         StratConGMs.mapGeneration(campaignOptions)
               .setScenarioTerrain(track, scenario, campaign.getCampaignOptions().get(CampaignOption.USE_NO_TORNADOES));
@@ -764,6 +767,26 @@ public class StratConRulesManager {
         int crisisDieSize = morale.getCrisisDieSize();
         int roll = randomInt(crisisDieSize);
         backingScenario.setIsCrisis(roll == 0);
+    }
+
+    /**
+     * Adds the scenario modifiers a beaten enemy brings into battle (see
+     * {@link MHQMorale#getMoraleScenarioModifierKeys(ContractMoraleLevel)}): a scattered enemy fights short of
+     * ammunition and with unrepaired damage, and a critical one with one of the two.
+     *
+     * @param morale          the enemy's morale level when the scenario is generated
+     * @param backingScenario the scenario to add the modifiers to
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void addMoraleScenarioModifiers(ContractMoraleLevel morale, AtBDynamicScenario backingScenario) {
+        for (String modifierKey : MHQMorale.getMoraleScenarioModifierKeys(morale)) {
+            AtBScenarioModifier modifier = AtBScenarioModifier.getScenarioModifier(modifierKey);
+            if ((modifier != null) && !backingScenario.alreadyHasModifier(modifier)) {
+                backingScenario.addScenarioModifier(modifier);
+            }
+        }
     }
 
     /**
@@ -1266,10 +1289,10 @@ public class StratConRulesManager {
         // Under "Essential Scenarios Only", deploying into an empty hex never rolls a random encounter - only the
         // contract's Essential objective scenarios appear. Facility scenarios (below) are objective-tied and unaffected.
         boolean essentialScenariosOnly = campaignOptions.get(CampaignOption.ESSENTIAL_SCENARIOS_ONLY);
-        // Only a forced scenario needs to ask whether the enemy is routed: the usual roll already accounts for it, as
-        // calculateScenarioOdds returns odds no roll can meet against a routed enemy.
-        boolean enemyRouted = (pointOfInterestOutcome == PointOfInterestDeploymentOutcome.FORCE_SCENARIO) &&
-                                    contract.getMoraleLevel().isRouted();
+        // Only a forced scenario needs to ask whether the contract is peaceful: the usual roll already accounts for it,
+        // as calculateScenarioOdds returns odds no roll can meet while there is no enemy activity.
+        boolean isContractPeaceful = (pointOfInterestOutcome == PointOfInterestDeploymentOutcome.FORCE_SCENARIO) &&
+                                           contract.isPeaceful();
         // A point of interest still holding the hex - one this formation could not follow up - keeps the usual roll
         // off it, as a facility does; only one that asks for a scenario gets one there.
         boolean isHeldByPointOfInterest = (pointOfInterestOutcome == PointOfInterestDeploymentOutcome.NO_EFFECT) &&
@@ -1277,7 +1300,7 @@ public class StratConRulesManager {
         boolean spawnScenario = rollsRandomScenario(pointOfInterestOutcome,
               essentialScenariosOnly,
               (facility != null) || isHeldByPointOfInterest,
-              enemyRouted,
+              isContractPeaceful,
               targetNum);
 
         if (isNonAlliedFacility || spawnScenario) {
@@ -1977,14 +2000,15 @@ public class StratConRulesManager {
      *
      * <p>No random scenario is ever rolled under "Essential Scenarios Only", or on a hex already held - by a facility,
      * whose own rules decide there, or by a point of interest the formation could not follow up. Otherwise a point of
-     * interest on the hex may rule the roll out, or make it certain - but not against a routed enemy, which fields no
-     * scenarios at all. Without a point of interest's say, it is the usual roll against the sector's scenario
-     * odds.</p>
+     * interest on the hex may rule the roll out, or make it certain - but not while a garrison-type contract is
+     * peaceful, between raids, when there is no enemy to field a scenario at all. Without a point of interest's say, it
+     * is the usual roll against the sector's scenario odds.</p>
      *
      * @param pointOfInterestOutcome what the points of interest on the hex want done to the roll
      * @param essentialScenariosOnly whether the "Essential Scenarios Only" option is on
      * @param isHexHeld              whether the hex is held by a facility, or by a point of interest occupying it
-     * @param enemyRouted            whether the contract's enemy is routed
+     * @param isContractPeaceful     whether the contract is peaceful, between raids (see
+     *                               {@link AbstractContract#isPeaceful()})
      * @param targetNumber           the sector's scenario odds, out of 100
      *
      * @return {@code true} if a random scenario spawns
@@ -1993,14 +2017,14 @@ public class StratConRulesManager {
      * @since 0.51.01
      */
     public static boolean rollsRandomScenario(PointOfInterestDeploymentOutcome pointOfInterestOutcome,
-          boolean essentialScenariosOnly, boolean isHexHeld, boolean enemyRouted, int targetNumber) {
+          boolean essentialScenariosOnly, boolean isHexHeld, boolean isContractPeaceful, int targetNumber) {
         if (essentialScenariosOnly || isHexHeld) {
             return false;
         }
 
         return switch (pointOfInterestOutcome) {
             case SUPPRESS_SCENARIO -> false;
-            case FORCE_SCENARIO -> !enemyRouted;
+            case FORCE_SCENARIO -> !isContractPeaceful;
             case NO_EFFECT -> randomInt(100) <= targetNumber;
         };
     }
@@ -2576,7 +2600,7 @@ public class StratConRulesManager {
         int interceptionRoll = randomInt(100);
 
         // Check passed
-        if (interceptionRoll >= interceptionOdds || contract.getMoraleLevel().isRouted()) {
+        if (interceptionRoll >= interceptionOdds || contract.isPeaceful()) {
             reportStatus.append(' ');
             reportStatus.append(String.format(resources.getString("reinforcementsCommandFailure.text"),
                   spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
@@ -4599,10 +4623,12 @@ public class StratConRulesManager {
      *
      * <p>The calculation follows these rules:</p>
      * <ul>
-     *   <li>If the contract's morale level is {@link ContractMoraleLevel#ROUTED}, the method immediately returns {@code
-     *   -1}, indicating that no scenarios can occur.</li>
+     *   <li>If the contract is peaceful (a garrison-type contract between raids, see
+     *   {@link AbstractContract#isPeaceful()}), the method immediately returns {@code -1}, indicating that no scenarios
+     *   can occur.</li>
      *   <li>If {@code isReinforcements} is {@code true}, a morale-based modifier is applied:
      *       <ul>
+     *         <li>{@link ContractMoraleLevel#SCATTERED}: -15 penalty</li>
      *         <li>{@link ContractMoraleLevel#CRITICAL}: -10 penalty</li>
      *         <li>{@link ContractMoraleLevel#WEAKENED}: -5 penalty</li>
      *         <li>{@link ContractMoraleLevel#ADVANCING}: +5 bonus</li>
@@ -4627,9 +4653,9 @@ public class StratConRulesManager {
      *                         {@code true}, morale modifiers are applied; when {@code false}, morale has no effect on
      *                         the calculation.
      *
-     * @return The calculated scenario odds value. Returns {@code -1} if the contract's morale level is
-     *       {@link ContractMoraleLevel#ROUTED}, indicating no scenarios should occur. Otherwise, returns the sum of the
-     *       base scenario odds, morale modifier (if applicable), and data center modifier.
+     * @return The calculated scenario odds value. Returns {@code -1} if the contract is peaceful, indicating no
+     *       scenarios should occur. Otherwise, returns the sum of the base scenario odds, morale modifier (if
+     *       applicable), and data center modifier.
      */
     public static int calculateScenarioOdds(StratConTrackState track, AbstractContract contract,
           boolean isReinforcements) {
@@ -4638,22 +4664,22 @@ public class StratConRulesManager {
 
     /**
      * Calculates the scenario odds as {@link #calculateScenarioOdds(StratConTrackState, AbstractContract, boolean)}
-     * does, optionally ignoring a rout: for scenarios that break out whatever state the enemy is in, such as civil
-     * unrest.
+     * does, optionally ignoring a peaceful spell: for scenarios that break out whether or not the enemy is active, such
+     * as civil unrest.
      *
      * @param track            the sector
      * @param contract         the contract
      * @param isReinforcements whether morale modifiers apply
-     * @param isIgnoringRout   whether a routed enemy still leaves the usual odds, rather than none at all
+     * @param isIgnoringPeace  whether a peaceful contract still leaves the usual odds, rather than none at all
      *
-     * @return the scenario odds; {@code -1} against a routed enemy unless the rout is ignored
+     * @return the scenario odds; {@code -1} while the contract is peaceful, unless that is ignored
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static int calculateScenarioOdds(StratConTrackState track, AbstractContract contract,
-          boolean isReinforcements, boolean isIgnoringRout) {
-        if (contract.getMoraleLevel().isRouted() && !isIgnoringRout) {
+          boolean isReinforcements, boolean isIgnoringPeace) {
+        if (contract.isPeaceful() && !isIgnoringPeace) {
             return -1;
         }
 
@@ -4661,6 +4687,7 @@ public class StratConRulesManager {
 
         if (isReinforcements) {
             moraleModifier += switch (contract.getMoraleLevel()) {
+                case SCATTERED -> -15;
                 case CRITICAL -> -10;
                 case WEAKENED -> -5;
                 case ADVANCING -> 5;

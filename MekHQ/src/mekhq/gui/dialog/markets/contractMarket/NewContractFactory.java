@@ -118,7 +118,8 @@ public final class NewContractFactory {
               ContractObjectiveType.UNDEFINED));
         contract.setContractFinanceData(new ContractFinanceData(Money.zero(), Money.zero(), Money.zero()));
         contract.setRentedFacilitiesData(new RentedFacilitiesData(0, 0, 0));
-        contract.setMoraleData(new MoraleData(ContractMoraleLevel.STALEMATE, null, Money.zero()));
+        // A new contract is Garrison Duty, and a garrison-type contract begins peaceful, between raids
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.STALEMATE, true, Money.zero()));
 
         return contract;
     }

@@ -113,6 +113,8 @@ public class ContractEmergencyExtension {
         roll = d6(2) / 2;
         moraleOrdinal = min(moraleOrdinal + roll, OVERWHELMING.ordinal());
         contract.changeMorale(ContractMoraleLevel.values()[moraleOrdinal]);
+        // The enemy surge that prompts the clause ends any peace a garrison-type contract was enjoying
+        contract.setPeaceful(false);
 
         MekHQ.triggerEvent(new MissionChangedEvent(contract));
 

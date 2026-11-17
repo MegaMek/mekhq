@@ -347,11 +347,11 @@ public final class ContractXmlCodec {
         if (data.moraleLevel() != null) {
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "moraleLevel", data.moraleLevel().name());
         }
-        if (data.routEndDate() != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "routEndDate", data.routEndDate());
+        if (data.peaceful()) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "peaceful", true);
         }
-        if (data.routedPayout() != null) {
-            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "finalPayout", data.routedPayout());
+        if (data.finalPayout() != null) {
+            MHQXMLUtility.writeSimpleXMLTag(pw, indent, "finalPayout", data.finalPayout());
         }
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "moraleData");
     }
@@ -992,35 +992,40 @@ public final class ContractXmlCodec {
 
     private static final class MoraleDataBuilder {
         ContractMoraleLevel moraleLevel;
-        LocalDate routEndDate;
-        Money routedPayout;
+        boolean peaceful;
+        Money finalPayout;
     }
 
     private static final Map<String, FieldBinder<MoraleDataBuilder>> MORALE_BINDERS = createMoraleBinders();
 
     private static Map<String, FieldBinder<MoraleDataBuilder>> createMoraleBinders() {
         final Map<String, FieldBinder<MoraleDataBuilder>> binders = new HashMap<>();
-        binders.put("moraleLevel",
-              (builder, node, campaign, version) -> builder.moraleLevel = ContractMoraleLevel.valueOf(text(node)));
-        binders.put("routEndDate",
-              (builder, node, campaign, version) -> builder.routEndDate = MHQXMLUtility.parseDate(text(node)));
-        // Saves written before the routed payout became nullable stored a zero payout on every contract under this
+        // Accepts the legacy ROUTED name for what is now SCATTERED
+        binders.put("moraleLevel", (builder, node, campaign, version) ->
+                                         builder.moraleLevel = ContractMoraleLevel.parseFromString(text(node)));
+        binders.put("peaceful",
+              (builder, node, campaign, version) -> builder.peaceful = Boolean.parseBoolean(text(node)));
+        // Saves from before 0.51.01 gave a rout an end date. On a garrison-type contract that rout was a lull with no
+        // enemy activity, which is now a peaceful spell between raids; on any other contract the flag is ignored (see
+        // AbstractContract#isPeaceful), and the lull simply ends.
+        binders.put("routEndDate", (builder, node, campaign, version) -> builder.peaceful = true);
+        // Saves written before the final payout became nullable stored a zero payout on every contract under this
         // tag, meaning "not set", so a zero here is read back as unset rather than as a deliberate "pay nothing".
         binders.put("routedPayout", (builder, node, campaign, version) -> {
             Money routedPayout = Money.fromXmlString(text(node));
-            builder.routedPayout = routedPayout.isZero() ? null : routedPayout;
+            builder.finalPayout = routedPayout.isZero() ? null : routedPayout;
         });
         // Current saves only write this tag when a payout has been set, so its value is always taken as given - a zero
         // here is a deliberate "pay nothing".
         binders.put("finalPayout",
-              (builder, node, campaign, version) -> builder.routedPayout = Money.fromXmlString(text(node)));
+              (builder, node, campaign, version) -> builder.finalPayout = Money.fromXmlString(text(node)));
         return binders;
     }
 
     private static MoraleData parseMoraleData(final Node wn) {
         final MoraleDataBuilder builder = readFields(wn, new MoraleDataBuilder(), MORALE_BINDERS, null, null,
               "moraleData");
-        return new MoraleData(builder.moraleLevel, builder.routEndDate, builder.routedPayout);
+        return new MoraleData(builder.moraleLevel, builder.peaceful, builder.finalPayout);
     }
 
     private static final class NegotiationDataBuilder {

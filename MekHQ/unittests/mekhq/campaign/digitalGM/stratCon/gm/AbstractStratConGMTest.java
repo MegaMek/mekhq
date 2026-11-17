@@ -333,7 +333,7 @@ class AbstractStratConGMTest {
     }
 
     @Test
-    void dailyScenariosGeneratedWhenScheduledTodayAndNotRouted() {
+    void dailyScenariosGeneratedWhenScheduledTodayAndNotPeaceful() {
         StratConTrackState track = trackWith();
         // today scheduled twice -> scenarioCount == 2
         StratConCampaignState campaignState = campaignStateWith(List.of(track),
@@ -347,11 +347,12 @@ class AbstractStratConGMTest {
     }
 
     @Test
-    void dailyScenariosSkippedWhenOpForRouted() {
+    void dailyScenariosSkippedWhileTheContractIsPeaceful() {
         StratConTrackState track = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track),
               new ArrayList<>(List.of(TUESDAY)));
-        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.ROUTED);
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        when(contract.isPeaceful()).thenReturn(true);
         TestGM gm = new TestGM(false);
 
         gm.handleNewDay(newDay(TUESDAY, contract));
@@ -360,6 +361,19 @@ class AbstractStratConGMTest {
               any(),
               any(),
               org.mockito.ArgumentMatchers.anyInt());
+    }
+
+    @Test
+    void dailyScenariosStillGeneratedAgainstAScatteredEnemy() {
+        StratConTrackState track = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track),
+              new ArrayList<>(List.of(TUESDAY)));
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.SCATTERED);
+        TestGM gm = new TestGM(false);
+
+        gm.handleNewDay(newDay(TUESDAY, contract));
+
+        verify(gm.generation).generateDailyScenarios(any(), eq(campaignState), eq(contract), eq(1));
     }
 
     @Test

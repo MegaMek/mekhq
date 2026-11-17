@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.digitalGM.stratCon.gm;
 
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDeploymentOrderBehavior.isDeploymentOrder;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -290,9 +292,8 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 }
                 scheduledScenarioDates.removeIf(date -> date.equals(today));
 
-                // If the OpFor is routed, we want to just discard any scheduled scenarios, clearly they've been
-                // canceled due to impending defeat
-                if (!contract.getMoraleLevel().isRouted()) {
+                // A garrison between raids sees no enemy activity, so any scheduled scenarios are simply discarded
+                if (!contract.isPeaceful()) {
                     // Some may be counterattacks on facilities held by the player or their employer instead.
                     scenarioCount -= getFacilityStrategy().launchCounterattacks(campaign,
                           contract,
@@ -336,8 +337,10 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
      * type is no longer defined (its data renamed or removed) can never be placed, so it is dropped at once. In mapless
      * play, where there is no map to place them on, due points of interest are simply dropped.
      *
-     * <p>Unlike strategic-objective scenarios, points of interest still appear while the enemy is routed: they are
-     * features of the ground, not attacks the enemy has to mount.</p>
+     * <p>Unlike strategic-objective scenarios, points of interest still appear while a garrison-type contract is
+     * peaceful, between raids: they are features of the ground, not attacks the enemy has to mount. Deployment Orders
+     * are the exception: with no enemy activity, the employer has no deployment to order, so a Deployment Order due
+     * while the contract is peaceful is dropped.</p>
      *
      * @author Illiani
      * @since 0.51.01
@@ -373,6 +376,15 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
             // Its type is gone from the data, so no day will ever place it; warned once, as it is dropped here.
             if (StratConPointOfInterestDefinitions.getDefinition(duePointOfInterest.getTypeId()) == null) {
                 LOGGER.warn("Dropping scheduled point of interest {} on contract {}: its type is not defined.",
+                      duePointOfInterest,
+                      contract.getName());
+                scheduledPointsOfInterest.remove(duePointOfInterest);
+                continue;
+            }
+
+            // With no enemy activity between raids, the employer has no deployment to order
+            if (contract.isPeaceful() && isDeploymentOrder(duePointOfInterest.getTypeId())) {
+                LOGGER.info("Dropping Deployment Order {} on contract {}: the contract is peaceful.",
                       duePointOfInterest,
                       contract.getName());
                 scheduledPointsOfInterest.remove(duePointOfInterest);
@@ -428,10 +440,10 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
         spawnDates.removeIf(spawnDate -> !spawnDate.isAfter(today));
         int dueCount = before - spawnDates.size();
 
-        // The due dates are consumed above whatever happens. If the OpFor is routed, those scenarios are simply
-        // skipped rather than spawned - clearly the enemy is in no state to contest the objective - matching how the
-        // ambient weekly scenarios are discarded while routed.
-        if ((dueCount > 0) && !contract.getMoraleLevel().isRouted()) {
+        // The due dates are consumed above whatever happens. While a garrison-type contract is peaceful, between
+        // raids, those scenarios are simply skipped rather than spawned - there is no enemy activity to contest the
+        // objective - matching how the ambient weekly scenarios are discarded while peaceful.
+        if ((dueCount > 0) && !contract.isPeaceful()) {
             StratConContractInitializer.spawnScheduledStrategicScenarios(campaign, contract, dueCount);
         }
     }

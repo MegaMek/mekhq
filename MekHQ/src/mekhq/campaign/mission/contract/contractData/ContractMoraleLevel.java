@@ -34,6 +34,7 @@ package mekhq.campaign.mission.contract.contractData;
 
 import java.util.ResourceBundle;
 
+import com.fasterxml.jackson.annotation.JsonCreator;
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
@@ -43,7 +44,7 @@ import mekhq.MekHQ;
  */
 public enum ContractMoraleLevel {
     // region Enum Declarations
-    ROUTED(-3, 7, "ContractMoraleLevel.ROUTED.text", "ContractMoraleLevel.ROUTED.toolTipText"),
+    SCATTERED(-3, 7, "ContractMoraleLevel.SCATTERED.text", "ContractMoraleLevel.SCATTERED.toolTipText"),
     CRITICAL(-2, 6, "ContractMoraleLevel.CRITICAL.text", "ContractMoraleLevel.CRITICAL.toolTipText"),
     WEAKENED(-1, 5, "ContractMoraleLevel.WEAKENED.text", "ContractMoraleLevel.WEAKENED.toolTipText"),
     STALEMATE(0, 4, "ContractMoraleLevel.STALEMATE.text", "ContractMoraleLevel.STALEMATE.toolTipText"),
@@ -51,8 +52,11 @@ public enum ContractMoraleLevel {
     DOMINATING(2, 2, "ContractMoraleLevel.DOMINATING.text", "ContractMoraleLevel.DOMINATING.toolTipText"),
     OVERWHELMING(3, 1, "ContractMoraleLevel.OVERWHELMING.text", "ContractMoraleLevel.OVERWHELMING.toolTipText");
 
-    public final static int MINIMUM_MORALE_LEVEL = ROUTED.getLevel();
+    public final static int MINIMUM_MORALE_LEVEL = SCATTERED.getLevel();
     public final static int MAXIMUM_MORALE_LEVEL = OVERWHELMING.getLevel();
+
+    /** The name saves from before 0.51.01 use for {@link #SCATTERED}. */
+    private static final String LEGACY_ROUTED_NAME = "ROUTED";
     // endregion Enum Declarations
 
     // region Variable Declarations
@@ -104,12 +108,12 @@ public enum ContractMoraleLevel {
     // region Boolean Comparison Methods
 
     /**
-     * Checks if the current object is equal to the value of {@code ROUTED}.
+     * Checks if the current object is equal to the value of {@code SCATTERED}.
      *
-     * @return {@code true} if the current object is equal to {@code ROUTED}, {@code false} otherwise.
+     * @return {@code true} if the current object is equal to {@code SCATTERED}, {@code false} otherwise.
      */
-    public boolean isRouted() {
-        return this == ROUTED;
+    public boolean isScattered() {
+        return this == SCATTERED;
     }
 
     /**
@@ -196,22 +200,31 @@ public enum ContractMoraleLevel {
      * Parses a string representation of a morale level and returns the corresponding {@link ContractMoraleLevel} enum
      * value.
      *
+     * <p>Accepts the enum name, the legacy {@code ROUTED} name (now {@link #SCATTERED}), or the legacy 0-6 ordinal
+     * form.</p>
+     *
      * @param moraleLevel the string representation of a morale level
      *
      * @return the {@link ContractMoraleLevel} enum value corresponding to the given morale level string, or
      *       {@code STALEMATE} if the string cannot be parsed
      */
     // region File I/O
+    @JsonCreator
     public static ContractMoraleLevel parseFromString(final String moraleLevel) {
         try {
             return valueOf(moraleLevel);
         } catch (Exception ignored) {
         }
 
+        // Saves from before 0.51.01 call the lowest level ROUTED
+        if (LEGACY_ROUTED_NAME.equals(moraleLevel)) {
+            return SCATTERED;
+        }
+
         try {
             switch (Integer.parseInt(moraleLevel)) {
                 case 0:
-                    return ROUTED;
+                    return SCATTERED;
                 case 1:
                     return CRITICAL;
                 case 2:

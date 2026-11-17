@@ -220,7 +220,7 @@ public enum Familiarity {
      * Awards off-contract training Familiarity (sim pods, drills and the like) to every unit in the hangar.
      *
      * <p>Normally this happens on the first of each month. While the campaign is on an offensive contract, or on a
-     * defensive contract whose enemy morale isn't Routed, it happens every Monday instead. Each unit gains Familiarity
+     * defensive contract that isn't peaceful between raids, it happens every Monday instead. Each unit gains Familiarity
      * as if it had returned from a scenario, following all the usual restrictions (eligible chassis, single-unit techs,
      * trait modifiers, and the mode's cap).</p>
      *
@@ -257,7 +257,7 @@ public enum Familiarity {
 
     /**
      * @return {@code true} if the campaign has arrived at any active contract that is offensive, or is defensive with
-     *       enemy morale that isn't Routed
+     *       isn't peaceful between raids (see {@link AbstractContract#isPeaceful()})
      *
      * @author Illiani
      * @since 0.51.01
@@ -269,7 +269,7 @@ public enum Familiarity {
                 continue;
             }
 
-            if (contract.isPlayerAttacker() || !contract.getMoraleLevel().isRouted()) {
+            if (contract.isPlayerAttacker() || !contract.isPeaceful()) {
                 return true;
             }
         }

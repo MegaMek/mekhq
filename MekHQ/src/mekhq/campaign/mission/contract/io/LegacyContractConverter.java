@@ -157,7 +157,8 @@ public final class LegacyContractConverter {
         int difficulty = 0;
 
         ContractMoraleLevel moraleLevel = ContractMoraleLevel.STALEMATE;
-        LocalDate routEndDate = null;
+        // A legacy rout end date marks a lull, which on a garrison-type contract is now a peaceful spell between raids
+        boolean peaceful = false;
         Money routedPayout = null;
 
         // Matches the legacy default: a contract that never involved a Batchall counts as accepted.
@@ -214,8 +215,8 @@ public final class LegacyContractConverter {
                     case "holdingCellsRented" -> holdingCells = MathUtility.parseInt(value);
                     case "requiredCombatTeams" -> scale = MathUtility.parseInt(value);
                     case "difficulty" -> difficulty = MathUtility.parseInt(value);
-                    case "moraleLevel" -> moraleLevel = ContractMoraleLevel.valueOf(value);
-                    case "routEnd" -> routEndDate = MHQXMLUtility.parseDate(value);
+                    case "moraleLevel" -> moraleLevel = ContractMoraleLevel.parseFromString(value);
+                    case "routEnd" -> peaceful = true;
                     case "routedPayout" -> routedPayout = Money.fromXmlString(value);
                     case "batchallAccepted" -> batchallAccepted = Boolean.parseBoolean(value);
                     case "sharesPct" -> sharesPercent = MathUtility.parseInt(value);
@@ -286,7 +287,7 @@ public final class LegacyContractConverter {
         contract.setObjectiveData(new ContractObjectiveData(objective, ContractObjectiveType.UNDEFINED));
         contract.setContractFinanceData(new ContractFinanceData(transportAmount, baseAmount, Money.zero()));
         contract.setRentedFacilitiesData(new RentedFacilitiesData(hospitalBeds, kitchens, holdingCells));
-        contract.setMoraleData(new MoraleData(moraleLevel, routEndDate, routedPayout));
+        contract.setMoraleData(new MoraleData(moraleLevel, peaceful, routedPayout));
 
         // Point any restored StratCon state back at its new contract.
         if (contract.getStratConCampaignState() != null) {

@@ -137,9 +137,9 @@ class MissionViewPanelTest {
     }
 
     @Test
-    void battleRecordIsHiddenWhileTheEnemyIsMidRout() {
+    void battleRecordIsHiddenWhileTheContractIsPeaceful() {
         final AbstractContract contract = contractAt(CONTRACT_SYSTEM, true);
-        when(contract.getRoutEndDate()).thenReturn(CAMPAIGN_DATE.plusMonths(1));
+        when(contract.isPeaceful()).thenReturn(true);
 
         assertFalse(MissionViewPanel.isBattleRecordShown(CAMPAIGN_DATE, contract));
     }

@@ -1295,13 +1295,18 @@ public class CampaignNewDayManager {
                 }
 
                 ContractMoraleLevel oldMorale = contract.getMoraleLevel();
+                boolean wasPeaceful = contract.isPeaceful();
 
                 MHQMorale.checkMorale(campaign, contract, true);
                 ContractMoraleLevel newMorale = contract.getMoraleLevel();
 
                 String report = "";
                 if (contract.isPeaceful()) {
-                    report = resources.getString("garrisonDutyRouted.text");
+                    report = resources.getString("garrisonPeaceful.text");
+                } else if (wasPeaceful) {
+                    report = String.format(resources.getString("garrisonRaid.text"),
+                          contract.getHyperlinkedName(),
+                          newMorale);
                 } else if (oldMorale != newMorale) {
                     report = String.format(resources.getString("contractMoraleReport.text"),
                           newMorale,
@@ -2304,11 +2309,6 @@ public class CampaignNewDayManager {
                     campaign.addReport(GENERAL, "The start and end dates of " +
                                                       contract.getHyperlinkedName() +
                                                       " have been shifted to reflect the current ETA.");
-
-                    if (campaignOptions.isUseStratCon() && contract.getMoraleLevel().isRouted()) {
-                        LocalDate newRoutEndDate = contract.getStartDate().plusMonths(max(1, d6() - 3)).minusDays(1);
-                        contract.changeMorale(newRoutEndDate);
-                    }
                 }
 
                 continue;

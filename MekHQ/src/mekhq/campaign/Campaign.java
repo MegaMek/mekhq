@@ -5688,9 +5688,9 @@ public class Campaign implements ITechManager {
             return Money.zero();
         }
 
-        Money routedPayout = mission.getRoutPayout();
-        if (routedPayout != null) {
-            return routedPayout;
+        Money finalPayout = mission.getFinalPayout();
+        if (finalPayout != null) {
+            return finalPayout;
         }
 
         return mission.getMonthlyPayOut().multipliedBy(mission.getMonthsLeft(getLocalDate()));

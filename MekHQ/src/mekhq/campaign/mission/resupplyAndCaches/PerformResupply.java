@@ -382,8 +382,8 @@ public class PerformResupply {
         // First, we need to identify whether the convoy has been intercepted.
         ContractMoraleLevel morale = contract.getMoraleLevel();
 
-        // There isn't any chance of an interception if the enemy is Routed, so early-exit
-        if (morale.isRouted()) {
+        // There isn't any chance of an interception while a garrison-type contract is peaceful, so early-exit
+        if (contract.isPeaceful()) {
             completeSuccessfulDelivery(resupply, convoyContents);
             return;
         }

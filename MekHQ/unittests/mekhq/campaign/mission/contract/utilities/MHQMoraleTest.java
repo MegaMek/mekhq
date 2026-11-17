@@ -36,7 +36,7 @@ import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.A
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.CRITICAL;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.DOMINATING;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.OVERWHELMING;
-import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.ROUTED;
+import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.SCATTERED;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.WEAKENED;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -55,8 +55,12 @@ import java.util.stream.Stream;
 
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveData;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
@@ -422,7 +426,7 @@ class MHQMoraleTest {
 
     private static Stream<Arguments> moraleRallyingCases() {
         return Stream.of(
-              Arguments.of(ROUTED, CRITICAL),
+              Arguments.of(SCATTERED, CRITICAL),
               Arguments.of(CRITICAL, WEAKENED),
               Arguments.of(WEAKENED, STALEMATE),
               Arguments.of(STALEMATE, ADVANCING),
@@ -451,8 +455,8 @@ class MHQMoraleTest {
 
     private static Stream<Arguments> moraleWaveringCases() {
         return Stream.of(
-              Arguments.of(ROUTED, ROUTED),
-              Arguments.of(CRITICAL, ROUTED),
+              Arguments.of(SCATTERED, SCATTERED),
+              Arguments.of(CRITICAL, SCATTERED),
               Arguments.of(WEAKENED, CRITICAL),
               Arguments.of(STALEMATE, WEAKENED),
               Arguments.of(ADVANCING, STALEMATE),
@@ -480,7 +484,7 @@ class MHQMoraleTest {
 
     private static Stream<Arguments> moraleNoChangeCases() {
         return Stream.of(
-              Arguments.of(ROUTED, ROUTED),
+              Arguments.of(SCATTERED, SCATTERED),
               Arguments.of(CRITICAL, CRITICAL),
               Arguments.of(WEAKENED, WEAKENED),
               Arguments.of(STALEMATE, STALEMATE),
@@ -524,8 +528,7 @@ class MHQMoraleTest {
     void winningARiotOnARiotDutyContractLowersMorale() {
         AbstractContract riotDuty = contractOfType(ContractObjectiveType.RIOT_DUTY);
 
-        MHQMorale.processMoraleChangeFromScenario(mock(Campaign.class), riotDuty, ScenarioStatus.VICTORY,
-              ScenarioType.RIOT);
+        MHQMorale.processMoraleChangeFromScenario(riotDuty, ScenarioStatus.VICTORY, ScenarioType.RIOT);
 
         verify(riotDuty).changeMorale(WEAKENED);
     }
@@ -534,23 +537,145 @@ class MHQMoraleTest {
     void winningARiotElsewhereLeavesMoraleAlone() {
         AbstractContract retainer = contractOfType(ContractObjectiveType.RETAINER);
 
-        MHQMorale.processMoraleChangeFromScenario(mock(Campaign.class), retainer, ScenarioStatus.VICTORY,
-              ScenarioType.RIOT);
+        MHQMorale.processMoraleChangeFromScenario(retainer, ScenarioStatus.VICTORY, ScenarioType.RIOT);
 
         verify(retainer, never()).changeMorale(any(ContractMoraleLevel.class));
     }
 
     @Test
-    void winningAgainstAnAlreadyRoutedGarrisonEnemyDoesNotRepeatTheRout() {
-        Campaign campaign = mock(Campaign.class);
-        AbstractContract garrison = contractOfType(ContractObjectiveType.GARRISON_DUTY);
-        when(garrison.getMoraleLevel()).thenReturn(ROUTED);
+    void winningAgainstAScatteredEnemyLeavesItScattered() {
+        AbstractContract contract = contractOfType(ContractObjectiveType.PLANETARY_ASSAULT);
+        when(contract.getMoraleLevel()).thenReturn(SCATTERED);
 
-        MHQMorale.processMoraleChangeFromScenario(campaign, garrison, ScenarioStatus.VICTORY,
+        MHQMorale.processMoraleChangeFromScenario(contract, ScenarioStatus.VICTORY,
               ScenarioType.AFFECTS_MORALE_BOTH_WAYS);
 
-        // The rout's end date is not pushed back, and its prisoners are not handled a second time
-        verify(garrison, never()).changeMorale(any(LocalDate.class));
-        verify(campaign, never()).getPlayerForce();
+        // Scattered is the bottom of the scale, and it no longer ends the contract
+        verify(contract, never()).changeMorale(any(ContractMoraleLevel.class));
+        verify(contract, never()).endContractEarly(any(), any());
     }
+
+    // Scenario modifiers from morale
+
+    @Test
+    void aScatteredEnemyFightsShortOfAmmunitionAndUnrepaired() {
+        assertEquals(List.of(MHQMorale.LOW_AMMUNITION_MODIFIER, MHQMorale.POOR_REPAIR_MODIFIER),
+              MHQMorale.getMoraleScenarioModifierKeys(SCATTERED));
+    }
+
+    @Test
+    void aCriticalEnemyFightsWithOneOfTheTwo() {
+        for (int attempt = 0; attempt < 20; attempt++) {
+            List<String> keys = MHQMorale.getMoraleScenarioModifierKeys(CRITICAL);
+
+            assertEquals(1, keys.size());
+            assertTrue(List.of(MHQMorale.LOW_AMMUNITION_MODIFIER, MHQMorale.POOR_REPAIR_MODIFIER)
+                             .contains(keys.get(0)), keys.get(0));
+        }
+    }
+
+    @ParameterizedTest
+    @MethodSource("unaffectedMoraleLevels")
+    void anEnemyAboveCriticalBringsNoMoraleModifiers(ContractMoraleLevel moraleLevel) {
+        assertTrue(MHQMorale.getMoraleScenarioModifierKeys(moraleLevel).isEmpty());
+    }
+
+    private static Stream<ContractMoraleLevel> unaffectedMoraleLevels() {
+        return Stream.of(WEAKENED, STALEMATE, ADVANCING, DOMINATING, OVERWHELMING);
+    }
+
+    // Garrison raids
+
+    private static AbstractContract garrison() {
+        AbstractContract contract = new ChaosContract();
+        contract.setObjectiveData(new ContractObjectiveData(ContractObjectiveType.GARRISON_DUTY,
+              ContractObjectiveType.PLANETARY_ASSAULT));
+        return contract;
+    }
+
+    @Test
+    void aRaidEndsThePeaceAndKeepsTheEnemysMorale() {
+        AbstractContract contract = garrison();
+        contract.changeMorale(WEAKENED);
+        contract.setPeaceful(true);
+
+        MHQMorale.applyRaidRoll(mock(Campaign.class), contract, true, false);
+
+        assertFalse(contract.isPeaceful());
+        assertEquals(WEAKENED, contract.getMoraleLevel(),
+              "the enemy returns at the morale it held after its last raid");
+    }
+
+    @Test
+    void noRaidBringsPeaceAndKeepsTheEnemysMorale() {
+        AbstractContract contract = garrison();
+        contract.changeMorale(DOMINATING);
+
+        MHQMorale.applyRaidRoll(mock(Campaign.class), contract, false, false);
+
+        assertTrue(contract.isPeaceful());
+        assertEquals(DOMINATING, contract.getMoraleLevel(), "morale holds between raids");
+    }
+
+    @Test
+    void aPeacefulGarrisonsEnemyIsNotCheckedAndKeepsItsMorale() {
+        Campaign campaign = mock(Campaign.class);
+        AbstractContract contract = garrison();
+        contract.changeMorale(ADVANCING);
+        contract.setPeaceful(true);
+
+        MHQMorale.checkMorale(campaign, contract, false);
+
+        assertEquals(ADVANCING, contract.getMoraleLevel(), "with no fighting last month, there is nothing to check");
+        verify(campaign, never()).getCampaignOptions();
+    }
+
+    // Starting morale
+
+    private static Campaign moraleCheckCampaign() {
+        Campaign campaign = mock(Campaign.class);
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(campaign.getLocalDate()).thenReturn(TODAY);
+        when(options.get(CampaignOption.MORALE_DECISIVE_VICTORY_EFFECT)).thenReturn(3);
+        when(options.get(CampaignOption.MORALE_VICTORY_EFFECT)).thenReturn(2);
+        when(options.get(CampaignOption.MORALE_DECISIVE_DEFEAT_EFFECT)).thenReturn(-3);
+        when(options.get(CampaignOption.MORALE_DEFEAT_EFFECT)).thenReturn(-2);
+        return campaign;
+    }
+
+    private static AbstractContract newContractOfType(ContractObjectiveType objectiveType) {
+        AbstractContract contract = contractOfType(objectiveType);
+        when(contract.getEnemyForceSkill()).thenReturn(SkillLevel.REGULAR);
+        when(contract.getEnemyFaction()).thenReturn(mock(Faction.class));
+        return contract;
+    }
+
+    @ParameterizedTest
+    @MethodSource("garrisonTypes")
+    void aGarrisonTypeContractStartsPeaceful(ContractObjectiveType objectiveType) {
+        AbstractContract contract = newContractOfType(objectiveType);
+
+        MHQMorale.determineStartingMorale(contract, moraleCheckCampaign());
+
+        verify(contract).setPeaceful(true);
+    }
+
+    private static Stream<ContractObjectiveType> garrisonTypes() {
+        return Stream.of(ContractObjectiveType.GARRISON_DUTY,
+              ContractObjectiveType.CADRE_DUTY,
+              ContractObjectiveType.SECURITY_DUTY,
+              ContractObjectiveType.RIOT_DUTY,
+              ContractObjectiveType.RETAINER);
+    }
+
+    @Test
+    void anyOtherContractStartsWithTheEnemyActive() {
+        AbstractContract contract = newContractOfType(ContractObjectiveType.PLANETARY_ASSAULT);
+
+        MHQMorale.determineStartingMorale(contract, moraleCheckCampaign());
+
+        verify(contract).setPeaceful(false);
+    }
+
 }

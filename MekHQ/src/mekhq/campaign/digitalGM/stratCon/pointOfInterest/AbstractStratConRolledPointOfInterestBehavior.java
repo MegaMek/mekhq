@@ -185,14 +185,14 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
     }
 
     /**
-     * @return {@code true} if a scenario can break out here even while the enemy is routed, rolled against the usual
-     *       odds as if it were not; by default, it cannot - a routed enemy fights over nothing. Civil unrest, which
-     *       does not answer to the enemy's morale, can.
+     * @return {@code true} if a scenario can break out here even while a garrison-type contract is peaceful, between
+     *       raids, rolled against the usual odds as if it were not; by default, it cannot - with no enemy activity,
+     *       nothing is fought over. Civil unrest, which does not answer to the enemy, can.
      *
      * @author Illiani
      * @since 0.51.01
      */
-    protected boolean isScenarioPossibleWhileRouted() {
+    protected boolean isScenarioPossibleWhilePeaceful() {
         return false;
     }
 
@@ -262,7 +262,7 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
         int targetNumber = StratConRulesManager.calculateScenarioOdds(track,
               contract,
               true,
-              isScenarioPossibleWhileRouted());
+              isScenarioPossibleWhilePeaceful());
         return StratConRulesManager.rollsRandomScenario(PointOfInterestDeploymentOutcome.NO_EFFECT,
               false,
               false,

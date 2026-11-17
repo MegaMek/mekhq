@@ -230,8 +230,9 @@ class StratConLookoutPointBehaviorTest {
     }
 
     @Test
-    void aRoutedEnemyCannotAmbushTheLookoutPoint() {
-        Campaign campaign = deploymentCampaign(MEK, ContractMoraleLevel.ROUTED, false);
+    void noEnemyCanAmbushTheLookoutPointWhileTheContractIsPeaceful() {
+        Campaign campaign = deploymentCampaign(MEK, ContractMoraleLevel.STALEMATE, false);
+        when(contract.isPeaceful()).thenReturn(true);
 
         assertEquals(PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO, deploy(campaign));
         assertObserved();

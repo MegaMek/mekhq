@@ -226,7 +226,7 @@ public class MissionViewPanel extends JScrollablePanel {
         // === Dashboard: all gauges grouped together, most important first ===
         // Enemy morale (always shown for AtB contracts).
         final MoraleBar.MoraleDisplay moraleDisplay = MoraleBar.getMoraleDisplay(mission);
-        MoraleBar moraleBar = new MoraleBar(mission.getMoraleLevel(), moraleDisplay.label());
+        MoraleBar moraleBar = new MoraleBar(moraleDisplay.barLevel(), moraleDisplay.label());
         moraleBar.setToolTipText(wordWrap(moraleDisplay.tooltip()));
         addGaugeRow(moraleBar, y++);
 
@@ -411,8 +411,8 @@ public class MissionViewPanel extends JScrollablePanel {
 
     /**
      * Whether the briefing room shows the contract's battle record: only while the record still feeds a monthly morale
-     * check. That is an active contract that is not mid-rout (a rout's end, not the record, decides what happens next)
-     * and is not a shell contract (which runs no morale checks).
+     * check. That is an active contract that is not peaceful (a garrison between raids has no morale check coming) and
+     * is not a shell contract (which runs no morale checks).
      *
      * @param today    the current date
      * @param contract the contract on show
@@ -420,7 +420,7 @@ public class MissionViewPanel extends JScrollablePanel {
      * @return {@code true} if the battle record should be shown
      */
     static boolean isBattleRecordShown(LocalDate today, AbstractContract contract) {
-        return !(contract instanceof ShellContract) && contract.isActiveOn(today) && (contract.getRoutEndDate() == null);
+        return !(contract instanceof ShellContract) && contract.isActiveOn(today) && !contract.isPeaceful();
     }
 
     /**

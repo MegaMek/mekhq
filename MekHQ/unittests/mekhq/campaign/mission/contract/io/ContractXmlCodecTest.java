@@ -160,9 +160,7 @@ class ContractXmlCodecTest {
         contract.setScheduleData(new ContractScheduleData(START, START.plusMonths(6), 6));
         contract.setSystemsTargetData(new SystemsTargetData("Galatea", "Galatea 3"));
         contract.setRentedFacilitiesData(new RentedFacilitiesData(8, 3, 5));
-        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING,
-              START.plusDays(20),
-              Money.of(90_000)));
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING, true, Money.of(90_000)));
         contract.setNegotiationData(new NegotiationData(3,
               1,
               2,
@@ -236,39 +234,39 @@ class ContractXmlCodecTest {
     }
 
     @Test
-    void anUnsetRoutedPayoutStaysUnsetAcrossARoundTrip() throws Exception {
+    void anUnsetFinalPayoutStaysUnsetAcrossARoundTrip() throws Exception {
         AbstractContract contract = fullyPopulatedContract();
         contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING));
 
         AbstractContract reloaded = reparse(write(contract));
 
-        assertNull(reloaded.getRoutPayout(), "an unset payout must not come back as a payout that overrides escrow");
+        assertNull(reloaded.getFinalPayout(), "an unset payout must not come back as a payout that overrides escrow");
     }
 
     @Test
     void aDeliberateZeroPayoutSurvivesARoundTrip() throws Exception {
         AbstractContract contract = fullyPopulatedContract();
-        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING, null, Money.zero()));
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING, false, Money.zero()));
 
         AbstractContract reloaded = reparse(write(contract));
 
-        assertEquals(Money.zero(), reloaded.getRoutPayout(), "a zero payout must still block the remaining escrow");
+        assertEquals(Money.zero(), reloaded.getFinalPayout(), "a zero payout must still block the remaining escrow");
     }
 
     /**
-     * Saves written before the routed payout became nullable stored a zero payout on every contract, under the
+     * Saves written before the final payout became nullable stored a zero payout on every contract, under the
      * {@code routedPayout} tag, to mean "not set". Reading that back as a real zero would wipe the remaining escrow of
      * any contract completed before its end date.
      */
     @Test
     void aZeroRoutedPayoutFromAnOlderSaveIsReadAsUnset() throws Exception {
         AbstractContract contract = fullyPopulatedContract();
-        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING, null, Money.zero()));
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING, false, Money.zero()));
         String legacyXml = write(contract).replace("finalPayout>", "routedPayout>");
 
         AbstractContract reloaded = reparse(legacyXml);
 
-        assertNull(reloaded.getRoutPayout());
+        assertNull(reloaded.getFinalPayout());
     }
 
     @Test
@@ -278,7 +276,42 @@ class ContractXmlCodecTest {
 
         AbstractContract reloaded = reparse(legacyXml);
 
-        assertEquals(Money.of(90_000), reloaded.getRoutPayout());
+        assertEquals(Money.of(90_000), reloaded.getFinalPayout());
+    }
+
+    @Test
+    void theLegacyRoutedMoraleLevelIsReadAsScattered() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.SCATTERED));
+        String legacyXml = write(contract).replace("<moraleLevel>SCATTERED</moraleLevel>",
+              "<moraleLevel>ROUTED</moraleLevel>");
+
+        AbstractContract reloaded = reparse(legacyXml);
+
+        assertEquals(ContractMoraleLevel.SCATTERED, reloaded.getMoraleLevel());
+    }
+
+    /**
+     * Saves from before the raid model gave a rout an end date. On a garrison-type contract that rout was a lull with
+     * no enemy activity, so it now reads as a peaceful spell between raids.
+     */
+    @Test
+    void aLegacyRoutEndDateIsReadAsPeaceful() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.SCATTERED, true, null));
+        String legacyXml = write(contract).replace("<peaceful>true</peaceful>", "<routEndDate>3051-02-01</routEndDate>");
+
+        AbstractContract reloaded = reparse(legacyXml);
+
+        assertTrue(reloaded.getMoraleData().peaceful());
+    }
+
+    @Test
+    void aContractThatIsNotPeacefulWritesNoPeacefulTag() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING));
+
+        assertFalse(write(contract).contains("<peaceful>"));
     }
 
     // endregion round trip
