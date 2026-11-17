@@ -33,6 +33,7 @@
 package mekhq.campaign.parts;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
@@ -133,5 +134,26 @@ class RepairBayStockLineTest {
         String task = plainText(armor.getDesc());
 
         assertEquals(1, task.split("in stock", -1).length - 1, task);
+    }
+
+    @Test
+    void aStrippingTaskHasNoBlankLine() {
+        Unit locust = locustBeingStripped();
+        Armor armor = PartsScenario.unitParts(locust, Armor.class).getFirst();
+
+        String task = armor.getDesc();
+
+        assertFalse(task.contains("<br><br>"), task);
+    }
+
+    @Test
+    void aRepairTaskHasNoBlankLine() {
+        Unit locust = scenario.withUnit(UnitFixture.LOCUST_LCT_1V);
+        EquipmentPart laser = mediumLaser(locust);
+        laser.setHits(1);
+
+        String task = laser.getDesc();
+
+        assertFalse(task.contains("<br><br>"), task);
     }
 }

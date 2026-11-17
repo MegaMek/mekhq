@@ -576,16 +576,14 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                         getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"));
         }
 
+        // Each line ends with its own break, so the task reads without a blank line between details and stock
+        toReturn.append("</b><br>");
         String details = getDetails();
-
-        if (details != null && !details.isBlank()) {
-            toReturn.append("</b><br>").append(getDetails()).append("<br>");
+        if ((details != null) && !details.isBlank()) {
+            toReturn.append(details).append("<br>");
         }
-
-        if (this.isSalvaging()) {
-            toReturn.append("<br>").append(countStock().describe()).append("<br>");
-        } else {
-            toReturn.append("<br>");
+        if (isSalvaging()) {
+            toReturn.append(countStock().describe()).append("<br>");
         }
 
         if (!isDamagedBeyondRepair()) {
