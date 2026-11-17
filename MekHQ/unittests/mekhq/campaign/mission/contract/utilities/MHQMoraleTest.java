@@ -221,12 +221,19 @@ class MHQMoraleTest {
               pyrrhicVictories, decisiveDefeats, defeats, fleetInBeing, refusedEngagements);
         when(mockContract.getScenarios()).thenReturn(scenarioList);
 
-        int actualPerformanceModifier = MHQMorale.getPerformanceModifier(TODAY, mockContract,
-              DECISIVE_VICTORY_MODIFIER, VICTORY_MODIFIER, DECISIVE_DEFEAT_MODIFIER, DEFEAT_MODIFIER);
+        int actualPerformanceModifier = getPerformanceModifier(mockContract);
 
         assertEquals(expectedModifier, actualPerformanceModifier,
               String.format("Expected %d but got %d",
                     expectedModifier, actualPerformanceModifier));
+    }
+
+    /**
+     * Rates the contract's last month and looks up the modifier for that rating, as the morale check does.
+     */
+    private static int getPerformanceModifier(AbstractContract contract) {
+        return MHQMorale.getPerformanceModifier(MHQMorale.getPerformanceOutcome(TODAY, contract),
+              DECISIVE_VICTORY_MODIFIER, VICTORY_MODIFIER, DECISIVE_DEFEAT_MODIFIER, DEFEAT_MODIFIER);
     }
 
     private static Stream<Arguments> performanceModifierTestCases() {
@@ -251,8 +258,7 @@ class MHQMoraleTest {
         when(mockContract.getScenarios()).thenReturn(scenarioList);
 
         int expectedPerformanceModifier = DECISIVE_VICTORY_MODIFIER;
-        int actualPerformanceModifier = MHQMorale.getPerformanceModifier(TODAY, mockContract,
-              DECISIVE_VICTORY_MODIFIER, VICTORY_MODIFIER, DECISIVE_DEFEAT_MODIFIER, DEFEAT_MODIFIER);
+        int actualPerformanceModifier = getPerformanceModifier(mockContract);
 
         assertEquals(expectedPerformanceModifier, actualPerformanceModifier,
               String.format("Expected %d but got %d",
@@ -279,10 +285,7 @@ class MHQMoraleTest {
         when(mockContract.getScenarios()).thenReturn(scenarioList);
 
         int expectedModifier = DECISIVE_VICTORY_MODIFIER; // only the recent victory should count
-        int actualModifier = MHQMorale.getPerformanceModifier(
-              TODAY, mockContract,
-              DECISIVE_VICTORY_MODIFIER, VICTORY_MODIFIER,
-              DECISIVE_DEFEAT_MODIFIER, DEFEAT_MODIFIER);
+        int actualModifier = getPerformanceModifier(mockContract);
 
         assertEquals(expectedModifier, actualModifier,
               String.format("Expected %d but got %d",
@@ -319,18 +322,14 @@ class MHQMoraleTest {
 
     @ParameterizedTest
     @MethodSource("outcomeTestCases")
-    void testGetOutcome(MHQMorale.PerformanceOutcome expectedOutcome, int scoreModifier) {
-        MHQMorale.PerformanceOutcome actualPerformanceOutcome = MHQMorale.getOutcome(
+    void eachPerformanceOutcomeUsesItsOwnModifier(MHQMorale.PerformanceOutcome outcome, int expectedModifier) {
+        int actualModifier = MHQMorale.getPerformanceModifier(outcome,
               DECISIVE_VICTORY_MODIFIER,
               VICTORY_MODIFIER,
               DECISIVE_DEFEAT_MODIFIER,
-              DEFEAT_MODIFIER,
-              scoreModifier);
+              DEFEAT_MODIFIER);
 
-        assertEquals(expectedOutcome, actualPerformanceOutcome,
-              String.format("Performance outcome should match expected: expected %s but got %s",
-                    expectedOutcome,
-                    actualPerformanceOutcome));
+        assertEquals(expectedModifier, actualModifier);
     }
 
     private static Stream<Arguments> outcomeTestCases() {
@@ -341,6 +340,27 @@ class MHQMoraleTest {
               Arguments.of(MHQMorale.PerformanceOutcome.DEFEAT, DEFEAT_MODIFIER),
               Arguments.of(MHQMorale.PerformanceOutcome.DECISIVE_DEFEAT, DECISIVE_DEFEAT_MODIFIER)
         );
+    }
+
+    @Test
+    void aPlainVictoryIsRatedAsSuchEvenWhenTheOptionsGiveItTheDecisiveModifier() {
+        // 1 decisive victory + 1 victory = 3 victory points against 2 defeat points: a victory, but not decisive
+        AbstractContract mockContract = mock(AbstractContract.class);
+        when(mockContract.getScenarios()).thenReturn(buildScenarioArray(7, 1, 1, 0, 0, 2, 0, 0));
+
+        MHQMorale.PerformanceOutcome outcome = MHQMorale.getPerformanceOutcome(TODAY, mockContract);
+
+        assertEquals(MHQMorale.PerformanceOutcome.VICTORY, outcome);
+        // With both victory options set to 1, the modifier alone could not tell the two apart
+        assertEquals(1, MHQMorale.getPerformanceModifier(outcome, 1, 1, -1, -1));
+    }
+
+    @Test
+    void aDrawIsRatedAsSuchEvenWhenAnOptionIsZero() {
+        AbstractContract mockContract = mock(AbstractContract.class);
+        when(mockContract.getScenarios()).thenReturn(buildScenarioArray(7, 0, 1, 0, 0, 1, 0, 0));
+
+        assertEquals(MHQMorale.PerformanceOutcome.DRAW, MHQMorale.getPerformanceOutcome(TODAY, mockContract));
     }
 
     @ParameterizedTest
@@ -478,5 +498,19 @@ class MHQMoraleTest {
               ScenarioType.RIOT);
 
         verify(retainer, never()).changeMorale(any(ContractMoraleLevel.class));
+    }
+
+    @Test
+    void winningAgainstAnAlreadyRoutedGarrisonEnemyDoesNotRepeatTheRout() {
+        Campaign campaign = mock(Campaign.class);
+        AbstractContract garrison = contractOfType(ContractObjectiveType.GARRISON_DUTY);
+        when(garrison.getMoraleLevel()).thenReturn(ROUTED);
+
+        MHQMorale.processMoraleChangeFromScenario(campaign, garrison, ScenarioStatus.VICTORY,
+              ScenarioType.AFFECTS_MORALE_BOTH_WAYS);
+
+        // The rout's end date is not pushed back, and its prisoners are not handled a second time
+        verify(garrison, never()).changeMorale(any(LocalDate.class));
+        verify(campaign, never()).getPlayerForce();
     }
 }

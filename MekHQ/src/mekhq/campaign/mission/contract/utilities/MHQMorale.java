@@ -173,7 +173,10 @@ public class MHQMorale {
         int reliability = getReliability(contract.getEnemyForceSkill().getAdjustedValue(), contract.getEnemyFaction());
         targetNumber.addModifier(reliability, getTextAt(RESOURCE_BUNDLE, "MHQMorale.modifier.reliability"));
 
-        int performanceModifier = getPerformanceModifier(today, contract, decisiveVictoryModifier, victoryModifier,
+        // The outcome is settled first and the modifier read from it, so the report names the outcome actually earned
+        // even when campaign options give two outcomes the same modifier.
+        PerformanceOutcome performanceOutcome = getPerformanceOutcome(today, contract);
+        int performanceModifier = getPerformanceModifier(performanceOutcome, decisiveVictoryModifier, victoryModifier,
               decisiveDefeatModifier, defeatModifier);
         targetNumber.addModifier(performanceModifier, getTextAt(RESOURCE_BUNDLE, "MHQMorale.modifier.performance"));
 
@@ -183,8 +186,6 @@ public class MHQMorale {
         MoraleOutcome moraleOutcome = getMoraleOutcome(contract, modifiedRoll);
 
         // Generate and return the report
-        PerformanceOutcome performanceOutcome = getOutcome(decisiveVictoryModifier, victoryModifier,
-              decisiveDefeatModifier, defeatModifier, performanceModifier);
         return getReport(reliability, performanceOutcome, performanceModifier, moraleOutcome, roll, modifiedRoll);
     }
 
@@ -299,32 +300,31 @@ public class MHQMorale {
     }
 
     /**
-     * Maps the calculated performance modifier to a {@link PerformanceOutcome} value.
+     * Returns the performance modifier the campaign options assign to a {@link PerformanceOutcome}. A draw is always
+     * {@code 0}.
      *
+     * <p>A higher modifier means the OpFor is more likely to lose morale.</p>
+     *
+     * @param performanceOutcome      The outcome to look up.
      * @param decisiveVictoryModifier Modifier value for decisive victories.
      * @param victoryModifier         Modifier value for normal victories.
      * @param decisiveDefeatModifier  Modifier value for decisive defeats.
      * @param defeatModifier          Modifier value for normal defeats.
-     * @param performanceModifier     The final calculated performance modifier.
      *
-     * @return The corresponding PerformanceOutcome.
+     * @return The performance modifier for the outcome.
      *
      * @author Illiani
-     * @since 0.50.10
+     * @since 0.51.01
      */
-    static PerformanceOutcome getOutcome(int decisiveVictoryModifier, int victoryModifier,
-          int decisiveDefeatModifier, int defeatModifier, int performanceModifier) {
-        if (performanceModifier == decisiveVictoryModifier) {
-            return PerformanceOutcome.DECISIVE_VICTORY;
-        } else if (performanceModifier == victoryModifier) {
-            return PerformanceOutcome.VICTORY;
-        } else if (performanceModifier == decisiveDefeatModifier) {
-            return PerformanceOutcome.DECISIVE_DEFEAT;
-        } else if (performanceModifier == defeatModifier) {
-            return PerformanceOutcome.DEFEAT;
-        } else {
-            return PerformanceOutcome.DRAW;
-        }
+    static int getPerformanceModifier(PerformanceOutcome performanceOutcome, int decisiveVictoryModifier,
+          int victoryModifier, int decisiveDefeatModifier, int defeatModifier) {
+        return switch (performanceOutcome) {
+            case DECISIVE_VICTORY -> decisiveVictoryModifier;
+            case VICTORY -> victoryModifier;
+            case DRAW -> 0;
+            case DEFEAT -> defeatModifier;
+            case DECISIVE_DEFEAT -> decisiveDefeatModifier;
+        };
     }
 
     /**
@@ -428,25 +428,18 @@ public class MHQMorale {
     }
 
     /**
-     * Calculates the performance modifier for recent scenario outcomes within the contract. Considers victories,
-     * defeats, and special outcome scenarios within the last month.
+     * Rates the player's performance over the contract's scenarios within the last month. Considers victories,
+     * defeats, and special outcome scenarios.
      *
-     * <p>A higher modifier means the OpFor is more likely to lose morale.</p>
+     * @param today    The current date for the evaluation.
+     * @param contract The contract to evaluate scenarios for.
      *
-     * @param today                   The current date for modifier evaluation.
-     * @param contract                The contract to evaluate scenarios for.
-     * @param decisiveVictoryModifier Modifier value for decisive victories.
-     * @param victoryModifier         Modifier value for normal victories.
-     * @param decisiveDefeatModifier  Modifier value for decisive defeats.
-     * @param defeatModifier          Modifier value for normal defeats.
-     *
-     * @return The computed performance modifier to be used in morale calculation.
+     * @return The performance outcome over the last month.
      *
      * @author Illiani
-     * @since 0.50.10
+     * @since 0.51.01
      */
-    static int getPerformanceModifier(LocalDate today, AbstractContract contract, int decisiveVictoryModifier,
-          int victoryModifier, int decisiveDefeatModifier, int defeatModifier) {
+    static PerformanceOutcome getPerformanceOutcome(LocalDate today, AbstractContract contract) {
         int victories = 0;
         int defeats = 0;
         LocalDate lastMonth = today.minusMonths(1);
@@ -455,32 +448,18 @@ public class MHQMorale {
             LocalDate scenarioDate = scenario.getDate();
             // Scenario date can be null if the scenario hasn't been found in StratCon
             if (scenarioDate == null) {
-                LOGGER.info("{} has not been found yet. Skipping", scenario.getName());
+                LOGGER.debug("{} has not been found yet. Skipping", scenario.getName());
                 continue;
             }
             // Skip scenarios that occurred more than a month ago
             if (lastMonth.isAfter(scenarioDate)) {
-                LOGGER.info("{} occurred more than a month ago. Skipping", scenario.getName());
+                LOGGER.debug("{} occurred more than a month ago. Skipping", scenario.getName());
                 continue;
             }
 
             ScenarioStatus scenarioStatus = scenario.getStatus();
-            // We're trying to track down an instance where a scenario can be both resolved and current. This is
-            // logging that will be de-escalated to debug once we've got enough information to track the cause.
-            LOGGER.info("Processing scenario {} ({}) date={} resolved={} ovlVic={} ovlDef={} decVic={} decDef={} " +
-                              "pyrrhic={} fib={}",
-                  scenario.getName(),
-                  scenario.getId(),
-                  scenario.getDate(),
-                  scenario.getStatus(),
-                  scenario.getStatus().isOverallVictory(),
-                  scenario.getStatus().isOverallDefeat(),
-                  scenario.getStatus().isDecisiveVictory(),
-                  scenario.getStatus().isDecisiveDefeat(),
-                  scenario.getStatus().isPyrrhicVictory(),
-                  scenario.getStatus().isFleetInBeing());
-            LOGGER.info("Read in status for {} this should match the block above: {}", scenario.getName(),
-                  scenarioStatus);
+            LOGGER.debug("Processing scenario {} ({}) date={} status={}", scenario.getName(), scenario.getId(),
+                  scenarioDate, scenarioStatus);
 
             // Decisive Defeat or Refused Engagement count as 2 defeats
             if (scenarioStatus.isDecisiveDefeat() || scenarioStatus.isRefusedEngagement()) {
@@ -515,16 +494,15 @@ public class MHQMorale {
             }
         }
 
-        LOGGER.info("Total victory points for Morale: {}", victories);
-        LOGGER.info("Total defeat points for Morale: {}", defeats);
+        LOGGER.debug("Morale performance points: {} victory, {} defeat", victories, defeats);
 
-        // Compute performance modifier using concise math logic
+        // Winning by at least two to one is decisive
         if (victories > defeats) {
-            return (victories >= defeats * 2) ? decisiveVictoryModifier : victoryModifier;
+            return (victories >= defeats * 2) ? PerformanceOutcome.DECISIVE_VICTORY : PerformanceOutcome.VICTORY;
         } else if (defeats > victories) {
-            return (defeats >= victories * 2) ? decisiveDefeatModifier : defeatModifier;
+            return (defeats >= victories * 2) ? PerformanceOutcome.DECISIVE_DEFEAT : PerformanceOutcome.DEFEAT;
         }
-        return 0;
+        return PerformanceOutcome.DRAW;
     }
 
     /**
@@ -567,9 +545,10 @@ public class MHQMorale {
      *     <li>Otherwise: roll defaults to {@link #NO_CHANGE_TARGET_NUMBER}.</li>
      * </ul>
      *
-     * <p>After applying the morale outcome, if the contract's morale level is routed,
+     * <p>After applying the morale outcome, if this scenario has routed the enemy,
      * {@link #routedMoraleUpdate(Campaign, AbstractContract)} is invoked to handle follow-up effects such as early
-     * contract end or prisoner handling.</p>
+     * contract end or prisoner handling. An enemy that was already routed before the scenario has already had those
+     * effects applied, so they are not repeated.</p>
      *
      * @param campaign             the active campaign containing contract and prisoner state
      * @param contract             the contract whose morale is being updated
@@ -596,9 +575,12 @@ public class MHQMorale {
             forcedRoll = RALLYING_TARGET_NUMBER;
         }
 
+        boolean wasRouted = contract.getMoraleLevel().isRouted();
         getMoraleOutcome(contract, forcedRoll);
 
-        if (contract.getMoraleLevel().isRouted()) {
+        // Only a scenario that routs the enemy sets off the rout. Re-running it for an enemy that was already routed
+        // would push a garrison's rout end date further out and process its prisoners again.
+        if (!wasRouted && contract.getMoraleLevel().isRouted()) {
             routedMoraleUpdate(campaign, contract);
         }
     }

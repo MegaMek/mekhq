@@ -133,7 +133,7 @@ public class MoraleBar extends JPanel {
      * Builds a self-contained panel wrapping a {@link MoraleBar}, suitable for embedding in dialogs such as the
      * immersive "Morale Update" notification. The bar is given generous horizontal padding so it reads as a centered
      * gauge rather than spanning the full dialog width. The label beneath the active segment honours the contract's
-     * special "Peaceful" wording for routed garrison/retainer contracts, matching the briefing-room contract panel.
+     * special "Peaceful" wording for routed garrison-type contracts, matching the briefing-room contract panel.
      *
      * @param contract the contract whose enemy morale should be displayed
      *
@@ -165,8 +165,8 @@ public class MoraleBar extends JPanel {
 
     /**
      * Computes the morale label and tooltip for a contract, applying the special "Peaceful" wording used for routed
-     * garrison-duty and retainer contracts. This is the single source of truth shared by the briefing-room contract
-     * panel and the morale dialog so the two never diverge.
+     * garrison-type contracts (see {@link AbstractContract#isPeaceful()}). This is the single source of truth shared by
+     * the briefing-room contract panel and the morale dialog so the two never diverge.
      *
      * @param contract the contract whose enemy morale should be described
      *
@@ -174,8 +174,7 @@ public class MoraleBar extends JPanel {
      */
     public static @Nonnull MoraleDisplay getMoraleDisplay(@Nonnull final AbstractContract contract) {
         final ContractMoraleLevel level = contract.getMoraleLevel();
-        if ((contract.getObjectiveType().isGarrisonDuty() || contract.getObjectiveType().isRetainer()) &&
-                  level.isRouted()) {
+        if (contract.isPeaceful()) {
             return new MoraleDisplay(getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.text"),
                   getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.tooltip"));
         }
