@@ -193,4 +193,34 @@ class RandomOperationNameGeneratorTest {
         // After reset the descriptor pool is gone; a fresh instance would reload from files (not exercised here).
         assertNull(RandomOperationNameGenerator.getWeightedDescriptor());
     }
+
+    // --- real loading from the shipped data files ---
+
+    @Test
+    void aDrawStraightAfterFirstUseWaitsForLoadingRatherThanFailing() {
+        // The very first draw used to arrive before the background loader had run, returning null (and so the
+        // fallback codename). It must now wait for loading and draw a real word.
+        RandomOperationNameGenerator generator = RandomOperationNameGenerator.getInstance();
+
+        assertNotNull(generator.generateDescriptor());
+    }
+
+    @ParameterizedTest
+    @EnumSource(ContractObjectiveType.class)
+    void everyObjectivePoolIsFullyLoadedFromTheShippedData(final ContractObjectiveType objectiveType) {
+        RandomOperationNameGenerator generator = RandomOperationNameGenerator.getInstance();
+
+        assertNotNull(generator.generateNoun(objectiveType), "no noun drawn for " + objectiveType);
+        WeightedIntMap<String> pool = RandomOperationNameGenerator.getWeightedNoun(objectiveType);
+        assertNotNull(pool, "no pool published for " + objectiveType);
+        assertFalse(pool.isEmpty(), "empty pool published for " + objectiveType);
+        assertFalse(RandomOperationNameGenerator.getWeightedDescriptor().isEmpty());
+    }
+
+    @Test
+    void controllerProducesARealNameRatherThanTheFallbackOnFirstUse() {
+        String name = OperationNameController.generateOperationName(ContractObjectiveType.GARRISON_DUTY);
+
+        assertNotEquals("STEEL BANJO", name);
+    }
 }

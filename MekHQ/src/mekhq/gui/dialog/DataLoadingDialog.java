@@ -89,6 +89,7 @@ import mekhq.campaign.finances.CurrencyManager;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.io.CustomUnitFileUUIDRepair;
 import mekhq.campaign.market.PartsStore;
+import mekhq.campaign.mission.contract.contractGeneration.RandomOperationNameGenerator;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import mekhq.campaign.personnel.Bloodname;
 import mekhq.campaign.personnel.SpecialAbility;
@@ -321,6 +322,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             RandomCallsignGenerator.getInstance();
             RandomCompanyNameGenerator.getInstance();
             RandomOracleGenerator.getInstance();
+            RandomOperationNameGenerator.getInstance();
             Bloodname.loadBloodnameData();
             // endregion Progress 2
 
