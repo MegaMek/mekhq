@@ -239,7 +239,10 @@ class MHQMoraleTest {
     private static Stream<Arguments> performanceModifierTestCases() {
         return Stream.of(
               // expectedModifier, daysToSubtract, decisiveV, victories, pyrrhicV, decisiveD, defeats, fleetInBeing, refusedEng
-              Arguments.of(DECISIVE_VICTORY_MODIFIER, 7, 1, 2, 0, 0, 2, 0, 0),
+              // 4 - 2: two to one, but only 2 points ahead, so not decisive
+              Arguments.of(VICTORY_MODIFIER, 7, 1, 2, 0, 0, 2, 0, 0),
+              // 5 - 2: 3 points ahead is decisive
+              Arguments.of(DECISIVE_VICTORY_MODIFIER, 7, 2, 1, 0, 0, 2, 0, 0),
               Arguments.of(VICTORY_MODIFIER, 7, 1, 1, 0, 0, 2, 0, 0),
               Arguments.of(VICTORY_MODIFIER, 7, 1, 1, 1, 0, 2, 0, 0),
               Arguments.of(DECISIVE_DEFEAT_MODIFIER, 7, 0, 1, 0, 1, 2, 0, 0),
@@ -253,7 +256,7 @@ class MHQMoraleTest {
     @Test
     void testPerformanceModifier_decisiveVictoryAllDefeatsExpired() {
         AbstractContract mockContract = mock(AbstractContract.class);
-        List<Scenario> scenarioList = buildScenarioArray(7, 0, 1, 0, 0, 0, 0, 0);
+        List<Scenario> scenarioList = buildScenarioArray(7, 0, 3, 0, 0, 0, 0, 0);
         scenarioList.addAll(buildScenarioArray(357, 0, 1, 0, 0, 2, 0, 0));
         when(mockContract.getScenarios()).thenReturn(scenarioList);
 
@@ -284,7 +287,7 @@ class MHQMoraleTest {
 
         when(mockContract.getScenarios()).thenReturn(scenarioList);
 
-        int expectedModifier = DECISIVE_VICTORY_MODIFIER; // only the recent victory should count
+        int expectedModifier = VICTORY_MODIFIER; // only the recent victory should count
         int actualModifier = getPerformanceModifier(mockContract);
 
         assertEquals(expectedModifier, actualModifier,
@@ -353,6 +356,43 @@ class MHQMoraleTest {
         assertEquals(MHQMorale.PerformanceOutcome.VICTORY, outcome);
         // With both victory options set to 1, the modifier alone could not tell the two apart
         assertEquals(1, MHQMorale.getPerformanceModifier(outcome, 1, 1, -1, -1));
+    }
+
+    @Test
+    void eachScenarioStatusAddsItsPointsToTheTally() {
+        AbstractContract mockContract = mock(AbstractContract.class);
+        // decisiveV, victories, pyrrhicV, decisiveD, defeats, fleetInBeing, refusedEngagements
+        when(mockContract.getScenarios()).thenReturn(buildScenarioArray(7, 1, 1, 1, 1, 1, 1, 1));
+
+        MHQMorale.PerformanceTally tally = MHQMorale.getPerformanceTally(TODAY, mockContract);
+
+        assertEquals(2 + 1 + 1, tally.victoryPoints());
+        assertEquals(1 + 2 + 1 + 1 + 2, tally.defeatPoints());
+    }
+
+    @ParameterizedTest
+    @MethodSource("tallyOutcomeCases")
+    void aTallyIsRatedByItsMargin(int victoryPoints, int defeatPoints, MHQMorale.PerformanceOutcome expected) {
+        assertEquals(expected, new MHQMorale.PerformanceTally(victoryPoints, defeatPoints).outcome());
+    }
+
+    private static Stream<Arguments> tallyOutcomeCases() {
+        return Stream.of(
+              Arguments.of(0, 0, MHQMorale.PerformanceOutcome.DRAW),
+              Arguments.of(2, 2, MHQMorale.PerformanceOutcome.DRAW),
+              // A lone win in a quiet month is not decisive, however lopsided the ratio
+              Arguments.of(1, 0, MHQMorale.PerformanceOutcome.VICTORY),
+              Arguments.of(4, 2, MHQMorale.PerformanceOutcome.VICTORY),
+              Arguments.of(3, 2, MHQMorale.PerformanceOutcome.VICTORY),
+              Arguments.of(3, 0, MHQMorale.PerformanceOutcome.DECISIVE_VICTORY),
+              // Sustained success against some setbacks is decisive, though short of two to one
+              Arguments.of(9, 5, MHQMorale.PerformanceOutcome.DECISIVE_VICTORY),
+              Arguments.of(2, 3, MHQMorale.PerformanceOutcome.DEFEAT),
+              Arguments.of(2, 4, MHQMorale.PerformanceOutcome.DEFEAT),
+              Arguments.of(0, 1, MHQMorale.PerformanceOutcome.DEFEAT),
+              Arguments.of(0, 3, MHQMorale.PerformanceOutcome.DECISIVE_DEFEAT),
+              Arguments.of(5, 9, MHQMorale.PerformanceOutcome.DECISIVE_DEFEAT)
+        );
     }
 
     @Test

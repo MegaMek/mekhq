@@ -1118,9 +1118,9 @@ public final class CampaignOption<T> {
     public static final CampaignOption<BoardScalingType> BOARD_SCALING_TYPE =
           of(BoardScalingType.class, BoardScalingType.NORMAL, "boardScalingType");
     public static final CampaignOption<Integer> MORALE_VICTORY_EFFECT =
-          of(Integer.class, 1, "moraleVictoryEffect");
+          of(Integer.class, 2, "moraleVictoryEffect");
     public static final CampaignOption<Integer> MORALE_DECISIVE_VICTORY_EFFECT =
-          of(Integer.class, 2, "moraleDecisiveVictoryEffect");
+          of(Integer.class, 3, "moraleDecisiveVictoryEffect");
     public static final CampaignOption<Integer> MORALE_DEFEAT_EFFECT =
           of(Integer.class, -2, "moraleDefeatEffect");
     public static final CampaignOption<Integer> MORALE_DECISIVE_DEFEAT_EFFECT =

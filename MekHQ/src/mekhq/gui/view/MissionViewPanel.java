@@ -38,6 +38,8 @@ import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.mission.resupplyAndCaches.ResupplyUtilities.estimateCargoRequirements;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
+import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -66,8 +68,12 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.utilities.ContractScore;
+import mekhq.campaign.mission.contract.utilities.MHQMorale;
+import mekhq.campaign.mission.contract.utilities.MHQMorale.PerformanceOutcome;
+import mekhq.campaign.mission.contract.utilities.MHQMorale.PerformanceTally;
 import mekhq.campaign.mission.contract.utilities.SalvageUtilities;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
@@ -223,6 +229,20 @@ public class MissionViewPanel extends JScrollablePanel {
         MoraleBar moraleBar = new MoraleBar(mission.getMoraleLevel(), moraleDisplay.label());
         moraleBar.setToolTipText(wordWrap(moraleDisplay.tooltip()));
         addGaugeRow(moraleBar, y++);
+
+        // The victory and defeat points the next morale check will weigh, so players can see what their battles earn
+        if (isBattleRecordShown(campaign.getLocalDate(), mission)) {
+            JLabel lblBattleRecord = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblBattleRecord.text"));
+            lblBattleRecord.setName("lblBattleRecord");
+            JLabel txtBattleRecord = new JLabel(getBattleRecordText(campaign.getLocalDate(), mission));
+            txtBattleRecord.setName("txtBattleRecord");
+            // Formatted (with no arguments) so the bundle's escaped apostrophes come out as single ones
+            final String battleRecordTooltip = wordWrap(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "lblBattleRecord.tooltip"));
+            lblBattleRecord.setToolTipText(battleRecordTooltip);
+            txtBattleRecord.setToolTipText(battleRecordTooltip);
+            addStatRow(lblBattleRecord, txtBattleRecord, y++);
+        }
 
         final boolean useStratCon = campaign.getCampaignOptions().isUseStratCon();
         if (useStratCon) {
@@ -387,6 +407,40 @@ public class MissionViewPanel extends JScrollablePanel {
         gridBagConstraints.weighty = 1.0;
         gridBagConstraints.fill = GridBagConstraints.BOTH;
         pnlStats.add(verticalGlue, gridBagConstraints);
+    }
+
+    /**
+     * Whether the briefing room shows the contract's battle record: only while the record still feeds a monthly morale
+     * check. That is an active contract that is not mid-rout (a rout's end, not the record, decides what happens next)
+     * and is not a shell contract (which runs no morale checks).
+     *
+     * @param today    the current date
+     * @param contract the contract on show
+     *
+     * @return {@code true} if the battle record should be shown
+     */
+    static boolean isBattleRecordShown(LocalDate today, AbstractContract contract) {
+        return !(contract instanceof ShellContract) && contract.isActiveOn(today) && (contract.getRoutEndDate() == null);
+    }
+
+    /**
+     * Builds the battle record shown in the briefing room: the rating the next morale check would give, followed by
+     * the victory and defeat points behind it, for example "Victory (6–4)".
+     *
+     * @param today    the current date
+     * @param contract the contract on show
+     *
+     * @return the battle record text
+     */
+    static String getBattleRecordText(LocalDate today, AbstractContract contract) {
+        final PerformanceTally tally = MHQMorale.getPerformanceTally(today, contract);
+        final PerformanceOutcome outcome = tally.outcome();
+        return getFormattedTextAt(RESOURCE_BUNDLE, "txtBattleRecord.text",
+              spanOpeningWithCustomColor(outcome.getColor()),
+              outcome.getLabel(),
+              CLOSING_SPAN_TAG,
+              tally.victoryPoints(),
+              tally.defeatPoints());
     }
 
     static boolean shouldShowContractTimeline(Campaign campaign, AbstractContract contract) {

@@ -40,10 +40,15 @@ import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
+import java.util.List;
 
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ShellContract;
+import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioStatus;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.Test;
 
@@ -117,6 +122,58 @@ class MissionViewPanelTest {
     void inTransitCurrentLocationUsesSystemName() {
         assertEquals("Somewhere Else (in transit)",
               MissionViewPanel.currentLocationDescription(campaignInSpace(OTHER_SYSTEM, false)));
+    }
+
+    // Battle record
+
+    @Test
+    void battleRecordIsShownForAnActiveContract() {
+        assertTrue(MissionViewPanel.isBattleRecordShown(CAMPAIGN_DATE, contractAt(CONTRACT_SYSTEM, true)));
+    }
+
+    @Test
+    void battleRecordIsHiddenForAContractThatIsNotActive() {
+        assertFalse(MissionViewPanel.isBattleRecordShown(CAMPAIGN_DATE, contractAt(CONTRACT_SYSTEM, false)));
+    }
+
+    @Test
+    void battleRecordIsHiddenWhileTheEnemyIsMidRout() {
+        final AbstractContract contract = contractAt(CONTRACT_SYSTEM, true);
+        when(contract.getRoutEndDate()).thenReturn(CAMPAIGN_DATE.plusMonths(1));
+
+        assertFalse(MissionViewPanel.isBattleRecordShown(CAMPAIGN_DATE, contract));
+    }
+
+    @Test
+    void battleRecordIsHiddenForAShellContract() {
+        final ShellContract contract = mock(ShellContract.class);
+        when(contract.isActiveOn(CAMPAIGN_DATE)).thenReturn(true);
+
+        assertFalse(MissionViewPanel.isBattleRecordShown(CAMPAIGN_DATE, contract));
+    }
+
+    @Test
+    void battleRecordTextShowsTheRatingAndThePointsBehindIt() {
+        final AbstractContract contract = contractAt(CONTRACT_SYSTEM, true);
+        // 2 + 1 victory points against 2 defeat points for an unanswered scenario: a victory, but not a decisive one
+        when(contract.getScenarios()).thenReturn(scenariosWithStatuses(ScenarioStatus.DECISIVE_VICTORY,
+              ScenarioStatus.VICTORY, ScenarioStatus.REFUSED_ENGAGEMENT));
+
+        final String text = MissionViewPanel.getBattleRecordText(CAMPAIGN_DATE, contract);
+
+        assertTrue(text.contains("<b>Victory</b>"), text);
+        assertTrue(text.contains("(3 \u2013 2)"), text);
+    }
+
+    private static List<Scenario> scenariosWithStatuses(ScenarioStatus... statuses) {
+        final List<Scenario> scenarios = new ArrayList<>();
+        for (ScenarioStatus status : statuses) {
+            final Scenario scenario = mock(Scenario.class);
+            when(scenario.getDate()).thenReturn(CAMPAIGN_DATE.minusDays(7));
+            when(scenario.getStatus()).thenReturn(status);
+            scenarios.add(scenario);
+        }
+        return scenarios;
     }
 
     private static Campaign campaignOnDate(PlanetarySystem currentSystem, boolean onPlanet) {

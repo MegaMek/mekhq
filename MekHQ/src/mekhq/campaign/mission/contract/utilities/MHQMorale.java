@@ -106,6 +106,12 @@ public class MHQMorale {
     public static final int WAVERING_TARGET_NUMBER = 8;
 
     /**
+     * How many points one side must out-score the other by, over a month, for the result to be decisive (see
+     * {@link PerformanceTally#outcome()}).
+     */
+    public static final int DECISIVE_MARGIN = 3;
+
+    /**
      * Returns the localized title used for the morale check report UI.
      *
      * <p>The value is loaded from {@link #RESOURCE_BUNDLE} under the key {@code MHQMorale.check.title} and is
@@ -131,7 +137,74 @@ public class MHQMorale {
         VICTORY,
         DRAW,
         DEFEAT,
-        DECISIVE_DEFEAT
+        DECISIVE_DEFEAT;
+
+        /**
+         * @return the localized name of this outcome, as the morale check report shows it
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        public String getLabel() {
+            return getTextAt(RESOURCE_BUNDLE, "MHQMorale.performanceOutcome." + name());
+        }
+
+        /**
+         * @return the report color for this outcome, from the player's point of view
+         *
+         * @author Illiani
+         * @since 0.51.01
+         */
+        public String getColor() {
+            return switch (this) {
+                case DECISIVE_VICTORY -> getAmazingColor();
+                case VICTORY -> getPositiveColor();
+                case DRAW -> getWarningColor();
+                case DEFEAT, DECISIVE_DEFEAT -> getNegativeColor();
+            };
+        }
+    }
+
+    /**
+     * The victory and defeat points a contract's recent scenarios count for in the morale check (see
+     * {@link #getPerformanceTally(LocalDate, AbstractContract)}).
+     *
+     * @param victoryPoints the victory points
+     * @param defeatPoints  the defeat points
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public record PerformanceTally(int victoryPoints, int defeatPoints) {
+        /**
+         * @return victory points less defeat points: positive when the player is ahead, negative when behind
+         */
+        public int margin() {
+            return victoryPoints - defeatPoints;
+        }
+
+        /**
+         * Rates the tally by its {@link #margin()}. The side with more points wins, and winning by at least
+         * {@link MHQMorale#DECISIVE_MARGIN} points is decisive; an even tally is a draw.
+         *
+         * <p>The margin, rather than the ratio, is what counts: a month of sustained success against some setbacks
+         * (say 9 to 5) is decisive, while a single lucky win in an otherwise quiet month (1 to 0) is not.</p>
+         *
+         * @return the performance outcome this tally earns
+         */
+        public PerformanceOutcome outcome() {
+            int margin = margin();
+            if (margin >= DECISIVE_MARGIN) {
+                return PerformanceOutcome.DECISIVE_VICTORY;
+            } else if (margin > 0) {
+                return PerformanceOutcome.VICTORY;
+            } else if (margin <= -DECISIVE_MARGIN) {
+                return PerformanceOutcome.DECISIVE_DEFEAT;
+            } else if (margin < 0) {
+                return PerformanceOutcome.DEFEAT;
+            }
+            return PerformanceOutcome.DRAW;
+        }
     }
 
     /**
@@ -213,15 +286,8 @@ public class MHQMorale {
             reliabilityColor = getNegativeColor();
         }
 
-        String performanceColor = switch (performanceOutcome) {
-            case DECISIVE_VICTORY -> getAmazingColor();
-            case VICTORY -> getPositiveColor();
-            case DRAW -> getWarningColor();
-            case DEFEAT, DECISIVE_DEFEAT -> getNegativeColor();
-        };
-
-        String performanceText = getTextAt(RESOURCE_BUNDLE,
-              "MHQMorale.performanceOutcome." + performanceOutcome.name());
+        String performanceColor = performanceOutcome.getColor();
+        String performanceText = performanceOutcome.getLabel();
 
         String moraleColor = switch (moraleOutcome) {
             case RALLYING -> getNegativeColor();
@@ -440,6 +506,30 @@ public class MHQMorale {
      * @since 0.51.01
      */
     static PerformanceOutcome getPerformanceOutcome(LocalDate today, AbstractContract contract) {
+        return getPerformanceTally(today, contract).outcome();
+    }
+
+    /**
+     * Tallies the victory and defeat points the contract's scenarios within the last month count for in the morale
+     * check.
+     *
+     * <ul>
+     *     <li>Decisive victory: 2 victory points</li>
+     *     <li>Victory: 1 victory point</li>
+     *     <li>Pyrrhic victory: 1 victory point and 1 defeat point</li>
+     *     <li>Defeat or fleet in being: 1 defeat point</li>
+     *     <li>Decisive defeat or refused engagement: 2 defeat points</li>
+     * </ul>
+     *
+     * @param today    The current date for the evaluation.
+     * @param contract The contract to evaluate scenarios for.
+     *
+     * @return The victory and defeat points over the last month.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static PerformanceTally getPerformanceTally(LocalDate today, AbstractContract contract) {
         int victories = 0;
         int defeats = 0;
         LocalDate lastMonth = today.minusMonths(1);
@@ -496,13 +586,7 @@ public class MHQMorale {
 
         LOGGER.debug("Morale performance points: {} victory, {} defeat", victories, defeats);
 
-        // Winning by at least two to one is decisive
-        if (victories > defeats) {
-            return (victories >= defeats * 2) ? PerformanceOutcome.DECISIVE_VICTORY : PerformanceOutcome.VICTORY;
-        } else if (defeats > victories) {
-            return (defeats >= victories * 2) ? PerformanceOutcome.DECISIVE_DEFEAT : PerformanceOutcome.DEFEAT;
-        }
-        return PerformanceOutcome.DRAW;
+        return new PerformanceTally(victories, defeats);
     }
 
     /**
