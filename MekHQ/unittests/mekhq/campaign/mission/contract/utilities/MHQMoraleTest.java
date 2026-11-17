@@ -354,7 +354,9 @@ class MHQMoraleTest {
     void aPlainVictoryIsRatedAsSuchEvenWhenTheOptionsGiveItTheDecisiveModifier() {
         // 1 decisive victory + 1 victory = 3 victory points against 2 defeat points: a victory, but not decisive
         AbstractContract mockContract = mock(AbstractContract.class);
-        when(mockContract.getScenarios()).thenReturn(buildScenarioArray(7, 1, 1, 0, 0, 2, 0, 0));
+        // Built before stubbing, as building it stubs the scenarios' own mocks
+        List<Scenario> scenarios = buildScenarioArray(7, 1, 1, 0, 0, 2, 0, 0);
+        when(mockContract.getScenarios()).thenReturn(scenarios);
 
         MHQMorale.PerformanceOutcome outcome = MHQMorale.getPerformanceTally(TODAY, mockContract).outcome();
 
@@ -367,7 +369,8 @@ class MHQMoraleTest {
     void eachScenarioStatusAddsItsPointsToTheTally() {
         AbstractContract mockContract = mock(AbstractContract.class);
         // decisiveV, victories, pyrrhicV, decisiveD, defeats, fleetInBeing, refusedEngagements
-        when(mockContract.getScenarios()).thenReturn(buildScenarioArray(7, 1, 1, 1, 1, 1, 1, 1));
+        List<Scenario> scenarios = buildScenarioArray(7, 1, 1, 1, 1, 1, 1, 1);
+        when(mockContract.getScenarios()).thenReturn(scenarios);
 
         MHQMorale.PerformanceTally tally = MHQMorale.getPerformanceTally(TODAY, mockContract);
 
@@ -403,7 +406,8 @@ class MHQMoraleTest {
     @Test
     void aDrawIsRatedAsSuchEvenWhenAnOptionIsZero() {
         AbstractContract mockContract = mock(AbstractContract.class);
-        when(mockContract.getScenarios()).thenReturn(buildScenarioArray(7, 0, 1, 0, 0, 1, 0, 0));
+        List<Scenario> scenarios = buildScenarioArray(7, 0, 1, 0, 0, 1, 0, 0);
+        when(mockContract.getScenarios()).thenReturn(scenarios);
 
         assertEquals(MHQMorale.PerformanceOutcome.DRAW, MHQMorale.getPerformanceTally(TODAY, mockContract).outcome());
     }

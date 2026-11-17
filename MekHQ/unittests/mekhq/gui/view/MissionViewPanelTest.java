@@ -156,8 +156,10 @@ class MissionViewPanelTest {
     void battleRecordTextShowsTheRatingAndThePointsBehindIt() {
         final AbstractContract contract = contractAt(CONTRACT_SYSTEM, true);
         // 2 + 1 victory points against 2 defeat points for an unanswered scenario: a victory, but not a decisive one
-        when(contract.getScenarios()).thenReturn(scenariosWithStatuses(ScenarioStatus.DECISIVE_VICTORY,
-              ScenarioStatus.VICTORY, ScenarioStatus.REFUSED_ENGAGEMENT));
+        // Built before stubbing, as building it stubs the scenarios' own mocks
+        final List<Scenario> scenarios = scenariosWithStatuses(ScenarioStatus.DECISIVE_VICTORY,
+              ScenarioStatus.VICTORY, ScenarioStatus.REFUSED_ENGAGEMENT);
+        when(contract.getScenarios()).thenReturn(scenarios);
 
         final String text = MissionViewPanel.getBattleRecordText(CAMPAIGN_DATE, contract);
 

@@ -1432,7 +1432,11 @@ public abstract class AbstractContract {
      * @return {@code true} if this is a Garrison Duty or Retainer contract between raids
      */
     public boolean isPeaceful() {
-        return getObjectiveType().hasGarrisonRaids() && moraleData.peaceful();
+        // The flag is checked first: most contracts are never peaceful, and some have no objective data to read
+        return moraleData.peaceful()
+                     && (objectiveData != null)
+                     && (objectiveData.playerObjectiveType() != null)
+                     && objectiveData.playerObjectiveType().hasGarrisonRaids();
     }
 
     /**
