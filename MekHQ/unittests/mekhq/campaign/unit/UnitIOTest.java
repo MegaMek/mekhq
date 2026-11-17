@@ -142,6 +142,7 @@ public class UnitIOTest {
             // Mock Camouflage (required for writeEntityToXmlString)
             megamek.common.icons.Camouflage mockCamouflage = mock(megamek.common.icons.Camouflage.class);
             when(mockCamouflage.hasDefaultCategory()).thenReturn(true);
+            when(mockCamouflage.hasDefaultOverlay()).thenReturn(true);
             when(mockEntity.getCamouflage()).thenReturn(mockCamouflage);
 
             // Mock entity setter methods
