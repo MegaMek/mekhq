@@ -101,7 +101,6 @@ import mekhq.gui.FactionComboBox;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
-import mekhq.gui.baseComponents.hud.HudDateField;
 import mekhq.gui.baseComponents.hud.HudModeSelector;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
@@ -292,9 +291,8 @@ public class ContractEditorDialog extends JDialog {
 
     // Morale
     private HudSegmentedControl<ContractMoraleLevel> moralePicker;
-    private HudDateField routEndDateField;
-    private JSpinner routedPayoutSpinner;
-    private boolean routFieldsEditable;
+    private JSpinner finalPayoutSpinner;
+    private boolean finalPayoutEditable;
 
     // Personnel - edit mode wraps the existing NPCs; create mode captures overrides applied to NPCs generated on
     // save.
@@ -883,25 +881,15 @@ public class ContractEditorDialog extends JDialog {
         refreshBatchallEnabled();
         grid.add(batchallRow);
 
-        // A rout only begins once the contract is accepted (and even then only for certain objectives), so the rout
-        // fields are only editable for an accepted contract - one with a status. On an unstarted offer they are
-        // disabled, never hidden.
-        routFieldsEditable = contract.getStatus() != null;
-        String routNote = routFieldsEditable ? null : getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.note.rout");
-        routEndDateField = new HudDateField(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.date.placeholder"),
-              this::onEdited);
-        LocalDate routEnd = contract.getRoutEndDate();
-        routEndDateField.setText(routEnd == null ? "" : routEnd.toString());
-        routEndDateField.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.date.tooltip")));
-        routEndDateField.setEnabled(routFieldsEditable);
-        // The date field already refreshes the form on every change, so it is not watched a second time.
-        grid.add(trackedRow("edit.contractMarket.field.routEndDate", routEndDateField, routNote,
-              routEndDateField::getText));
-
-        routedPayoutSpinner = moneySpinner(contract.getRoutPayout());
-        routedPayoutSpinner.setEnabled(routFieldsEditable);
-        grid.add(trackedRow("edit.contractMarket.field.routedPayout", routedPayoutSpinner, routNote,
-              routedPayoutSpinner::getValue, routedPayoutSpinner));
+        // A final payout is only set when an accepted contract ends early, so it is only editable for an accepted
+        // contract - one with a status. On an unstarted offer it is disabled, never hidden.
+        finalPayoutEditable = contract.getStatus() != null;
+        String finalPayoutNote = finalPayoutEditable ? null : getTextAt(RESOURCE_BUNDLE,
+              "edit.contractMarket.note.finalPayout");
+        finalPayoutSpinner = moneySpinner(contract.getFinalPayout());
+        finalPayoutSpinner.setEnabled(finalPayoutEditable);
+        grid.add(trackedRow("edit.contractMarket.field.finalPayout", finalPayoutSpinner, finalPayoutNote,
+              finalPayoutSpinner::getValue, finalPayoutSpinner));
         section.add(leftAligned(grid.panel));
 
         section.add(leftAligned(subHeading("edit.contractMarket.sub.people")));
@@ -1813,6 +1801,7 @@ public class ContractEditorDialog extends JDialog {
               salvageNonNegotiableCheck.isSelected(), commandNonNegotiableCheck.isSelected()));
 
         // Objectives
+        final ContractObjectiveType previousObjectiveType = contract.getObjectiveType();
         contract.setObjectiveData(new ContractObjectiveData(objectiveValue(playerObjectiveCombo),
               objectiveValue(opposingObjectiveCombo)));
 
@@ -1847,19 +1836,20 @@ public class ContractEditorDialog extends JDialog {
         contract.setRentedFacilitiesData(new RentedFacilitiesData(intValue(hospitalBedsSpinner),
               intValue(kitchensSpinner), intValue(holdingCellsSpinner)));
 
-        // Morale. The rout fields are only written when editable (an accepted contract); on an unstarted offer they
-        // are disabled and the contract's existing rout values (an absent end date, an unset payout) are preserved. A
-        // zero payout from the spinner means none has been set, so the remaining escrow is paid as normal.
-        LocalDate routEndDate = routFieldsEditable
-                                      ? parseDate(routEndDateField, contract.getRoutEndDate())
-                                      : contract.getRoutEndDate();
-        Money routPayout = contract.getRoutPayout();
-        if (routFieldsEditable) {
-            Money spinnerPayout = moneyValue(routedPayoutSpinner);
-            routPayout = spinnerPayout.isZero() ? null : spinnerPayout;
+        // Morale. The final payout is only written when editable (an accepted contract); on an unstarted offer it is
+        // disabled and the contract's existing payout is preserved. A zero payout from the spinner means none has been
+        // set, so the remaining escrow is paid as normal. Whether a garrison is between raids is left to the monthly
+        // raid roll, unless the objective changed: then it starts afresh, as a new contract with that objective would.
+        Money finalPayout = contract.getFinalPayout();
+        if (finalPayoutEditable) {
+            Money spinnerPayout = moneyValue(finalPayoutSpinner);
+            finalPayout = spinnerPayout.isZero() ? null : spinnerPayout;
         }
-        contract.setMoraleData(new MoraleData(selectedOr(moralePicker, contract.getMoraleLevel()),
-              routEndDate, routPayout));
+        boolean isPeaceful = (contract.getObjectiveType() == previousObjectiveType)
+                                   ? contract.getMoraleData().peaceful()
+                                   : contract.getObjectiveType().isGarrisonType();
+        contract.setMoraleData(new MoraleData(selectedOr(moralePicker, contract.getMoraleLevel()), isPeaceful,
+              finalPayout));
 
         // Personnel. Create mode generates the NPCs now (from the just-applied factions) and layers the GM's overrides
         // on top; edit mode mutates the existing NPCs in place (their references are preserved by the rebuilds above).
@@ -2571,19 +2561,6 @@ public class ContractEditorDialog extends JDialog {
     /** Trimmed field text (never null; blank stays blank). */
     private static String text(JTextField field) {
         return field.getText().trim();
-    }
-
-    /** Parses an ISO date from a field, treating blank as {@code null} and an unparseable value as {@code fallback}. */
-    private static @Nullable LocalDate parseDate(JTextField field, LocalDate fallback) {
-        String value = field.getText().trim();
-        if (value.isEmpty()) {
-            return null;
-        }
-        try {
-            return LocalDate.parse(value);
-        } catch (Exception ex) {
-            return fallback;
-        }
     }
 
     private static String orEmpty(String value) {

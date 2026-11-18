@@ -629,10 +629,10 @@ class StratConFacilitySiegeTest {
         }
 
         @Test
-        void aRoutedGarrisonNeverSorties() {
+        void aGarrisonNeverSortiesWhileTheContractIsPeaceful() {
             track.getCutOffFacilities().clear();
             track.setScenarioOdds(100);
-            when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.ROUTED);
+            when(contract.isPeaceful()).thenReturn(true);
             besiege(FORMATION_ID, 0);
 
             assertNull(StratConFacilitySiege.trySortie(campaign,

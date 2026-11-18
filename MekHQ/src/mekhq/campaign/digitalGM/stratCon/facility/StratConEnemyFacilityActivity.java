@@ -593,8 +593,8 @@ public final class StratConEnemyFacilityActivity {
         }
         engineerDates.removeIf(engineerDate -> !engineerDate.isAfter(today));
 
-        // The enemy is in no state to expand while routed.
-        if (contract.getMoraleLevel().isRouted()) {
+        // With no enemy activity between raids, there is no one to expand.
+        if (contract.isPeaceful()) {
             return;
         }
 

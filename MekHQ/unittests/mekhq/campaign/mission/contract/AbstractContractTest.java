@@ -36,8 +36,7 @@ import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.mission.contract.AbstractContract.DEFAULT_SHARES_PERCENT;
 import static mekhq.campaign.mission.contract.AbstractContract.INITIAL_SUPPORT_POINTS_PER_COMBAT_TEAM;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.ADVANCING;
-import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.OVERWHELMING;
-import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.ROUTED;
+import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.SCATTERED;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.STALEMATE;
 import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static org.junit.jupiter.api.Assertions.assertEquals;
@@ -109,42 +108,42 @@ class AbstractContractTest {
     }
 
     @Test
-    void changeMoraleToALevelClearsTheRoutState() {
+    void changeMoraleToALevelKeepsThePeaceAndTheFinalPayout() {
         AbstractContract contract = contract();
-        contract.setMoraleData(new MoraleData(ROUTED, START.plusDays(10), Money.of(500)));
+        contract.setMoraleData(new MoraleData(SCATTERED, true, Money.of(500)));
 
         contract.changeMorale(ADVANCING);
 
         assertEquals(ADVANCING, contract.getMoraleLevel());
-        assertNull(contract.getRoutEndDate(), "a morale level change ends any rout in progress");
-        assertNull(contract.getRoutPayout(), "a morale level change clears the pending rout payout");
+        assertTrue(contract.getMoraleData().peaceful(), "a morale level change must not end a peaceful spell");
+        assertEquals(Money.of(500), contract.getFinalPayout(),
+              "a morale level change after an early end must not lose the final payout");
     }
 
     @Test
     void endingAContractEarlyMovesTheEndDateAndSetsThePayout() {
         AbstractContract contract = contract();
-        contract.changeMorale(ADVANCING, START.plusDays(5));
+        contract.setMoraleData(new MoraleData(ADVANCING, true, null));
 
         contract.endContractEarly(START.plusDays(30), Money.of(4_000));
 
         assertEquals(START.plusDays(30), contract.getEndingDate());
         assertEquals(START, contract.getStartDate());
         assertEquals(6, contract.getLengthInMonths(), "an early finish must not rewrite the contract length");
-        assertEquals(Money.of(4_000), contract.getRoutPayout());
+        assertEquals(Money.of(4_000), contract.getFinalPayout());
         assertEquals(ADVANCING, contract.getMoraleLevel(), "ending early must not move the morale level");
-        assertEquals(START.plusDays(5), contract.getRoutEndDate(), "ending early must not touch the rout window");
+        assertTrue(contract.getMoraleData().peaceful(), "ending early must not touch the peaceful state");
     }
 
     @Test
-    void changeMoraleToARoutDateKeepsTheCurrentLevel() {
+    void setPeacefulKeepsTheCurrentLevel() {
         AbstractContract contract = contract();
         contract.changeMorale(ADVANCING);
 
-        contract.changeMorale(START.plusDays(10), Money.of(500));
+        contract.setPeaceful(true);
 
-        assertEquals(ADVANCING, contract.getMoraleLevel(), "setting a rout window must not move the morale level");
-        assertEquals(START.plusDays(10), contract.getRoutEndDate());
-        assertEquals(Money.of(500), contract.getRoutPayout());
+        assertEquals(ADVANCING, contract.getMoraleLevel(), "a peaceful spell must not move the morale level");
+        assertTrue(contract.getMoraleData().peaceful());
     }
 
     @ParameterizedTest
@@ -152,7 +151,7 @@ class AbstractContractTest {
           "STALEMATE, 1, ADVANCING",
           "STALEMATE, -1, WEAKENED",
           "STALEMATE, 3, OVERWHELMING",
-          "STALEMATE, -3, ROUTED"
+          "STALEMATE, -3, SCATTERED"
     })
     void changeMoraleByDeltaWalksTheLadder(ContractMoraleLevel start, int delta, ContractMoraleLevel expected) {
         AbstractContract contract = contract();
@@ -163,7 +162,7 @@ class AbstractContractTest {
     }
 
     @ParameterizedTest
-    @CsvSource({ "OVERWHELMING, 5, OVERWHELMING", "ROUTED, -5, ROUTED" })
+    @CsvSource({ "OVERWHELMING, 5, OVERWHELMING", "SCATTERED, -5, SCATTERED" })
     void changeMoraleByDeltaClampsAtTheEndsOfTheLadder(ContractMoraleLevel start, int delta,
           ContractMoraleLevel expected) {
         AbstractContract contract = contract();
@@ -174,33 +173,33 @@ class AbstractContractTest {
     }
 
     @Test
-    void garrisonContractWithRoutedEnemyIsPeaceful() {
+    void garrisonContractBetweenRaidsIsPeaceful() {
         AbstractContract contract = contract();
         contract.setObjectiveData(new ContractObjectiveData(ContractObjectiveType.GARRISON_DUTY,
               ContractObjectiveType.PLANETARY_ASSAULT));
-        contract.changeMorale(ROUTED);
+        contract.setPeaceful(true);
 
-        assertTrue(contract.isPeaceful(), "a garrison whose opposition has been routed has nothing left to fight");
+        assertTrue(contract.isPeaceful(), "a garrison between raids sees no enemy activity");
     }
 
     @Test
-    void garrisonContractWithIntactEnemyIsNotPeaceful() {
+    void garrisonContractDuringARaidIsNotPeacefulEvenAgainstAScatteredEnemy() {
         AbstractContract contract = contract();
         contract.setObjectiveData(new ContractObjectiveData(ContractObjectiveType.GARRISON_DUTY,
               ContractObjectiveType.PLANETARY_ASSAULT));
-        contract.changeMorale(OVERWHELMING);
+        contract.changeMorale(SCATTERED);
 
-        assertFalse(contract.isPeaceful());
+        assertFalse(contract.isPeaceful(), "a scattered enemy still fights; only a spell between raids is peaceful");
     }
 
     @Test
-    void nonGarrisonContractIsNeverPeacefulEvenAgainstARoutedEnemy() {
+    void nonGarrisonContractIsNeverPeaceful() {
         AbstractContract contract = contract();
         contract.setObjectiveData(new ContractObjectiveData(ContractObjectiveType.PLANETARY_ASSAULT,
               ContractObjectiveType.GARRISON_DUTY));
-        contract.changeMorale(ROUTED);
+        contract.setPeaceful(true);
 
-        assertFalse(contract.isPeaceful(), "an offensive contract still has objectives to take");
+        assertFalse(contract.isPeaceful(), "only garrison-type contracts have spells between raids");
     }
 
     // endregion morale

@@ -160,9 +160,7 @@ class ContractXmlCodecTest {
         contract.setScheduleData(new ContractScheduleData(START, START.plusMonths(6), 6));
         contract.setSystemsTargetData(new SystemsTargetData("Galatea", "Galatea 3"));
         contract.setRentedFacilitiesData(new RentedFacilitiesData(8, 3, 5));
-        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING,
-              START.plusDays(20),
-              Money.of(90_000)));
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING, true, Money.of(90_000)));
         contract.setNegotiationData(new NegotiationData(3,
               1,
               2,
@@ -236,39 +234,39 @@ class ContractXmlCodecTest {
     }
 
     @Test
-    void anUnsetRoutedPayoutStaysUnsetAcrossARoundTrip() throws Exception {
+    void anUnsetFinalPayoutStaysUnsetAcrossARoundTrip() throws Exception {
         AbstractContract contract = fullyPopulatedContract();
         contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING));
 
         AbstractContract reloaded = reparse(write(contract));
 
-        assertNull(reloaded.getRoutPayout(), "an unset payout must not come back as a payout that overrides escrow");
+        assertNull(reloaded.getFinalPayout(), "an unset payout must not come back as a payout that overrides escrow");
     }
 
     @Test
     void aDeliberateZeroPayoutSurvivesARoundTrip() throws Exception {
         AbstractContract contract = fullyPopulatedContract();
-        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING, null, Money.zero()));
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING, false, Money.zero()));
 
         AbstractContract reloaded = reparse(write(contract));
 
-        assertEquals(Money.zero(), reloaded.getRoutPayout(), "a zero payout must still block the remaining escrow");
+        assertEquals(Money.zero(), reloaded.getFinalPayout(), "a zero payout must still block the remaining escrow");
     }
 
     /**
-     * Saves written before the routed payout became nullable stored a zero payout on every contract, under the
+     * Saves written before the final payout became nullable stored a zero payout on every contract, under the
      * {@code routedPayout} tag, to mean "not set". Reading that back as a real zero would wipe the remaining escrow of
      * any contract completed before its end date.
      */
     @Test
     void aZeroRoutedPayoutFromAnOlderSaveIsReadAsUnset() throws Exception {
         AbstractContract contract = fullyPopulatedContract();
-        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING, null, Money.zero()));
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING, false, Money.zero()));
         String legacyXml = write(contract).replace("finalPayout>", "routedPayout>");
 
         AbstractContract reloaded = reparse(legacyXml);
 
-        assertNull(reloaded.getRoutPayout());
+        assertNull(reloaded.getFinalPayout());
     }
 
     @Test
@@ -278,7 +276,156 @@ class ContractXmlCodecTest {
 
         AbstractContract reloaded = reparse(legacyXml);
 
-        assertEquals(Money.of(90_000), reloaded.getRoutPayout());
+        assertEquals(Money.of(90_000), reloaded.getFinalPayout());
+    }
+
+    @Test
+    void theLegacyRoutedMoraleLevelIsReadAsScattered() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.SCATTERED));
+        String legacyXml = write(contract).replace("<moraleLevel>SCATTERED</moraleLevel>",
+              "<moraleLevel>ROUTED</moraleLevel>");
+
+        AbstractContract reloaded = reparse(legacyXml);
+
+        assertEquals(ContractMoraleLevel.SCATTERED, reloaded.getMoraleLevel());
+    }
+
+    /**
+     * Writes a contract with the given player objective as a save from before the raid model would: routed, with a
+     * rout end date.
+     */
+    private String legacyRoutedXml(ContractObjectiveType objectiveType) throws Exception {
+        return legacyRoutedXml(objectiveType, "3051-02-01");
+    }
+
+    /**
+     * As {@link #legacyRoutedXml(ContractObjectiveType)}, with the given rout end date. The contract starts on
+     * {@link #START}.
+     */
+    private String legacyRoutedXml(ContractObjectiveType objectiveType, String routEndDate) throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setObjectiveData(new ContractObjectiveData(objectiveType, ContractObjectiveType.PLANETARY_ASSAULT));
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.SCATTERED, true, null));
+        return write(contract).replace("<moraleLevel>SCATTERED</moraleLevel>", "<moraleLevel>ROUTED</moraleLevel>")
+                     .replace("<peaceful>true</peaceful>", "<routEndDate>" + routEndDate + "</routEndDate>");
+    }
+
+    @Test
+    void aLegacyGarrisonStillInTheRoutItBeganWithHasNotBeenRaided() throws Exception {
+        // The contract's first rout always ended within three months of its start
+        AbstractContract reloaded = reparse(legacyRoutedXml(ContractObjectiveType.GARRISON_DUTY,
+              START.plusMonths(2).toString()));
+
+        assertFalse(reloaded.hasBeenRaided(), "its first raid, and any Batchall, are still to come");
+    }
+
+    @Test
+    void aLegacyGarrisonInALaterRoutHasBeenRaided() throws Exception {
+        AbstractContract reloaded = reparse(legacyRoutedXml(ContractObjectiveType.RETAINER,
+              START.plusMonths(5).toString()));
+
+        assertTrue(reloaded.hasBeenRaided(), "the enemy came back from an earlier rout, bringing any Batchall then");
+    }
+
+    @Test
+    void aGarrisonWithAnActiveEnemyInASaveFromBeforeTheRaidModelHasBeenRaided() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setObjectiveData(new ContractObjectiveData(ContractObjectiveType.GARRISON_DUTY,
+              ContractObjectiveType.PLANETARY_ASSAULT));
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING));
+
+        AbstractContract reloaded = parse(write(contract), new Version("0.51.00"));
+
+        assertTrue(reloaded.hasBeenRaided(), "under the old model the enemy only fights once its first rout has ended");
+    }
+
+    @Test
+    void anyOtherContractInASaveFromBeforeTheRaidModelHasNotBeenRaided() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setObjectiveData(new ContractObjectiveData(ContractObjectiveType.PLANETARY_ASSAULT,
+              ContractObjectiveType.CADRE_DUTY));
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING));
+
+        AbstractContract reloaded = parse(write(contract), new Version("0.51.00"));
+
+        assertFalse(reloaded.hasBeenRaided(), "only garrison-type contracts are raided");
+    }
+
+    @Test
+    void aGarrisonWithAnActiveEnemyInACurrentSaveKeepsItsOwnRecord() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setObjectiveData(new ContractObjectiveData(ContractObjectiveType.GARRISON_DUTY,
+              ContractObjectiveType.PLANETARY_ASSAULT));
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING));
+
+        assertFalse(reparse(write(contract)).hasBeenRaided(), "a current save records the first raid itself");
+    }
+
+    /**
+     * Saves from before the raid model gave a rout an end date. On a Garrison Duty contract that rout was a lull with
+     * no enemy activity, so it now reads as a peaceful spell between raids, and the enemy returns from it at Stalemate.
+     */
+    @Test
+    void aLegacyGarrisonRoutEndDateIsReadAsPeacefulAtStalemate() throws Exception {
+        AbstractContract reloaded = reparse(legacyRoutedXml(ContractObjectiveType.GARRISON_DUTY));
+
+        assertTrue(reloaded.getMoraleData().peaceful());
+        assertEquals(ContractMoraleLevel.STALEMATE, reloaded.getMoraleLevel());
+    }
+
+    @Test
+    void aLegacyRoutEndDateOnAnyOtherContractEndsTheLull() throws Exception {
+        AbstractContract reloaded = reparse(legacyRoutedXml(ContractObjectiveType.OBJECTIVE_RAID));
+
+        assertFalse(reloaded.getMoraleData().peaceful(), "only a raided garrison keeps a peaceful flag");
+        assertEquals(ContractMoraleLevel.STALEMATE, reloaded.getMoraleLevel());
+    }
+
+    @Test
+    void anEmergencyExtensionStartSurvivesARoundTrip() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setEmergencyExtensionStartDate(START.plusMonths(6).plusDays(1));
+
+        AbstractContract reloaded = reparse(write(contract));
+
+        assertEquals(START.plusMonths(6).plusDays(1), reloaded.getEmergencyExtensionStartDate());
+    }
+
+    @Test
+    void aRaidedContractStaysRaidedAcrossARoundTrip() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setHasBeenRaided(true);
+
+        assertTrue(reparse(write(contract)).hasBeenRaided());
+    }
+
+    @Test
+    void aContractNeverRaidedWritesNoRaidedTag() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+
+        String xml = write(contract);
+
+        assertFalse(xml.contains("<hasBeenRaided>"));
+        assertFalse(reparse(xml).hasBeenRaided());
+    }
+
+    @Test
+    void aContractNeverExtendedHasNoEmergencyExtensionStart() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+
+        String xml = write(contract);
+
+        assertFalse(xml.contains("<emergencyExtensionStartDate>"));
+        assertNull(reparse(xml).getEmergencyExtensionStartDate());
+    }
+
+    @Test
+    void aContractThatIsNotPeacefulWritesNoPeacefulTag() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING));
+
+        assertFalse(write(contract).contains("<peaceful>"));
     }
 
     // endregion round trip
@@ -507,10 +654,14 @@ class ContractXmlCodecTest {
     }
 
     private AbstractContract parse(String contractXml) throws Exception {
+        return parse(contractXml, VERSION);
+    }
+
+    private AbstractContract parse(String contractXml, Version version) throws Exception {
         try (InputStream inputStream = new ByteArrayInputStream(contractXml.getBytes(StandardCharsets.UTF_8))) {
             Document document = MHQXMLUtility.newSafeDocumentBuilder().parse(inputStream);
             assertEquals(CONTRACT_TAG, document.getDocumentElement().getNodeName());
-            return ContractXmlCodec.readContract(document.getDocumentElement(), campaign, VERSION);
+            return ContractXmlCodec.readContract(document.getDocumentElement(), campaign, version);
         }
     }
 

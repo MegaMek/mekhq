@@ -385,8 +385,8 @@ class StratConEnemyFacilityActivityTest {
         }
 
         @Test
-        void thoseDueWhileTheEnemyIsRoutedNeverAppear() {
-            when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.ROUTED);
+        void thoseDueWhileTheContractIsPeacefulNeverAppear() {
+            when(contract.isPeaceful()).thenReturn(true);
             campaignState.setEnemyEngineersScheduledUntil(TODAY.plusDays(5));
             campaignState.getEnemyEngineerDates().add(TODAY);
 

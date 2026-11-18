@@ -667,8 +667,8 @@ class StratConFacilitySupplyTest {
         }
 
         @Test
-        void noneArePlacedByARoutedEnemy() {
-            when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.ROUTED);
+        void noneArePlacedWhileTheContractIsPeaceful() {
+            when(contract.isPeaceful()).thenReturn(true);
             campaignState.setSupplyInterdictionsScheduledUntil(TODAY.plusDays(10));
             campaignState.getSupplyInterdictionDates().add(TODAY);
 

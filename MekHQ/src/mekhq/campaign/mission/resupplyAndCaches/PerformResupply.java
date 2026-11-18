@@ -382,8 +382,9 @@ public class PerformResupply {
         // First, we need to identify whether the convoy has been intercepted.
         ContractMoraleLevel morale = contract.getMoraleLevel();
 
-        // There isn't any chance of an interception if the enemy is Routed, so early-exit
-        if (morale.isRouted()) {
+        // There isn't any chance of an interception while a garrison-type contract is peaceful, so
+        // early-exit
+        if (contract.isPeaceful()) {
             completeSuccessfulDelivery(resupply, convoyContents);
             return;
         }
@@ -477,6 +478,11 @@ public class PerformResupply {
                       commanderAddress);
             } else {
                 int roll = randomInt(2);
+
+                // There is no Scattered text: a Scattered enemy reads as a Critical one
+                if (morale.isScattered()) {
+                    morale = CRITICAL;
+                }
 
                 if (morale.isAdvancing() || morale.isWeakened()) {
                     morale = roll == 0 ? (morale.isAdvancing() ? DOMINATING : CRITICAL) : STALEMATE;

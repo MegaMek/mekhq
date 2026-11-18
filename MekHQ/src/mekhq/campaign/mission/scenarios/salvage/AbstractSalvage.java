@@ -99,7 +99,7 @@ public abstract class AbstractSalvage {
      * Checks whether a formation set to 'Salvage' may fight in a scenario and still recover that scenario's salvage.
      *
      * <p>Under CamOps (Strict) rules, a salvage team cannot take part in the fighting; it sits on the sidelines until
-     * the OpFor has been routed. Other systems may allow Salvage formations to fight and then salvage. Units in any
+     * the OpFor has been driven off. Other systems may allow Salvage formations to fight and then salvage. Units in any
      * other kind of formation can never salvage a scenario they fought in.</p>
      *
      * @return {@code true} if Salvage formations may fight and then salvage the same scenario

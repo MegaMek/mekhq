@@ -544,7 +544,8 @@ public final class StratConFacilitySupply {
      * schedule runs out - as many as the enemy sends engineers (see
      * {@link StratConEnemyFacilityActivity#getMonthlyEngineerCount}) - and places those due today across the player's
      * supply routes in a random sector. One that finds no route to sit on is dropped. None are sent while supply lines
-     * are out of use or the enemy is idle, and none are placed against a routed enemy.
+     * are out of use or the enemy is idle, and none are placed while a garrison-type contract is peaceful,
+     * between raids.
      *
      * @param campaign      the current campaign
      * @param contract      the contract
@@ -579,8 +580,8 @@ public final class StratConFacilitySupply {
         }
         interdictionDates.removeIf(interdictionDate -> !interdictionDate.isAfter(today));
 
-        // The enemy is in no state to raid while routed.
-        if (contract.getMoraleLevel().isRouted()) {
+        // With no enemy activity between raids, there is no one to raid.
+        if (contract.isPeaceful()) {
             return;
         }
 
