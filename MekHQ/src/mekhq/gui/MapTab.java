@@ -1524,6 +1524,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
         if (!jumpReport.isBlank()) {
             getCampaign().addReport(GENERAL, jumpReport);
+            return;
         }
 
         currentLocation.setJumpPath(jumpPath);
