@@ -92,7 +92,7 @@ class RepairBayStockLineTest {
         Unit locust = locustBeingStripped();
         mediumLasersOnTheirWay(locust, 8);
 
-        assertEquals("None in stock (8 arriving in 5 days)", plainText(mediumLaser(locust).countStock().describe()));
+        assertEquals("Stock: 0 (8 due in 5 days)", plainText(mediumLaser(locust).countStock().describe()));
     }
 
     @Test
@@ -112,7 +112,7 @@ class RepairBayStockLineTest {
         Unit locust = locustBeingStripped();
         scenario.withSpare(mediumLaser(locust).clone(), 8);
 
-        assertEquals("8 in stock", plainText(mediumLaser(locust).countStock().describe()));
+        assertEquals("Stock: 8", plainText(mediumLaser(locust).countStock().describe()));
     }
 
     @Test
@@ -122,7 +122,7 @@ class RepairBayStockLineTest {
         campaign.getQuartermaster()
               .addPart(new AmmoStorage(0, machineGunAmmo.getType(), 100, campaign), DAYS_TO_ARRIVE, false);
 
-        assertEquals("None in stock (100 shots arriving in 5 days)",
+        assertEquals("Stock: 0 shots (100 due in 5 days)",
               plainText(machineGunAmmo.countStock().describe()));
     }
 
@@ -133,7 +133,7 @@ class RepairBayStockLineTest {
 
         String task = plainText(armor.getDesc());
 
-        assertEquals(1, task.split("in stock", -1).length - 1, task);
+        assertEquals(1, task.split("Stock:", -1).length - 1, task);
     }
 
     @Test

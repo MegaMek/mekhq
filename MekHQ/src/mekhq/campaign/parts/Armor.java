@@ -416,6 +416,14 @@ public class Armor extends Part implements IAcquisitionWork {
     }
 
     /**
+     * Armor on a unit shows its stock whether it is being replaced or salvaged.
+     */
+    @Override
+    public @Nullable StockCount getShownStock() {
+        return (unit != null) ? countStock() : null;
+    }
+
+    /**
      * Counts the spare armor of this kind, in points. Replacing armor is short when there are fewer points here than
      * the location needs; salvaging needs none.
      *
