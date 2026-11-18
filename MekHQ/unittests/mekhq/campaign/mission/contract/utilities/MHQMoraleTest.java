@@ -50,11 +50,16 @@ import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
+import java.io.File;
+import java.io.IOException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Stream;
 
+import com.fasterxml.jackson.core.JsonParser;
+import com.fasterxml.jackson.databind.JsonNode;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -71,7 +76,6 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
 import mekhq.campaign.mission.scenarios.ScenarioType;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
-import mekhq.campaign.mission.scenarios.atb.ScenarioModifierManifest;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -587,13 +591,17 @@ class MHQMoraleTest {
 
     /** The production data the morale modifiers are read from, which would otherwise only fail when played. */
     @Test
-    void theMoraleModifiersAreShippedAndListedInTheManifest() {
-        ScenarioModifierManifest manifest = ScenarioModifierManifest.Deserialize(
-              "data/scenariomodifiers/modifiermanifest.json");
-        assertNotNull(manifest);
+    void theMoraleModifiersAreShippedAndListedInTheManifest() throws IOException {
+        // The manifest class is package-private, so the shipped file's list is read directly here.
+        ObjectMapper mapper = new ObjectMapper().enable(JsonParser.Feature.ALLOW_YAML_COMMENTS);
+        JsonNode fileNameList = mapper.readTree(new File("data/scenariomodifiers/modifiermanifest.json"))
+                                      .get("fileNameList");
+        assertNotNull(fileNameList);
+        List<String> manifestFileNames = new ArrayList<>();
+        fileNameList.forEach(fileName -> manifestFileNames.add(fileName.asText().trim()));
 
         for (String key : MHQMorale.getMoraleScenarioModifierKeys(SCATTERED)) {
-            assertTrue(manifest.fileNameList.stream().map(String::trim).anyMatch(key::equals), key);
+            assertTrue(manifestFileNames.contains(key), key);
 
             AtBScenarioModifier modifier = AtBScenarioModifier.Deserialize("data/scenariomodifiers/" + key);
             assertNotNull(modifier, key);
