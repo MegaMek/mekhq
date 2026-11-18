@@ -122,7 +122,8 @@ class StratConDataCacheSchedulingTest {
 
     @Test
     void anEspionageContractSchedulesOnlyDataCachesEachAnObjective() {
-        List<StratConScheduledPointOfInterest> scheduled = 
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.ESPIONAGE, 1), true);
 
         assertFalse(scheduled.isEmpty());
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
@@ -133,14 +134,16 @@ class StratConDataCacheSchedulingTest {
 
     @Test
     void threeComeEachMonthPerPointOfScale() {
-        List<StratConScheduledPointOfInterest> scheduled = 
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.ESPIONAGE, 1), true);
 
         assertEquals(NAV_POINT_COUNT, scheduled.size());
     }
 
     @Test
     void theTrackCountDoesNotChangeHowManyCome() {
-        List<StratConScheduledPointOfInterest> scheduled = 
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.ESPIONAGE, 5), true);
 
         assertEquals(NAV_POINT_COUNT, scheduled.size());
     }
@@ -156,7 +159,8 @@ class StratConDataCacheSchedulingTest {
 
     @Test
     void dataCachesAppearWithinTheContract() {
-        List<StratConScheduledPointOfInterest> scheduled = 
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.ESPIONAGE, 1), true);
 
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertNotNull(pointOfInterest.getSpawnDate());
@@ -191,7 +195,8 @@ class StratConDataCacheSchedulingTest {
 
     @Test
     void otherContractTypesNeverGetDataCaches() {
-        List<StratConScheduledPointOfInterest> scheduled = 
+        List<StratConScheduledPointOfInterest> scheduled =
+              schedule(contract(ContractObjectiveType.UNDEFINED, 1), true);
 
         assertEquals(2 + NAV_POINT_COUNT, scheduled.size(), "two objectives, and the ordinary points of interest");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
