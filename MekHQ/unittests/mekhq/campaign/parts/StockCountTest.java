@@ -33,6 +33,7 @@
 package mekhq.campaign.parts;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
 
 import org.junit.jupiter.api.Test;
 
@@ -60,48 +61,72 @@ class StockCountTest {
     void nothingOnTheShelfStillSaysWhatIsOnItsWay() {
         StockCount stock = new StockCount(0, 0, coming(8, 0, "", 3));
 
-        assertEquals("None in stock (8 arriving in 3 days)", plainText(stock.describe()));
+        assertEquals("Stock: 0 (8 due in 3 days)", plainText(stock.describe()));
     }
 
     @Test
     void fewerThanTheJobNeedsIsShort() {
         StockCount stock = new StockCount(3, 5, coming(0, 0, ""));
 
-        assertEquals("3 of 5 in stock", plainText(stock.describe()));
+        assertEquals("Stock: 3/5", plainText(stock.describe()));
     }
 
     @Test
     void enoughForTheJobIsInStock() {
         StockCount stock = new StockCount(5, 5, coming(0, 0, ""));
 
-        assertEquals("5 in stock", plainText(stock.describe()));
+        assertEquals("Stock: 5", plainText(stock.describe()));
     }
 
     @Test
-    void partsInTransitAndOnOrderAreListedSeparately() {
+    void partsBothArrivingAndOnOrderAreCountedTogether() {
         StockCount stock = new StockCount(0, 1, coming(2, 3, "", 1));
 
-        assertEquals("None in stock (2 arriving in 1 day, 3 on order)", plainText(stock.describe()));
+        assertEquals("Stock: 0 (5 coming)", plainText(stock.describe()));
+        assertEquals("2 due in 1 day<br>3 ordered", stock.describeDetails());
+    }
+
+    @Test
+    void theLineThatSaysItAllHasNoDetails() {
+        StockCount stock = new StockCount(0, 0, coming(8, 0, "", 3));
+
+        assertNull(stock.describeDetails());
+    }
+
+    @Test
+    void partsOnlyOnOrderSayHowMany() {
+        StockCount stock = new StockCount(0, 1, coming(0, 3, ""));
+
+        assertEquals("Stock: 0 (3 ordered)", plainText(stock.describe()));
+        assertNull(stock.describeDetails());
+    }
+
+    @Test
+    void ammunitionNamesItsUnitOnce() {
+        StockCount stock = new StockCount(0, 20, coming(100, 0, "shots", 5));
+
+        assertEquals("Stock: 0 shots (100 due in 5 days)", plainText(stock.describe()));
     }
 
     @Test
     void ammunitionOnItsWayIsCountedInShots() {
         StockCount stock = new StockCount(8, 20, coming(0, 16, "shots"));
 
-        assertEquals("8 of 20 shots in stock (16 shots on order)", plainText(stock.describe()));
+        assertEquals("Stock: 8/20 shots (16 ordered)", plainText(stock.describe()));
     }
 
     @Test
     void armorOnTheShelfIsCountedInPoints() {
         StockCount stock = new StockCount(12, 0, coming(0, 0, "points"));
 
-        assertEquals("12 points in stock", plainText(stock.describe()));
+        assertEquals("Stock: 12 points", plainText(stock.describe()));
     }
 
     @Test
     void lotsArrivingOnDifferentDaysGiveTheSoonest() {
         StockCount stock = new StockCount(0, 1, coming(8, 0, "", 5, 2));
 
-        assertEquals("None in stock (8 arriving, the first in 2 days)", plainText(stock.describe()));
+        assertEquals("Stock: 0 (8 coming)", plainText(stock.describe()));
+        assertEquals("8 due, the first in 2 days", stock.describeDetails());
     }
 }

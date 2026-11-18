@@ -300,6 +300,14 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
     }
 
     /**
+     * A replacement task always shows the stock of replacements.
+     */
+    @Override
+    public @Nullable StockCount getShownStock() {
+        return countStock();
+    }
+
+    /**
      * Counts the replacements for this part. A spare already taken for another job, such as one being worked on, is
      * not one this job can use, so it is not counted as in stock.
      *

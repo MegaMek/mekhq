@@ -67,6 +67,7 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.AcquisitionPriceMultipliers;
@@ -200,6 +201,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     private Person reservedBy;
     // temporarily mark the part used by current refit planning
     protected transient boolean usedForRefitPlanning;
+
+    // The units the salvage task names as needing this part, set when the Repair Bay refreshes its task list
+    private transient PartDemand taskDemand = PartDemand.NONE;
 
     // for delivery
     protected int daysToArrival;
@@ -584,6 +588,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         }
         if (isSalvaging()) {
             toReturn.append(countStock().describe()).append("<br>");
+            if (taskDemand.isNeeded()) {
+                toReturn.append(taskDemand.describe()).append("<br>");
+            }
         }
 
         if (!isDamagedBeyondRepair()) {
@@ -607,6 +614,65 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     public StockCount countStock() {
         PartInventory inventory = getPartInventory(this);
         return new StockCount(inventory.getSupply(), 0, inventory);
+    }
+
+    /**
+     * A part's own task shows its stock only when salvaging; repairing it needs no spare.
+     */
+    @Override
+    public @Nullable StockCount getShownStock() {
+        return isSalvaging() ? countStock() : null;
+    }
+
+    /**
+     * Finds the hangar at this part's place, falling back to the force's own, as {@link #getWarehouse()} does for the
+     * warehouse. Its units draw on the same stock as this part, so they are the ones a salvaged part could repair.
+     *
+     * @return the hangar at this part's place
+     */
+    public LocalHangar findHangarAtPlace() {
+        IPlace place = getPlace();
+        LocalHangar hangar = (place != null) ? place.getHangar() : null;
+        return (hangar != null) ? hangar : campaign.getPlayerForce().getHangar();
+    }
+
+    /**
+     * Finds the other units that need a part like this one, so the player can see whether stripping it would repair
+     * something else. This goes through every unit in {@link #findHangarAtPlace()}; to check many parts, gather the
+     * gaps once with {@link PartDemand#findGaps} and use {@link #countDemand(List)}.
+     *
+     * @return the units missing a part this one could replace, or {@link PartDemand#NONE}
+     */
+    public PartDemand countDemand() {
+        return countDemand(PartDemand.findGaps(findHangarAtPlace().getUnits()));
+    }
+
+    /**
+     * Finds which of the given gaps a part like this one could fill.
+     *
+     * @param gaps the gaps waiting for a part, from {@link PartDemand#findGaps}
+     *
+     * @return the units missing a part this one could replace, or {@link PartDemand#NONE}
+     */
+    public PartDemand countDemand(List<MissingPart> gaps) {
+        return PartDemand.findFor(this, gaps);
+    }
+
+    /**
+     * Sets the units this part's salvage task names as needing it. The Repair Bay works this out when it refreshes its
+     * task list, so the check runs once per refresh rather than every time a row is drawn.
+     *
+     * @param taskDemand the units that need the part, or {@link PartDemand#NONE} to name none
+     */
+    public void setTaskDemand(PartDemand taskDemand) {
+        this.taskDemand = Objects.requireNonNull(taskDemand);
+    }
+
+    /**
+     * @return the units this part's salvage task names as needing it, as of the Repair Bay's last refresh
+     */
+    public PartDemand getTaskDemand() {
+        return taskDemand;
     }
 
     /**
