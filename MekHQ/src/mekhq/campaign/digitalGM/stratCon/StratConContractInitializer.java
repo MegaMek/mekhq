@@ -61,9 +61,11 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObj
 import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest;
 import mekhq.campaign.digitalGM.stratCon.facility.FacilityTrait;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConContractFacilityProfile;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityAttacks;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOrder;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
@@ -405,15 +407,7 @@ public class StratConContractInitializer {
         // A new contract has placed nothing yet, so its point of interest ledger starts empty rather than from the map.
         campaignState.setPointOfInterestLedgerSeeded(true);
 
-        // Snapshot the options so every schedule below uses the same rules. Only editing the contract refreshes them.
-        campaignState.setMinimumOneTrackPerRoll(campaignOptions.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL));
-        campaignState.setRollTracksWeekly(campaignOptions.get(CampaignOption.ROLL_TRACKS_WEEKLY));
-
-        // Pre-roll the days on which the contract's ordinary scenarios appear. Mapless play has them too; Single Drop
-        // play keeps its own weekly pace instead.
-        if (!campaignOptions.isUseStratConSinglesMode()) {
-            StratConScenarioTempo.scheduleNormalScenarios(campaign, contract, campaignState, contract.getStartDate());
-        }
+        // Normal scenarios are not scheduled up front: they are rolled for each week (see StratConScenarioTempo).
 
         // Pre-roll the days on which each strategic-objective scenario, and each point of interest, appears over the
         // contract's run.
@@ -425,16 +419,17 @@ public class StratConContractInitializer {
             campaignState.setContractsUseSpecialMechanics(isContractsUseSpecialMechanics);
 
             // Most contracts with special points of interest get no Essential scenarios: those points of interest, and
-            // the combat bonus paid for each one dealt with, take their place.
-            if (!isReplacingEssentialScenarios(contract, isContractsUseSpecialMechanics)) {
+            // the combat bonus paid for each one dealt with, take their place. Nor does a contract whose definition
+            // has no Essential scenarios to fight.
+            if (usesEssentialScenarios(contract, isContractsUseSpecialMechanics)) {
                 scheduleStrategicScenarioSpawnDates(contract, campaignState, contract.getStartDate());
             }
 
-            schedulePointsOfInterest(contract,
-                  contractDefinition,
-                  campaignState,
-                  campaignOptions.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE),
-                  isContractsUseSpecialMechanics);
+            schedulePointsOfInterest(contract, contractDefinition, campaignState, isContractsUseSpecialMechanics);
+
+            // The enemy's engineers and its attacks on the facilities held by the player and the employer.
+            StratConEnemyFacilityActivity.scheduleEnemyEngineers(contract, campaignState, contract.getStartDate());
+            StratConFacilityAttacks.scheduleFacilityAttacks(contract, campaignState, contract.getStartDate());
 
             // A Diversionary Raid's strategic objective is to escalate the fighting, rather than to hit any one target.
             if (isContractsUseSpecialMechanics && contract.getObjectiveType().isDiversionaryRaid()) {
@@ -466,7 +461,8 @@ public class StratConContractInitializer {
      *
      * <p>The sectors, their terrain, and any forces deployed to them are kept. Everything the old objective type set
      * up is cleared: strategic objectives (facilities that were objectives remain, as ordinary facilities), points of
-     * interest, scheduled scenarios and points of interest, global scenario modifiers, Escalation, and Victory Points.
+     * interest, scheduled scenarios, points of interest, enemy engineers and facility attacks, global scenario
+     * modifiers, Escalation, and Victory Points.
      * The tracks' scenario odds and deployment times are re-rolled for the new definition, and then the map is seeded
      * as a new contract's would be (see {@link #seedCampaignState}).</p>
      *
@@ -500,6 +496,8 @@ public class StratConContractInitializer {
 
         campaignState.getStrategicScenarioSpawnDates().clear();
         campaignState.getScheduledPointsOfInterest().clear();
+        campaignState.getEnemyEngineerDates().clear();
+        campaignState.getFacilityAttackDates().clear();
         campaignState.setGlobalScenarioModifiers(new ArrayList<>());
         campaignState.setEscalation(0);
         campaignState.setVictoryPoints(0);
@@ -559,8 +557,8 @@ public class StratConContractInitializer {
      * @author Illiani
      * @since 0.51.01
      */
-    // Package-private rather than private so the calendar rules can be tested directly.
-    static List<LocalDate> rollSpawnDates(LocalDate startDate, List<Integer> schedule, int lengthInMonths) {
+    // Public so the other schedules laid out month by month (engineers, facility attacks) share the calendar rules.
+    public static List<LocalDate> rollSpawnDates(LocalDate startDate, List<Integer> schedule, int lengthInMonths) {
         List<LocalDate> spawnDates = new ArrayList<>();
         int contractMonths = max(1, lengthInMonths);
 
@@ -592,8 +590,9 @@ public class StratConContractInitializer {
      * to appear over the contract's run instead of all at once - the way strategic-objective scenarios do.
      *
      * <p>Point of interest objectives are a fixed number, spread across the contract's months by the Track Intensity
-     * Tables (see {@link TrackIntensityTable#rollScheduleForCount}). Ordinary points of interest have no fixed number:
-     * it is rolled on the tables like the contract's scenarios (see {@link #scheduleOrdinaryPointsOfInterest}). Each
+     * Tables (see {@link TrackIntensityTable#rollScheduleForCount}). Ordinary points of interest come
+     * {@value StratConSpawnRates#NAV_POINTS_PER_SCALE} a month per point of Scale (see
+     * {@link #scheduleOrdinaryPointsOfInterest}). Each
      * month's points of interest then get random days within
      * it (see {@link #rollSpawnDates}), and are stored on the campaign state for the daily StratCon lifecycle to
      * place as their days come (see {@link #spawnScheduledPointOfInterest}). Which point of interest lands on which day
@@ -612,7 +611,6 @@ public class StratConContractInitializer {
      * @param contract                        the contract being accepted
      * @param contractDefinition              its StratCon contract definition
      * @param campaignState                   the campaign state to store the scheduled points of interest on
-     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
      * @param isContractsUseSpecialMechanics  whether the "Contracts Use Special Mechanics" option is on
      *
      * @author Illiani
@@ -620,10 +618,9 @@ public class StratConContractInitializer {
      */
     // Package-private rather than private so scheduling can be tested without standing up a whole contract.
     static void schedulePointsOfInterest(AbstractContract contract, StratConContractDefinition contractDefinition,
-          StratConCampaignState campaignState, boolean isMultiplyTrackIntensityByScale,
-          boolean isContractsUseSpecialMechanics) {
-        schedulePointsOfInterest(contract, contractDefinition, campaignState, isMultiplyTrackIntensityByScale,
-              isContractsUseSpecialMechanics, contract.getStartDate(), 0, Map.of());
+          StratConCampaignState campaignState, boolean isContractsUseSpecialMechanics) {
+        schedulePointsOfInterest(contract, contractDefinition, campaignState, isContractsUseSpecialMechanics,
+              contract.getStartDate(), 0, Map.of());
     }
 
     /**
@@ -640,7 +637,6 @@ public class StratConContractInitializer {
      * @param contract                        the contract
      * @param contractDefinition              its StratCon contract definition
      * @param campaignState                   the campaign state to store the scheduled points of interest on
-     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
      * @param isContractsUseSpecialMechanics  whether the contract uses its type's special mechanics
      * @param fromDate                        the first day to schedule on; the contract's start date when it is
      *                                        accepted
@@ -652,13 +648,11 @@ public class StratConContractInitializer {
      * @since 0.51.01
      */
     static void schedulePointsOfInterest(AbstractContract contract, StratConContractDefinition contractDefinition,
-          StratConCampaignState campaignState, boolean isMultiplyTrackIntensityByScale,
-          boolean isContractsUseSpecialMechanics, @Nullable LocalDate fromDate, int committedCount,
-          Map<String, Integer> alreadyMarkedCounts) {
+          StratConCampaignState campaignState, boolean isContractsUseSpecialMechanics, @Nullable LocalDate fromDate,
+          int committedCount, Map<String, Integer> alreadyMarkedCounts) {
         // Deployment Orders come from the contract's command rights rather than its type, so every contract gets them,
         // whatever else it schedules.
-        StratConDeploymentOrders.scheduleDeploymentOrders(contract, campaignState, isMultiplyTrackIntensityByScale,
-              fromDate);
+        StratConDeploymentOrders.scheduleDeploymentOrders(contract, campaignState, fromDate);
 
         // A Recon Raid using special mechanics has no other points of interest: its sectors are scouted instead.
         if (StratConReconnaissance.usesReconnaissance(contract, isContractsUseSpecialMechanics)) {
@@ -667,13 +661,11 @@ public class StratConContractInitializer {
 
         String specialTypeId = getSpecialPointOfInterestTypeId(contract, isContractsUseSpecialMechanics);
         if (specialTypeId != null) {
-            scheduleSpecialPointsOfInterest(contract, campaignState, isMultiplyTrackIntensityByScale, specialTypeId,
-                  fromDate, alreadyMarkedCounts);
+            scheduleSpecialPointsOfInterest(contract, campaignState, specialTypeId, fromDate, alreadyMarkedCounts);
             return;
         }
 
-        scheduleOrdinaryPointsOfInterest(contract, contractDefinition, campaignState, isMultiplyTrackIntensityByScale,
-              fromDate);
+        scheduleOrdinaryPointsOfInterest(contract, contractDefinition, campaignState, fromDate);
 
         List<StratConScheduledPointOfInterest> requestedPointsOfInterest =
               getRequestedObjectivePointsOfInterest(contractDefinition, contract.getScale());
@@ -717,10 +709,9 @@ public class StratConContractInitializer {
     }
 
     /**
-     * Schedules a contract definition's ordinary (non-objective) points of interest. Their number is not fixed: it is
-     * rolled on the Track Intensity Tables the way special points of interest are (see
-     * {@link #scheduleSpecialPointsOfInterest}), once per point of scale when "Multiply Track Intensity by Scale" is on
-     * and once otherwise, honoring the contract's Track Intensity Table options. Each one's type is drawn from the
+     * Schedules a contract definition's ordinary (non-objective) points of interest. They come as often as special points
+     * of interest do (see {@link #scheduleSpecialPointsOfInterest}): {@value StratConSpawnRates#NAV_POINTS_PER_SCALE}
+     * a month per point of Scale, rounded normally and never below one. Each one's type is drawn from the
      * definition's {@code pointsOfInterest}, weighted by the size of each entry's count (see
      * {@link #getOrdinaryPointOfInterestWeights}).
      *
@@ -730,7 +721,6 @@ public class StratConContractInitializer {
      * @param contract                        the contract
      * @param contractDefinition              its StratCon contract definition
      * @param campaignState                   the campaign state to store the scheduled points of interest on
-     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
      * @param fromDate                        the first day to keep; the contract's start date when it is accepted
      *
      * @author Illiani
@@ -738,7 +728,7 @@ public class StratConContractInitializer {
      */
     private static void scheduleOrdinaryPointsOfInterest(AbstractContract contract,
           StratConContractDefinition contractDefinition, StratConCampaignState campaignState,
-          boolean isMultiplyTrackIntensityByScale, @Nullable LocalDate fromDate) {
+          @Nullable LocalDate fromDate) {
         Map<String, Double> weights = getOrdinaryPointOfInterestWeights(contractDefinition);
         LocalDate startDate = contract.getStartDate();
         if (weights.isEmpty() || (startDate == null)) {
@@ -750,13 +740,9 @@ public class StratConContractInitializer {
             totalWeight += weight;
         }
 
-        // A scale-0 contract (auto-scaled from an empty hangar) still rolls once, as special points of interest do.
-        int rollCount = isMultiplyTrackIntensityByScale ? max(1, contract.getScale()) : 1;
-        List<Integer> schedule = TrackIntensityTable.rollSchedule(contract.getLengthInMonths(),
-              contract.getTrackCount(),
-              rollCount,
-              campaignState.isMinimumOneTrackPerRoll(),
-              campaignState.isRollTracksWeekly());
+        // As many as the contract's special points of interest would be (see StratConSpawnRates)
+        List<Integer> schedule = StratConSpawnRates.getMonthlySchedule(contract,
+              StratConSpawnRates.NAV_POINTS_PER_SCALE);
 
         LocalDate endDate = contract.getEndingDate();
         for (LocalDate spawnDate : rollSpawnDates(startDate, schedule, contract.getLengthInMonths())) {
@@ -835,6 +821,51 @@ public class StratConContractInitializer {
     }
 
     /**
+     * Decides whether a contract fights Essential scenarios: its special points of interest do not replace them (see
+     * {@link #isReplacingEssentialScenarios}), and its StratCon definition has a
+     * {@link StrategicObjectiveType#SpecificScenarioVictory} objective to draw them from. Without one there is nothing
+     * to spawn, so such a contract gets none, and no combat bonus is projected for them.
+     *
+     * @param contract                       the contract
+     * @param isContractsUseSpecialMechanics whether the "Contracts Use Special Mechanics" option is on
+     *
+     * @return {@code true} if the contract's Essential scenarios are scheduled and spawned
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean usesEssentialScenarios(AbstractContract contract, boolean isContractsUseSpecialMechanics) {
+        if (isReplacingEssentialScenarios(contract, isContractsUseSpecialMechanics)) {
+            return false;
+        }
+
+        return getEssentialScenarioObjective(
+              StratConContractDefinition.getContractDefinition(contract.getObjectiveType())) != null;
+    }
+
+    /**
+     * @param definition a StratCon contract definition, or {@code null}
+     *
+     * @return its {@link StrategicObjectiveType#SpecificScenarioVictory} objective, whose template pool Essential
+     *       scenarios are drawn from; {@code null} if it has none. Every shipped definition has at most one.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable ObjectiveParameters getEssentialScenarioObjective(@Nullable StratConContractDefinition definition) {
+        if ((definition == null) || (definition.getObjectiveParameters() == null)) {
+            return null;
+        }
+
+        for (ObjectiveParameters objectiveParams : definition.getObjectiveParameters()) {
+            if (objectiveParams.getObjectiveType() == StrategicObjectiveType.SpecificScenarioVictory) {
+                return objectiveParams;
+            }
+        }
+        return null;
+    }
+
+    /**
      * Decides whether a special point of interest type is a strategic objective (see
      * {@link StratConContractMechanics#isPointOfInterestObjective}). A type no contract uses as its special point of
      * interest counts as one.
@@ -856,17 +887,14 @@ public class StratConContractInitializer {
      * Schedules a contract's special points of interest (see {@link #getSpecialPointOfInterestTypeId}). Each is a
      * strategic objective if its type is one (see {@link #isSpecialPointOfInterestObjective}).
      *
-     * <p>They are scheduled the way the contract's Essential scenarios are: a roll on the Track Intensity Tables for the
-     * contract's length and track count (see {@link TrackIntensityTable#rollSchedule}), made once per point of scale
-     * when "Multiply Track Intensity by Scale" is on and once otherwise. That roll is independent of the scenarios' own.
-     * Each month's points of interest then get random days within it (see {@link #rollSpawnDates}), and the type's
+     * <p>{@value StratConSpawnRates#NAV_POINTS_PER_SCALE} come each month per point of Scale, rounded normally and never
+     * below one (see {@link StratConSpawnRates}). Each month's points of interest then get random days within it (see {@link #rollSpawnDates}), and the type's
      * behavior is told of the whole schedule (see {@link IStratConPointOfInterestBehavior#onScheduled}).</p>
      *
      * <p>Does nothing if the contract has no settled start date.</p>
      *
      * @param contract                        the contract being accepted
      * @param campaignState                   the campaign state to store the scheduled points of interest on
-     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
      * @param typeId                          the type ID of the special point of interest to schedule
      *
      * @author Illiani
@@ -874,9 +902,8 @@ public class StratConContractInitializer {
      */
     // Package-private rather than private so scheduling can be tested without standing up a whole contract.
     static void scheduleSpecialPointsOfInterest(AbstractContract contract, StratConCampaignState campaignState,
-          boolean isMultiplyTrackIntensityByScale, String typeId) {
-        scheduleSpecialPointsOfInterest(contract, campaignState, isMultiplyTrackIntensityByScale, typeId,
-              contract.getStartDate(), Map.of());
+          String typeId) {
+        scheduleSpecialPointsOfInterest(contract, campaignState, typeId, contract.getStartDate(), Map.of());
     }
 
     /**
@@ -887,7 +914,6 @@ public class StratConContractInitializer {
      *
      * @param contract                        the contract
      * @param campaignState                   the campaign state to store the scheduled points of interest on
-     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
      * @param typeId                          the type ID of the special point of interest to schedule
      * @param fromDate                        the first day to keep; the contract's start date when it is accepted
      * @param alreadyMarkedCounts             how many points of interest earlier in the contract were marked under
@@ -897,8 +923,7 @@ public class StratConContractInitializer {
      * @since 0.51.01
      */
     static void scheduleSpecialPointsOfInterest(AbstractContract contract, StratConCampaignState campaignState,
-          boolean isMultiplyTrackIntensityByScale, String typeId, @Nullable LocalDate fromDate,
-          Map<String, Integer> alreadyMarkedCounts) {
+          String typeId, @Nullable LocalDate fromDate, Map<String, Integer> alreadyMarkedCounts) {
         LocalDate startDate = contract.getStartDate();
         if (startDate == null) {
             LOGGER.warn("Contract {} has no start date, so its {} points of interest cannot be scheduled.",
@@ -907,13 +932,9 @@ public class StratConContractInitializer {
             return;
         }
 
-        // A scale-0 contract (auto-scaled from an empty hangar) still rolls once, or it would have no objectives.
-        int rollCount = isMultiplyTrackIntensityByScale ? max(1, contract.getScale()) : 1;
-        List<Integer> schedule = TrackIntensityTable.rollSchedule(contract.getLengthInMonths(),
-              contract.getTrackCount(),
-              rollCount,
-              campaignState.isMinimumOneTrackPerRoll(),
-              campaignState.isRollTracksWeekly());
+        // A scale-0 contract (auto-scaled from an empty hangar) still gets one a month, or it would have no objectives.
+        List<Integer> schedule = StratConSpawnRates.getMonthlySchedule(contract,
+              StratConSpawnRates.NAV_POINTS_PER_SCALE);
 
         boolean isStrategicObjective = isSpecialPointOfInterestObjective(typeId);
         List<StratConScheduledPointOfInterest> scheduledPointsOfInterest = new ArrayList<>();
@@ -2571,22 +2592,20 @@ public class StratConContractInitializer {
     }
 
     /**
-     * Spawns a batch of specific-scenario strategic objectives partway through a contract, distributing them across its
-     * StratCon tracks.
+     * Spawns Essential (specific-scenario strategic objective) scenarios whose day has come, each in a random sector.
      *
-     * <p>Specific-scenario objectives are not all placed at contract start; they appear over the contract's months,
-     * paced by its scenario schedule ({@link mekhq.campaign.mission.contract.contractData.ContractIntensityData}). The
-     * daily StratCon lifecycle calls this once per contract month with that month's scheduled count. The scenarios are
-     * drawn from the contract definition's {@link StrategicObjectiveType#SpecificScenarioVictory} template pool - the
-     * same pool the up-front placement used - and are placed cloaked and dateless, exactly as before, so the existing
-     * reveal-on-scouting flow is unchanged.</p>
+     * <p>Essential scenarios are scheduled when the contract is accepted, one a month per point of Scale, each on a
+     * random day within its month (see {@link #scheduleStrategicScenarioSpawnDates}). The daily StratCon lifecycle calls
+     * this with however many are due. The scenarios are drawn from the contract definition's
+     * {@link StrategicObjectiveType#SpecificScenarioVictory} template pool and placed visible and ready to fight (see
+     * {@link #initializeObjectiveScenarios}). One whose sector is full is placed in another sector instead.</p>
      *
      * <p>Does nothing in mapless mode (there is no map to place on), when the contract has no campaign state, or when
      * the contract definition has no specific-scenario objective.</p>
      *
      * @param campaign      the campaign managing overall gameplay
      * @param contract      the contract whose strategic scenarios are being spawned
-     * @param scenarioCount how many strategic scenarios to spawn this batch (skipped when not positive)
+     * @param scenarioCount how many strategic scenarios to spawn (skipped when not positive)
      */
     public static void spawnScheduledStrategicScenarios(Campaign campaign, AbstractContract contract,
           int scenarioCount) {
@@ -2604,32 +2623,29 @@ public class StratConContractInitializer {
             return;
         }
 
-        StratConContractDefinition definition = StratConContractDefinition.getContractDefinition(
-              contract.getObjectiveType());
-        if (definition == null) {
-            return;
-        }
-
-        // Every shipped contract definition carries at most one specific-scenario objective; use its template pool.
-        ObjectiveParameters specificObjective = null;
-        for (ObjectiveParameters objectiveParams : definition.getObjectiveParameters()) {
-            if (objectiveParams.getObjectiveType() == StrategicObjectiveType.SpecificScenarioVictory) {
-                specificObjective = objectiveParams;
-                break;
-            }
-        }
+        ObjectiveParameters specificObjective = getEssentialScenarioObjective(
+              StratConContractDefinition.getContractDefinition(contract.getObjectiveType()));
         if (specificObjective == null) {
             return;
         }
 
-        List<Integer> trackObjects = trackObjectDistribution(scenarioCount, campaignState.getTrackCount());
-        for (int x = 0; x < trackObjects.size(); x++) {
-            initializeObjectiveScenarios(campaign,
-                  contract,
-                  campaignState.getTrack(x),
-                  trackObjects.get(x),
-                  specificObjective.getObjectiveScenarios(),
-                  specificObjective.getObjectiveScenarioModifiers());
+        // Each lands in a random sector. One whose sector is full tries the others, in random order, so none is lost
+        // while any sector has room.
+        for (int scenario = 0; scenario < scenarioCount; scenario++) {
+            List<StratConTrackState> tracks = new ArrayList<>(campaignState.getTracks());
+            while (!tracks.isEmpty()) {
+                StratConTrackState track = tracks.remove(Compute.randomInt(tracks.size()));
+                int objectivesBefore = track.getStrategicObjectives().size();
+                initializeObjectiveScenarios(campaign,
+                      contract,
+                      track,
+                      1,
+                      specificObjective.getObjectiveScenarios(),
+                      specificObjective.getObjectiveScenarioModifiers());
+                if (track.getStrategicObjectives().size() > objectivesBefore) {
+                    break;
+                }
+            }
         }
     }
 
@@ -2803,12 +2819,13 @@ public class StratConContractInitializer {
      *     <li>Empty coordinates (no facility, no forces) receive a default weight of {@code 1}.</li>
      *     <li>Allowed allied facilities receive a higher weight when {@code emphasizeStrategicTargets} is
      *     {@code true}.</li>
-     *     <li>Allowed player-force coordinates also receive the strategic weight when
-     *     {@code emphasizeStrategicTargets} is {@code true}.</li>
+     *     <li>Allowed player-force coordinates receive one more weight for each formation deployed there when
+     *     {@code emphasizeStrategicTargets} is {@code true}: twice an empty hex's for one formation, three times for
+     *     two, and so on - a small bias towards where the player's forces are.</li>
      * </ul>
      *
-     * <p>The strategic emphasis weight is equal to {@code max(trackWidth, trackHeight)} when
-     * {@code emphasizeStrategicTargets} is enabled, and {@code 1} otherwise.</p>
+     * <p>The allied facility weight is {@code max(trackWidth, trackHeight)} when {@code emphasizeStrategicTargets} is
+     * enabled, and {@code 1} otherwise.</p>
      *
      * <p>The method returns one randomly weighted coordinate, or {@code null} if no valid coordinates are
      * available.</p>
@@ -2861,8 +2878,15 @@ public class StratConContractInitializer {
                     continue;
                 }
 
-                boolean isStrategicTarget = hasPlayerForces || (facility != null);
-                weightedMap.add(isStrategicTarget ? strategicEmphasis : defaultWeight, coords);
+                int weight = defaultWeight;
+                if (facility != null) {
+                    weight = strategicEmphasis;
+                } else if (hasPlayerForces && emphasizeStrategicTargets) {
+                    // A small bias towards the player's forces, growing with how many formations are there
+                    Set<Integer> formationsHere = trackState.getAssignedCoordForces().get(coords);
+                    weight = defaultWeight + Math.max(1, (formationsHere == null) ? 0 : formationsHere.size());
+                }
+                weightedMap.add(weight, coords);
             }
         }
 

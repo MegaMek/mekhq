@@ -51,7 +51,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link StratConCombatBonusProjection}: Essential scenarios pay from their known schedule, replacing Nav Points
- * pay their average count, and an Objective Raid's target intelligence is capped by Scale.
+ * pay three a month per point of Scale, an Objective Raid's target intelligence is capped by Scale, and a contract type
+ * with no Essential scenarios of its own pays nothing.
  */
 class StratConCombatBonusProjectionTest {
     private static final double DELTA = 0.0001;
@@ -64,9 +65,6 @@ class StratConCombatBonusProjectionTest {
         campaignOptions = new CampaignOptions();
         campaignOptions.set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.NORMAL);
         campaignOptions.set(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS, true);
-        campaignOptions.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, true);
-        campaignOptions.set(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL, false);
-        campaignOptions.set(CampaignOption.ROLL_TRACKS_WEEKLY, false);
         campaign = mock(Campaign.class);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
     }
@@ -79,25 +77,37 @@ class StratConCombatBonusProjectionTest {
         when(contract.getLengthInMonths()).thenReturn(6);
         when(contract.getTrackCount()).thenReturn(3);
         when(contract.getScale()).thenReturn(4);
+        when(contract.getExactScale()).thenReturn(4.0);
         return contract;
     }
 
     @Test
     void essentialScenariosPayFromTheirSchedule() {
+        // Planetary Assault keeps its Essential scenarios alongside its strategic positions
         StratConCombatBonusProjection projection = StratConCombatBonusProjection.project(campaign,
-              contract(ContractObjectiveType.GARRISON_DUTY));
+              contract(ContractObjectiveType.PLANETARY_ASSAULT));
 
         assertEquals(5.0, projection.bonusCount(), DELTA);
         assertFalse(projection.isFromNavPoint());
     }
 
     @Test
-    void navPointsReplacingEssentialScenariosPayTheirAverageCount() {
-        // Espionage's data caches replace its Essential scenarios: 4 rolls x 3 tracks
+    void aContractTypeWithoutEssentialScenariosPaysNothing() {
+        // Garrison Duty's definition has no Essential scenarios, and its shows of force do not replace them
+        StratConCombatBonusProjection projection = StratConCombatBonusProjection.project(campaign,
+              contract(ContractObjectiveType.GARRISON_DUTY));
+
+        assertEquals(0.0, projection.bonusCount(), DELTA);
+        assertFalse(projection.isFromNavPoint());
+    }
+
+    @Test
+    void navPointsReplacingEssentialScenariosPayThreeAMonthPerPointOfScale() {
+        // Espionage's data caches replace its Essential scenarios: 3 x Scale 4 x 6 months
         StratConCombatBonusProjection projection = StratConCombatBonusProjection.project(campaign,
               contract(ContractObjectiveType.ESPIONAGE));
 
-        assertEquals(12.0, projection.bonusCount(), DELTA);
+        assertEquals(72.0, projection.bonusCount(), DELTA);
         assertTrue(projection.isFromNavPoint());
     }
 
@@ -126,7 +136,7 @@ class StratConCombatBonusProjectionTest {
         campaignOptions.set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.MAPLESS);
 
         assertEquals(0.0, StratConCombatBonusProjection.project(campaign,
-              contract(ContractObjectiveType.GARRISON_DUTY)).bonusCount(), DELTA);
+              contract(ContractObjectiveType.PLANETARY_ASSAULT)).bonusCount(), DELTA);
     }
 
     @Test
@@ -134,6 +144,6 @@ class StratConCombatBonusProjectionTest {
         campaignOptions.set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.DISABLED);
 
         assertEquals(0.0, StratConCombatBonusProjection.project(campaign,
-              contract(ContractObjectiveType.GARRISON_DUTY)).bonusCount(), DELTA);
+              contract(ContractObjectiveType.PLANETARY_ASSAULT)).bonusCount(), DELTA);
     }
 }

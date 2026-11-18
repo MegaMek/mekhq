@@ -146,7 +146,7 @@ class StratConReconnaissanceTest {
         definition.setPointsOfInterest(List.of(ordinary));
         StratConCampaignState scheduleState = new StratConCampaignState();
 
-        StratConContractInitializer.schedulePointsOfInterest(contract, definition, scheduleState, true, true);
+        StratConContractInitializer.schedulePointsOfInterest(contract, definition, scheduleState, true);
 
         assertTrue(scheduleState.getScheduledPointsOfInterest().isEmpty(), "not even the definition's own");
         assertFalse(StratConContractInitializer.isReplacingEssentialScenarios(contract, true));

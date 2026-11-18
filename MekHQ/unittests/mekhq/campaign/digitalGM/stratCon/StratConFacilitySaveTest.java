@@ -177,10 +177,10 @@ class StratConFacilitySaveTest {
 
         StratConCampaignState campaignState = new StratConCampaignState();
         campaignState.addTrack(track);
-        campaignState.setLastCounterattackDate(TODAY);
         campaignState.getEnemyEngineerDates().add(TODAY.plusDays(5));
-        campaignState.setSupplyInterdictionsScheduledUntil(TODAY.plusDays(20));
-        campaignState.getSupplyInterdictionDates().add(TODAY.plusDays(6));
+        campaignState.setFacilityAttacksScheduledUntil(TODAY.plusDays(20));
+        campaignState.getFacilityAttackDates().add(TODAY.plusDays(6));
+        campaignState.addScheduledScenario(new StratConScheduledScenario(TODAY.plusDays(3), 0));
 
         StratConCampaignState reloadedState = saveAndLoad(campaignState);
         StratConTrackState reloadedTrack = reloadedState.getTrack(0);
@@ -206,10 +206,12 @@ class StratConFacilitySaveTest {
         assertEquals(TODAY, reloadedSiege.getCompletionDate());
         assertTrue(reloadedSiege.isWasAlreadySticky());
 
-        assertEquals(TODAY, reloadedState.getLastCounterattackDate());
         assertEquals(List.of(TODAY.plusDays(5)), reloadedState.getEnemyEngineerDates());
-        assertEquals(TODAY.plusDays(20), reloadedState.getSupplyInterdictionsScheduledUntil());
-        assertEquals(List.of(TODAY.plusDays(6)), reloadedState.getSupplyInterdictionDates());
+        assertEquals(TODAY.plusDays(20), reloadedState.getFacilityAttacksScheduledUntil());
+        assertEquals(List.of(TODAY.plusDays(6)), reloadedState.getFacilityAttackDates());
+        assertEquals(1, reloadedState.getScheduledScenarios().size());
+        assertEquals(TODAY.plusDays(3), reloadedState.getScheduledScenarios().get(0).getDate());
+        assertEquals(0, reloadedState.getScheduledScenarios().get(0).getSectorIndex());
     }
 
     @Test

@@ -682,6 +682,13 @@ class StratConRulesManagerTest {
         }
     }
 
+    /** @return the sectors for one daily scenario, in any sector */
+    private static List<StratConTrackState> oneScenarioInAnySector() {
+        List<StratConTrackState> scenarioSectors = new ArrayList<>();
+        scenarioSectors.add(null);
+        return scenarioSectors;
+    }
+
     /**
      * Bundles the mocks a {@link StratConRulesManager#generateDailyScenariosForTrack} ambush test needs.
      */
@@ -780,7 +787,7 @@ class StratConRulesManagerTest {
                   fixture.coords());
 
             StratConRulesManager.generateDailyScenariosForTrack(fixture.campaign(), fixture.campaignState(),
-                  fixture.contract(), 1);
+                  fixture.contract(), oneScenarioInAnySector());
 
             // Ambush template requested for the deployed force (non-patrol, so not a bungled patrol) ...
             scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(false), any()));
@@ -808,7 +815,7 @@ class StratConRulesManagerTest {
                   fixture.coords());
 
             StratConRulesManager.generateDailyScenariosForTrack(fixture.campaign(), fixture.campaignState(),
-                  fixture.contract(), 1);
+                  fixture.contract(), oneScenarioInAnySector());
 
             scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), eq(true), any()));
             rulesManager.verify(() -> StratConRulesManager.generateScenarioForExistingForces(eq(fixture.coords()),
@@ -835,7 +842,7 @@ class StratConRulesManagerTest {
                   .thenReturn(null);
 
             StratConRulesManager.generateDailyScenariosForTrack(fixture.campaign(), fixture.campaignState(),
-                  fixture.contract(), 1);
+                  fixture.contract(), oneScenarioInAnySector());
 
             scenarioFactory.verify(() -> StratConScenarioFactory.getRandomScenario(anyInt(), eq(true), anyBoolean(), any()),
                   never());

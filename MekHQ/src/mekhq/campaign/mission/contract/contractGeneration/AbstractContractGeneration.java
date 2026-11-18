@@ -52,6 +52,8 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.chaosCampaign.ChaosScaleLimits;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
+import mekhq.campaign.digitalGM.stratCon.StratConSpawnRates;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
@@ -707,26 +709,19 @@ public abstract class AbstractContractGeneration {
         ContractScheduleData contractScheduleData = new ContractScheduleData(startDate, endDate, monthsLength);
         contract.setScheduleData(contractScheduleData);
 
-        // Scenario schedule - spread the (already determined) track count across the contract's months via the Track
-        // Intensity Tables. This schedule is consumed by StratCon to stagger strategic-objective scenario spawns over
-        // the contract's run (see StratConContractInitializer).
-        //
-        // Hot Spots Draconis Reach sizes each scenario by the contract's scale. When "Multiply Track Intensity by
-        // Scale" is set (the default MekHQ behavior), we instead roll the intensity table once per point of scale and
-        // sum the results, so the contract's combat volume grows with scale while each scenario keeps its rolled size -
-        // letting a player deploy smaller formations (e.g. lances). Otherwise, a single roll is made.
+        // Essential scenario schedule - one a month per point of the contract's Scale. StratCon gives each a random day
+        // within its month (see StratConContractInitializer).
         contract.setScenarioSchedule(rollScenarioSchedule(campaign, contract, monthsLength));
     }
 
     /**
-     * Rolls a contract's Essential scenario schedule on the Track Intensity Tables: once per point of scale when
-     * "Multiply Track Intensity by Scale" is on, and once otherwise. The "Minimum of 1 Hot Spots Track per Roll" and
-     * "Roll Hot Spots Tracks Weekly, Not Monthly" options are honored (see
-     * {@link TrackIntensityTable#rollSchedule(int, int, int, boolean, boolean)}).
+     * Lays out a contract's Essential scenario schedule: {@link StratConSpawnRates#ESSENTIAL_SCENARIOS_PER_SCALE} a
+     * month per point of the contract's Scale, rounded normally and never below one. Whether the contract fights any
+     * of them at all is up to StratCon (see {@link StratConContractInitializer#usesEssentialScenarios}).
      *
-     * @param campaign       the campaign, whose options decide the roll count
-     * @param contract       the contract, whose scale and track count are rolled for
-     * @param lengthInMonths the contract's length in months, choosing which table applies
+     * @param campaign       the campaign; unused, kept so every caller reads the same
+     * @param contract       the contract, whose Scale sets the count
+     * @param lengthInMonths the contract's length in months
      *
      * @return the scenario schedule as per-month scenario counts
      *
@@ -735,15 +730,8 @@ public abstract class AbstractContractGeneration {
      */
     public static List<Integer> rollScenarioSchedule(Campaign campaign, AbstractContract contract,
           int lengthInMonths) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        int rollCount = campaignOptions.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)
-                              ? contract.getScale()
-                              : 1;
-        return TrackIntensityTable.rollSchedule(lengthInMonths,
-              contract.getTrackCount(),
-              rollCount,
-              campaignOptions.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL),
-              campaignOptions.get(CampaignOption.ROLL_TRACKS_WEEKLY));
+        return StratConSpawnRates.getMonthlySchedule(lengthInMonths,
+              StratConSpawnRates.getCount(contract, StratConSpawnRates.ESSENTIAL_SCENARIOS_PER_SCALE));
     }
 
     private static @Nonnull EnemyData pickEnemy(Campaign campaign, LocalDate currentDate, ILocation currentLocation,

@@ -50,6 +50,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConReconnaissance;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
+import mekhq.campaign.digitalGM.stratCon.StratConScheduledScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
@@ -187,8 +188,8 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
 
     /**
      * The shared StratCon daily lifecycle. Runs the scenario-generation routine for every track attached to an active
-     * contract: applying facility effects, expiring ignored scenarios, scheduling ordinary scenarios (up front, or the
-     * coming week's in Single Drop play), and generating those due today.
+     * contract: applying facility effects, expiring ignored scenarios, rolling the week's normal scenarios each Monday
+     * (or, in Single Drop play, scheduling the week's one scenario), and generating those due today.
      *
      * <p>Returning formations whose deployment has ended is not part of this. It runs earlier in the day, through
      * {@link #processForceReturns(Campaign)}, so those formations are home before the hangar is processed.</p>
@@ -215,12 +216,6 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 continue;
             }
 
-            // Ordinary scenarios are scheduled up front, as the contract is accepted. A contract begun before that, or
-            // in Single Drop play, is scheduled from today the first time it runs outside Single Drop play.
-            if (!singleDrop && !campaignState.isNormalTempoScheduled()) {
-                StratConScenarioTempo.scheduleNormalScenarios(campaign, contract, campaignState, today);
-            }
-
             // Strategic-objective scenarios trickle in over the contract's months, paced by its scenario schedule,
             // rather than all being placed at contract start.
             processScheduledStrategicScenarios(campaign, contract, campaignState, today);
@@ -228,10 +223,10 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
             // Points of interest likewise appear over the contract's run, on days rolled when it was accepted.
             processScheduledPointsOfInterest(campaign, contract, campaignState, today);
 
-            // The enemy's own facility activity across the contract, such as engineers sent to build outposts.
+            // The enemy's own facility activity across the contract: engineers sent to build outposts, and attacks on
+            // the facilities held by the player and their employer.
             getFacilityStrategy().processEnemyActivity(campaign, contract, campaignState);
 
-            boolean hasAssignedSingleDropScenario = false;
             for (StratConTrackState track : campaignState.getTracks()) {
                 // Formations whose deployment has ended were already sent home earlier in the day (see
                 // processForceReturns), before the hangar was processed.
@@ -264,44 +259,40 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                               campaign);
                     }
                 }
-
-                // Single Drop play schedules its one scenario each Monday - unless Essential-only play suppresses ambient
-                // scenarios. Other play schedules its ordinary scenarios up front (see StratConScenarioTempo).
-                if (!essentialScenariosOnly && isMonday && singleDrop && !hasAssignedSingleDropScenario) {
-                    getScenarioGenerationStrategy().generateWeeklyScenarioDates(campaign,
-                          campaignState,
-                          contract,
-                          track,
-                          singleDrop);
-                }
-
-                // Only one scenario/week for Single Drop
-                if (singleDrop) {
-                    hasAssignedSingleDropScenario = true;
-                }
             }
 
-            // Every date on or before today is taken off the schedule, so a date rolled for a day already processed (by a
-            // contract edit or extension) is caught up the next day rather than lost. Under Essential-only play they are
-            // taken off and discarded, so they do not pile up.
-            int scenarioCount = StratConScenarioTempo.takeDueScenarioDates(campaignState.getScheduledScenarioDates(),
-                  today);
+            // Each Monday: Single Drop play schedules its one scenario of the week, and other play rolls the week's
+            // normal scenarios against each sector's threat - unless Essential-only play suppresses ambient scenarios.
+            // A contract still on the up-front schedule it was given before the weekly rolls keeps that instead.
+            boolean isOnWeeklyRolls = singleDrop || !campaignState.isNormalTempoScheduled();
+            if (!essentialScenariosOnly && isMonday && isOnWeeklyRolls) {
+                getScenarioGenerationStrategy().generateWeeklyScenarioDates(campaign,
+                      campaignState,
+                      contract,
+                      singleDrop);
+            }
 
-            if (!essentialScenariosOnly && (scenarioCount > 0)) {
-                // A garrison between raids sees no enemy activity, so any scheduled scenarios are simply discarded
-                if (!contract.isPeaceful()) {
-                    // Some may be counterattacks on facilities held by the player or their employer instead.
-                    scenarioCount -= getFacilityStrategy().launchCounterattacks(campaign,
-                          contract,
-                          campaignState,
-                          scenarioCount);
-                    if (scenarioCount > 0) {
-                        getScenarioGenerationStrategy().generateDailyScenarios(campaign,
-                              campaignState,
-                              contract,
-                              scenarioCount);
-                    }
-                }
+            // Every scenario due on or before today is taken off the schedule, so one scheduled for a day already
+            // processed (by a contract edit or extension) is caught up the next day rather than lost. Under
+            // Essential-only play they are taken off and discarded, so they do not pile up. Dates without a sector -
+            // Single Drop play's, and an up-front schedule's - go to a random sector.
+            List<StratConTrackState> scenarioSectors = new ArrayList<>();
+            int randomSectorCount = StratConScenarioTempo.takeDueScenarioDates(
+                  campaignState.getScheduledScenarioDates(), today);
+            for (int scenario = 0; scenario < randomSectorCount; scenario++) {
+                scenarioSectors.add(null);
+            }
+            for (StratConScheduledScenario scheduledScenario : StratConScenarioTempo.takeDueScheduledScenarios(
+                  campaignState.getScheduledScenarios(), today)) {
+                scenarioSectors.add(scheduledScenario.getSector(campaignState));
+            }
+
+            // A garrison between raids sees no enemy activity, so any scheduled scenarios are simply discarded
+            if (!essentialScenariosOnly && !scenarioSectors.isEmpty() && !contract.isPeaceful()) {
+                getScenarioGenerationStrategy().generateDailyScenarios(campaign,
+                      campaignState,
+                      contract,
+                      scenarioSectors);
             }
         }
     }

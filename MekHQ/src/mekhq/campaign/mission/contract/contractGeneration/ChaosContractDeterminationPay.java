@@ -68,18 +68,14 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
         if (campaign.getCampaignOptions().get(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE)) {
             combatPayInSupportPoints = DEFAULT_COMBAT_PAY_MULTIPLIER * ChaosScaleLimits.getTaperedScale(economicScale);
         }
-        // When "Multiply Track Intensity by Scale" is set, a contract fields scale times as many scenarios. Divide
-        // combat pay by scale so it stays flat across those extra scenarios rather than growing with their number.
-        // The track rolls are a whole number, so this divides by the whole Scale even under Fractional Scale.
+        // A contract fields one Essential scenario a month per point of Scale (see StratConSpawnRates), so divide
+        // combat pay by Scale: it stays flat across those extra scenarios rather than growing with their number. Their
+        // count is a whole number, so this divides by the whole Scale even under Fractional Scale.
         int rollScale = contract.getScale();
-        if ((rollScale > 0) && campaign.getCampaignOptions().get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)) {
+        if (rollScale > 0) {
             combatPayInSupportPoints /= rollScale;
         }
-        // Likewise for the extra scenarios the minimum track and weekly rolling options bring.
-        double trackRollingMultiplier = TrackIntensityTable.getCombatPayMultiplier(contract.getTrackCount(),
-              campaign.getCampaignOptions().get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL),
-              campaign.getCampaignOptions().get(CampaignOption.ROLL_TRACKS_WEEKLY));
-        int roundedCombatPayInSupportPoints = (int) round(combatPayInSupportPoints * trackRollingMultiplier);
+        int roundedCombatPayInSupportPoints = (int) round(combatPayInSupportPoints);
         return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(roundedCombatPayInSupportPoints,
               shouldConvertSupportPoints(campaign));
     }

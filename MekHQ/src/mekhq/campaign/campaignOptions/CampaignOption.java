@@ -919,12 +919,6 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useChaosSupportPointConversion");
     public static final CampaignOption<Boolean> USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION =
           of(Boolean.class, true, "useChaosScaleSupportPointConversion");
-    public static final CampaignOption<Boolean> MULTIPLY_TRACK_INTENSITY_BY_SCALE =
-          of(Boolean.class, true, "multiplyTrackIntensityByScale");
-    public static final CampaignOption<Boolean> MINIMUM_ONE_TRACK_PER_ROLL =
-          of(Boolean.class, false, "minimumOneTrackPerRoll");
-    public static final CampaignOption<Boolean> ROLL_TRACKS_WEEKLY =
-          of(Boolean.class, false, "rollTracksWeekly");
     public static final CampaignOption<Boolean> USE_CONTRACT_FACTION_MODIFIERS =
           of(Boolean.class, true, "useContractFactionModifiers");
     public static final CampaignOption<Boolean> USE_INTEL_OBFUSCATION =
@@ -949,8 +943,6 @@ public final class CampaignOption<T> {
           of(Double.class, 1.0, "contractTransportMultiplier");
     public static final CampaignOption<Double> CONTRACT_SALVAGE_MULTIPLIER =
           of(Double.class, 1.0, "contractSalvageMultiplier");
-    public static final CampaignOption<Double> SCENARIO_TEMPO_MULTIPLIER =
-          of(Double.class, 1.0, "scenarioTempoMultiplier");
     public static final CampaignOption<Boolean> USE_LEGACY_CONTRACT_PAY =
           of(Boolean.class, false, "useLegacyContractPay");
     public static final CampaignOption<Boolean> USE_ALTERNATE_PAYMENT_MODE =

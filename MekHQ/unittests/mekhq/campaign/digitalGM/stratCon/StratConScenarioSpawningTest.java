@@ -48,20 +48,26 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
+import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
- * Tests for where and how StratCon scenarios spawn: the objective an ignored scenario fails, the hexes an enemy
- * scenario may spawn on, the catch-up of overdue ordinary scenario dates, and the forces an external scenario is
- * seeded with.
+ * Tests for where and how StratCon scenarios spawn: how many come per point of Scale, which contracts fight Essential
+ * scenarios, the objective an ignored scenario fails, the hexes an enemy scenario may spawn on, the catch-up of overdue
+ * ordinary scenario dates, and the forces an external scenario is seeded with.
  *
  * @author Illiani
  * @since 0.51.01
@@ -307,5 +313,70 @@ class StratConScenarioSpawningTest {
         assertTrue(StratConRulesManager.getExternalScenarioCandidateForceIDs(List.of(),
               sortedForces(List.of(), List.of(), List.of()),
               true).isEmpty());
+    }
+
+    // Spawn rates
+
+    @ParameterizedTest
+    @CsvSource({
+          // exact scale, rate per scale, expected
+          "2.0, 1, 2",
+          "1.4, 3, 4",
+          "2.5, 1, 3",
+          "2.4, 1, 2",
+          "0.0, 1, 1",
+          "0.3, 3, 1",
+          "2.0, 0, 0"
+    })
+    void theCountIsTheScaleTimesTheRateRoundedNormallyAndNeverBelowOne(double exactScale, double ratePerScale,
+          int expected) {
+        assertEquals(expected, StratConSpawnRates.getCount(exactScale, ratePerScale));
+    }
+
+    @Test
+    void theMonthlyScheduleHasTheSameCountEveryMonth() {
+        assertEquals(List.of(2, 2, 2), StratConSpawnRates.getMonthlySchedule(3, 2));
+        assertEquals(List.of(4), StratConSpawnRates.getMonthlySchedule(0, 4), "a contract under a month gets one");
+    }
+
+    // Essential scenarios
+
+    private static AbstractContract contract(ContractObjectiveType objectiveType, double exactScale) {
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getObjectiveType()).thenReturn(objectiveType);
+        when(contract.getExactScale()).thenReturn(exactScale);
+        when(contract.getLengthInMonths()).thenReturn(4);
+        return contract;
+    }
+
+    @Test
+    void essentialScenariosComeOnceAMonthPerPointOfScale() {
+        AbstractContract contract = contract(ContractObjectiveType.PLANETARY_ASSAULT, 2.6);
+
+        assertEquals(List.of(3, 3, 3, 3),
+              AbstractContractGeneration.rollScenarioSchedule(mock(Campaign.class), contract, 4));
+    }
+
+    @Test
+    void aContractWithEssentialScenariosInItsDefinitionFightsThem() {
+        // Planetary Assault keeps its Essential scenarios alongside its strategic positions
+        assertTrue(StratConContractInitializer.usesEssentialScenarios(
+              contract(ContractObjectiveType.PLANETARY_ASSAULT, 1), true));
+    }
+
+    @Test
+    void aContractWhoseNavPointsReplaceItsEssentialScenariosFightsNone() {
+        AbstractContract contract = contract(ContractObjectiveType.ESPIONAGE, 1);
+
+        assertFalse(StratConContractInitializer.usesEssentialScenarios(contract, true));
+        assertTrue(StratConContractInitializer.usesEssentialScenarios(contract, false),
+              "without special mechanics, its Essential scenarios come back");
+    }
+
+    @Test
+    void aContractWhoseDefinitionHasNoEssentialScenariosFightsNone() {
+        // Garrison Duty's definition has no specific-scenario objective to draw them from
+        assertFalse(StratConContractInitializer.usesEssentialScenarios(
+              contract(ContractObjectiveType.GARRISON_DUTY, 1), false));
     }
 }

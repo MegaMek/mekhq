@@ -32,14 +32,10 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
-import static java.lang.Math.max;
-
 import java.time.LocalDate;
-import java.util.ArrayList;
 import java.util.List;
 
 import jakarta.annotation.Nullable;
-import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDeploymentOrderBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
@@ -54,21 +50,19 @@ import mekhq.campaign.universe.Faction;
  * strategic objective (see {@link StratConDeploymentOrderBehavior}). Letting one lapse costs the player a Complete
  * Success.
  *
- * <p>How often orders come is set by the contract's command step (see {@link #getCommandStep}): its command rights,
- * shifted by how controlling the employer is. An Independent contract never receives any.</p>
+ * <p>How many orders come is set by the contract's command step (see {@link #getCommandStep}): its command rights,
+ * shifted by how controlling the employer is. Each month brings the command step's worth of orders per point of the
+ * contract's Scale, rounded normally, each on its own random day of the month:</p>
  *
  * <table>
  *     <caption>Deployment Orders per month, by command step</caption>
  *     <tr><th>Step</th><th>Orders</th></tr>
- *     <tr><td>0</td><td>None</td></tr>
- *     <tr><td>1</td><td>A one-in-three chance of one</td></tr>
- *     <tr><td>2</td><td>A one-in-two chance of one</td></tr>
- *     <tr><td>3</td><td>One</td></tr>
- *     <tr><td>4</td><td>One, and a one-in-two chance of a second</td></tr>
+ *     <tr><td>0</td><td>None (Independent, or a lenient employer under Liaison command rights)</td></tr>
+ *     <tr><td>1</td><td>1 x Scale (Liaison)</td></tr>
+ *     <tr><td>2</td><td>2 x Scale (House)</td></tr>
+ *     <tr><td>3</td><td>3 x Scale (Integrated)</td></tr>
+ *     <tr><td>4</td><td>4 x Scale (Integrated, under a controlling employer)</td></tr>
  * </table>
- *
- * <p>The month's orders are rolled once per point of scale when "Multiply Track Intensity by Scale" is on, and once
- * otherwise, as a contract's special points of interest are.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -128,74 +122,45 @@ public final class StratConDeploymentOrders {
     }
 
     /**
-     * Rolls how many Deployment Orders arrive in one month at the given command step (see the table in the class
-     * description).
+     * Works out how many Deployment Orders arrive each month.
      *
      * @param commandStep the contract's command step (see {@link #getCommandStep})
+     * @param exactScale  the contract's exact Scale
      *
-     * @return the number of orders this month
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    // Package-private rather than private so the table can be tested directly.
-    static int rollMonthlyOrderCount(int commandStep) {
-        return switch (commandStep) {
-            case 1 -> (Compute.randomInt(3) == 0) ? 1 : 0;
-            case 2 -> (Compute.randomInt(2) == 0) ? 1 : 0;
-            case 3 -> 1;
-            case 4 -> 1 + ((Compute.randomInt(2) == 0) ? 1 : 0);
-            default -> 0;
-        };
-    }
-
-    /**
-     * Rolls the number of Deployment Orders arriving in each month of a contract.
-     *
-     * @param lengthInMonths the contract's length in months
-     * @param commandStep    the contract's command step (see {@link #getCommandStep})
-     * @param rollCount      how many times each month is rolled
-     *
-     * @return the number of orders in each month, one entry per month
+     * @return the command step times the Scale, rounded normally and never below one; none at command step 0
      *
      * @author Illiani
      * @since 0.51.01
      */
-    // Package-private rather than private so the schedule can be tested directly.
-    static List<Integer> rollSchedule(int lengthInMonths, int commandStep, int rollCount) {
-        List<Integer> schedule = new ArrayList<>();
-        for (int month = 0; month < max(1, lengthInMonths); month++) {
-            int ordersThisMonth = 0;
-            for (int roll = 0; roll < rollCount; roll++) {
-                ordersThisMonth += rollMonthlyOrderCount(commandStep);
-            }
-            schedule.add(ordersThisMonth);
+    // Package-private rather than private so the rate can be tested directly.
+    static int getMonthlyOrderCount(int commandStep, double exactScale) {
+        if (commandStep <= MINIMUM_COMMAND_STEP) {
+            return 0;
         }
-        return schedule;
+        return StratConSpawnRates.getCount(exactScale, commandStep);
     }
 
     /**
      * Schedules a contract's Deployment Orders over its run, each on a random day of its month (see
      * {@link StratConContractInitializer#rollSpawnDates}), for the daily StratCon lifecycle to place as their days come.
-     * Each is a strategic objective.
+     * Several may fall on the same day. Each is a strategic objective.
      *
-     * <p>The schedule is rolled for the whole contract and only the days from {@code fromDate} on are kept, so a
-     * schedule rolled again partway through leaves the days already past alone. Any order that would land on or after
+     * <p>The schedule is laid out for the whole contract and only the days from {@code fromDate} on are kept, so a
+     * schedule laid out again partway through leaves the days already past alone. Any order that would land on or after
      * the contract's last day is moved to the day before, so it has a chance to be carried out.</p>
      *
      * <p>Does nothing if the contract's command step is 0 (see {@link #getCommandStep}), it has no settled start date,
      * or the Deployment Order type is not defined.</p>
      *
-     * @param contract                        the contract
-     * @param campaignState                   the campaign state to store the scheduled orders on
-     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
-     * @param fromDate                        the first day to keep; the contract's start date when it is accepted
+     * @param contract      the contract
+     * @param campaignState the campaign state to store the scheduled orders on
+     * @param fromDate      the first day to keep; the contract's start date when it is accepted
      *
      * @author Illiani
      * @since 0.51.01
      */
     static void scheduleDeploymentOrders(AbstractContract contract, StratConCampaignState campaignState,
-          boolean isMultiplyTrackIntensityByScale, @Nullable LocalDate fromDate) {
+          @Nullable LocalDate fromDate) {
         int commandStep = getCommandStep(contract.getCommandRights(), contract.getEmployerFaction());
         LocalDate startDate = contract.getStartDate();
         if ((commandStep == MINIMUM_COMMAND_STEP) || (startDate == null)) {
@@ -209,9 +174,8 @@ public final class StratConDeploymentOrders {
             return;
         }
 
-        // A scale-0 contract (auto-scaled from an empty hangar) still rolls once, as special points of interest do.
-        int rollCount = isMultiplyTrackIntensityByScale ? max(1, contract.getScale()) : 1;
-        List<Integer> schedule = rollSchedule(contract.getLengthInMonths(), commandStep, rollCount);
+        List<Integer> schedule = StratConSpawnRates.getMonthlySchedule(contract.getLengthInMonths(),
+              getMonthlyOrderCount(commandStep, contract.getExactScale()));
 
         LocalDate endDate = contract.getEndingDate();
         for (LocalDate spawnDate : StratConContractInitializer.rollSpawnDates(startDate,

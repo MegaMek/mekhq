@@ -33,7 +33,6 @@
 package mekhq.campaign.mission.contract.contractGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockStatic;
 
 import java.util.List;
@@ -185,93 +184,5 @@ class TrackIntensityTableTest {
     void scheduleForANonPositiveCountIsEmpty() {
         assertEquals(List.of(0, 0, 0), TrackIntensityTable.rollScheduleForCount(3, 0));
         assertEquals(List.of(0, 0, 0, 0, 0, 0), TrackIntensityTable.rollScheduleForCount(6, -2));
-    }
-    // Track Intensity Table options
-
-    @Test
-    void minimumOneTrackOnlyRaisesAContractWithNoTracks() {
-        assertEquals(1, TrackIntensityTable.getEffectiveTrackCount(0, true));
-        assertEquals(0, TrackIntensityTable.getEffectiveTrackCount(0, false));
-        assertEquals(3, TrackIntensityTable.getEffectiveTrackCount(3, true));
-    }
-
-    @Test
-    void minimumOneTrackGivesAContractWithNoTracksOneTrackPerRoll() {
-        assertEquals(0, sum(TrackIntensityTable.rollSchedule(THREE_MONTH_LENGTH, 0, 2, false, false)));
-        assertEquals(2, sum(TrackIntensityTable.rollSchedule(THREE_MONTH_LENGTH, 0, 2, true, false)));
-    }
-
-    @Test
-    void weeklyScheduleHasOneEntryPerMonthAndFillsEveryWeek() {
-        // Thirteen weeks off the three-week table: four whole rolls and the first week of a fifth, at one track each.
-        for (int attempt = 0; attempt < 20; attempt++) {
-            List<Integer> schedule = TrackIntensityTable.rollWeeklySchedule(THREE_MONTH_LENGTH, 1, 1);
-
-            assertEquals(THREE_MONTH_LENGTH, schedule.size());
-            int total = sum(schedule);
-            assertTrue((total >= 4) && (total <= 5), "total " + total);
-        }
-    }
-
-    @Test
-    void weeklyScheduleWithNoTracksIsEmpty() {
-        assertEquals(List.of(0, 0, 0), TrackIntensityTable.rollWeeklySchedule(THREE_MONTH_LENGTH, 0, 1));
-    }
-
-    @Test
-    void weeklyOptionRollsWeeklyThroughTheOptionOverload() {
-        assertEquals(SIX_MONTH_LENGTH, TrackIntensityTable.rollSchedule(SIX_MONTH_LENGTH, 2, 1, false, true).size());
-    }
-
-    @Test
-    void combatPayIsUnchangedWithoutTheOptions() {
-        assertEquals(1.0, TrackIntensityTable.getCombatPayMultiplier(2, false, false), 0.0001);
-    }
-
-    @Test
-    void combatPayIsDividedByWeeksPerMonthWhenRollingWeekly() {
-        assertEquals(1.0 / TrackIntensityTable.WEEKS_PER_MONTH,
-              TrackIntensityTable.getCombatPayMultiplier(2, false, true),
-              0.0001);
-    }
-
-    @Test
-    void combatPayIsZeroForAContractThatOnlyFightsThroughTheMinimumTrack() {
-        assertEquals(0.0, TrackIntensityTable.getCombatPayMultiplier(0, true, false), 0.0001);
-        assertEquals(0.0, TrackIntensityTable.getCombatPayMultiplier(0, true, true), 0.0001);
-    }
-
-    @Test
-    void combatPayIsUnchangedByTheMinimumTrackWhenTracksWereRolled() {
-        assertEquals(1.0, TrackIntensityTable.getCombatPayMultiplier(2, true, false), 0.0001);
-    }
-
-    @Test
-    void expectedMonthlyTotalIsRollsTimesTracks() {
-        assertEquals(6.0, TrackIntensityTable.getExpectedScheduleTotal(6, 3, 2, false, false), 0.0001);
-    }
-
-    @Test
-    void expectedTotalClampsToTheWidestColumn() {
-        // The three-month table's widest column is three tracks
-        assertEquals(6.0, TrackIntensityTable.getExpectedScheduleTotal(3, 5, 2, false, false), 0.0001);
-    }
-
-    @Test
-    void expectedTotalIsZeroWithoutTracksOrRolls() {
-        assertEquals(0.0, TrackIntensityTable.getExpectedScheduleTotal(6, 0, 3, false, false), 0.0001);
-        assertEquals(0.0, TrackIntensityTable.getExpectedScheduleTotal(6, 3, 0, false, false), 0.0001);
-    }
-
-    @Test
-    void expectedTotalHonorsTheMinimumTrack() {
-        assertEquals(2.0, TrackIntensityTable.getExpectedScheduleTotal(6, 0, 2, true, false), 0.0001);
-    }
-
-    @Test
-    void expectedWeeklyTotalAveragesTheCutShortBlock() {
-        // 3 months = 13 weeks = four full three-week blocks (one track each) plus the first slot of a fifth, which
-        // holds a track on one row in six; two rolls double it
-        assertEquals(2 * (4 + 1.0 / 6), TrackIntensityTable.getExpectedScheduleTotal(3, 1, 2, false, true), 0.0001);
     }
 }

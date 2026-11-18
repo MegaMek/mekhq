@@ -108,9 +108,6 @@ class ContractMarketPage {
     private JCheckBox chkUseDynamicDifficulty;
     private JCheckBox chkUseBolsterContractSkill;
     private JCheckBox chkUseChaosScaleSupportPointConversion;
-    private JCheckBox chkMultiplyTrackIntensityByScale;
-    private JCheckBox chkMinimumOneTrackPerRoll;
-    private JCheckBox chkRollTracksWeekly;
     private JCheckBox chkUseContractFactionModifiers;
     private JCheckBox chkUseIntelObfuscation;
     private JCheckBox chkUseNonNegotiableTerms;
@@ -133,8 +130,6 @@ class ContractMarketPage {
     private JSpinner spnContractTransportMultiplier;
     private JLabel lblContractSalvageMultiplier;
     private JSpinner spnContractSalvageMultiplier;
-    private JLabel lblScenarioTempoMultiplier;
-    private JSpinner spnScenarioTempoMultiplier;
 
     private JPanel pnlContractTermMultipliers;
 
@@ -298,19 +293,6 @@ class ContractMarketPage {
         chkUseChaosScaleSupportPointConversion.addMouseListener(
                 createTipPanelUpdater("UseChaosScaleSupportPointConversion"));
 
-        chkMultiplyTrackIntensityByScale = new CampaignOptionsCheckBox("MultiplyTrackIntensityByScale",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
-        chkMultiplyTrackIntensityByScale.addMouseListener(
-              createTipPanelUpdater("MultiplyTrackIntensityByScale"));
-
-        chkMinimumOneTrackPerRoll = new CampaignOptionsCheckBox("MinimumOneTrackPerRoll",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
-        chkMinimumOneTrackPerRoll.addMouseListener(createTipPanelUpdater("MinimumOneTrackPerRoll"));
-
-        chkRollTracksWeekly = new CampaignOptionsCheckBox("RollTracksWeekly",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
-        chkRollTracksWeekly.addMouseListener(createTipPanelUpdater("RollTracksWeekly"));
-
         chkUseContractFactionModifiers = new CampaignOptionsCheckBox("UseContractFactionModifiers",
               getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
         chkUseContractFactionModifiers.addMouseListener(createTipPanelUpdater("UseContractFactionModifiers"));
@@ -376,9 +358,6 @@ class ContractMarketPage {
               chkUseDynamicDifficulty,
                 chkUseBolsterContractSkill,
               chkUseChaosScaleSupportPointConversion,
-              chkMultiplyTrackIntensityByScale,
-              chkMinimumOneTrackPerRoll,
-              chkRollTracksWeekly,
               chkUseContractFactionModifiers,
               chkUseIntelObfuscation,
               chkUseNonNegotiableTerms,
@@ -438,12 +417,6 @@ class ContractMarketPage {
         spnContractSalvageMultiplier = new CampaignOptionsSpinner("ContractSalvageMultiplier", 1.0, 0.1, 2.0, 0.1);
         spnContractSalvageMultiplier.addMouseListener(createTipPanelUpdater("ContractSalvageMultiplier"));
 
-        lblScenarioTempoMultiplier = new CampaignOptionsLabel("ScenarioTempoMultiplier",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
-        lblScenarioTempoMultiplier.addMouseListener(createTipPanelUpdater("ScenarioTempoMultiplier"));
-        spnScenarioTempoMultiplier = new CampaignOptionsSpinner("ScenarioTempoMultiplier", 1.0, 0.1, 5.0, 0.1);
-        spnScenarioTempoMultiplier.addMouseListener(createTipPanelUpdater("ScenarioTempoMultiplier"));
-
         final SettingsFormPanel panel = new SettingsFormPanel("ContractTermMultipliersPanel",
               LABEL_COLUMN_WIDTH,
               CONTROL_COLUMN_WIDTH);
@@ -452,7 +425,6 @@ class ContractMarketPage {
         panel.addRow(lblContractBattlefieldLossMultiplier, spnContractBattlefieldLossMultiplier);
         panel.addRow(lblContractTransportMultiplier, spnContractTransportMultiplier);
         panel.addRow(lblContractSalvageMultiplier, spnContractSalvageMultiplier);
-        panel.addRow(lblScenarioTempoMultiplier, spnScenarioTempoMultiplier);
 
         return panel;
     }
@@ -751,9 +723,6 @@ class ContractMarketPage {
         chkUseDynamicDifficulty.setSelected(model.useDynamicDifficulty);
         chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
         chkUseChaosScaleSupportPointConversion.setSelected(model.useChaosScaleSupportPointConversion);
-        chkMultiplyTrackIntensityByScale.setSelected(model.multiplyTrackIntensityByScale);
-        chkMinimumOneTrackPerRoll.setSelected(model.minimumOneTrackPerRoll);
-        chkRollTracksWeekly.setSelected(model.rollTracksWeekly);
         chkUseContractFactionModifiers.setSelected(model.useContractFactionModifiers);
         chkUseIntelObfuscation.setSelected(model.useIntelObfuscation);
         chkUseNonNegotiableTerms.setSelected(model.useNonNegotiableTerms);
@@ -769,7 +738,6 @@ class ContractMarketPage {
         spnContractBattlefieldLossMultiplier.setValue(model.contractBattlefieldLossMultiplier);
         spnContractTransportMultiplier.setValue(model.contractTransportMultiplier);
         spnContractSalvageMultiplier.setValue(model.contractSalvageMultiplier);
-        spnScenarioTempoMultiplier.setValue(model.scenarioTempoMultiplier);
         chkUseChaosSupportPointConversion.setSelected(model.useChaosSupportPointConversion);
         chkBasePayOnlyConsidersScale.setSelected(model.basePayOnlyConsidersScale);
         chkCapContractScaleByHiringHall.setSelected(model.capContractScaleByHiringHall);
@@ -819,9 +787,6 @@ class ContractMarketPage {
         model.useDynamicDifficulty = chkUseDynamicDifficulty.isSelected();
         model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
         model.useChaosScaleSupportPointConversion = chkUseChaosScaleSupportPointConversion.isSelected();
-        model.multiplyTrackIntensityByScale = chkMultiplyTrackIntensityByScale.isSelected();
-        model.minimumOneTrackPerRoll = chkMinimumOneTrackPerRoll.isSelected();
-        model.rollTracksWeekly = chkRollTracksWeekly.isSelected();
         model.useContractFactionModifiers = chkUseContractFactionModifiers.isSelected();
         model.useIntelObfuscation = chkUseIntelObfuscation.isSelected();
         model.useNonNegotiableTerms = chkUseNonNegotiableTerms.isSelected();
@@ -837,7 +802,6 @@ class ContractMarketPage {
         model.contractBattlefieldLossMultiplier = (double) spnContractBattlefieldLossMultiplier.getValue();
         model.contractTransportMultiplier = (double) spnContractTransportMultiplier.getValue();
         model.contractSalvageMultiplier = (double) spnContractSalvageMultiplier.getValue();
-        model.scenarioTempoMultiplier = (double) spnScenarioTempoMultiplier.getValue();
         model.useChaosSupportPointConversion = chkUseChaosSupportPointConversion.isSelected();
         model.basePayOnlyConsidersScale = chkBasePayOnlyConsidersScale.isSelected();
         model.capContractScaleByHiringHall = chkCapContractScaleByHiringHall.isSelected();

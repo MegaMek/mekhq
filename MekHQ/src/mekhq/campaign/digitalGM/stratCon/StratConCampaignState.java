@@ -91,11 +91,8 @@ public class StratConCampaignState {
     // whether "Contracts Use Special Mechanics" was on when the contract was accepted; see
     // isContractsUseSpecialMechanics
     private boolean contractsUseSpecialMechanics;
-    // whether the Track Intensity Table options were on when the contract was accepted; see isMinimumOneTrackPerRoll
-    // and isRollTracksWeekly
-    private boolean minimumOneTrackPerRoll;
-    private boolean rollTracksWeekly;
-    // whether the contract's ordinary scenarios have been scheduled up front; see isNormalTempoScheduled
+    // whether the contract's ordinary scenarios were scheduled up front, as contracts accepted before they were rolled
+    // each week were; see isNormalTempoScheduled
     private boolean normalTempoScheduled;
     // what has been placed from the point of interest schedule; see recordPlacedPointOfInterest
     private boolean pointOfInterestLedgerSeeded;
@@ -113,15 +110,14 @@ public class StratConCampaignState {
     private final List<StratConTrackState> tracks;
 
     private List<LocalDate> scheduledScenarioDates;
+    private final List<StratConScheduledScenario> scheduledScenarios;
     private final List<LocalDate> strategicScenarioSpawnDates;
     private final List<StratConScheduledPointOfInterest> scheduledPointsOfInterest;
-    // enemy facility activity; see StratConEnemyFacilityActivity
-    private LocalDate lastCounterattackDate;
+    // enemy facility activity; see StratConEnemyFacilityActivity and StratConFacilityAttacks
     private LocalDate enemyEngineersScheduledUntil;
     private final List<LocalDate> enemyEngineerDates;
-    // enemy supply interdictions; see StratConFacilitySupply
-    private LocalDate supplyInterdictionsScheduledUntil;
-    private final List<LocalDate> supplyInterdictionDates;
+    private LocalDate facilityAttacksScheduledUntil;
+    private final List<LocalDate> facilityAttackDates;
 
     @XmlTransient
     public AbstractContract getContract() {
@@ -135,19 +131,21 @@ public class StratConCampaignState {
     public StratConCampaignState() {
         tracks = new ArrayList<>();
         scheduledScenarioDates = new ArrayList<>();
+        scheduledScenarios = new ArrayList<>();
         strategicScenarioSpawnDates = new ArrayList<>();
         scheduledPointsOfInterest = new ArrayList<>();
         enemyEngineerDates = new ArrayList<>();
-        supplyInterdictionDates = new ArrayList<>();
+        facilityAttackDates = new ArrayList<>();
     }
 
     public StratConCampaignState(AbstractContract contract) {
         tracks = new ArrayList<>();
         scheduledScenarioDates = new ArrayList<>();
+        scheduledScenarios = new ArrayList<>();
         strategicScenarioSpawnDates = new ArrayList<>();
         scheduledPointsOfInterest = new ArrayList<>();
         enemyEngineerDates = new ArrayList<>();
-        supplyInterdictionDates = new ArrayList<>();
+        facilityAttackDates = new ArrayList<>();
         setContract(contract);
     }
 
@@ -168,8 +166,9 @@ public class StratConCampaignState {
     }
 
     /**
-     * @return the still-to-come days on which the contract's ordinary scenarios appear, one entry per scenario
-     *       (mutable; drained as they are generated)
+     * @return the still-to-come days on which ordinary scenarios appear in a random sector, one entry per scenario
+     *       (mutable; drained as they are generated): Single Drop play's weekly scenario, and what remains of the
+     *       up-front schedule of a contract accepted before normal scenarios were rolled each week
      */
     @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
     @XmlElementWrapper(name = SCHEDULED_SCENARIO_DATES_ELEMENT)
@@ -185,6 +184,29 @@ public class StratConCampaignState {
     @Deprecated(since = "0.51.0", forRemoval = true)
     public void setScheduledScenarioDates(final List<LocalDate> scheduledScenarioDates) {
         this.scheduledScenarioDates = scheduledScenarioDates;
+    }
+
+    /**
+     * @return the normal scenarios the weekly rolls have called for and that are still to come, each with its day and
+     *       sector (mutable; drained as they are generated; see {@link StratConScenarioTempo#rollWeeklyScenarios})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlElementWrapper(name = "scheduledScenarios")
+    @XmlElement(name = "scheduledScenario")
+    public List<StratConScheduledScenario> getScheduledScenarios() {
+        return scheduledScenarios;
+    }
+
+    /**
+     * @param scheduledScenario a normal scenario to generate on its day
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void addScheduledScenario(StratConScheduledScenario scheduledScenario) {
+        scheduledScenarios.add(scheduledScenario);
     }
 
     /** @return the still-to-come days on which strategic-objective scenarios appear (mutable; drained as they spawn) */
@@ -222,22 +244,8 @@ public class StratConCampaignState {
     }
 
     /**
-     * @return the day of the contract's most recent enemy counterattack, or {@code null} if there has been none
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
-    public @Nullable LocalDate getLastCounterattackDate() {
-        return lastCounterattackDate;
-    }
-
-    public void setLastCounterattackDate(@Nullable LocalDate lastCounterattackDate) {
-        this.lastCounterattackDate = lastCounterattackDate;
-    }
-
-    /**
-     * @return the day up to which enemy engineers have been scheduled, exclusive, or {@code null} if none have been
+     * @return the day up to which enemy engineers have been scheduled, exclusive - the contract's end once they are
+     *       scheduled up front - or {@code null} if none have been
      *
      * @author Illiani
      * @since 0.51.01
@@ -265,38 +273,38 @@ public class StratConCampaignState {
     }
 
     /**
-     * @return the day up to which enemy supply interdictions have been scheduled, exclusive, or {@code null} if none
-     *       have been
+     * @return the day up to which the enemy's attacks on facilities have been scheduled, exclusive (the contract's
+     *       end), or {@code null} if none have been (see {@link mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityAttacks})
      *
      * @author Illiani
      * @since 0.51.01
      */
     @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
-    public @Nullable LocalDate getSupplyInterdictionsScheduledUntil() {
-        return supplyInterdictionsScheduledUntil;
+    public @Nullable LocalDate getFacilityAttacksScheduledUntil() {
+        return facilityAttacksScheduledUntil;
     }
 
-    public void setSupplyInterdictionsScheduledUntil(@Nullable LocalDate supplyInterdictionsScheduledUntil) {
-        this.supplyInterdictionsScheduledUntil = supplyInterdictionsScheduledUntil;
+    public void setFacilityAttacksScheduledUntil(@Nullable LocalDate facilityAttacksScheduledUntil) {
+        this.facilityAttacksScheduledUntil = facilityAttacksScheduledUntil;
     }
 
     /**
-     * @return the still-to-come days on which enemy supply interdictions appear, one entry each (mutable; drained as
-     *       they appear)
+     * @return the still-to-come days on which the enemy attacks a facility held by the player or their employer, one
+     *       entry each (mutable; drained as they come)
      *
      * @author Illiani
      * @since 0.51.01
      */
     @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
-    @XmlElementWrapper(name = "supplyInterdictionDates")
-    @XmlElement(name = "supplyInterdictionDate")
-    public List<LocalDate> getSupplyInterdictionDates() {
-        return supplyInterdictionDates;
+    @XmlElementWrapper(name = "facilityAttackDates")
+    @XmlElement(name = "facilityAttackDate")
+    public List<LocalDate> getFacilityAttackDates() {
+        return facilityAttackDates;
     }
 
     /**
-     * Moves every date still to come in the contract's pre-rolled schedule - its ordinary scenarios, its
-     * strategic-objective scenarios, and its points of interest - by the given number of days. Used when the contract's start date moves, so the schedule
+     * Moves every date still to come in the contract's schedule - its ordinary scenarios, its strategic-objective
+     * scenarios, its points of interest, its enemy engineers, and its facility attacks - by the given number of days. Used when the contract's start date moves, so the schedule
      * keeps its place within the contract.
      *
      * @param days how many days to move them; negative moves them earlier
@@ -312,7 +320,16 @@ public class StratConCampaignState {
         scheduledScenarioDates.replaceAll(scenarioDate -> scenarioDate.plusDays(days));
         strategicScenarioSpawnDates.replaceAll(spawnDate -> spawnDate.plusDays(days));
         enemyEngineerDates.replaceAll(engineerDate -> engineerDate.plusDays(days));
-        supplyInterdictionDates.replaceAll(interdictionDate -> interdictionDate.plusDays(days));
+        facilityAttackDates.replaceAll(attackDate -> attackDate.plusDays(days));
+        for (StratConScheduledScenario scheduledScenario : scheduledScenarios) {
+            scheduledScenario.setDate(scheduledScenario.getDate().plusDays(days));
+        }
+        if (enemyEngineersScheduledUntil != null) {
+            enemyEngineersScheduledUntil = enemyEngineersScheduledUntil.plusDays(days);
+        }
+        if (facilityAttacksScheduledUntil != null) {
+            facilityAttacksScheduledUntil = facilityAttacksScheduledUntil.plusDays(days);
+        }
         for (StratConScheduledPointOfInterest scheduledPointOfInterest : scheduledPointsOfInterest) {
             LocalDate spawnDate = scheduledPointOfInterest.getSpawnDate();
             if (spawnDate != null) {
@@ -322,10 +339,10 @@ public class StratConCampaignState {
     }
 
     /**
-     * @return {@code true} if the contract's ordinary scenarios have been scheduled up front (see
-     *       {@link StratConScenarioTempo#scheduleNormalScenarios}); {@code false} for a contract begun in Single Drop
-     *       play or before scenarios were scheduled that way, which is scheduled on its next day outside Single Drop
-     *       play
+     * @return {@code true} if the contract's ordinary scenarios were scheduled up front, as those of a contract accepted
+     *       before normal scenarios were rolled each week were. Such a contract keeps its schedule (see
+     *       {@link #getScheduledScenarioDates}) and gets no weekly rolls until it is edited or extended, which moves it
+     *       onto the weekly rolls (see {@link StratConScenarioTempo#rollWeeklyScenarios}).
      *
      * @author Illiani
      * @since 0.51.01
@@ -335,7 +352,7 @@ public class StratConCampaignState {
     }
 
     /**
-     * @param normalTempoScheduled whether the contract's ordinary scenarios have been scheduled up front
+     * @param normalTempoScheduled whether the contract's ordinary scenarios were scheduled up front
      *
      * @author Illiani
      * @since 0.51.01
@@ -535,38 +552,6 @@ public class StratConCampaignState {
      */
     public void setContractsUseSpecialMechanics(boolean contractsUseSpecialMechanics) {
         this.contractsUseSpecialMechanics = contractsUseSpecialMechanics;
-    }
-
-    /**
-     * @return {@code true} if "Minimum of 1 Hot Spots Track per Roll" was on when the contract was accepted, or when its
-     *       schedules were last regenerated by editing the contract. Changing the option mid-contract has no effect
-     *       otherwise.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public boolean isMinimumOneTrackPerRoll() {
-        return minimumOneTrackPerRoll;
-    }
-
-    public void setMinimumOneTrackPerRoll(boolean minimumOneTrackPerRoll) {
-        this.minimumOneTrackPerRoll = minimumOneTrackPerRoll;
-    }
-
-    /**
-     * @return {@code true} if "Roll Hot Spots Tracks Weekly, Not Monthly" was on when the contract was accepted, or
-     *       when its schedules were last regenerated by editing the contract. Changing the option mid-contract has no
-     *       effect otherwise.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public boolean isRollTracksWeekly() {
-        return rollTracksWeekly;
-    }
-
-    public void setRollTracksWeekly(boolean rollTracksWeekly) {
-        this.rollTracksWeekly = rollTracksWeekly;
     }
 
     public String getBriefingText() {

@@ -85,13 +85,6 @@ public class NoOpFacilityStrategy implements IFacilityStrategy {
     }
 
     @Override
-    public int launchCounterattacks(Campaign campaign, AbstractContract contract,
-          StratConCampaignState campaignState, int scenarioCount) {
-        // Mapless and Singles play have no facilities to counterattack.
-        return 0;
-    }
-
-    @Override
     public void updateFacilityForScenario(AtBScenario scenario, AbstractContract contract, boolean destroy,
           boolean capture) {
         // Intentionally empty: Mapless and Singles play have no facilities to update.
