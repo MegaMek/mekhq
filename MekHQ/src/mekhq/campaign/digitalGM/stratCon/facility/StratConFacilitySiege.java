@@ -211,7 +211,6 @@ public final class StratConFacilitySiege {
               coords,
               false);
         if (scenario != null) {
-            campaignState.setLastCounterattackDate(campaign.getLocalDate());
             StratConFacilityOperations.report(campaign,
                   "report.siege.relief",
                   track.getFacility(coords).getDisplayableName());

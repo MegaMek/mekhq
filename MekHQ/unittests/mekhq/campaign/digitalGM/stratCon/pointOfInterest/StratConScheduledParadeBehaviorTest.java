@@ -198,22 +198,30 @@ class StratConScheduledParadeBehaviorTest {
     }
 
     @Test
-    void aRiotCanBreakOutWhileTheEnemyIsRouted() {
-        assertTrue(new StratConScheduledParadeBehavior().isScenarioPossibleWhileRouted(),
-              "civil unrest does not answer to the enemy's morale");
-        assertFalse(VULNERABLE_INFRASTRUCTURE.createBehavior().isScenarioPossibleWhileRouted(),
-              "a routed enemy still mounts no ordinary ambushes");
+    void aRiotCanBreakOutWhileTheContractIsPeaceful() {
+        assertTrue(new StratConScheduledParadeBehavior().isScenarioPossibleWhilePeaceful(),
+              "civil unrest does not answer to the enemy");
+        assertFalse(VULNERABLE_INFRASTRUCTURE.createBehavior().isScenarioPossibleWhilePeaceful(),
+              "with no enemy activity between raids, there are no ordinary ambushes");
     }
 
     @Test
-    void ignoringARoutLeavesTheUsualOdds() {
-        AbstractContract routedContract = mock(AbstractContract.class);
-        when(routedContract.getMoraleLevel()).thenReturn(ContractMoraleLevel.ROUTED);
+    void aRiotIsNotFoughtAgainstTheContractsEnemy() {
+        assertFalse(new StratConScheduledParadeBehavior().isOpposedByContractEnemy(),
+              "civil unrest is not the enemy's fight, so the enemy's morale does not shape it");
+        assertTrue(VULNERABLE_INFRASTRUCTURE.createBehavior().isOpposedByContractEnemy());
+    }
+
+    @Test
+    void ignoringThePeaceLeavesTheUsualOdds() {
+        AbstractContract peacefulContract = mock(AbstractContract.class);
+        when(peacefulContract.getMoraleLevel()).thenReturn(ContractMoraleLevel.STALEMATE);
+        when(peacefulContract.isPeaceful()).thenReturn(true);
         track.setScenarioOdds(30);
 
-        assertEquals(-1, StratConRulesManager.calculateScenarioOdds(track, routedContract, true),
-              "a routed enemy normally mounts nothing");
-        assertEquals(30, StratConRulesManager.calculateScenarioOdds(track, routedContract, true, true));
+        assertEquals(-1, StratConRulesManager.calculateScenarioOdds(track, peacefulContract, true),
+              "a peaceful contract normally sees nothing");
+        assertEquals(30, StratConRulesManager.calculateScenarioOdds(track, peacefulContract, true, true));
     }
 
     @Test

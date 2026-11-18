@@ -629,10 +629,10 @@ class StratConFacilitySiegeTest {
         }
 
         @Test
-        void aRoutedGarrisonNeverSorties() {
+        void aGarrisonNeverSortiesWhileTheContractIsPeaceful() {
             track.getCutOffFacilities().clear();
             track.setScenarioOdds(100);
-            when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.ROUTED);
+            when(contract.isPeaceful()).thenReturn(true);
             besiege(FORMATION_ID, 0);
 
             assertNull(StratConFacilitySiege.trySortie(campaign,
@@ -663,17 +663,14 @@ class StratConFacilitySiegeTest {
             besiege(FORMATION_ID, 0);
 
             assertNull(StratConFacilitySiege.tryRelief(campaign, contract, track, FACILITY_COORDS, FORMATION_ID));
-            assertNull(campaignState.getLastCounterattackDate());
         }
 
         @Test
-        void aReliefForceWithNoBesiegerToFallOnDoesNotCountAsACounterattack() {
+        void noReliefComesWithNoBesiegerToFallOn() {
             track.getCutOffFacilities().clear();
             when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(3.0);
-            campaignState.setLastCounterattackDate(TODAY.minusDays(100));
 
             assertNull(StratConFacilitySiege.tryRelief(campaign, contract, track, FACILITY_COORDS, FORMATION_ID));
-            assertEquals(TODAY.minusDays(100), campaignState.getLastCounterattackDate());
         }
     }
 }

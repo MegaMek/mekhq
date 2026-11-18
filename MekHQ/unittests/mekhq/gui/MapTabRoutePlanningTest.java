@@ -135,6 +135,18 @@ class MapTabRoutePlanningTest {
     }
 
     @Test
+    void plannedRouteFollowsFleetOnlyWhenItStartedWhereTheFleetWas() {
+        PlanetarySystem stafford = new PlanetarySystem("Stafford");
+        PlanetarySystem loganPrime = new PlanetarySystem("Logan Prime");
+        PlanetarySystem elsewhere = new PlanetarySystem("Elsewhere");
+
+        assertTrue(MapTab.shouldRouteFollowFleet(stafford, stafford, loganPrime));
+        assertFalse(MapTab.shouldRouteFollowFleet(stafford, stafford, stafford));
+        assertFalse(MapTab.shouldRouteFollowFleet(elsewhere, stafford, loganPrime));
+        assertFalse(MapTab.shouldRouteFollowFleet(stafford, stafford, null));
+    }
+
+    @Test
     void quickPlotRequiresOnlyADifferentSelectedSystem() {
         PlanetarySystem fleetSystem = new PlanetarySystem("Fleet System");
         PlanetarySystem destination = new PlanetarySystem("Destination");

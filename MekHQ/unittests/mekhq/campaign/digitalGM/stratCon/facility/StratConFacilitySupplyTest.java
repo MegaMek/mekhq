@@ -39,10 +39,13 @@ import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
+import static org.mockito.Mockito.CALLS_REAL_METHODS;
 import static org.mockito.Mockito.RETURNS_DEEP_STUBS;
 import static org.mockito.Mockito.clearInvocations;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -53,6 +56,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
+import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -76,6 +80,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.mockito.MockedStatic;
 
 /**
  * Tests supply lines: how each side's supply routes are laid and kept, when a facility is cut off, what being cut off
@@ -592,16 +597,12 @@ class StratConFacilitySupplyTest {
     }
 
     @Nested
-    class InterdictionSchedule {
+    class InterdictionsAsFacilityAttacks {
         private StratConCampaignState campaignState;
         private AbstractContract contract;
 
         @BeforeEach
-        void setUpSchedule() {
-            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(1.0);
-            when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(true);
-            when(options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
-
+        void setUpAttacks() {
             campaignState = new StratConCampaignState();
             campaignState.addTrack(track);
             contract = mock(AbstractContract.class);
@@ -623,59 +624,30 @@ class StratConFacilitySupplyTest {
         }
 
         @Test
-        void oneDueTodaySitsAcrossAPlayerSupplyRoute() {
-            campaignState.setSupplyInterdictionsScheduledUntil(TODAY.plusDays(10));
-            campaignState.getSupplyInterdictionDates().add(TODAY);
-
-            StratConFacilitySupply.processSupplyInterdictions(campaign, contract, campaignState);
+        void oneSitsAcrossAPlayerSupplyRoute() {
+            StratConPointOfInterest interdiction = StratConFacilitySupply.placeSupplyInterdiction(campaignState, TODAY);
 
             assertEquals(1, countInterdictions());
-            StratConPointOfInterest interdiction = track.getPointsOfInterest().getFirst();
             assertTrue(track.getPlayerSupplyNetwork().contains(interdiction.getCoords()));
-            assertTrue(campaignState.getSupplyInterdictionDates().isEmpty());
         }
 
         @Test
-        void theyComeAsOftenAsEngineers() {
-            StratConFacilitySupply.processSupplyInterdictions(campaign, contract, campaignState);
+        void aFacilityAttackCanBeASupplyInterdiction() {
+            // The lowest roll picks the first of the possible attacks: an interdiction, since there is a route
+            try (MockedStatic<Compute> dice = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
+                dice.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
 
-            int expected = StratConEnemyFacilityActivity.getMonthlyEngineerCount(6, false, 1.0);
-            assertEquals(expected, campaignState.getSupplyInterdictionDates().size() + countInterdictions());
-            assertEquals(TODAY.plusMonths(1), campaignState.getSupplyInterdictionsScheduledUntil());
+                assertEquals(StratConFacilityAttacks.FacilityAttackType.SUPPLY_INTERDICTION,
+                      StratConFacilityAttacks.launchFacilityAttack(campaign, contract, campaignState));
+            }
+
+            assertEquals(1, countInterdictions());
         }
 
         @Test
-        void noneAreSentWhileSupplyLinesAreOff() {
-            when(options.get(CampaignOption.USE_SUPPLY_LINES)).thenReturn(false);
-            campaignState.getSupplyInterdictionDates().add(TODAY);
-
-            StratConFacilitySupply.processSupplyInterdictions(campaign, contract, campaignState);
-
-            assertEquals(0, countInterdictions());
-            assertTrue(campaignState.getSupplyInterdictionDates().isEmpty());
-        }
-
-        @Test
-        void noneAreSentByAnIdleEnemy() {
-            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(0.0);
-            campaignState.getSupplyInterdictionDates().add(TODAY);
-
-            StratConFacilitySupply.processSupplyInterdictions(campaign, contract, campaignState);
-
-            assertEquals(0, countInterdictions());
-            assertTrue(campaignState.getSupplyInterdictionDates().isEmpty());
-        }
-
-        @Test
-        void noneArePlacedByARoutedEnemy() {
-            when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.ROUTED);
-            campaignState.setSupplyInterdictionsScheduledUntil(TODAY.plusDays(10));
-            campaignState.getSupplyInterdictionDates().add(TODAY);
-
-            StratConFacilitySupply.processSupplyInterdictions(campaign, contract, campaignState);
-
-            assertEquals(0, countInterdictions());
-            assertTrue(campaignState.getSupplyInterdictionDates().isEmpty());
+        void noRouteMeansNoInterdictionToPick() {
+            assertFalse(StratConFacilityAttacks.getPossibleAttackTypes(false)
+                              .contains(StratConFacilityAttacks.FacilityAttackType.SUPPLY_INTERDICTION));
         }
     }
 

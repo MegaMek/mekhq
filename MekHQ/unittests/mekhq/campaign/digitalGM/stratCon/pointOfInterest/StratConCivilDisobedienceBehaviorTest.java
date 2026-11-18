@@ -80,7 +80,7 @@ import testUtilities.MHQTestUtilities;
 /**
  * Tests for civil disobedience, which shares the contested rules of the data cache (see
  * {@link StratConDataCacheBehaviorTest} for those in depth): these cover what differs - any formation can respond, a
- * riot can break out against a routed enemy, it is fought as Crowd Control, and its text and visibility - and that each
+ * riot can break out while the contract is peaceful, it is fought as Crowd Control, and its text and visibility - and that each
  * of its outcomes plays out.
  *
  * <p>The riot itself is set up as a full scenario with its mobs and dialog, so it is not covered here; its outcome is,
@@ -174,13 +174,20 @@ class StratConCivilDisobedienceBehaviorTest {
     }
 
     @Test
-    void aRiotIsFoughtAsCrowdControlAndCanBreakOutWhileTheEnemyIsRouted() {
+    void aRiotIsFoughtAsCrowdControlAndCanBreakOutWhileTheContractIsPeaceful() {
         StratConCivilDisobedienceBehavior behavior = new StratConCivilDisobedienceBehavior();
 
         assertEquals("Crowd Control.json", behavior.getScenarioTemplateName());
-        assertTrue(behavior.isScenarioPossibleWhileRouted(), "civil unrest does not answer to the enemy's morale");
-        assertFalse(DATA_CACHE.createBehavior().isScenarioPossibleWhileRouted(),
-              "a routed enemy still contests nothing else");
+        assertTrue(behavior.isScenarioPossibleWhilePeaceful(), "civil unrest does not answer to the enemy");
+        assertFalse(DATA_CACHE.createBehavior().isScenarioPossibleWhilePeaceful(),
+              "with no enemy activity between raids, nothing else is contested");
+    }
+
+    @Test
+    void aRiotIsNotFoughtAgainstTheContractsEnemy() {
+        assertFalse(new StratConCivilDisobedienceBehavior().isOpposedByContractEnemy(),
+              "civil unrest is not the enemy's fight, so the enemy's morale does not shape it");
+        assertTrue(DATA_CACHE.createBehavior().isOpposedByContractEnemy());
     }
 
     @Test

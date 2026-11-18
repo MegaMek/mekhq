@@ -345,6 +345,98 @@ class RoutePlanningIntentTest {
         assertTrue(intent.getJumpPath().isEmpty());
     }
 
+    @Test
+    void fleetMovingAlongRouteDropsReachedSystemsAndStops() {
+        PlanetarySystem origin = system("Origin");
+        PlanetarySystem firstStop = system("First Stop");
+        PlanetarySystem intermediate = system("Intermediate");
+        PlanetarySystem destination = system("Destination");
+        Planet target = world("target", destination);
+        RoutePlanningIntent intent = new RoutePlanningIntent(origin);
+        RoutePlanningIntent.SegmentPlanner planner = planner(Map.of(
+              new Leg(origin, firstStop), List.of(origin, firstStop),
+              new Leg(firstStop, destination), List.of(firstStop, intermediate, destination)));
+        assertTrue(intent.plot(origin, firstStop, planner).changed());
+        assertTrue(intent.appendToPlanet(target, planner).changed());
+
+        assertTrue(intent.moveOriginTo(firstStop, planner(Map.of())).changed());
+        assertSame(firstStop, intent.getOrigin());
+        assertIterableEquals(List.of(destination), intent.getRequestedStops());
+        assertIterableEquals(List.of(firstStop, intermediate, destination), intent.getJumpPath().getSystems());
+        assertSame(target, intent.getJumpPath().getTargetPlanet());
+
+        assertTrue(intent.moveOriginTo(intermediate, planner(Map.of())).changed());
+        assertSame(intermediate, intent.getOrigin());
+        assertIterableEquals(List.of(destination), intent.getRequestedStops());
+        assertIterableEquals(List.of(intermediate, destination), intent.getJumpPath().getSystems());
+        assertSame(target, intent.getJumpPath().getTargetPlanet());
+    }
+
+    @Test
+    void fleetReachingFinalStopClearsRouteFromItsNewSystem() {
+        PlanetarySystem origin = system("Origin");
+        PlanetarySystem intermediate = system("Intermediate");
+        PlanetarySystem destination = system("Destination");
+        RoutePlanningIntent intent = new RoutePlanningIntent(origin);
+        assertTrue(intent.plot(origin, destination,
+              planner(Map.of(new Leg(origin, destination), List.of(origin, intermediate, destination)))).changed());
+
+        assertTrue(intent.moveOriginTo(destination, planner(Map.of())).changed());
+
+        assertSame(destination, intent.getOrigin());
+        assertTrue(intent.getRequestedStops().isEmpty());
+        assertTrue(intent.getJumpPath().isEmpty());
+    }
+
+    @Test
+    void fleetLeavingRouteReplotsRemainingStopsFromItsNewSystem() {
+        PlanetarySystem origin = system("Origin");
+        PlanetarySystem intermediate = system("Intermediate");
+        PlanetarySystem destination = system("Destination");
+        PlanetarySystem elsewhere = system("Elsewhere");
+        RoutePlanningIntent intent = new RoutePlanningIntent(origin);
+        assertTrue(intent.plot(origin, destination,
+              planner(Map.of(new Leg(origin, destination), List.of(origin, intermediate, destination)))).changed());
+
+        assertTrue(intent.moveOriginTo(elsewhere,
+              planner(Map.of(new Leg(elsewhere, destination), List.of(elsewhere, destination)))).changed());
+
+        assertSame(elsewhere, intent.getOrigin());
+        assertIterableEquals(List.of(destination), intent.getRequestedStops());
+        assertIterableEquals(List.of(elsewhere, destination), intent.getJumpPath().getSystems());
+    }
+
+    @Test
+    void fleetLeavingRouteWithNoCourseOnwardClearsRoute() {
+        PlanetarySystem origin = system("Origin");
+        PlanetarySystem destination = system("Destination");
+        PlanetarySystem elsewhere = system("Elsewhere");
+        RoutePlanningIntent intent = new RoutePlanningIntent(origin);
+        assertTrue(intent.plot(origin, destination,
+              planner(Map.of(new Leg(origin, destination), List.of(origin, destination)))).changed());
+
+        assertTrue(intent.moveOriginTo(elsewhere, planner(Map.of())).changed());
+
+        assertSame(elsewhere, intent.getOrigin());
+        assertTrue(intent.getRequestedStops().isEmpty());
+        assertTrue(intent.getJumpPath().isEmpty());
+    }
+
+    @Test
+    void routeAlreadyStartingAtFleetSystemIsUnchanged() {
+        PlanetarySystem origin = system("Origin");
+        PlanetarySystem destination = system("Destination");
+        RoutePlanningIntent intent = new RoutePlanningIntent(origin);
+        assertTrue(intent.plot(origin, destination,
+              planner(Map.of(new Leg(origin, destination), List.of(origin, destination)))).changed());
+
+        assertFalse(intent.moveOriginTo(origin, planner(Map.of())).changed());
+        assertFalse(intent.moveOriginTo(null, planner(Map.of())).changed());
+
+        assertSame(origin, intent.getOrigin());
+        assertIterableEquals(List.of(origin, destination), intent.getJumpPath().getSystems());
+    }
+
     private static Planet world(String id, PlanetarySystem system) {
         Planet planet = new Planet(id);
         planet.setParentSystem(system);

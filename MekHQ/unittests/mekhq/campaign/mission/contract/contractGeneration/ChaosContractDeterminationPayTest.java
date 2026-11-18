@@ -95,7 +95,6 @@ class ChaosContractDeterminationPayTest {
         campaignOptions = new CampaignOptions();
         // Every running cost starts off, so each test turns on only what it checks
         campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, false);
-        campaignOptions.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, false);
         campaignOptions.set(CampaignOption.PAY_FOR_SALARIES, false);
         campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, false);
         campaignOptions.set(CampaignOption.PAY_FOR_OVERHEAD, false);
@@ -433,36 +432,30 @@ class ChaosContractDeterminationPayTest {
     @Nested
     class CombatPay {
         @Test
-        void combatPayIsScaleInSupportPointsAndIgnoresTheBasePayMultiplier() {
-            // 500 * scale(3) = 1500 support points; the base-pay multiplier does not affect combat pay.
-            assertEquals(Money.of(1_500), payScheme.getCombatPay(campaign, contract(3, 2.0)));
+        void combatPayIsScaleInSupportPointsSpreadAcrossTheScalesEssentialScenarios() {
+            // 500 * scale(3) / scale(3) = 500 support points: a contract brings one Essential scenario a month per
+            // point of Scale. The base-pay multiplier does not affect combat pay.
+            assertEquals(Money.of(500), payScheme.getCombatPay(campaign, contract(3, 2.0)));
         }
 
         @Test
         void combatPayConvertsSupportPointsToCBillsWhenEnabled() {
             campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, true);
 
-            assertEquals(supportPoints(1_500), payScheme.getCombatPay(campaign, contract(3, 1.0)));
-        }
-
-        @Test
-        void combatPayIsDividedByScaleWhenTrackIntensityIsMultipliedByScale() {
-            // 500 * scale(3) / scale(3) = 500 support points
-            campaignOptions.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, true);
-
-            assertEquals(Money.of(500), payScheme.getCombatPay(campaign, contract(3, 1.0)));
+            assertEquals(supportPoints(500), payScheme.getCombatPay(campaign, contract(3, 1.0)));
         }
 
         @Test
         void combatPayIsNotTaperedWithoutTheOption() {
             campaignOptions.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, false);
 
-            assertEquals(Money.of(3_500), payScheme.getCombatPay(campaign, contract(7, 1.0)));
+            // 3500 / 7
+            assertEquals(Money.of(500), payScheme.getCombatPay(campaign, contract(7, 1.0)));
         }
 
         @ParameterizedTest
-        @CsvSource({ "0, 0", "1, 500", "3, 1500", "4, 1750", "7, 2500", "10, 3250" })
-        void taperedCombatPayIsFullToScaleThreeThenHalf(int scale, int expectedSupportPoints) {
+        @CsvSource({ "0, 0", "1, 500", "3, 500", "4, 438", "7, 357", "10, 325" })
+        void taperedCombatPayIsFullToScaleThreeThenHalfSpreadAcrossTheScale(int scale, int expectedSupportPoints) {
             campaignOptions.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, true);
 
             assertEquals(Money.of(expectedSupportPoints), payScheme.getCombatPay(campaign, contract(scale, 1.0)));
@@ -473,13 +466,13 @@ class ChaosContractDeterminationPayTest {
             campaignOptions.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, true);
             campaignOptions.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, true);
 
-            assertEquals(supportPoints(2_500), payScheme.getCombatPay(campaign, contract(7, 1.0)));
+            // 2500 / 7, rounded
+            assertEquals(supportPoints(357), payScheme.getCombatPay(campaign, contract(7, 1.0)));
         }
 
         @Test
-        void taperAndTrackIntensityCombine() {
+        void taperedPayIsSpreadAcrossTheScale() {
             campaignOptions.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, true);
-            campaignOptions.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, true);
 
             // Scale 5 tapers to 2000, divided across 5 x the scenarios; Scale 7 tapers to 2500, / 7 (rounded)
             assertEquals(Money.of(400), payScheme.getCombatPay(campaign, contract(5, 1.0)));
@@ -487,9 +480,27 @@ class ChaosContractDeterminationPayTest {
         }
 
         @Test
-        void scaleZeroWithTrackIntensityDoesNotDivideByZero() {
+        void navPointBonusesPayAThirdOfAnEssentialScenarios() {
+            campaignOptions.set(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS, true);
+            AbstractContract contract = contract(3, 1.0);
+            // Espionage's data caches replace its Essential scenarios and come three times as often
+            when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.ESPIONAGE);
+
+            // 1500, spread across 3 x 3 = 9 Nav Points a month: 167 (rounded)
+            assertEquals(Money.of(167), payScheme.getCombatPay(campaign, contract));
+        }
+
+        @Test
+        void withoutSupportPointsInScaleEveryThreePointsOfScaleBringOneEssentialScenario() {
+            campaignOptions.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, false);
+
+            // 3000, spread across the 2 Essential scenarios a month that Scale 6 brings counted this way
+            assertEquals(Money.of(1_500), payScheme.getCombatPay(campaign, contract(6, 1.0)));
+        }
+
+        @Test
+        void scaleZeroDoesNotDivideByZero() {
             campaignOptions.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, true);
-            campaignOptions.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, true);
 
             assertEquals(Money.zero(), payScheme.getCombatPay(campaign, contract(0, 1.0)));
         }
@@ -516,10 +527,11 @@ class ChaosContractDeterminationPayTest {
         @Test
         void salvageAndCombatPayTaperByTheSameFraction() {
             campaignOptions.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, true);
-            AbstractContract contract = contract(9, 1.0);
+            AbstractContract contract = contract(6, 1.0);
 
-            double combatPayFraction = payScheme.getCombatPay(campaign, contract).getAmount().doubleValue()
-                                             / (ChaosContractDeterminationPay.DEFAULT_COMBAT_PAY_MULTIPLIER * 9);
+            // Combat pay is spread across the Scale's Essential scenarios, so multiply it back up to compare
+            double combatPayFraction = payScheme.getCombatPay(campaign, contract).getAmount().doubleValue() * 6
+                                             / (ChaosContractDeterminationPay.DEFAULT_COMBAT_PAY_MULTIPLIER * 6);
 
             assertEquals(combatPayFraction, payScheme.getSalvageTaperMultiplier(campaign, contract), DELTA);
         }
@@ -565,23 +577,24 @@ class ChaosContractDeterminationPayTest {
         void withoutTheOptionPayRoundsScaleToTheNearestWhole() {
             campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, false);
 
-            // Scale 2.6 is paid as Scale 3
-            assertEquals(Money.of(1_500), payScheme.getCombatPay(campaign, contract(2.6, 1.0)));
+            // Scale 2.6 is paid as Scale 3: 1500, spread across 3
+            assertEquals(Money.of(500), payScheme.getCombatPay(campaign, contract(2.6, 1.0)));
         }
 
         @Test
         void withoutTheOptionPayRoundsAPartScaleDown() {
             campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, false);
 
-            // Scale 2.3 is paid as Scale 2
-            assertEquals(Money.of(1_000), payScheme.getCombatPay(campaign, contract(2.3, 1.0)));
+            // Scale 2.3 is paid as Scale 2: 1000, spread across 2
+            assertEquals(Money.of(500), payScheme.getCombatPay(campaign, contract(2.3, 1.0)));
         }
 
         @Test
         void combatPayFollowsTheExactScale() {
             campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
 
-            assertEquals(Money.of(1_150), payScheme.getCombatPay(campaign, contract(2.3, 1.0)));
+            // 1150, spread across the whole Scale of 2
+            assertEquals(Money.of(575), payScheme.getCombatPay(campaign, contract(2.3, 1.0)));
         }
 
         @Test
@@ -597,26 +610,37 @@ class ChaosContractDeterminationPayTest {
         void exactScaleNeverFallsBelowTheMinimum() {
             campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
 
-            // Paid as Scale 0.1
+            // Paid as Scale 0.1, spread across a whole Scale of 1
             assertEquals(Money.of(50), payScheme.getCombatPay(campaign, contract(0.02, 1.0)));
         }
 
         @Test
-        void trackIntensityStillDividesByTheWholeScale() {
+        void payIsStillSpreadAcrossTheWholeScale() {
             campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
-            campaignOptions.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, true);
 
-            // Scale 2.6 rolls 3 times the tracks: 1300 / 3 (rounded)
+            // Scale 2.6 brings 3 Essential scenarios a month: 1300 / 3 (rounded)
             assertEquals(Money.of(433), payScheme.getCombatPay(campaign, contract(2.6, 1.0)));
         }
 
         @Test
-        void trackIntensityDivisionRoundsRatherThanTruncates() {
+        void spreadingPayRoundsRatherThanTruncates() {
             campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
-            campaignOptions.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, true);
 
-            // Scale 2.5 rolls 3 times the tracks: 1250 / 3 = 416.67, paid as 417
+            // Scale 2.5 brings 3 Essential scenarios a month: 1250 / 3 = 416.67, paid as 417
             assertEquals(Money.of(417), payScheme.getCombatPay(campaign, contract(2.5, 1.0)));
+        }
+
+        @Test
+        void navPointContractsPayTheirWholeMonthlyCombatPayAtAFractionalScale() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            campaignOptions.set(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS, true);
+            AbstractContract contract = contract(1.4, 1.0);
+            when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.ESPIONAGE);
+
+            // 700 a month, spread across the 4 Nav Points (3 x 1.4 = 4.2, rounded) the contract brings each month - as
+            // an Essential scenario contract's 700 is spread across its 1
+            assertEquals(Money.of(175), payScheme.getCombatPay(campaign, contract));
+            assertEquals(Money.of(700), payScheme.getCombatPay(campaign, contract(1.4, 1.0)));
         }
 
         @Test
@@ -624,8 +648,8 @@ class ChaosContractDeterminationPayTest {
             campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
             campaignOptions.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, true);
 
-            // Scale 4.5 tapers to 3 + (1.5 x 0.5) = 3.75
-            assertEquals(Money.of(1_875), payScheme.getCombatPay(campaign, contract(4.5, 1.0)));
+            // Scale 4.5 tapers to 3 + (1.5 x 0.5) = 3.75: 1875, spread across the whole Scale of 5
+            assertEquals(Money.of(375), payScheme.getCombatPay(campaign, contract(4.5, 1.0)));
             assertEquals(3.75 / 4.5, payScheme.getSalvageTaperMultiplier(campaign, contract(4.5, 1.0)), DELTA);
         }
 

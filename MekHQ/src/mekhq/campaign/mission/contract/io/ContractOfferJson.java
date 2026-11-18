@@ -316,7 +316,10 @@ public record ContractOfferJson(@Nullable String type, @Nullable ContractSearchT
         if ((nonNegotiableTerms != null) && nonNegotiableTerms.anyLocked()) {
             contract.setNonNegotiableTermsData(nonNegotiableTerms);
         }
-        contract.setMoraleData(new MoraleData(Objects.requireNonNullElse(morale, ContractMoraleLevel.STALEMATE)));
+        // An offer is always a contract not yet begun, and a garrison-type contract begins peaceful
+        boolean isPeaceful = contract.getObjectiveType().isGarrisonType();
+        contract.setMoraleData(new MoraleData(Objects.requireNonNullElse(morale, ContractMoraleLevel.STALEMATE),
+              isPeaceful, null));
 
         return contract;
     }

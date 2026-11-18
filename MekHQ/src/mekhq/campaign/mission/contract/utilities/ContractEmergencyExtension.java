@@ -93,6 +93,12 @@ public class ContractEmergencyExtension {
             return false;
         }
 
+        // Recorded before the end date moves, since moving it also recomputes the length: nothing else would remember
+        // where the agreed term ended. A second extension keeps the first one's start.
+        if (contract.getEmergencyExtensionStartDate() == null) {
+            contract.setEmergencyExtensionStartDate(endingDate.plusDays(1));
+        }
+
         LocalDate newEndDate = endingDate.plusMonths(extension);
         contract.updateScheduleData(null, newEndDate);
 
@@ -113,10 +119,22 @@ public class ContractEmergencyExtension {
         roll = d6(2) / 2;
         moraleOrdinal = min(moraleOrdinal + roll, OVERWHELMING.ordinal());
         contract.changeMorale(ContractMoraleLevel.values()[moraleOrdinal]);
+        // The enemy surge that prompts the clause ends any peace a garrison-type contract was enjoying. On
+        // such a contract the surge counts as a raid, so if the enemy has not raided yet, it brings the Batchall the
+        // first raid would have.
+        contract.setPeaceful(false);
+        boolean isFirstRaid = contract.getObjectiveType().isGarrisonType() && !contract.hasBeenRaided();
+        if (isFirstRaid) {
+            contract.setHasBeenRaided(true);
+        }
 
         MekHQ.triggerEvent(new MissionChangedEvent(contract));
 
         triggerDialog(campaign, contract, extension, warName);
+
+        if (isFirstRaid) {
+            ContractBatchall.offerBatchall(campaign, contract);
+        }
 
         return true;
     }

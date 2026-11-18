@@ -53,8 +53,8 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
  * <p>Each qualifying scenario resolution nudges a running tally on the {@link AbstractContract}: a player victory adds
  * {@code +1} and any other result subtracts {@code 1}. When the tally reaches {@code +2} the contract is drawn to a
  * close on the player's success and any outstanding pay is settled; when it reaches {@code -2} the contract ends on the
- * player's failure and no further pay is rendered. The ending itself mirrors how a morale rout finishes a contract
- * early, staging an end date and routed payout the completion flow then honours.</p>
+ * player's failure and no further pay is rendered. The ending itself mirrors how any contract is finished early,
+ * staging an end date and final payout the completion flow then honours.</p>
  *
  * <p>When the contract is tracked by StratCon only Essential scenarios - those tied to a strategic objective - count
  * towards the tally. When the contract has no StratCon campaign state every scenario counts.</p>
@@ -198,13 +198,12 @@ public final class TwoConsecutiveTracks {
         new ImmersiveDialogNotification(campaign, message, true);
 
         if (renderOutstandingPay) {
-            // Settle the remaining escrow through the routed payout, exactly as a morale rout that finishes a contract
-            // early does.
+            // Settle the remaining escrow through the final payout, exactly as any contract finished early does.
             long remainingMonths = contract.getMonthsLeft(endDate);
             Money finalPayout = contract.getMonthlyPayOut().multipliedBy(remainingMonths);
             contract.endContractEarly(endDate, finalPayout);
         } else {
-            // A zero routed payout overrides the escrow settlement when the contract is completed, so a failure ending
+            // A zero final payout overrides the escrow settlement when the contract is completed, so a failure ending
             // renders no outstanding pay.
             contract.endContractEarly(endDate, Money.zero());
         }

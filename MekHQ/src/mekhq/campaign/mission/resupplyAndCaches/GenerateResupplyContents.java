@@ -267,7 +267,7 @@ public class GenerateResupplyContents {
         ContractMoraleLevel moraleLevel = contract.getMoraleLevel();
 
         double multiplier = switch (moraleLevel) {
-            case ROUTED -> 0.25;
+            case SCATTERED -> 0.25;
             case CRITICAL -> 0.5;
             case WEAKENED -> 0.75;
             case STALEMATE -> 1;

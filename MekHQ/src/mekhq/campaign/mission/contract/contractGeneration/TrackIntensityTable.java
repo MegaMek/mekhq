@@ -34,20 +34,17 @@ package mekhq.campaign.mission.contract.contractGeneration;
 
 import static megamek.common.compute.Compute.d6;
 
-import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
-import mekhq.campaign.mission.contract.contractData.ContractIntensityData;
 
 /**
  * The Hot Spots Draconis Reach Track Intensity Tables (Hot Spots Draconis Reach, "Track Intensity Tables", pg 147),
  * transcribed.
  *
- * <p>Each table distributes a contract's StratCon tracks across the months it runs. There is one table per canonical
- * contract length - three months and six months - and within a table the column is the contract's track count, and the
- * row is a 1D6 roll. The chosen cell lists, month by month, how many tracks fall in that month; the months in a cell
- * always sum to the track count that selected the column.</p>
+ * <p>Each table distributes a number of items across the months a contract runs. There is one table per canonical
+ * contract length - three months and six months - and within a table the column is the number of items, and the row is
+ * a 1D6 roll. The chosen cell lists, month by month, how many items fall in that month; the months in a cell always sum
+ * to the number that selected the column.</p>
  *
  * <p>The published tables assume contracts of exactly three or six months. When variable contract lengths yield
  * something else, the shorter table serves the shorter contracts and the longer table the rest (see
@@ -55,7 +52,7 @@ import mekhq.campaign.mission.contract.contractData.ContractIntensityData;
  * six entries) rather than the contract's actual month count. Callers that read the schedule against the calendar must
  * map it onto the real contract duration - a schedule longer than the contract has to fold its tail into the final
  * month rather than dropping it, and a shorter one simply leaves the later months empty (see
- * {@code StratConContractInitializer#scheduleStrategicScenarioSpawnDates}).</p>
+ * {@code StratConContractInitializer#rollSpawnDates}).</p>
  */
 public final class TrackIntensityTable {
     private TrackIntensityTable() {}
@@ -111,227 +108,13 @@ public final class TrackIntensityTable {
           };
 
     /**
-     * Rolls a scenario schedule for a contract from the Track Intensity Tables with a single 1D6 roll.
-     *
-     * <p>Equivalent to {@link #rollSchedule(int, int, int)} with one roll.</p>
-     *
-     * @param lengthInMonths the contract's length in months, choosing which table applies
-     * @param trackCount     the contract's StratCon track count, choosing the table column
-     *
-     * @return the scenario schedule as per-month track counts, distributing {@code trackCount} tracks across the chosen
-     *       table's months
-     */
-    public static List<Integer> rollSchedule(int lengthInMonths, int trackCount) {
-        return rollSchedule(lengthInMonths, trackCount, 1);
-    }
-
-    /**
-     * Rolls a scenario schedule for a contract from the Track Intensity Tables, combining several rolls.
-     *
-     * <p>The contract's length picks the table and its track count picks the column. Each of {@code rollCount} rolls
-     * is an independent 1D6 that picks a row; the chosen rows are summed month by month, so {@code rollCount} rolls
-     * yield roughly {@code rollCount} times the intensity (each row for the column sums to the track count, so the
-     * combined schedule sums to {@code rollCount * trackCount}). A contract with no tracks - or no rolls - gets an
-     * empty schedule (every month zero) spanning the chosen table's native length. A track count above the table's
-     * widest column is clamped to it, so an unusually track-heavy short contract still resolves.</p>
-     *
-     * @param lengthInMonths the contract's length in months, choosing which table applies
-     * @param trackCount     the contract's StratCon track count, choosing the table column
-     * @param rollCount      how many 1D6 rolls to combine (e.g. the contract's scale)
-     *
-     * @return the scenario schedule as per-month track counts, summed across all rolls
-     */
-    public static List<Integer> rollSchedule(int lengthInMonths, int trackCount, int rollCount) {
-        final int[][][] table = (lengthInMonths <= SHORT_TABLE_MAX_MONTHS) ? THREE_MONTH_TABLE : SIX_MONTH_TABLE;
-        final int nativeMonths = table[0][0].length;
-
-        if (trackCount <= 0 || rollCount <= 0) {
-            return ContractIntensityData.emptySchedule(nativeMonths);
-        }
-
-        final int column = Math.min(trackCount, table[0].length);
-        final int[] monthlyTracks = new int[nativeMonths];
-        for (int roll = 0; roll < rollCount; roll++) {
-            final int[] cell = table[d6() - 1][column - 1];
-            for (int month = 0; month < nativeMonths; month++) {
-                monthlyTracks[month] += cell[month];
-            }
-        }
-
-        return Arrays.stream(monthlyTracks).boxed().toList();
-    }
-
-    /**
-     * The average number of weeks in a month, for reading the table's columns as weeks rather than months.
-     */
-    public static final double WEEKS_PER_MONTH = 365.25 / 7 / 12;
-
-    /**
-     * @param trackCount        the contract's track count, as rolled
-     * @param isMinimumOneTrack whether the "Minimum of 1 Hot Spots Track per Roll" option is on
-     *
-     * @return the track count to roll the table for: at least one when the option is on, otherwise as rolled
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public static int getEffectiveTrackCount(int trackCount, boolean isMinimumOneTrack) {
-        return isMinimumOneTrack ? Math.max(1, trackCount) : trackCount;
-    }
-
-    /**
-     * Rolls a scenario schedule as {@link #rollSchedule(int, int, int)} does, honoring the two Track Intensity Table
-     * options.
-     *
-     * <ul>
-     *     <li>"Minimum of 1 Hot Spots Track per Roll" rolls a contract with no tracks as if it had one (see
-     *     {@link #getEffectiveTrackCount}).</li>
-     *     <li>"Roll Hot Spots Tracks Weekly, Not Monthly" reads the table's columns as weeks (see
-     *     {@link #rollWeeklySchedule}).</li>
-     * </ul>
-     *
-     * @param lengthInMonths    the contract's length in months, choosing which table applies
-     * @param trackCount        the contract's track count, as rolled
-     * @param rollCount         how many 1D6 rolls to combine
-     * @param isMinimumOneTrack whether the "Minimum of 1 Hot Spots Track per Roll" option is on
-     * @param isWeekly          whether the "Roll Hot Spots Tracks Weekly, Not Monthly" option is on
-     *
-     * @return the scenario schedule as per-month counts
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public static List<Integer> rollSchedule(int lengthInMonths, int trackCount, int rollCount,
-          boolean isMinimumOneTrack, boolean isWeekly) {
-        int effectiveTrackCount = getEffectiveTrackCount(trackCount, isMinimumOneTrack);
-        return isWeekly ?
-                     rollWeeklySchedule(lengthInMonths, effectiveTrackCount, rollCount) :
-                     rollSchedule(lengthInMonths, effectiveTrackCount, rollCount);
-    }
-
-    /**
-     * Rolls a scenario schedule reading the table's columns as weeks rather than months. The table is rolled afresh
-     * for every block of weeks it covers until the whole contract is filled, and each week's count is then added to
-     * the month it falls in, so the result has one entry per month of the contract, like a monthly schedule.
-     *
-     * @param lengthInMonths the contract's length in months, choosing which table applies and how many weeks to fill
-     * @param trackCount     the track count to roll for
-     * @param rollCount      how many 1D6 rolls to combine for each block of weeks
-     *
-     * @return the scenario schedule as per-month counts, one per month of the contract; every month zero if there are
-     *       no tracks or no rolls
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public static List<Integer> rollWeeklySchedule(int lengthInMonths, int trackCount, int rollCount) {
-        int monthCount = Math.max(1, lengthInMonths);
-        int[] monthlyCounts = new int[monthCount];
-
-        if ((trackCount > 0) && (rollCount > 0)) {
-            int weekCount = Math.max(1, (int) Math.round(monthCount * WEEKS_PER_MONTH));
-            int week = 0;
-            while (week < weekCount) {
-                for (int weeklyCount : rollSchedule(lengthInMonths, trackCount, rollCount)) {
-                    if (week >= weekCount) {
-                        break;
-                    }
-
-                    int month = Math.min((int) (week / WEEKS_PER_MONTH), monthCount - 1);
-                    monthlyCounts[month] += weeklyCount;
-                    week++;
-                }
-            }
-        }
-
-        return Arrays.stream(monthlyCounts).boxed().toList();
-    }
-
-    /**
-     * The average total a schedule rolled by {@link #rollSchedule(int, int, int, boolean, boolean)} would come to,
-     * without rolling it.
-     *
-     * <p>Every row of a column sums to that column's track count, so a monthly schedule always totals the roll count
-     * times the column, whatever the dice say. A weekly schedule repeats the table in blocks of weeks and cuts the last
-     * block short, so its total does depend on the dice; each week contributes the average of its slot across the
-     * table's rows.</p>
-     *
-     * @param lengthInMonths    the contract's length in months, choosing which table applies
-     * @param trackCount        the contract's track count, as rolled
-     * @param rollCount         how many 1D6 rolls to combine
-     * @param isMinimumOneTrack whether the "Minimum of 1 Hot Spots Track per Roll" option is on
-     * @param isWeekly          whether the "Roll Hot Spots Tracks Weekly, Not Monthly" option is on
-     *
-     * @return the average total of the schedule
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public static double getExpectedScheduleTotal(int lengthInMonths, int trackCount, int rollCount,
-          boolean isMinimumOneTrack, boolean isWeekly) {
-        int effectiveTrackCount = getEffectiveTrackCount(trackCount, isMinimumOneTrack);
-        if ((effectiveTrackCount <= 0) || (rollCount <= 0)) {
-            return 0;
-        }
-
-        final int[][][] table = (lengthInMonths <= SHORT_TABLE_MAX_MONTHS) ? THREE_MONTH_TABLE : SIX_MONTH_TABLE;
-        final int column = Math.min(effectiveTrackCount, table[0].length);
-        if (!isWeekly) {
-            return (double) rollCount * column;
-        }
-
-        final int nativeMonths = table[0][0].length;
-        int weekCount = Math.max(1, (int) Math.round(Math.max(1, lengthInMonths) * WEEKS_PER_MONTH));
-        double total = 0;
-        for (int week = 0; week < weekCount; week++) {
-            int slot = week % nativeMonths;
-            int slotTotal = 0;
-            for (int[][] row : table) {
-                slotTotal += row[column - 1][slot];
-            }
-            total += (double) slotTotal / table.length;
-        }
-        return total * rollCount;
-    }
-
-    /**
-     * How much to multiply a contract's combat pay by under the two Track Intensity Table options, so the extra
-     * scenarios they bring do not inflate the contract's total combat pay.
-     *
-     * <ul>
-     *     <li>Rolling weekly brings about {@link #WEEKS_PER_MONTH} times as many scenarios, so combat pay is divided by
-     *     that.</li>
-     *     <li>A contract that rolled no tracks would have had no Essential scenarios, and so earned no combat pay. The
-     *     minimum of one track gives it some, but they pay nothing, keeping its combat pay what it would have been.</li>
-     * </ul>
-     *
-     * @param trackCount        the contract's track count, as rolled
-     * @param isMinimumOneTrack whether the "Minimum of 1 Hot Spots Track per Roll" option is on
-     * @param isWeekly          whether the "Roll Hot Spots Tracks Weekly, Not Monthly" option is on
-     *
-     * @return the multiplier, between zero and one
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public static double getCombatPayMultiplier(int trackCount, boolean isMinimumOneTrack, boolean isWeekly) {
-        double multiplier = isWeekly ? (1.0 / WEEKS_PER_MONTH) : 1.0;
-
-        int effectiveTrackCount = getEffectiveTrackCount(trackCount, isMinimumOneTrack);
-        if (effectiveTrackCount > trackCount) {
-            multiplier *= (double) Math.max(0, trackCount) / effectiveTrackCount;
-        }
-        return multiplier;
-    }
-
-    /**
      * Rolls a schedule spreading an exact number of items - such as points of interest - across a contract's months,
-     * the way {@link #rollSchedule} spreads its tracks.
+     * using the Track Intensity Tables.
      *
-     * <p>A table's widest column caps how many items one roll can place, and {@link #rollSchedule} clamps anything
-     * above it. So the items are split into batches no larger than that column, one roll per batch, and the batches are
-     * summed month by month. Because each row sums to its column, the result always sums to exactly {@code count}.
-     * Like {@link #rollSchedule}, it spans the chosen table's native length.</p>
+     * <p>The contract's length picks the table. A table's widest column caps how many items one roll can place, so the
+     * items are split into batches no larger than that column; each batch picks its column, a 1D6 picks the row, and
+     * the batches are summed month by month. Because each row sums to its column, the result always sums to exactly
+     * {@code count}. It spans the chosen table's native length (three or six months).</p>
      *
      * @param lengthInMonths the contract's length in months, choosing which table applies
      * @param count          how many items to spread
@@ -351,17 +134,13 @@ public final class TrackIntensityTable {
         int remaining = count;
         while (remaining > 0) {
             int batch = Math.min(remaining, widestColumn);
-            List<Integer> batchSchedule = rollSchedule(lengthInMonths, batch, 1);
+            final int[] cell = table[d6() - 1][batch - 1];
             for (int month = 0; month < nativeMonths; month++) {
-                monthlyItems[month] += batchSchedule.get(month);
+                monthlyItems[month] += cell[month];
             }
             remaining -= batch;
         }
 
-        List<Integer> schedule = new ArrayList<>();
-        for (int items : monthlyItems) {
-            schedule.add(items);
-        }
-        return List.copyOf(schedule);
+        return Arrays.stream(monthlyItems).boxed().toList();
     }
 }

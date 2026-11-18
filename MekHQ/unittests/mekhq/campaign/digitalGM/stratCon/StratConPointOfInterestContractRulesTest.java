@@ -91,7 +91,7 @@ class StratConPointOfInterestContractRulesTest {
     }
 
     @Test
-    void forcingNeverSpawnsAgainstARoutedEnemy() {
+    void forcingNeverSpawnsWhileTheContractIsPeaceful() {
         assertFalse(StratConRulesManager.rollsRandomScenario(PointOfInterestDeploymentOutcome.FORCE_SCENARIO,
               false,
               false,

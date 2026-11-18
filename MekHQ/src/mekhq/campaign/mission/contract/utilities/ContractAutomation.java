@@ -87,9 +87,9 @@ public class ContractAutomation {
      *
      * <p>Regardless of the transit choice the contract is dated to <b>start on the day the force should arrive</b> at
      * the target system (today plus the computed travel time; today if already there). When {@code mothball} is set,
-     * eligible units are GM-mothballed first. When {@code travel} is set and a jump path exists, the jump is plotted
-     * and the journey is charged; if it is not set, the player is left to make the trip themselves but the contract
-     * still starts on the projected arrival day.</p>
+     * eligible units are GM-mothballed first. When {@code travel} is set and a jump path exists, the journey is charged
+     * and, if the charge succeeds, the jump is plotted. If {@code travel} is not set, or the journey cannot be afforded,
+     * the player is left to make the trip themselves but the contract still starts on the projected arrival day.</p>
      *
      * @param campaign the current campaign
      * @param contract the contract being started
@@ -129,15 +129,7 @@ public class ContractAutomation {
             return;
         }
 
-            campaign.getPlayerForce().getForceDetachment().getCurrentLocation().setJumpPath(jumpPath);
-            campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
-            campaign.getGUI().refreshAllTabs();
-
-        Detachment detachment = playerForce.getForceDetachment();
-        TransportCostCalculations costCalculations = new TransportCostCalculations(detachment.getHangar().getUnits(),
-              playerForce.getWarehouse().getSpareParts(),
-              detachment.getPersonnel().values(),
-              EXP_REGULAR);
+        TransportCostCalculations costCalculations = campaign.getTransportCostCalculation(EXP_REGULAR);
         Money cost = costCalculations.calculateCostForEntireJourney(travelDays, jumpPath);
 
         // Hyperlinked so the player can jump straight to the destination on the interstellar map.
@@ -145,13 +137,16 @@ public class ContractAutomation {
         String targetSystem = (targetPlanetarySystem == null) ?
                                     contract.getTargetSystemName(campaign.getLocalDate()) :
                                     targetPlanetarySystem.getHyperlinkedName(campaign.getLocalDate());
-        // performJumpTransaction returns an empty string when the charge succeeded.
+        // performJumpTransaction returns an empty string when the charge succeeded. The force only departs once the
+        // journey is paid for; otherwise the player is left to make the trip themselves, as when travel is not chosen.
         String jumpReport = TransportCostCalculations.performJumpTransaction(playerForce.getFinances(),
               jumpPath,
               campaign.getLocalDate(),
               cost,
               campaign.getCurrentSystem());
         if (jumpReport.isBlank()) {
+            currentLocation.setJumpPath(jumpPath);
+            campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));
             campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, "transitDescription.report",
                   targetSystem, travelDays));
         } else {

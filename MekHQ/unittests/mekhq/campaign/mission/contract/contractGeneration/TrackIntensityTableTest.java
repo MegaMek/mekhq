@@ -33,7 +33,6 @@
 package mekhq.campaign.mission.contract.contractGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mockStatic;
 
 import java.util.List;
@@ -44,7 +43,7 @@ import org.mockito.MockedStatic;
 
 /**
  * Tests {@link TrackIntensityTable}: the transcription of the printed Track Intensity Tables, the 1D6 row lookup, table
- * selection by contract length, track-count clamping, and the roll-count summing that scales intensity. The 1D6 roll is
+ * selection by contract length, and the batching that places counts above a table's widest column. The 1D6 roll is
  * stubbed so each table row can be pinned exactly.
  */
 class TrackIntensityTableTest {
@@ -53,15 +52,10 @@ class TrackIntensityTableTest {
     private static final int THREE_MONTH_LENGTH = 3;
     private static final int SIX_MONTH_LENGTH = 6;
 
-    private static List<Integer> rollForRow(final int lengthInMonths, final int trackCount, final int row) {
-        return rollForRow(lengthInMonths, trackCount, 1, row);
-    }
-
-    private static List<Integer> rollForRow(final int lengthInMonths, final int trackCount, final int rollCount,
-          final int row) {
+    private static List<Integer> rollForRow(final int lengthInMonths, final int count, final int row) {
         try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
             compute.when(Compute::d6).thenReturn(row);
-            return TrackIntensityTable.rollSchedule(lengthInMonths, trackCount, rollCount);
+            return TrackIntensityTable.rollScheduleForCount(lengthInMonths, count);
         }
     }
 
@@ -89,23 +83,23 @@ class TrackIntensityTableTest {
     }
 
     @Test
-    void everyThreeMonthCellHasThreeMonthsSummingToTrackCount() {
-        for (int trackCount = 1; trackCount <= 3; trackCount++) {
+    void everyThreeMonthCellHasThreeMonthsSummingToCount() {
+        for (int count = 1; count <= 3; count++) {
             for (int row = 1; row <= 6; row++) {
-                List<Integer> schedule = rollForRow(THREE_MONTH_LENGTH, trackCount, row);
-                assertEquals(3, schedule.size(), "row " + row + " track count " + trackCount);
-                assertEquals(trackCount, sum(schedule), "row " + row + " track count " + trackCount);
+                List<Integer> schedule = rollForRow(THREE_MONTH_LENGTH, count, row);
+                assertEquals(3, schedule.size(), "row " + row + " count " + count);
+                assertEquals(count, sum(schedule), "row " + row + " count " + count);
             }
         }
     }
 
     @Test
-    void everySixMonthCellHasSixMonthsSummingToTrackCount() {
-        for (int trackCount = 1; trackCount <= 6; trackCount++) {
+    void everySixMonthCellHasSixMonthsSummingToCount() {
+        for (int count = 1; count <= 6; count++) {
             for (int row = 1; row <= 6; row++) {
-                List<Integer> schedule = rollForRow(SIX_MONTH_LENGTH, trackCount, row);
-                assertEquals(6, schedule.size(), "row " + row + " track count " + trackCount);
-                assertEquals(trackCount, sum(schedule), "row " + row + " track count " + trackCount);
+                List<Integer> schedule = rollForRow(SIX_MONTH_LENGTH, count, row);
+                assertEquals(6, schedule.size(), "row " + row + " count " + count);
+                assertEquals(count, sum(schedule), "row " + row + " count " + count);
             }
         }
     }
@@ -123,44 +117,16 @@ class TrackIntensityTableTest {
     }
 
     @Test
-    void trackCountAboveWidestColumnIsClamped() {
-        // The three-month table has three columns; a track count of 5 clamps to column 3 (so it sums to 3, not 5).
+    void countAboveWidestColumnIsRolledInBatches() {
+        // The three-month table has three columns: a count of 5 is a batch of 3 then a batch of 2, here both on row 1.
         List<Integer> threeMonth = rollForRow(THREE_MONTH_LENGTH, 5, 1);
-        assertEquals(List.of(0, 1, 2), threeMonth);
-        assertEquals(3, sum(threeMonth));
+        assertEquals(List.of(0, 2, 3), threeMonth);
+        assertEquals(5, sum(threeMonth));
 
-        // The six-month table has six columns; a track count of 9 clamps to column 6.
+        // The six-month table has six columns: a count of 9 is a batch of 6 then a batch of 3.
         List<Integer> sixMonth = rollForRow(SIX_MONTH_LENGTH, 9, 1);
-        assertEquals(6, sum(sixMonth));
-    }
-
-    @Test
-    void zeroTrackCountYieldsAnEmptyScheduleOfTheTableLength() {
-        assertEquals(List.of(0, 0, 0), TrackIntensityTable.rollSchedule(THREE_MONTH_LENGTH, 0));
-        assertEquals(List.of(0, 0, 0, 0, 0, 0), TrackIntensityTable.rollSchedule(SIX_MONTH_LENGTH, 0));
-    }
-
-    @Test
-    void rollCountSumsThatManyRowsToScaleIntensity() {
-        // Every roll is pinned to the same row, so the result is that row's cell multiplied element-wise by the count.
-        assertEquals(List.of(0, 3, 6), rollForRow(THREE_MONTH_LENGTH, 3, 3, 1));
-        assertEquals(6 * 3, sum(rollForRow(SIX_MONTH_LENGTH, 6, 3, 1)));
-    }
-
-    @Test
-    void nonPositiveRollCountYieldsAnEmptySchedule() {
-        assertEquals(List.of(0, 0, 0), rollForRow(THREE_MONTH_LENGTH, 3, 0, 1));
-        assertEquals(List.of(0, 0, 0, 0, 0, 0), rollForRow(SIX_MONTH_LENGTH, 6, -2, 1));
-    }
-
-    @Test
-    void twoArgRollIsASingleRoll() {
-        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
-            compute.when(Compute::d6).thenReturn(1);
-            // Same row, one roll: the two-arg overload matches the three-arg overload with a roll count of one.
-            assertEquals(TrackIntensityTable.rollSchedule(SIX_MONTH_LENGTH, 6, 1),
-                  TrackIntensityTable.rollSchedule(SIX_MONTH_LENGTH, 6));
-        }
+        assertEquals(List.of(1, 2, 1, 2, 1, 2), sixMonth);
+        assertEquals(9, sum(sixMonth));
     }
 
     @Test
@@ -185,93 +151,5 @@ class TrackIntensityTableTest {
     void scheduleForANonPositiveCountIsEmpty() {
         assertEquals(List.of(0, 0, 0), TrackIntensityTable.rollScheduleForCount(3, 0));
         assertEquals(List.of(0, 0, 0, 0, 0, 0), TrackIntensityTable.rollScheduleForCount(6, -2));
-    }
-    // Track Intensity Table options
-
-    @Test
-    void minimumOneTrackOnlyRaisesAContractWithNoTracks() {
-        assertEquals(1, TrackIntensityTable.getEffectiveTrackCount(0, true));
-        assertEquals(0, TrackIntensityTable.getEffectiveTrackCount(0, false));
-        assertEquals(3, TrackIntensityTable.getEffectiveTrackCount(3, true));
-    }
-
-    @Test
-    void minimumOneTrackGivesAContractWithNoTracksOneTrackPerRoll() {
-        assertEquals(0, sum(TrackIntensityTable.rollSchedule(THREE_MONTH_LENGTH, 0, 2, false, false)));
-        assertEquals(2, sum(TrackIntensityTable.rollSchedule(THREE_MONTH_LENGTH, 0, 2, true, false)));
-    }
-
-    @Test
-    void weeklyScheduleHasOneEntryPerMonthAndFillsEveryWeek() {
-        // Thirteen weeks off the three-week table: four whole rolls and the first week of a fifth, at one track each.
-        for (int attempt = 0; attempt < 20; attempt++) {
-            List<Integer> schedule = TrackIntensityTable.rollWeeklySchedule(THREE_MONTH_LENGTH, 1, 1);
-
-            assertEquals(THREE_MONTH_LENGTH, schedule.size());
-            int total = sum(schedule);
-            assertTrue((total >= 4) && (total <= 5), "total " + total);
-        }
-    }
-
-    @Test
-    void weeklyScheduleWithNoTracksIsEmpty() {
-        assertEquals(List.of(0, 0, 0), TrackIntensityTable.rollWeeklySchedule(THREE_MONTH_LENGTH, 0, 1));
-    }
-
-    @Test
-    void weeklyOptionRollsWeeklyThroughTheOptionOverload() {
-        assertEquals(SIX_MONTH_LENGTH, TrackIntensityTable.rollSchedule(SIX_MONTH_LENGTH, 2, 1, false, true).size());
-    }
-
-    @Test
-    void combatPayIsUnchangedWithoutTheOptions() {
-        assertEquals(1.0, TrackIntensityTable.getCombatPayMultiplier(2, false, false), 0.0001);
-    }
-
-    @Test
-    void combatPayIsDividedByWeeksPerMonthWhenRollingWeekly() {
-        assertEquals(1.0 / TrackIntensityTable.WEEKS_PER_MONTH,
-              TrackIntensityTable.getCombatPayMultiplier(2, false, true),
-              0.0001);
-    }
-
-    @Test
-    void combatPayIsZeroForAContractThatOnlyFightsThroughTheMinimumTrack() {
-        assertEquals(0.0, TrackIntensityTable.getCombatPayMultiplier(0, true, false), 0.0001);
-        assertEquals(0.0, TrackIntensityTable.getCombatPayMultiplier(0, true, true), 0.0001);
-    }
-
-    @Test
-    void combatPayIsUnchangedByTheMinimumTrackWhenTracksWereRolled() {
-        assertEquals(1.0, TrackIntensityTable.getCombatPayMultiplier(2, true, false), 0.0001);
-    }
-
-    @Test
-    void expectedMonthlyTotalIsRollsTimesTracks() {
-        assertEquals(6.0, TrackIntensityTable.getExpectedScheduleTotal(6, 3, 2, false, false), 0.0001);
-    }
-
-    @Test
-    void expectedTotalClampsToTheWidestColumn() {
-        // The three-month table's widest column is three tracks
-        assertEquals(6.0, TrackIntensityTable.getExpectedScheduleTotal(3, 5, 2, false, false), 0.0001);
-    }
-
-    @Test
-    void expectedTotalIsZeroWithoutTracksOrRolls() {
-        assertEquals(0.0, TrackIntensityTable.getExpectedScheduleTotal(6, 0, 3, false, false), 0.0001);
-        assertEquals(0.0, TrackIntensityTable.getExpectedScheduleTotal(6, 3, 0, false, false), 0.0001);
-    }
-
-    @Test
-    void expectedTotalHonorsTheMinimumTrack() {
-        assertEquals(2.0, TrackIntensityTable.getExpectedScheduleTotal(6, 0, 2, true, false), 0.0001);
-    }
-
-    @Test
-    void expectedWeeklyTotalAveragesTheCutShortBlock() {
-        // 3 months = 13 weeks = four full three-week blocks (one track each) plus the first slot of a fifth, which
-        // holds a track on one row in six; two rolls double it
-        assertEquals(2 * (4 + 1.0 / 6), TrackIntensityTable.getExpectedScheduleTotal(3, 1, 2, false, true), 0.0001);
     }
 }

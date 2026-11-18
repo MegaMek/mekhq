@@ -38,7 +38,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -55,6 +54,8 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
+import mekhq.campaign.digitalGM.stratCon.StratConSpawnRates;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConEnemyEngineersBehavior;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
@@ -66,24 +67,21 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
- * What the enemy does with facilities between the player's fights: monthly upkeep of its own facilities,
- * counterattacks on facilities the player or their employer holds, and enemy engineers building new outposts.
+ * What the enemy does with facilities between the player's fights: monthly upkeep of its own facilities, the
+ * counterattacks and assaults it makes on facilities the player or their employer holds, and enemy engineers building
+ * new outposts.
  *
  * <ul>
- *     <li><b>Monthly upkeep.</b> At the start of each month, every enemy facility repairs one condition step and
- *     reinforces one garrison step, unless a fight is under way there, it is cut off from its supply lines, or it is
- *     under siege.</li>
- *     <li><b>Counterattacks.</b> When one of the contract's ordinary scenarios comes due, it may instead become a
- *     counterattack on a facility held by the player or their employer. A counterattack is a Crisis, placed on the
- *     facility's hex with a deployment deadline of 3 to 7 days. Losing or ignoring it hands the facility to the enemy,
- *     except that one held by the employer is left to an off-screen roll when ignored. If a month passes without a
- *     counterattack, the next ordinary scenario is always one, if there is anything to counterattack.</li>
- *     <li><b>Enemy engineers.</b> Once a month per 3 points of the contract's scale (per 9 when support points are
- *     factored into scale), enemy engineers appear on a random day as a point of interest. If not dealt with before
- *     they leave, they become an enemy outpost (see {@link StratConEnemyEngineersBehavior}).</li>
+ *     <li><b>Monthly upkeep.</b> At the start of each month, every enemy facility repairs and reinforces by the "Enemy
+ *     Facility Activity" option's worth of steps, unless a fight is under way there, it is cut off from its supply
+ *     lines, or it is under siege.</li>
+ *     <li><b>Counterattacks and assaults.</b> Started by the contract's facility attacks (see
+ *     {@link StratConFacilityAttacks}). Losing one outright hands the facility to the enemy; ignoring one does too,
+ *     except that one held by the employer is left to an off-screen roll.</li>
+ *     <li><b>Enemy engineers.</b> {@value StratConSpawnRates#ENGINEERS_PER_SCALE} a month per point of the contract's
+ *     Scale, each on a random day, as a point of interest. If not dealt with before they leave, they become an enemy
+ *     outpost (see {@link StratConEnemyEngineersBehavior}). They need Facility Operations.</li>
  * </ul>
- *
- * <p>The "Enemy Facility Activity" campaign option scales all three; at 0, the enemy does none of them.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -96,11 +94,8 @@ public final class StratConEnemyFacilityActivity {
     /** The highest value the Enemy Facility Activity option takes. */
     static final double MAXIMUM_ACTIVITY = 3.0;
 
-    /** The percentage chance, at an activity of 1, that a due ordinary scenario becomes a counterattack. */
-    static final int COUNTERATTACK_CHANCE_PERCENT = 25;
-
-    /** How many days, at an activity of 1, can pass before the next due ordinary scenario is always a counterattack. */
-    static final int COUNTERATTACK_GUARANTEE_DAYS = 30;
+    /** The percentage chance, at an activity of 1, that the enemy sends a relief force against a new siege. */
+    static final int RELIEF_CHANCE_PERCENT = 25;
 
     /** The fewest days a counterattack gives the player to deploy. */
     static final int COUNTERATTACK_MINIMUM_WARNING_DAYS = 3;
@@ -112,12 +107,6 @@ public final class StratConEnemyFacilityActivity {
     static final int OFF_SCREEN_DEFENSE_TARGET = 9;
     /** The condition and garrison steps your employer restores to each facility it holds every month. */
     static final int EMPLOYER_UPKEEP_STEPS = 1;
-
-    /** How many points of scale bring one enemy engineers point of interest a month. */
-    static final int ENGINEER_SCALE_DIVISOR = 3;
-
-    /** How many points of scale bring one a month when support points are factored into scale. */
-    static final int ENGINEER_SUPPORT_POINT_SCALE_DIVISOR = 9;
 
     private StratConEnemyFacilityActivity() {}
 
@@ -224,31 +213,8 @@ public final class StratConEnemyFacilityActivity {
     }
 
     /**
-     * Decides whether a due ordinary scenario becomes a counterattack.
-     *
-     * @param activity             the Enemy Facility Activity option
-     * @param daysSinceLastAttack  days since the last counterattack, or since the contract began if there has been none
-     * @param percentile           a roll from 0 to 99
-     *
-     * @return {@code true} if it does; never at an activity of 0
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    static boolean isCounterattack(double activity, long daysSinceLastAttack, int percentile) {
-        if (activity <= 0) {
-            return false;
-        }
-
-        if (daysSinceLastAttack >= Math.round(COUNTERATTACK_GUARANTEE_DAYS / activity)) {
-            return true;
-        }
-        return percentile < Math.round(COUNTERATTACK_CHANCE_PERCENT * activity);
-    }
-
-    /**
-     * Rolls whether the enemy sends a relief force against a new siege: a counterattack's daily chance, scaled by
-     * activity, without the guarantee a long quiet spell gives a counterattack.
+     * Rolls whether the enemy sends a relief force against a new siege: {@value #RELIEF_CHANCE_PERCENT}%, scaled by
+     * activity.
      *
      * @param activity   the "Enemy Facility Activity" option (see {@link #getActivity})
      * @param percentile a roll from 0 to 99
@@ -259,91 +225,12 @@ public final class StratConEnemyFacilityActivity {
      * @since 0.51.01
      */
     static boolean isReliefSent(double activity, int percentile) {
-        return (activity > 0) && (percentile < Math.round(COUNTERATTACK_CHANCE_PERCENT * activity));
+        return (activity > 0) && (percentile < Math.round(RELIEF_CHANCE_PERCENT * activity));
     }
 
     /**
-     * Turns as many of the day's due ordinary scenarios into counterattacks as the rules call for (see
-     * {@link #isCounterattack}), each on a different facility held by the player or their employer. Each counterattack
-     * takes the place of one ordinary scenario, so the contract's pace is unchanged.
-     *
-     * @param campaign      the current campaign
-     * @param contract      the contract
-     * @param campaignState the contract's StratCon campaign state
-     * @param scenarioCount how many ordinary scenarios are due today
-     *
-     * @return how many of them became counterattacks, and so should not be generated as ordinary scenarios
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public static int launchCounterattacks(Campaign campaign, AbstractContract contract,
-          StratConCampaignState campaignState, int scenarioCount) {
-        double activity = getActivity(campaign);
-        if (activity <= 0) {
-            return 0;
-        }
-
-        LocalDate today = campaign.getLocalDate();
-        // The quiet spell that guarantees a counterattack counts from the first day counterattacks could come - not
-        // from the contract's start, which for a save loaded partway through would make the first one certain.
-        if (campaignState.getLastCounterattackDate() == null) {
-            campaignState.setLastCounterattackDate(today);
-        }
-
-        LocalDate contractEnd = contract.getEndingDate();
-        int launchedCount = 0;
-        for (int scenarioIndex = 0; scenarioIndex < scenarioCount; scenarioIndex++) {
-            if (!isCounterattack(activity, getDaysSinceLastCounterattack(contract, campaignState, today),
-                  Compute.randomInt(100))) {
-                continue;
-            }
-
-            CounterattackTarget target = pickCounterattackTarget(campaignState);
-            if (target == null) {
-                break;
-            }
-
-            int warningDays = COUNTERATTACK_MINIMUM_WARNING_DAYS
-                                    + Compute.randomInt(COUNTERATTACK_MAXIMUM_WARNING_DAYS
-                                                              - COUNTERATTACK_MINIMUM_WARNING_DAYS + 1);
-            // Like any scenario, a counterattack must fall before the contract ends.
-            if ((contractEnd != null) && !today.plusDays(warningDays).isBefore(contractEnd)) {
-                continue;
-            }
-            StratConScenario scenario = StratConRulesManager.startCounterattackScenario(campaign,
-                  contract,
-                  target.track(),
-                  target.coords(),
-                  warningDays);
-            if (scenario == null) {
-                LOGGER.warn("Could not generate a counterattack on {} in sector {}.",
-                      target.coords(),
-                      target.track().getDisplayableName());
-                continue;
-            }
-
-            campaignState.setLastCounterattackDate(today);
-            launchedCount++;
-            announceCounterattack(campaign, target, scenario);
-        }
-        return launchedCount;
-    }
-
-    static long getDaysSinceLastCounterattack(AbstractContract contract, StratConCampaignState campaignState,
-          LocalDate today) {
-        LocalDate lastAttackDate = campaignState.getLastCounterattackDate();
-        if (lastAttackDate == null) {
-            lastAttackDate = contract.getStartDate();
-        }
-        if (lastAttackDate == null) {
-            return 0;
-        }
-        return ChronoUnit.DAYS.between(lastAttackDate, today);
-    }
-
-    /**
-     * A facility an enemy counterattack can fall on.
+     * A facility held by the player or their employer that the enemy can attack: one with no fight already under way
+     * on its hex.
      *
      * @param track  the facility's sector
      * @param coords the facility's hex
@@ -373,23 +260,28 @@ public final class StratConEnemyFacilityActivity {
         return targets;
     }
 
-    private static @Nullable CounterattackTarget pickCounterattackTarget(StratConCampaignState campaignState) {
-        List<CounterattackTarget> targets = getCounterattackTargets(campaignState);
-        if (targets.isEmpty()) {
-            return null;
-        }
-        return targets.get(Compute.randomInt(targets.size()));
-    }
-
-    private static void announceCounterattack(Campaign campaign, CounterattackTarget target,
-          StratConScenario scenario) {
+    /**
+     * Tells the player the enemy is attacking one of their side's facilities: in the daily report, and with a warning
+     * when there is a GUI.
+     *
+     * @param campaign   the current campaign
+     * @param target     the facility under attack
+     * @param scenario   the attack's scenario
+     * @param isAssault  {@code true} for an assault, fought today; {@code false} for a counterattack, with warning
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void announceCounterattack(Campaign campaign, CounterattackTarget target, StratConScenario scenario,
+          boolean isAssault) {
         StratConFacility facility = target.track().getFacility(target.coords());
         String facilityName = (facility == null) ? "" : facility.getDisplayableName();
         String deadline = StratConFacilityAdvisor.formatDate(scenario.getDeploymentDate());
         boolean isEmployerHeld = (facility != null) && (facility.getOwner() == ForceAlignment.Allied);
+        String keyPrefix = isAssault ? "assault." : "";
 
         campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE,
-              "report.counterattack",
+              keyPrefix + "report.counterattack",
               facilityName,
               target.track().getDisplayableName(),
               target.coords().toBTString(),
@@ -402,7 +294,7 @@ public final class StratConEnemyFacilityActivity {
         new ImmersiveDialogSimple(campaign,
               null,
               getFormattedTextAt(RESOURCE_BUNDLE,
-                    isEmployerHeld ? "warning.message.employer" : "warning.message.player",
+                    keyPrefix + (isEmployerHeld ? "warning.message.employer" : "warning.message.player"),
                     facilityName,
                     target.track().getDisplayableName(),
                     deadline),
@@ -542,23 +434,12 @@ public final class StratConEnemyFacilityActivity {
     }
 
     /**
-     * @param scale                          the contract's scale
-     * @param isFactorSupportPointsIntoScale whether support points are factored into scale
-     * @param activity                       the Enemy Facility Activity option
+     * The contract-level daily step for enemy engineers: places those due today, each in a random sector with room.
+     * One that finds no room is dropped. None are placed while Facility Operations is off, or while a Garrison Duty or
+     * Retainer contract is peaceful, between raids; those due then are simply dropped.
      *
-     * @return how many enemy engineers appear each month
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    static int getMonthlyEngineerCount(int scale, boolean isFactorSupportPointsIntoScale, double activity) {
-        int divisor = isFactorSupportPointsIntoScale ? ENGINEER_SUPPORT_POINT_SCALE_DIVISOR : ENGINEER_SCALE_DIVISOR;
-        return (int) Math.floor((Math.max(0, scale) * activity) / divisor);
-    }
-
-    /**
-     * The contract-level daily step: schedules the next month's enemy engineers once the last month's schedule runs
-     * out, and places those due today on a random sector with room. One that finds no room is dropped.
+     * <p>A contract whose engineers were never scheduled - one from before they were scheduled up front - is scheduled
+     * from today (see {@link #scheduleEnemyEngineers}).</p>
      *
      * @param campaign      the current campaign
      * @param contract      the contract
@@ -569,32 +450,14 @@ public final class StratConEnemyFacilityActivity {
      */
     public static void processEnemyEngineers(Campaign campaign, AbstractContract contract,
           StratConCampaignState campaignState) {
-        // At no activity the enemy builds nothing, including engineers scheduled before the option was turned down.
-        if (getActivity(campaign) <= 0) {
-            campaignState.getEnemyEngineerDates().clear();
-            return;
-        }
-
         LocalDate today = campaign.getLocalDate();
         LocalDate scheduledUntil = campaignState.getEnemyEngineersScheduledUntil();
         if ((scheduledUntil == null) || !today.isBefore(scheduledUntil)) {
-            scheduleEnemyEngineers(campaign, contract, campaignState, today);
+            scheduleEnemyEngineers(contract, campaignState, today);
         }
 
-        List<LocalDate> engineerDates = campaignState.getEnemyEngineerDates();
-        int dueCount = 0;
-        for (LocalDate engineerDate : engineerDates) {
-            if (!engineerDate.isAfter(today)) {
-                dueCount++;
-            }
-        }
-        if (dueCount == 0) {
-            return;
-        }
-        engineerDates.removeIf(engineerDate -> !engineerDate.isAfter(today));
-
-        // The enemy is in no state to expand while routed.
-        if (contract.getMoraleLevel().isRouted()) {
+        int dueCount = StratConScenarioTempo.takeDueScenarioDates(campaignState.getEnemyEngineerDates(), today);
+        if ((dueCount == 0) || !StratConFacilityOperations.isEnabled(campaign) || contract.isPeaceful()) {
             return;
         }
 
@@ -610,26 +473,70 @@ public final class StratConEnemyFacilityActivity {
         StratConPointOfInterestRules.announceNewPointsOfInterest(campaign, contract, placed);
     }
 
-    private static void scheduleEnemyEngineers(Campaign campaign, AbstractContract contract,
-          StratConCampaignState campaignState, LocalDate today) {
-        LocalDate monthEnd = today.plusMonths(1);
-        campaignState.setEnemyEngineersScheduledUntil(monthEnd);
+    /**
+     * Schedules a contract's enemy engineers from the given day to the contract's end, replacing any scheduled from
+     * that
+     * day on: {@value StratConSpawnRates#ENGINEERS_PER_SCALE} a month per point of Scale, each on a random day within
+     * its month. Does nothing without a settled start date.
+     *
+     * @param contract      the contract
+     * @param campaignState the contract's StratCon campaign state
+     * @param fromDate      the first day to schedule on; the contract's start date when it is accepted
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void scheduleEnemyEngineers(AbstractContract contract, StratConCampaignState campaignState,
+          @Nullable LocalDate fromDate) {
+        LocalDate scheduledUntil = scheduleMonthlyDates(contract,
+              campaignState,
+              campaignState.getEnemyEngineerDates(),
+              StratConSpawnRates.ENGINEERS_PER_SCALE,
+              fromDate);
+        if (scheduledUntil != null) {
+            campaignState.setEnemyEngineersScheduledUntil(scheduledUntil);
+        }
+    }
 
-        LocalDate contractEnd = contract.getEndingDate();
-        if ((contractEnd != null) && contractEnd.isBefore(monthEnd)) {
-            monthEnd = contractEnd;
-        }
-        int dayCount = (int) ChronoUnit.DAYS.between(today, monthEnd);
-        if (dayCount <= 0) {
-            return;
+    /**
+     * Lays out a contract's dates for something that comes a set number of times a month per point of Scale (see
+     * {@link StratConSpawnRates}), each on a random day within its month, from the given day to the contract's end. Any
+     * dates already in the list from that day on are replaced; earlier ones are left alone. A date on or after the
+     * contract's last day is moved to the day before.
+     *
+     * @param contract      the contract
+     * @param campaignState the contract's StratCon campaign state, for how its Scale is counted (see
+     *                      {@link StratConSpawnRates#isFactorSupportPointsIntoScale(StratConCampaignState)})
+     * @param dates         the list to schedule into
+     * @param ratePerScale  how many come each month per point of Scale
+     * @param fromDate     the first day to schedule on, or {@code null} for the contract's start
+     *
+     * @return the day the schedule runs to - the contract's end - or {@code null} if the contract has no settled start
+     *       date and nothing was scheduled
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable LocalDate scheduleMonthlyDates(AbstractContract contract, StratConCampaignState campaignState,
+          List<LocalDate> dates, double ratePerScale, @Nullable LocalDate fromDate) {
+        LocalDate startDate = contract.getStartDate();
+        if (startDate == null) {
+            return null;
         }
 
-        int engineerCount = getMonthlyEngineerCount(contract.getScale(),
-              campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
-              getActivity(campaign));
-        for (int engineer = 0; engineer < engineerCount; engineer++) {
-            campaignState.getEnemyEngineerDates().add(today.plusDays(Compute.randomInt(dayCount)));
+        LocalDate firstDate = ((fromDate == null) || fromDate.isBefore(startDate)) ? startDate : fromDate;
+        LocalDate endDate = contract.getEndingDate();
+        if (endDate == null) {
+            endDate = startDate.plusMonths(Math.max(1, contract.getLengthInMonths()));
         }
+
+        dates.removeIf(date -> !date.isBefore(firstDate));
+        List<Integer> schedule = StratConSpawnRates.getMonthlySchedule(contract,
+              StratConSpawnRates.isFactorSupportPointsIntoScale(campaignState),
+              ratePerScale);
+        dates.addAll(StratConContractInitializer.layOutSpawnDates(startDate, endDate, schedule,
+              contract.getLengthInMonths(), firstDate));
+        return endDate;
     }
 
     private static @Nullable StratConPointOfInterest placeEnemyEngineers(StratConCampaignState campaignState,

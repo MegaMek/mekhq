@@ -62,6 +62,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.RepairCosts;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.StockCount;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.missing.MissingAvionics;
@@ -930,6 +931,17 @@ public class MekLocation extends Part {
         } else {
             return super.getAllMods(tech);
         }
+    }
+
+    /**
+     * Sealing or re-attaching the location shows no stock, even on a unit being stripped.
+     */
+    @Override
+    public @Nullable StockCount getShownStock() {
+        if (!isDamagedBeyondRepair() && (isBreached() || isBlownOff())) {
+            return null;
+        }
+        return super.getShownStock();
     }
 
     @Override

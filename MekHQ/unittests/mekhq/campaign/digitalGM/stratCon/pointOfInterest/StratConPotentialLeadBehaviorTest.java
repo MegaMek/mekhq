@@ -229,8 +229,9 @@ class StratConPotentialLeadBehaviorTest {
     }
 
     @Test
-    void aRoutedEnemyLeavesOnlyDuds() {
-        Campaign campaign = deploymentCampaign(MEK, ContractMoraleLevel.ROUTED, false);
+    void theContractBeingPeacefulLeavesOnlyDuds() {
+        Campaign campaign = deploymentCampaign(MEK, ContractMoraleLevel.STALEMATE, false);
+        when(contract.isPeaceful()).thenReturn(true);
 
         assertEquals(PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO, deploy(campaign));
         assertDud();

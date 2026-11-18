@@ -55,11 +55,8 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
 
 /**
- * Tests for Deployment Orders: the command step a contract's command rights and employer give it, the monthly order
- * table, and scheduling the orders over a contract's run.
- *
- * <p>Step 3 always gives exactly one order a month, so the scheduling tests use Integrated command rights with a
- * neutral employer to stay deterministic.</p>
+ * Tests for Deployment Orders: the command step a contract's command rights and employer give it, how many orders
+ * that brings each month (the command step per point of Scale), and scheduling the orders over a contract's run.
  *
  * @author Illiani
  * @since 0.51.01
@@ -98,14 +95,13 @@ class StratConDeploymentOrdersTest {
         when(contract.getEndingDate()).thenReturn(START_DATE.plusMonths(LENGTH_IN_MONTHS));
         when(contract.getLengthInMonths()).thenReturn(LENGTH_IN_MONTHS);
         when(contract.getScale()).thenReturn(SCALE);
+        when(contract.getExactScale()).thenReturn((double) SCALE);
         return contract;
     }
 
-    private static List<StratConScheduledPointOfInterest> schedule(AbstractContract contract,
-          boolean isMultiplyTrackIntensityByScale, LocalDate fromDate) {
+    private static List<StratConScheduledPointOfInterest> schedule(AbstractContract contract, LocalDate fromDate) {
         StratConCampaignState campaignState = new StratConCampaignState();
-        StratConDeploymentOrders.scheduleDeploymentOrders(contract, campaignState, isMultiplyTrackIntensityByScale,
-              fromDate);
+        StratConDeploymentOrders.scheduleDeploymentOrders(contract, campaignState, fromDate);
         return campaignState.getScheduledPointsOfInterest();
     }
 
@@ -141,44 +137,38 @@ class StratConDeploymentOrdersTest {
         assertEquals(0, StratConDeploymentOrders.getCommandStep(null, faction(true, false)));
     }
 
-    @Test
-    void theMonthlyTableStaysWithinItsBounds() {
-        for (int roll = 0; roll < 200; roll++) {
-            assertEquals(0, StratConDeploymentOrders.rollMonthlyOrderCount(0));
-            int stepOne = StratConDeploymentOrders.rollMonthlyOrderCount(1);
-            assertTrue((stepOne == 0) || (stepOne == 1));
-            int stepTwo = StratConDeploymentOrders.rollMonthlyOrderCount(2);
-            assertTrue((stepTwo == 0) || (stepTwo == 1));
-            assertEquals(1, StratConDeploymentOrders.rollMonthlyOrderCount(3));
-            int stepFour = StratConDeploymentOrders.rollMonthlyOrderCount(4);
-            assertTrue((stepFour == 1) || (stepFour == 2));
-        }
-    }
-
-    @Test
-    void theScheduleHasOneEntryPerMonthRolledOncePerRollCount() {
-        List<Integer> schedule = StratConDeploymentOrders.rollSchedule(LENGTH_IN_MONTHS, 3, SCALE);
-
-        assertEquals(LENGTH_IN_MONTHS, schedule.size());
-        for (int ordersThisMonth : schedule) {
-            assertEquals(SCALE, ordersThisMonth);
-        }
+    @ParameterizedTest
+    @CsvSource({
+          // command step, exact scale, expected orders a month
+          "0, 3.0, 0",
+          "1, 3.0, 3",
+          "2, 3.0, 6",
+          "3, 3.0, 9",
+          "4, 3.0, 12",
+          "1, 1.4, 1",
+          "3, 1.4, 4",
+          "2, 1.25, 3",
+          "1, 0.0, 1"
+    })
+    void eachMonthBringsTheCommandStepPerPointOfScaleRoundedNormally(int commandStep, double exactScale,
+          int expectedOrders) {
+        assertEquals(expectedOrders, StratConDeploymentOrders.getMonthlyOrderCount(commandStep, exactScale));
     }
 
     @Test
     void anIndependentContractReceivesNoOrders() {
         AbstractContract contract = contract(ContractCommandRights.INDEPENDENT, faction(true, false));
 
-        assertTrue(schedule(contract, true, START_DATE).isEmpty());
+        assertTrue(schedule(contract, START_DATE).isEmpty());
     }
 
     @Test
     void ordersAreStrategicObjectivesWithinTheContract() {
         AbstractContract contract = contract(ContractCommandRights.INTEGRATED, faction(false, false));
 
-        List<StratConScheduledPointOfInterest> scheduled = schedule(contract, false, START_DATE);
+        List<StratConScheduledPointOfInterest> scheduled = schedule(contract, START_DATE);
 
-        assertEquals(LENGTH_IN_MONTHS, scheduled.size(), "one order a month at step 3");
+        assertEquals(LENGTH_IN_MONTHS * 3 * SCALE, scheduled.size(), "three orders a month per point of Scale");
         LocalDate endDate = START_DATE.plusMonths(LENGTH_IN_MONTHS);
         for (StratConScheduledPointOfInterest scheduledOrder : scheduled) {
             assertEquals(StratConDeploymentOrderBehavior.TYPE_ID, scheduledOrder.getTypeId());
@@ -189,10 +179,17 @@ class StratConDeploymentOrdersTest {
     }
 
     @Test
-    void ordersAreRolledOncePerPointOfScaleWhenMultiplied() {
-        AbstractContract contract = contract(ContractCommandRights.INTEGRATED, faction(false, false));
+    void aControllingEmployerAddsAnOrderPerPointOfScale() {
+        AbstractContract contract = contract(ContractCommandRights.LIAISON, faction(true, false));
 
-        assertEquals(LENGTH_IN_MONTHS * SCALE, schedule(contract, true, START_DATE).size());
+        assertEquals(LENGTH_IN_MONTHS * 2 * SCALE, schedule(contract, START_DATE).size());
+    }
+
+    @Test
+    void aLenientEmployerUnderLiaisonCommandRightsIssuesNoOrders() {
+        AbstractContract contract = contract(ContractCommandRights.LIAISON, faction(false, true));
+
+        assertTrue(schedule(contract, START_DATE).isEmpty());
     }
 
     @Test
@@ -200,9 +197,9 @@ class StratConDeploymentOrdersTest {
         AbstractContract contract = contract(ContractCommandRights.INTEGRATED, faction(false, false));
         LocalDate fromDate = START_DATE.plusMonths(2);
 
-        List<StratConScheduledPointOfInterest> scheduled = schedule(contract, false, fromDate);
+        List<StratConScheduledPointOfInterest> scheduled = schedule(contract, fromDate);
 
-        assertEquals(2, scheduled.size(), "only the last two months are still to come");
+        assertEquals(2 * 3 * SCALE, scheduled.size(), "only the last two months are still to come");
         for (StratConScheduledPointOfInterest scheduledOrder : scheduled) {
             assertFalse(scheduledOrder.getSpawnDate().isBefore(fromDate));
         }

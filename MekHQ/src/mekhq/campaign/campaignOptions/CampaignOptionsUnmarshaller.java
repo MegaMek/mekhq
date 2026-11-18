@@ -159,6 +159,11 @@ public class CampaignOptionsUnmarshaller {
             // Removed option: spare parts now always pay the acquisition price multipliers (CO p.24).
             case "useExtendedPartsModifier" -> {
             }
+            // Removed options: StratCon now counts its scenarios, Nav Points and attacks per point of Scale, rolls
+            // normal scenarios weekly against each sector's threat, and no longer reads the Track Intensity Tables.
+            case "multiplyTrackIntensityByScale", "minimumOneTrackPerRoll", "rollTracksWeekly",
+                 "scenarioTempoMultiplier" -> {
+            }
             default -> LOGGER.warn("Potentially unexpected entry in campaign options: {}", nodeName);
         }
     }
