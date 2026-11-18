@@ -125,8 +125,8 @@ public final class StratConDeploymentOrders {
      * Works out how many Deployment Orders arrive each month.
      *
      * @param commandStep the contract's command step (see {@link #getCommandStep})
-     * @param exactScale  the contract's exact Scale, as StratCon counts it (see
-     *                    {@link StratConSpawnRates#getSpawnScale})
+     * @param exactScale  the contract's Scale, as StratCon counts it (see
+     *                    {@link StratConSpawnRates#getSpawnScale(AbstractContract, boolean)})
      *
      * @return the command step times the Scale, rounded normally and never below one; none at command step 0
      *
@@ -175,7 +175,7 @@ public final class StratConDeploymentOrders {
             return;
         }
 
-        double spawnScale = StratConSpawnRates.getSpawnScale(contract.getExactScale(),
+        double spawnScale = StratConSpawnRates.getSpawnScale(contract,
               StratConSpawnRates.isFactorSupportPointsIntoScale(campaignState));
         List<Integer> schedule = StratConSpawnRates.getMonthlySchedule(contract.getLengthInMonths(),
               getMonthlyOrderCount(commandStep, spawnScale));

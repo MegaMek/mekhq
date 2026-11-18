@@ -258,6 +258,43 @@ class AbstractStratConGMTest {
     }
 
     @Test
+    void aPeacefulWeekWaitsForTheRaidBeforeRolling() {
+        StratConTrackState track = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        when(contract.isPeaceful()).thenReturn(true);
+        TestGM gm = new TestGM(false);
+
+        gm.handleNewDay(newDay(MONDAY, contract));
+
+        // Between raids the week is not rolled, nor counted as rolled
+        verify(gm.generation, never()).generateWeeklyScenarioDates(any(), any(), any(), anyBoolean());
+        verify(campaignState, never()).setLastWeeklyRollDate(any());
+
+        // The raid breaks out midweek: the week is rolled on its first day
+        when(contract.isPeaceful()).thenReturn(false);
+        gm.handleNewDay(newDay(TUESDAY, contract));
+
+        verify(gm.generation, times(1)).generateWeeklyScenarioDates(any(), eq(campaignState), eq(contract),
+              eq(false));
+        verify(campaignState).setLastWeeklyRollDate(TUESDAY);
+    }
+
+    @Test
+    void singleDropSchedulesItsScenarioEvenWhilePeaceful() {
+        StratConTrackState track = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        when(contract.isPeaceful()).thenReturn(true);
+        TestGM gm = new TestGM(true);
+
+        gm.handleNewDay(newDay(MONDAY, contract));
+
+        verify(gm.generation, times(1)).generateWeeklyScenarioDates(any(), eq(campaignState), eq(contract),
+              eq(true));
+    }
+
+    @Test
     void getFacilityStrategyEffectsRunForEveryTrack() {
         StratConTrackState track1 = trackWith();
         StratConTrackState track2 = trackWith();

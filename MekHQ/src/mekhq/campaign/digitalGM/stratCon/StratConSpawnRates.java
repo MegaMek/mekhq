@@ -40,6 +40,8 @@ import java.util.List;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
+import mekhq.campaign.mission.contract.contractData.ContractCharacteristic.Category;
 
 /**
  * How often each thing the enemy and the employer bring to a StratCon contract turns up. Everything is counted per
@@ -61,6 +63,11 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * Without that option, every {@value #SUPPORT_POINT_SCALE_RATIO} points of Scale count as one (see
  * {@link #getSpawnScale}), as they do for sizing facilities, so the option does not change how often anything
  * comes.</p>
+ *
+ * <p>A {@link ContractCharacteristic#HIGH_INTENSITY High Intensity} contract counts as one point of Scale more, and a
+ * {@link ContractCharacteristic#LOW_INTENSITY Low Intensity} one as one point less (see
+ * {@link #getSpawnScale(AbstractContract, boolean)}), the way a controlling or lenient employer moves the Deployment
+ * Order multiplier.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -120,7 +127,42 @@ public final class StratConSpawnRates {
     }
 
     /**
-     * As {@link #getCount(double, double)}, for a contract.
+     * The Scale a contract's rates are counted against: its exact Scale as {@link #getSpawnScale(double, boolean)}
+     * counts it, stepped by its intensity characteristic, if any (one point up for
+     * {@link ContractCharacteristic#HIGH_INTENSITY High Intensity}, one down for
+     * {@link ContractCharacteristic#LOW_INTENSITY Low Intensity}), and never below zero.
+     *
+     * @param contract                       the contract
+     * @param isFactorSupportPointsIntoScale whether the contract's Scale was worked out with battlefield support
+     *                                       points factored in (see {@link #isFactorSupportPointsIntoScale})
+     *
+     * @return the Scale the rates are counted against
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getSpawnScale(AbstractContract contract, boolean isFactorSupportPointsIntoScale) {
+        return max(0, getSpawnScale(contract.getExactScale(), isFactorSupportPointsIntoScale)
+                            + getIntensityScaleStep(contract));
+    }
+
+    /**
+     * @param contract the contract
+     *
+     * @return how many points of Scale the contract's intensity characteristic adds (negative if it takes them away);
+     *       zero if it has none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getIntensityScaleStep(AbstractContract contract) {
+        ContractCharacteristic intensity = contract.getCharacteristic(Category.INTENSITY);
+        return (intensity == null) ? 0 : (int) Math.round(intensity.getMagnitude());
+    }
+
+    /**
+     * As {@link #getCount(double, double)}, for a contract, counted against its Scale as
+     * {@link #getSpawnScale(AbstractContract, boolean)} works it out.
      *
      * @param contract                       the contract
      * @param isFactorSupportPointsIntoScale whether the contract's Scale was worked out with battlefield support
@@ -134,7 +176,7 @@ public final class StratConSpawnRates {
      */
     public static int getCount(AbstractContract contract, boolean isFactorSupportPointsIntoScale,
           double ratePerScale) {
-        return getCount(getSpawnScale(contract.getExactScale(), isFactorSupportPointsIntoScale), ratePerScale);
+        return getCount(getSpawnScale(contract, isFactorSupportPointsIntoScale), ratePerScale);
     }
 
     /**

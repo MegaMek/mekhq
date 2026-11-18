@@ -269,10 +269,13 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
             // rolls the week's normal scenarios against each sector's threat - unless Essential-only play suppresses
             // ambient scenarios. A contract that starts midweek, or a week whose Monday was skipped, rolls on the first
             // day of the week processed. A contract still on the up-front schedule it was given before the weekly rolls
-            // keeps that instead.
+            // keeps that instead. While a garrison is between raids the roll waits, rather than being made against no
+            // threat at all, so a raid that breaks out midweek rolls on its first day for the rest of the week. Single
+            // Drop play schedules regardless: its scenario is discarded on the day if the contract is still peaceful.
             boolean isOnWeeklyRolls = singleDrop || !campaignState.isNormalTempoScheduled();
-            if (!essentialScenariosOnly && isOnWeeklyRolls && StratConScenarioTempo.isWeeklyRollDue(campaignState,
-                  today)) {
+            boolean isWeeklyRollPossible = singleDrop || !contract.isPeaceful();
+            if (!essentialScenariosOnly && isOnWeeklyRolls && isWeeklyRollPossible
+                      && StratConScenarioTempo.isWeeklyRollDue(campaignState, today)) {
                 getScenarioGenerationStrategy().generateWeeklyScenarioDates(campaign,
                       campaignState,
                       contract,

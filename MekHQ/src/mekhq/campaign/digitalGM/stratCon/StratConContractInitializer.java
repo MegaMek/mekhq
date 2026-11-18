@@ -232,7 +232,7 @@ public class StratConContractInitializer {
             campaignState.addTrack(track);
         }
 
-        seedCampaignState(contract, campaign, contractDefinition, campaignState);
+        seedCampaignState(contract, campaign, contractDefinition, campaignState, contract.getStartDate());
     }
 
     /**
@@ -243,11 +243,16 @@ public class StratConContractInitializer {
      * <p>Split out of {@link #initializeCampaignState} so a running contract whose objective changes can have its new
      * objectives laid over the map it already has (see {@link #reseedForNewObjective}).</p>
      *
+     * @param fromDate the first day to schedule anything on: the contract's start date when it is accepted, and the
+     *                 current day when a running contract is seeded again, so nothing is scheduled in the past to
+     *                 arrive all at once
+     *
      * @author Illiani
      * @since 0.51.01
      */
     private static void seedCampaignState(AbstractContract contract, Campaign campaign,
-          StratConContractDefinition contractDefinition, StratConCampaignState campaignState) {
+          StratConContractDefinition contractDefinition, StratConCampaignState campaignState,
+          @Nullable LocalDate fromDate) {
         StratConContractFacilityProfile facilityProfile = contractDefinition.getFacilityProfile();
         String facilityBriefing = ((facilityProfile == null) || (facilityProfile.getBriefing() == null)) ?
                                         "" :
@@ -426,16 +431,17 @@ public class StratConContractInitializer {
             // the combat bonus paid for each one dealt with, take their place. Nor does a contract whose definition
             // has no Essential scenarios to fight.
             if (usesEssentialScenarios(contract, isContractsUseSpecialMechanics)) {
-                scheduleStrategicScenarioSpawnDates(contract, campaignState, contract.getStartDate());
+                scheduleStrategicScenarioSpawnDates(contract, campaignState, fromDate);
             }
 
-            schedulePointsOfInterest(contract, contractDefinition, campaignState, isContractsUseSpecialMechanics);
+            schedulePointsOfInterest(contract, contractDefinition, campaignState, isContractsUseSpecialMechanics,
+                  fromDate, 0, Map.of());
 
             // The enemy's engineers and its attacks on the facilities held by the player and the employer. Single Drop
             // play keeps to its one scenario a week and has no enemy facility activity, so it schedules none.
             if (!campaignOptions.isUseStratConSinglesMode()) {
-                StratConEnemyFacilityActivity.scheduleEnemyEngineers(contract, campaignState, contract.getStartDate());
-                StratConFacilityAttacks.scheduleFacilityAttacks(contract, campaignState, contract.getStartDate());
+                StratConEnemyFacilityActivity.scheduleEnemyEngineers(contract, campaignState, fromDate);
+                StratConFacilityAttacks.scheduleFacilityAttacks(contract, campaignState, fromDate);
             }
 
             // A Diversionary Raid's strategic objective is to escalate the fighting, rather than to hit any one target.
@@ -468,10 +474,14 @@ public class StratConContractInitializer {
      *
      * <p>The sectors, their terrain, and any forces deployed to them are kept. Everything the old objective type set
      * up is cleared: strategic objectives (facilities that were objectives remain, as ordinary facilities), points of
-     * interest, scheduled scenarios, points of interest, enemy engineers and facility attacks, global scenario
-     * modifiers, Escalation, and Victory Points.
-     * The tracks' scenario odds and deployment times are re-rolled for the new definition, and then the map is seeded
-     * as a new contract's would be (see {@link #seedCampaignState}).</p>
+     * interest placed or still to come, the Essential scenarios still to come, the enemy engineers and facility attacks
+     * still to come, global scenario modifiers, Escalation, Victory Points and Support Points. The tracks' scenario
+     * odds and deployment times are re-rolled for the new definition, and then the map is seeded as a new contract's
+     * would be (see {@link #seedCampaignState}), except that everything is scheduled from the current day on rather
+     * than from the contract's start.</p>
+     *
+     * <p>Normal scenarios already rolled for this week, and scenarios already on the map, are kept: they belong to the
+     * sectors, which stay.</p>
      *
      * <p>Facility ownership is left to the caller; this method does not change who holds what.</p>
      *
@@ -510,7 +520,7 @@ public class StratConContractInitializer {
         campaignState.setVictoryPoints(0);
         campaignState.setSupportPoints(0);
 
-        seedCampaignState(contract, campaign, contractDefinition, campaignState);
+        seedCampaignState(contract, campaign, contractDefinition, campaignState, campaign.getLocalDate());
     }
 
     /**
@@ -631,10 +641,9 @@ public class StratConContractInitializer {
      * <p>Point of interest objectives are a fixed number, spread across the contract's months by the Track Intensity
      * Tables (see {@link TrackIntensityTable#rollScheduleForCount}). Ordinary points of interest come
      * {@value StratConSpawnRates#NAV_POINTS_PER_SCALE} a month per point of Scale (see
-     * {@link #scheduleOrdinaryPointsOfInterest}). Each
-     * month's points of interest then get random days within
-     * it (see {@link #rollSpawnDates}), and are stored on the campaign state for the daily StratCon lifecycle to
-     * place as their days come (see {@link #spawnScheduledPointOfInterest}). Which point of interest lands on which day
+     * {@link #scheduleOrdinaryPointsOfInterest}). Each month's points of interest then get random days within it (see
+     * {@link #rollSpawnDates}), and are stored on the campaign state for the daily StratCon lifecycle to place as their
+     * days come (see {@link #spawnScheduledPointOfInterest}). Which point of interest lands on which day
      * is shuffled, so types are not bunched together.</p>
      *
      * <p>When the "Contracts Use Special Mechanics" option is on, a contract type with a special point of interest (see
@@ -921,8 +930,9 @@ public class StratConContractInitializer {
      * strategic objective if its type is one (see {@link #isSpecialPointOfInterestObjective}).
      *
      * <p>{@value StratConSpawnRates#NAV_POINTS_PER_SCALE} come each month per point of Scale, rounded normally and never
-     * below one (see {@link StratConSpawnRates}). Each month's points of interest then get random days within it (see {@link #rollSpawnDates}), and the type's
-     * behavior is told of the whole schedule (see {@link IStratConPointOfInterestBehavior#onScheduled}).</p>
+     * below one (see {@link StratConSpawnRates}). Each month's points of interest then get random days within it (see
+     * {@link #rollSpawnDates}), and the type's behavior is told of the whole schedule (see
+     * {@link IStratConPointOfInterestBehavior#onScheduled}).</p>
      *
      * <p>Does nothing if the contract has no settled start date.</p>
      *

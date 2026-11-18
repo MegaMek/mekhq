@@ -62,7 +62,7 @@ public enum ContractCharacteristic {
     ELITE_NEGOTIATOR(Category.NEGOTIATOR, Polarity.ADVERSE, 6, 1.0),
     /** Combat pay is boosted by 5%. */
     HAZARD_PAY(Category.COMBAT_PAY, Polarity.BENEFICIAL, 10, 1.05),
-    /** The contract has one more track. */
+    /** StratCon counts the contract's Scale as one point higher when working out how often anything comes. */
     HIGH_INTENSITY(Category.INTENSITY, Polarity.NEUTRAL, 10, 1.0),
     /** Monthly pay is boosted by 25%. */
     HIGH_PAY(Category.PAY, Polarity.BENEFICIAL, 3, 1.25),
@@ -76,7 +76,7 @@ public enum ContractCharacteristic {
     LENGTHY(Category.LENGTH, Polarity.NEUTRAL, 10, 1.5),
     /** Required victory points are lowered, so the contract is easier to fulfill. */
     LENIENT(Category.OBJECTIVES, Polarity.BENEFICIAL, 10, -1.0),
-    /** The contract has one fewer track, to a minimum of one. */
+    /** StratCon counts the contract's Scale as one point lower when working out how often anything comes. */
     LOW_INTENSITY(Category.INTENSITY, Polarity.NEUTRAL, 10, -1.0),
     /** Monthly pay is reduced by 25%. */
     LOW_PAY(Category.PAY, Polarity.ADVERSE, 3, 0.75),
@@ -187,7 +187,10 @@ public enum ContractCharacteristic {
         LENGTH,
         /** Adjusts required victory points at generation (a signed step). */
         OBJECTIVES,
-        /** Adjusts the contract's track count at generation (a signed step, floored at one). */
+        /**
+         * Steps the Scale StratCon counts the contract's events against (a signed step; see
+         * {@code StratConSpawnRates#getSpawnScale}).
+         */
         INTENSITY,
         /** Scales the unit reputation change at completion (a multiplier). */
         UNIT_REPUTATION,
