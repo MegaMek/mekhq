@@ -186,6 +186,7 @@ class AbstractStratConGMTest {
         // Outside Single Drop play, each Monday rolls the week's normal scenarios against each sector's threat
         verify(gm.generation, times(1)).generateWeeklyScenarioDates(any(), eq(campaignState), eq(contract),
               eq(false));
+        verify(campaignState).setLastWeeklyRollDate(MONDAY);
     }
 
     @Test
@@ -229,15 +230,31 @@ class AbstractStratConGMTest {
     }
 
     @Test
-    void nonMondayDoesNotGenerateWeeklyDates() {
+    void aWeekAlreadyRolledIsNotRolledAgain() {
         StratConTrackState track = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        when(campaignState.getLastWeeklyRollDate()).thenReturn(MONDAY);
         AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
         TestGM gm = new TestGM(false);
 
         gm.handleNewDay(newDay(TUESDAY, contract));
 
         verify(gm.generation, never()).generateWeeklyScenarioDates(any(), any(), any(), anyBoolean());
+    }
+
+    @Test
+    void aWeekWhoseMondayWasMissedIsRolledOnItsFirstDayProcessed() {
+        StratConTrackState track = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        when(campaignState.getLastWeeklyRollDate()).thenReturn(MONDAY.minusWeeks(1));
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        TestGM gm = new TestGM(false);
+
+        gm.handleNewDay(newDay(TUESDAY, contract));
+
+        verify(gm.generation, times(1)).generateWeeklyScenarioDates(any(), eq(campaignState), eq(contract),
+              eq(false));
+        verify(campaignState).setLastWeeklyRollDate(TUESDAY);
     }
 
     @Test

@@ -122,7 +122,7 @@ class StratConScenarioTempoTest {
 
     @Test
     void aSureThreatSchedulesOneScenarioPerPointOfScaleWithinTheWeek() {
-        LocalDate monday = START_DATE;
+        LocalDate monday = START_DATE.minusDays(3);
         AbstractContract contract = contract(START_DATE, START_DATE.plusMonths(3), 3, 3);
         StratConCampaignState campaignState = campaignStateWithSectors(100, 100);
 
@@ -180,6 +180,47 @@ class StratConScenarioTempoTest {
         for (StratConScheduledScenario scheduledScenario : campaignState.getScheduledScenarios()) {
             assertTrue(scheduledScenario.getDate().isBefore(endDate), scheduledScenario.toString());
         }
+    }
+
+    @Test
+    void aRollMadeMidweekKeepsToWhatIsLeftOfTheWeek() {
+        // START_DATE is a Thursday: four days are left in its week
+        AbstractContract contract = contract(START_DATE, START_DATE.plusMonths(3), 3, 5);
+        StratConCampaignState campaignState = campaignStateWithSectors(100);
+
+        StratConScenarioTempo.rollWeeklyScenarios(campaign(START_DATE, false, true), contract, campaignState,
+              START_DATE);
+
+        assertEquals(5, campaignState.getScheduledScenarios().size());
+        for (StratConScheduledScenario scheduledScenario : campaignState.getScheduledScenarios()) {
+            assertFalse(scheduledScenario.getDate().isBefore(START_DATE));
+            assertTrue(scheduledScenario.getDate().isBefore(START_DATE.plusDays(4)), scheduledScenario.toString());
+        }
+    }
+
+    @Test
+    void theDaysLeftInAWeekCountTodayThroughSunday() {
+        LocalDate monday = START_DATE.minusDays(3);
+
+        assertEquals(7, StratConScenarioTempo.getDaysLeftInWeek(monday));
+        assertEquals(4, StratConScenarioTempo.getDaysLeftInWeek(START_DATE));
+        assertEquals(1, StratConScenarioTempo.getDaysLeftInWeek(monday.plusDays(6)));
+    }
+
+    @Test
+    void theWeeklyRollIsDueOncePerWeek() {
+        LocalDate monday = START_DATE.minusDays(3);
+        StratConCampaignState campaignState = new StratConCampaignState();
+
+        assertTrue(StratConScenarioTempo.isWeeklyRollDue(campaignState, START_DATE), "never rolled");
+
+        campaignState.setLastWeeklyRollDate(monday);
+        assertFalse(StratConScenarioTempo.isWeeklyRollDue(campaignState, START_DATE), "already rolled this week");
+        assertTrue(StratConScenarioTempo.isWeeklyRollDue(campaignState, monday.plusWeeks(1)), "a new week");
+
+        // A week whose Monday was skipped still rolls on the next day processed
+        campaignState.setLastWeeklyRollDate(monday.minusWeeks(1));
+        assertTrue(StratConScenarioTempo.isWeeklyRollDue(campaignState, START_DATE));
     }
 
     @Test

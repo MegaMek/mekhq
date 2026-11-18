@@ -67,8 +67,6 @@ import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
-import org.junit.jupiter.params.ParameterizedTest;
-import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
 
 /**
@@ -190,22 +188,29 @@ class StratConFacilityAttacksTest {
 
     // Which kind of attack
 
-    @ParameterizedTest
-    @CsvSource({
-          // interdiction possible, percentile, expected
-          "true, 0, SUPPLY_INTERDICTION",
-          "true, 33, SUPPLY_INTERDICTION",
-          "true, 34, COUNTERATTACK",
-          "true, 66, COUNTERATTACK",
-          "true, 67, ASSAULT",
-          "true, 99, ASSAULT",
-          "false, 0, COUNTERATTACK",
-          "false, 49, COUNTERATTACK",
-          "false, 50, ASSAULT",
-          "false, 99, ASSAULT"
-    })
-    void eachKindIsAsLikelyAsTheOthers(boolean isInterdictionPossible, int percentile, FacilityAttackType expected) {
-        assertEquals(expected, StratConFacilityAttacks.pickAttackType(isInterdictionPossible, percentile));
+    @Test
+    void anInterdictionCounterattackAndAssaultArePossibleWithASupplyRoute() {
+        assertEquals(List.of(FacilityAttackType.SUPPLY_INTERDICTION,
+                    FacilityAttackType.COUNTERATTACK,
+                    FacilityAttackType.ASSAULT),
+              StratConFacilityAttacks.getPossibleAttackTypes(true));
+    }
+
+    @Test
+    void withoutASupplyRouteOnlyACounterattackOrAssaultIsPossible() {
+        assertEquals(List.of(FacilityAttackType.COUNTERATTACK, FacilityAttackType.ASSAULT),
+              StratConFacilityAttacks.getPossibleAttackTypes(false));
+    }
+
+    @Test
+    void eachPossibleKindIsPickedByAnEvenRoll() {
+        try (MockedStatic<Compute> dice = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
+            dice.when(() -> Compute.randomInt(3)).thenReturn(0, 1, 2);
+
+            assertEquals(FacilityAttackType.SUPPLY_INTERDICTION, StratConFacilityAttacks.pickAttackType(true));
+            assertEquals(FacilityAttackType.COUNTERATTACK, StratConFacilityAttacks.pickAttackType(true));
+            assertEquals(FacilityAttackType.ASSAULT, StratConFacilityAttacks.pickAttackType(true));
+        }
     }
 
     @Test
@@ -236,9 +241,9 @@ class StratConFacilityAttacksTest {
 
         try (MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class);
               MockedStatic<Compute> dice = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
-            // The highest percentile picks an assault; everything else rolls lowest
+            // Of the two kinds possible without supply lines, the second is an assault; everything else rolls lowest
             dice.when(() -> Compute.randomInt(anyInt()))
-                  .thenAnswer(invocation -> (invocation.<Integer>getArgument(0) == 100) ? 99 : 0);
+                  .thenAnswer(invocation -> (invocation.<Integer>getArgument(0) == 2) ? 1 : 0);
             rulesManager.when(() -> StratConRulesManager.startCounterattackScenario(any(), any(), any(), any(),
                   anyInt(), anyBoolean())).thenReturn(scenario);
 

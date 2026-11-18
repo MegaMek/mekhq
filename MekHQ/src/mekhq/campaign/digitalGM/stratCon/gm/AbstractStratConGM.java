@@ -188,7 +188,7 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
 
     /**
      * The shared StratCon daily lifecycle. Runs the scenario-generation routine for every track attached to an active
-     * contract: applying facility effects, expiring ignored scenarios, rolling the week's normal scenarios each Monday
+     * contract: applying facility effects, expiring ignored scenarios, rolling the week's normal scenarios once a week
      * (or, in Single Drop play, scheduling the week's one scenario), and generating those due today.
      *
      * <p>Returning formations whose deployment has ended is not part of this. It runs earlier in the day, through
@@ -261,15 +261,19 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 }
             }
 
-            // Each Monday: Single Drop play schedules its one scenario of the week, and other play rolls the week's
-            // normal scenarios against each sector's threat - unless Essential-only play suppresses ambient scenarios.
-            // A contract still on the up-front schedule it was given before the weekly rolls keeps that instead.
+            // Once a week, ordinarily on Monday: Single Drop play schedules its one scenario of the week, and other play
+            // rolls the week's normal scenarios against each sector's threat - unless Essential-only play suppresses
+            // ambient scenarios. A contract that starts midweek, or a week whose Monday was skipped, rolls on the first
+            // day of the week processed. A contract still on the up-front schedule it was given before the weekly rolls
+            // keeps that instead.
             boolean isOnWeeklyRolls = singleDrop || !campaignState.isNormalTempoScheduled();
-            if (!essentialScenariosOnly && isMonday && isOnWeeklyRolls) {
+            if (!essentialScenariosOnly && isOnWeeklyRolls && StratConScenarioTempo.isWeeklyRollDue(campaignState,
+                  today)) {
                 getScenarioGenerationStrategy().generateWeeklyScenarioDates(campaign,
                       campaignState,
                       contract,
                       singleDrop);
+                campaignState.setLastWeeklyRollDate(today);
             }
 
             // Every scenario due on or before today is taken off the schedule, so one scheduled for a day already

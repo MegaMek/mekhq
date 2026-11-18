@@ -480,6 +480,17 @@ class ChaosContractDeterminationPayTest {
         }
 
         @Test
+        void navPointBonusesPayAThirdOfAnEssentialScenarios() {
+            campaignOptions.set(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS, true);
+            AbstractContract contract = contract(3, 1.0);
+            // Espionage's data caches replace its Essential scenarios and come three times as often
+            when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.ESPIONAGE);
+
+            // 1500 / 3, then a third: 167 (rounded)
+            assertEquals(Money.of(167), payScheme.getCombatPay(campaign, contract));
+        }
+
+        @Test
         void scaleZeroDoesNotDivideByZero() {
             campaignOptions.set(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE, true);
 

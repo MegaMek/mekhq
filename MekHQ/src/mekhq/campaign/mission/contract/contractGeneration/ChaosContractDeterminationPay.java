@@ -41,6 +41,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.chaosCampaign.ChaosScaleLimits;
+import mekhq.campaign.digitalGM.stratCon.StratConCombatBonusProjection;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.ContractExpenseProjection;
 import mekhq.campaign.finances.Money;
@@ -75,6 +76,10 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
         if (rollScale > 0) {
             combatPayInSupportPoints /= rollScale;
         }
+        // Nav Points that replace a contract's Essential scenarios come more often, so each pays proportionately less:
+        // every contract type offers the same total combat pay.
+        combatPayInSupportPoints *= StratConCombatBonusProjection.getCombatPayRateMultiplier(
+              campaign.getCampaignOptions(), contract);
         int roundedCombatPayInSupportPoints = (int) round(combatPayInSupportPoints);
         return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(roundedCombatPayInSupportPoints,
               shouldConvertSupportPoints(campaign));

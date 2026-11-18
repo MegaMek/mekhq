@@ -1664,7 +1664,9 @@ public class ContractEditorDialog extends JDialog {
      */
     private void saveAction() {
         // What StratCon's pre-rolled schedule was rolled from, so an edit to any of it rolls the schedule again below.
-        int previousScale = contract.getScale();
+        // The exact Scale, not the rounded one: how many of each thing a contract brings is the exact Scale times a
+        // rate, rounded afterward (see StratConSpawnRates), so even an edit within the same whole Scale can change it.
+        double previousExactScale = contract.getExactScale();
         int previousTrackCount = contract.getTrackCount();
         LocalDate previousStartDate = contract.getStartDate();
         LocalDate previousEndDate = contract.getEndingDate();
@@ -1872,7 +1874,7 @@ public class ContractEditorDialog extends JDialog {
         // what StratCon spawns the Essential scenarios from once the offer is accepted. A created offer has never had
         // one rolled, so it is always rolled here; an edited offer is rolled again only when its inputs changed.
         StratConCampaignState campaignState = contract.getStratConCampaignState();
-        boolean isScheduleChanged = (contract.getScale() != previousScale)
+        boolean isScheduleChanged = (Double.compare(contract.getExactScale(), previousExactScale) != 0)
                                           || (contract.getTrackCount() != previousTrackCount)
                                           || !Objects.equals(contract.getStartDate(), previousStartDate)
                                           || !Objects.equals(contract.getEndingDate(), previousEndDate)

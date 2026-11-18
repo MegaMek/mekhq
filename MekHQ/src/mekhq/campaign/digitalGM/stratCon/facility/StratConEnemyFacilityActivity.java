@@ -54,6 +54,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
 import mekhq.campaign.digitalGM.stratCon.StratConSpawnRates;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConEnemyEngineersBehavior;
@@ -262,8 +263,8 @@ public final class StratConEnemyFacilityActivity {
     /**
      * @param campaignState the contract's StratCon campaign state
      *
-     * @return a random facility the enemy can attack (see {@link #getCounterattackTargets}), or {@code null} if there is
-     *       none
+     * @return a random facility the enemy can attack (see {@link #getCounterattackTargets}), or {@code null} if
+     *       there is none
      *
      * @author Illiani
      * @since 0.51.01
@@ -472,7 +473,7 @@ public final class StratConEnemyFacilityActivity {
             scheduleEnemyEngineers(contract, campaignState, today);
         }
 
-        int dueCount = takeDueDates(campaignState.getEnemyEngineerDates(), today);
+        int dueCount = StratConScenarioTempo.takeDueScenarioDates(campaignState.getEnemyEngineerDates(), today);
         if ((dueCount == 0) || !StratConFacilityOperations.isEnabled(campaign) || contract.isPeaceful()) {
             return;
         }
@@ -490,7 +491,8 @@ public final class StratConEnemyFacilityActivity {
     }
 
     /**
-     * Schedules a contract's enemy engineers from the given day to the contract's end, replacing any scheduled from that
+     * Schedules a contract's enemy engineers from the given day to the contract's end, replacing any scheduled from
+     * that
      * day on: {@value StratConSpawnRates#ENGINEERS_PER_SCALE} a month per point of Scale, each on a random day within
      * its month. Does nothing without a settled start date.
      *
@@ -554,23 +556,6 @@ public final class StratConEnemyFacilityActivity {
             }
         }
         return endDate;
-    }
-
-    /**
-     * Takes every date on or before today out of a schedule.
-     *
-     * @param dates the schedule; due dates are removed from it
-     * @param today the current campaign date
-     *
-     * @return how many were due
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    static int takeDueDates(List<LocalDate> dates, LocalDate today) {
-        int before = dates.size();
-        dates.removeIf(date -> !date.isAfter(today));
-        return before - dates.size();
     }
 
     private static @Nullable StratConPointOfInterest placeEnemyEngineers(StratConCampaignState campaignState,

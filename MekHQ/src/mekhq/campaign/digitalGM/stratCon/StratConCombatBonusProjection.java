@@ -107,4 +107,38 @@ public record StratConCombatBonusProjection(double bonusCount, boolean isFromNav
 
         return new StratConCombatBonusProjection(navPointCount, true);
     }
+
+    /**
+     * Works out how much each combat bonus a contract pays is scaled by, so every contract type offers the same total
+     * combat pay at the same Scale and length.
+     *
+     * <p>Combat pay per bonus assumes one bonus a month per point of Scale, the rate Essential scenarios come at (see
+     * {@link StratConSpawnRates#ESSENTIAL_SCENARIOS_PER_SCALE}). Nav Points that replace a contract's Essential
+     * scenarios come {@value StratConSpawnRates#NAV_POINTS_PER_SCALE} times as often, so each pays that much less.
+     * Target intelligence is the exception: it pays nothing itself, and the Essential scenarios at the facilities it
+     * leads to pay in full.</p>
+     *
+     * @param campaignOptions the campaign options, for "Contracts Use Special Mechanics"
+     * @param contract        the contract
+     *
+     * @return the multiplier for each bonus's combat pay: {@code 1} for contracts paid through Essential scenarios
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getCombatPayRateMultiplier(CampaignOptions campaignOptions, AbstractContract contract) {
+        // Compared rather than unboxed, so a mocked options object (which returns null) reads as off
+        boolean isContractsUseSpecialMechanics =
+              Boolean.TRUE.equals(campaignOptions.get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS));
+        if (!StratConContractInitializer.isReplacingEssentialScenarios(contract, isContractsUseSpecialMechanics)) {
+            return 1.0;
+        }
+
+        StratConContractMechanics mechanics = StratConContractMechanics.forContract(contract);
+        if (StratConTargetIntelligenceBehavior.TYPE_ID.equals(mechanics.pointOfInterestTypeId())) {
+            return 1.0;
+        }
+
+        return (double) StratConSpawnRates.ESSENTIAL_SCENARIOS_PER_SCALE / StratConSpawnRates.NAV_POINTS_PER_SCALE;
+    }
 }

@@ -46,6 +46,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
 import mekhq.campaign.digitalGM.stratCon.StratConSpawnRates;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity.CounterattackTarget;
@@ -71,7 +72,7 @@ import mekhq.campaign.mission.contract.AbstractContract;
  *     {@value StratConEnemyFacilityActivity#COUNTERATTACK_MINIMUM_WARNING_DAYS} to
  *     {@value StratConEnemyFacilityActivity#COUNTERATTACK_MAXIMUM_WARNING_DAYS} days' warning. One whose warning would
  *     run past the contract's end is an assault instead.</li>
- *     <li><b>An assault:</b> as a counterattack, but fought today, defending the facility.</li>
+ *     <li><b>An assault:</b> as a counterattack, in the same templates, but fought today.</li>
  * </ul>
  *
  * <p>Counterattacks and assaults are never Crises or Turning Points, and never pay the combat bonus. Losing one hands
@@ -121,8 +122,8 @@ public final class StratConFacilityAttacks {
     }
 
     /**
-     * The contract-level daily step: makes the facility attacks due today. A contract whose attacks were never scheduled
-     * - one from before they were - is scheduled from today first.
+     * The contract-level daily step: makes the facility attacks due today. A contract whose attacks were never
+     * scheduled - one from before they were - is scheduled from today first.
      *
      * @param campaign      the current campaign
      * @param contract      the contract
@@ -139,7 +140,7 @@ public final class StratConFacilityAttacks {
             scheduleFacilityAttacks(contract, campaignState, today);
         }
 
-        int dueCount = StratConEnemyFacilityActivity.takeDueDates(campaignState.getFacilityAttackDates(), today);
+        int dueCount = StratConScenarioTempo.takeDueScenarioDates(campaignState.getFacilityAttackDates(), today);
         // With no enemy activity between raids, there is no one to attack; and without a map, nothing to attack.
         if ((dueCount == 0) || contract.isPeaceful() || campaign.getCampaignOptions().isUseStratConMaplessMode()) {
             return;
@@ -172,7 +173,7 @@ public final class StratConFacilityAttacks {
 
         boolean isInterdictionPossible = StratConFacilitySupply.isSupplyLinesActive(campaign)
                                                && hasInterdictionCandidates(campaignState);
-        FacilityAttackType attackType = pickAttackType(isInterdictionPossible, Compute.randomInt(100));
+        FacilityAttackType attackType = pickAttackType(isInterdictionPossible);
 
         if (attackType == FacilityAttackType.SUPPLY_INTERDICTION) {
             StratConPointOfInterest pointOfInterest = StratConFacilitySupply.placeSupplyInterdiction(campaignState,
@@ -182,7 +183,7 @@ public final class StratConFacilityAttacks {
                 return attackType;
             }
             // No route took it after all, so the enemy strikes the facilities themselves.
-            attackType = pickAttackType(false, Compute.randomInt(100));
+            attackType = pickAttackType(false);
         }
 
         CounterattackTarget target = StratConEnemyFacilityActivity.pickCounterattackTarget(campaignState);
@@ -223,26 +224,37 @@ public final class StratConFacilityAttacks {
     }
 
     /**
-     * Picks the kind of attack the enemy makes, each as likely as the others.
+     * Picks the kind of attack the enemy makes, each of those possible as likely as the others.
      *
      * @param isInterdictionPossible whether a Supply Interdiction can be made
-     * @param percentile             a roll from 0 to 99
      *
      * @return the kind of attack
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static FacilityAttackType pickAttackType(boolean isInterdictionPossible, int percentile) {
+    static FacilityAttackType pickAttackType(boolean isInterdictionPossible) {
+        List<FacilityAttackType> attackTypes = getPossibleAttackTypes(isInterdictionPossible);
+        return attackTypes.get(Compute.randomInt(attackTypes.size()));
+    }
+
+    /**
+     * @param isInterdictionPossible whether a Supply Interdiction can be made
+     *
+     * @return the kinds of attack the enemy can make: a Supply Interdiction first, if one can be made, then a
+     *       counterattack and an assault
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static List<FacilityAttackType> getPossibleAttackTypes(boolean isInterdictionPossible) {
         List<FacilityAttackType> attackTypes = new ArrayList<>();
         if (isInterdictionPossible) {
             attackTypes.add(FacilityAttackType.SUPPLY_INTERDICTION);
         }
         attackTypes.add(FacilityAttackType.COUNTERATTACK);
         attackTypes.add(FacilityAttackType.ASSAULT);
-
-        int index = (Math.clamp(percentile, 0, 99) * attackTypes.size()) / 100;
-        return attackTypes.get(index);
+        return attackTypes;
     }
 
     /**

@@ -146,4 +146,42 @@ class StratConCombatBonusProjectionTest {
         assertEquals(0.0, StratConCombatBonusProjection.project(campaign,
               contract(ContractObjectiveType.PLANETARY_ASSAULT)).bonusCount(), DELTA);
     }
+
+    // Combat pay per bonus
+
+    @Test
+    void essentialScenarioBonusesPayInFull() {
+        assertEquals(1.0, StratConCombatBonusProjection.getCombatPayRateMultiplier(campaignOptions,
+              contract(ContractObjectiveType.PLANETARY_ASSAULT)), DELTA);
+    }
+
+    @Test
+    void navPointBonusesPayAThirdSoTheTotalMatches() {
+        assertEquals(1.0 / 3.0, StratConCombatBonusProjection.getCombatPayRateMultiplier(campaignOptions,
+              contract(ContractObjectiveType.ESPIONAGE)), DELTA);
+    }
+
+    @Test
+    void withoutSpecialMechanicsEveryBonusPaysInFull() {
+        campaignOptions.set(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS, false);
+
+        assertEquals(1.0, StratConCombatBonusProjection.getCombatPayRateMultiplier(campaignOptions,
+              contract(ContractObjectiveType.ESPIONAGE)), DELTA);
+    }
+
+    @Test
+    void targetIntelligenceLeavesItsFacilityFightsPayingInFull() {
+        assertEquals(1.0, StratConCombatBonusProjection.getCombatPayRateMultiplier(campaignOptions,
+              contract(ContractObjectiveType.OBJECTIVE_RAID)), DELTA);
+    }
+
+    @Test
+    void navPointContractsOfferTheTotalCombatPayOfAFullEssentialSchedule() {
+        AbstractContract contract = contract(ContractObjectiveType.ESPIONAGE);
+        double bonusCount = StratConCombatBonusProjection.project(campaign, contract).bonusCount();
+        double multiplier = StratConCombatBonusProjection.getCombatPayRateMultiplier(campaignOptions, contract);
+
+        // One Essential scenario a month per point of Scale: 6 months x Scale 4
+        assertEquals(6 * 4, bonusCount * multiplier, DELTA);
+    }
 }

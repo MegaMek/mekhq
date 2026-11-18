@@ -111,6 +111,8 @@ public class StratConCampaignState {
 
     private List<LocalDate> scheduledScenarioDates;
     private final List<StratConScheduledScenario> scheduledScenarios;
+    // the day the week's normal scenarios were last rolled; see StratConScenarioTempo#isWeeklyRollDue
+    private LocalDate lastWeeklyRollDate;
     private final List<LocalDate> strategicScenarioSpawnDates;
     private final List<StratConScheduledPointOfInterest> scheduledPointsOfInterest;
     // enemy facility activity; see StratConEnemyFacilityActivity and StratConFacilityAttacks
@@ -207,6 +209,22 @@ public class StratConCampaignState {
      */
     public void addScheduledScenario(StratConScheduledScenario scheduledScenario) {
         scheduledScenarios.add(scheduledScenario);
+    }
+
+    /**
+     * @return the day the contract's weekly scenario roll was last made, or {@code null} if it never has been (see
+     *       {@link StratConScenarioTempo#isWeeklyRollDue})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @XmlJavaTypeAdapter(value = LocalDateAdapter.class)
+    public @Nullable LocalDate getLastWeeklyRollDate() {
+        return lastWeeklyRollDate;
+    }
+
+    public void setLastWeeklyRollDate(@Nullable LocalDate lastWeeklyRollDate) {
+        this.lastWeeklyRollDate = lastWeeklyRollDate;
     }
 
     /** @return the still-to-come days on which strategic-objective scenarios appear (mutable; drained as they spawn) */

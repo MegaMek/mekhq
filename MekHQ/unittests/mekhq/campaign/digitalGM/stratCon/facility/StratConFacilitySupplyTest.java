@@ -646,8 +646,8 @@ class StratConFacilitySupplyTest {
 
         @Test
         void noRouteMeansNoInterdictionToPick() {
-            assertEquals(StratConFacilityAttacks.FacilityAttackType.COUNTERATTACK,
-                  StratConFacilityAttacks.pickAttackType(false, 0));
+            assertFalse(StratConFacilityAttacks.getPossibleAttackTypes(false)
+                              .contains(StratConFacilityAttacks.FacilityAttackType.SUPPLY_INTERDICTION));
         }
     }
 

@@ -427,9 +427,12 @@ public class StratConContractInitializer {
 
             schedulePointsOfInterest(contract, contractDefinition, campaignState, isContractsUseSpecialMechanics);
 
-            // The enemy's engineers and its attacks on the facilities held by the player and the employer.
-            StratConEnemyFacilityActivity.scheduleEnemyEngineers(contract, campaignState, contract.getStartDate());
-            StratConFacilityAttacks.scheduleFacilityAttacks(contract, campaignState, contract.getStartDate());
+            // The enemy's engineers and its attacks on the facilities held by the player and the employer. Single Drop
+            // play keeps to its one scenario a week and has no enemy facility activity, so it schedules none.
+            if (!campaignOptions.isUseStratConSinglesMode()) {
+                StratConEnemyFacilityActivity.scheduleEnemyEngineers(contract, campaignState, contract.getStartDate());
+                StratConFacilityAttacks.scheduleFacilityAttacks(contract, campaignState, contract.getStartDate());
+            }
 
             // A Diversionary Raid's strategic objective is to escalate the fighting, rather than to hit any one target.
             if (isContractsUseSpecialMechanics && contract.getObjectiveType().isDiversionaryRaid()) {
@@ -2630,21 +2633,29 @@ public class StratConContractInitializer {
         }
 
         // Each lands in a random sector. One whose sector is full tries the others, in random order, so none is lost
-        // while any sector has room.
+        // while any sector has room. A sector with room that still fails - no template, say - is not the sector's
+        // fault, so no other is tried: they would fail, and log, the same way.
         for (int scenario = 0; scenario < scenarioCount; scenario++) {
             List<StratConTrackState> tracks = new ArrayList<>(campaignState.getTracks());
-            while (!tracks.isEmpty()) {
+            boolean isSectorFound = false;
+            while (!tracks.isEmpty() && !isSectorFound) {
                 StratConTrackState track = tracks.remove(Compute.randomInt(tracks.size()));
-                int objectivesBefore = track.getStrategicObjectives().size();
+                if (getUnoccupiedCoords(track) == null) {
+                    continue;
+                }
+
                 initializeObjectiveScenarios(campaign,
                       contract,
                       track,
                       1,
                       specificObjective.getObjectiveScenarios(),
                       specificObjective.getObjectiveScenarioModifiers());
-                if (track.getStrategicObjectives().size() > objectivesBefore) {
-                    break;
-                }
+                isSectorFound = true;
+            }
+
+            if (!isSectorFound) {
+                LOGGER.warn("Every sector of contract {} is full; an Essential scenario could not be placed.",
+                      contract.getName());
             }
         }
     }
@@ -2882,15 +2893,31 @@ public class StratConContractInitializer {
                 if (facility != null) {
                     weight = strategicEmphasis;
                 } else if (hasPlayerForces && emphasizeStrategicTargets) {
-                    // A small bias towards the player's forces, growing with how many formations are there
                     Set<Integer> formationsHere = trackState.getAssignedCoordForces().get(coords);
-                    weight = defaultWeight + Math.max(1, (formationsHere == null) ? 0 : formationsHere.size());
+                    weight = getPlayerForceHexWeight((formationsHere == null) ? 0 : formationsHere.size());
                 }
                 weightedMap.add(weight, coords);
             }
         }
 
         return weightedMap.randomItem();
+    }
+
+    /**
+     * The weight a hex where player formations are deployed gets when a normal scenario's hex is picked (see
+     * {@link #getUnoccupiedCoords(StratConTrackState, boolean, boolean, boolean)}): a small bias towards the player's
+     * forces, growing with how many formations are there. An empty hex weighs 1.
+     *
+     * @param formationCount how many formations are deployed on the hex
+     *
+     * @return 1 plus the number of formations, counting at least one: twice an empty hex for one formation, three
+     *       times for two, and so on
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int getPlayerForceHexWeight(int formationCount) {
+        return 1 + Math.max(1, formationCount);
     }
 
     /**

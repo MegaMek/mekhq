@@ -34,11 +34,16 @@ package mekhq.campaign.digitalGM.stratCon;
 
 import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDeploymentOrderBehavior.isDeploymentOrder;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
+import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
 import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
@@ -75,59 +80,37 @@ public final class StratConScenarioTempo {
      */
     static final int SUPPORT_POINT_SCALE_ROLL_MULTIPLIER = 3;
 
-    /** How many days of the week a rolled normal scenario may fall on, counting from the Monday it is rolled. */
-    static final int DAYS_PER_WEEK = 7;
+    /** The day each week's normal scenario roll is due. */
+    static final DayOfWeek WEEK_START = DayOfWeek.MONDAY;
 
     /**
-     * How many days late an ordinary scenario's date may be and still bring its scenario. Older dates are discarded, so
-     * a long backlog - from a save made before overdue dates were caught up - does not arrive all at once.
+     * How many days late a scheduled date - a normal scenario's, an enemy engineer party's, or a facility attack's -
+     * may be and still bring what it is for. Older dates are discarded, so a long backlog (from an older save, or a
+     * date jumped forward) does not arrive all at once.
      */
     static final int MAXIMUM_SCENARIO_CATCH_UP_DAYS = 7;
 
     private StratConScenarioTempo() {}
 
     /**
-     * Takes every ordinary scenario date on or before today off the schedule and counts the scenarios now due.
+     * Takes every date on or before today off a schedule and counts how many are now due.
      *
      * <p>A date is due if it falls today, or at most {@link #MAXIMUM_SCENARIO_CATCH_UP_DAYS} days before. That way a
-     * date rolled for a day the new day has already processed - by editing or extending the contract - still brings
-     * its scenario the next day, instead of sitting on the schedule forever. Older dates are discarded.</p>
+     * date set for a day the new day has already processed - by editing or extending the contract - still brings what
+     * it is for the next day, instead of sitting on the schedule forever. Older dates are discarded.</p>
      *
-     * @param scheduledDates the contract's scheduled ordinary scenario dates; due and stale dates are removed from it
+     * <p>Used for ordinary scenario dates, enemy engineers, and facility attacks alike.</p>
+     *
+     * @param scheduledDates the schedule; due and stale dates are removed from it
      * @param today          the current campaign date
      *
-     * @return how many scenarios are due today
+     * @return how many are due today
      *
      * @author Illiani
      * @since 0.51.01
      */
     public static int takeDueScenarioDates(List<LocalDate> scheduledDates, LocalDate today) {
-        LocalDate oldestDueDate = today.minusDays(MAXIMUM_SCENARIO_CATCH_UP_DAYS);
-        int dueCount = 0;
-        int staleCount = 0;
-        for (LocalDate scheduledDate : scheduledDates) {
-            if (scheduledDate.isAfter(today)) {
-                continue;
-            }
-
-            if (scheduledDate.isBefore(oldestDueDate)) {
-                staleCount++;
-            } else {
-                dueCount++;
-            }
-        }
-
-        if ((dueCount + staleCount) > 0) {
-            scheduledDates.removeIf(scheduledDate -> !scheduledDate.isAfter(today));
-        }
-
-        if (staleCount > 0) {
-            LOGGER.info("Discarded {} StratCon scenario date(s) more than {} days overdue.",
-                  staleCount,
-                  MAXIMUM_SCENARIO_CATCH_UP_DAYS);
-        }
-
-        return dueCount;
+        return takeDue(scheduledDates, date -> date, today).size();
     }
 
     /**
@@ -144,11 +127,30 @@ public final class StratConScenarioTempo {
      */
     public static List<StratConScheduledScenario> takeDueScheduledScenarios(
           List<StratConScheduledScenario> scheduledScenarios, LocalDate today) {
+        return takeDue(scheduledScenarios, StratConScheduledScenario::getDate, today);
+    }
+
+    /**
+     * Takes everything on a schedule dated on or before today off it, and returns those at most
+     * {@link #MAXIMUM_SCENARIO_CATCH_UP_DAYS} days late. Anything older, or with no date, is discarded and logged.
+     *
+     * @param schedule the schedule; due and stale entries are removed from it
+     * @param dateOf   reads an entry's date
+     * @param today    the current campaign date
+     *
+     * @return the entries due today, in schedule order
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static <T> List<T> takeDue(List<T> schedule, Function<T, LocalDate> dateOf, LocalDate today) {
         LocalDate oldestDueDate = today.minusDays(MAXIMUM_SCENARIO_CATCH_UP_DAYS);
-        List<StratConScheduledScenario> dueScenarios = new ArrayList<>();
+        List<T> dueEntries = new ArrayList<>();
         int staleCount = 0;
-        for (StratConScheduledScenario scheduledScenario : scheduledScenarios) {
-            LocalDate date = scheduledScenario.getDate();
+        Iterator<T> entries = schedule.iterator();
+        while (entries.hasNext()) {
+            T entry = entries.next();
+            LocalDate date = dateOf.apply(entry);
             if ((date != null) && date.isAfter(today)) {
                 continue;
             }
@@ -156,33 +158,73 @@ public final class StratConScenarioTempo {
             if ((date == null) || date.isBefore(oldestDueDate)) {
                 staleCount++;
             } else {
-                dueScenarios.add(scheduledScenario);
+                dueEntries.add(entry);
             }
+            entries.remove();
         }
 
-        scheduledScenarios.removeIf(scheduledScenario -> (scheduledScenario.getDate() == null)
-                                                               || !scheduledScenario.getDate().isAfter(today));
-
         if (staleCount > 0) {
-            LOGGER.info("Discarded {} scheduled StratCon scenario(s) more than {} days overdue.",
+            LOGGER.info("Discarded {} StratCon scheduled date(s) more than {} days overdue.",
                   staleCount,
                   MAXIMUM_SCENARIO_CATCH_UP_DAYS);
         }
 
-        return dueScenarios;
+        return dueEntries;
+    }
+
+    /**
+     * Decides whether a contract's weekly scenario roll is due: it has not been made yet this week, Monday to Sunday.
+     * Ordinarily that is on Monday; but a contract that starts midweek, or a week whose Monday was skipped, still
+     * rolls on the first day of the week that is processed.
+     *
+     * @param campaignState the contract's StratCon campaign state
+     * @param today         the current campaign date
+     *
+     * @return {@code true} if this week's roll is still to be made
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isWeeklyRollDue(StratConCampaignState campaignState, LocalDate today) {
+        LocalDate lastWeeklyRollDate = campaignState.getLastWeeklyRollDate();
+        return (lastWeeklyRollDate == null) || lastWeeklyRollDate.isBefore(getWeekStart(today));
+    }
+
+    /**
+     * @param date a day
+     *
+     * @return the Monday of the day's week; the day itself if it is a Monday
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static LocalDate getWeekStart(LocalDate date) {
+        return date.with(TemporalAdjusters.previousOrSame(WEEK_START));
+    }
+
+    /**
+     * @param date a day
+     *
+     * @return how many days are left in the day's week, counting the day itself: 7 on a Monday, 1 on a Sunday
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getDaysLeftInWeek(LocalDate date) {
+        return (int) ChronoUnit.DAYS.between(date, getWeekStart(date).plusWeeks(1));
     }
 
     /**
      * Makes the week's normal scenario rolls for a contract: {@value StratConSpawnRates#NORMAL_SCENARIO_ROLLS_PER_SCALE}
      * per point of Scale, rounded normally, never below one. Each roll picks a random sector and rolls d100 against its
      * threat - the chance shown on the sector's threat bar (see {@link StratConRulesManager#calculateScenarioOdds}). A
-     * hit schedules a normal scenario in that sector on a random day of the coming week, starting today. One that would
-     * fall on or after the contract's last day is not scheduled.
+     * hit schedules a normal scenario in that sector on a random day of what is left of the week, today included. One
+     * that would fall on or after the contract's last day is not scheduled.
      *
      * @param campaign      the current campaign
      * @param contract      the contract
      * @param campaignState the contract's StratCon campaign state
-     * @param today         the day of the rolls, a Monday
+     * @param today         the day of the rolls: ordinarily a Monday (see {@link #isWeeklyRollDue})
      *
      * @return how many normal scenarios were scheduled
      *
@@ -206,7 +248,7 @@ public final class StratConScenarioTempo {
                 continue;
             }
 
-            LocalDate date = today.plusDays(Compute.randomInt(DAYS_PER_WEEK));
+            LocalDate date = today.plusDays(Compute.randomInt(getDaysLeftInWeek(today)));
             if ((contractEnd != null) && !date.isBefore(contractEnd)) {
                 continue;
             }
@@ -252,7 +294,7 @@ public final class StratConScenarioTempo {
      *     StratConCampaignState, boolean, LocalDate, int, Map)}). Those already placed, or due and waiting for room,
      *     count against the contract's share, as do the marks they carry (see
      *     {@link StratConCampaignState#recordPlacedPointOfInterest}).</li>
-     *     <li>Enemy engineers and facility attacks are scheduled again (see
+     *     <li>Outside Single Drop play, enemy engineers and facility attacks are scheduled again (see
      *     {@link StratConEnemyFacilityActivity#scheduleEnemyEngineers} and
      *     {@link StratConFacilityAttacks#scheduleFacilityAttacks}).</li>
      * </ul>
@@ -301,8 +343,11 @@ public final class StratConScenarioTempo {
 
         regeneratePointsOfInterest(campaign, contract, campaignState, today);
 
-        StratConEnemyFacilityActivity.scheduleEnemyEngineers(contract, campaignState, today);
-        StratConFacilityAttacks.scheduleFacilityAttacks(contract, campaignState, today);
+        // Single Drop play has no enemy facility activity (see StratConContractInitializer#seedCampaignState)
+        if (!campaignOptions.isUseStratConSinglesMode()) {
+            StratConEnemyFacilityActivity.scheduleEnemyEngineers(contract, campaignState, today);
+            StratConFacilityAttacks.scheduleFacilityAttacks(contract, campaignState, today);
+        }
     }
 
     /**

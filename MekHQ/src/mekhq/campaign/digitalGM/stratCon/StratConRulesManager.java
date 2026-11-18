@@ -242,10 +242,11 @@ public class StratConRulesManager {
     }
 
     /**
-     * Makes the week's scenario scheduling for a contract, on a Monday.
+     * Makes the week's scenario scheduling for a contract, ordinarily on a Monday (see
+     * {@link StratConScenarioTempo#isWeeklyRollDue}).
      *
      * <ul>
-     *     <li>In Single Drop play: one scenario, on a random day within the week, in a random sector.</li>
+     *     <li>In Single Drop play: one scenario, on a random day of what is left of the week, in a random sector.</li>
      *     <li>Otherwise: the week's normal scenario rolls against each sector's threat (see
      *     {@link StratConScenarioTempo#rollWeeklyScenarios}).</li>
      * </ul>
@@ -264,7 +265,8 @@ public class StratConRulesManager {
             return;
         }
 
-        LocalDate scenarioDate = campaign.getLocalDate().plusDays(randomInt(7));
+        LocalDate today = campaign.getLocalDate();
+        LocalDate scenarioDate = today.plusDays(randomInt(StratConScenarioTempo.getDaysLeftInWeek(today)));
         campaignState.addScheduledScenarioDate(scenarioDate);
         LOGGER.info("StratCon Single Drop scenario scheduled for {}", scenarioDate);
     }
@@ -1895,15 +1897,15 @@ public class StratConRulesManager {
      * Starts an enemy attack on a facility held by the player or their employer (see {@code StratConFacilityAttacks}):
      *
      * <ul>
-     *     <li>A <b>counterattack</b> comes with warning, fought in the Base Defense or Hold Until Relief template.</li>
-     *     <li>An <b>assault</b> is fought today, in the allied facility template, defending the facility.</li>
+     *     <li>A <b>counterattack</b> comes with warning.</li>
+     *     <li>An <b>assault</b> is fought today.</li>
      * </ul>
      *
-     * <p>Either is never a Crisis or a Turning Point, and never pays the combat bonus, even on a facility that is a
-     * strategic objective. Formations already on the facility's hex are committed to it at once, as they would be to
-     * any scenario arising on their hex; otherwise the player has until the deployment deadline to send one. The
-     * facility's fate follows from the result (see {@code StratConFacilityOperations}), never from a facility-removing
-     * objective.</p>
+     * <p>Both are fought in the Base Defense or Hold Until Relief template. Neither is ever a Crisis or a Turning Point,
+     * and neither ever pays the combat bonus, even on a facility that is a strategic objective. Formations already on
+     * the facility's hex are committed to it at once, as they would be to any scenario arising on their hex; otherwise
+     * the player has until the deployment deadline to send one. The facility's fate follows from the result (see
+     * {@code StratConFacilityOperations}), never from a facility-removing objective.</p>
      *
      * @param campaign    the current campaign
      * @param contract    the contract whose map holds the sector
@@ -1925,10 +1927,10 @@ public class StratConRulesManager {
             return null;
         }
 
-        ScenarioTemplate template = isAssault ?
-                                          null :
-                                          StratConScenarioFactory.getSpecificScenario(
-                                                getRandomItem(COUNTERATTACK_SCENARIO_TEMPLATES));
+        // An assault is fought in the same templates as a counterattack, only today: never with the allied facility
+        // objective, which would remove the facility when failed rather than hand it to the enemy.
+        ScenarioTemplate template = StratConScenarioFactory.getSpecificScenario(
+              getRandomItem(COUNTERATTACK_SCENARIO_TEMPLATES));
         if (template == null) {
             template = StratConScenarioFactory.getFacilityScenario(true);
         }
@@ -1966,10 +1968,6 @@ public class StratConRulesManager {
         // Not Essential, even on a strategic-objective facility, so winning it never pays the combat bonus
         scenario.setStrategicObjective(false);
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
-        if (isAssault) {
-            // The allied facility template's own objective: holding the facility
-            setupFacilityScenario(scenario, facility);
-        }
         backingScenario.setName(String.format("%s - %s",
               facility.getDisplayableName(),
               isAssault ? "Assault" : "Counterattack"));

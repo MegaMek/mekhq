@@ -379,4 +379,18 @@ class StratConScenarioSpawningTest {
         assertFalse(StratConContractInitializer.usesEssentialScenarios(
               contract(ContractObjectiveType.GARRISON_DUTY, 1), false));
     }
+
+    // How strongly normal scenarios are drawn to the player's forces
+
+    @Test
+    void aHexWithFormationsWeighsOneMorePerFormation() {
+        assertEquals(2, StratConContractInitializer.getPlayerForceHexWeight(1), "twice an empty hex");
+        assertEquals(3, StratConContractInitializer.getPlayerForceHexWeight(2));
+        assertEquals(5, StratConContractInitializer.getPlayerForceHexWeight(4));
+    }
+
+    @Test
+    void aHexMarkedAsHoldingFormationsAlwaysWeighsMoreThanAnEmptyOne() {
+        assertEquals(2, StratConContractInitializer.getPlayerForceHexWeight(0));
+    }
 }
