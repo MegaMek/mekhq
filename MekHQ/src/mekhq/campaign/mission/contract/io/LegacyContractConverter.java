@@ -99,6 +99,12 @@ public final class LegacyContractConverter {
     /** Placeholder objective when the legacy save has none. */
     private static final ContractObjectiveType DEFAULT_OBJECTIVE = ContractObjectiveType.GARRISON_DUTY;
 
+    /**
+     * The most months a rout lasted under the old model, which ended it {@code max(1, d6 - 3)} months, less a day,
+     * after it began (see {@link #hasRaidedBeforeRaidModel}).
+     */
+    static final int LEGACY_MAXIMUM_ROUT_MONTHS = 3;
+
     private LegacyContractConverter() {}
 
     /**
@@ -346,7 +352,14 @@ public final class LegacyContractConverter {
      * Works out whether the enemy has already raided a garrison-type contract saved under the old rout
      * model, which began such a contract with the enemy routed. An enemy that is active had come back from a rout, so
      * it has raided - and brought any Batchall - already. One that is routed has too, unless this is still the rout the
-     * contract began with, which always ended within three months of the start.
+     * contract began with.
+     *
+     * <p>The old model ended every rout on the day before a whole number of months - one to
+     * {@value #LEGACY_MAXIMUM_ROUT_MONTHS} - after the day it began, and began the contract's own rout on its start
+     * date. So a rout ending on one of those days from the start date is taken for the rout the contract began with.
+     * A later rout ends on such a day from when it began instead, and only lines up with the start date if it began on
+     * a monthly anniversary of it. Comparing against a span of months alone is not enough: a rout begun a month into
+     * the contract can still end within three months of its start.</p>
      *
      * @param startDate         the contract's start date, or {@code null} if unknown
      * @param legacyRoutEndDate the end date of the rout in progress, or {@code null} if the enemy was active
@@ -361,7 +374,16 @@ public final class LegacyContractConverter {
             return true;
         }
 
-        return (startDate != null) && legacyRoutEndDate.isAfter(startDate.plusMonths(3));
+        if (startDate == null) {
+            return false;
+        }
+
+        for (int months = 1; months <= LEGACY_MAXIMUM_ROUT_MONTHS; months++) {
+            if (legacyRoutEndDate.equals(startDate.plusMonths(months).minusDays(1))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** Credits a closed-out legacy contract's outstanding lump sum (its routed payout) to the player. */

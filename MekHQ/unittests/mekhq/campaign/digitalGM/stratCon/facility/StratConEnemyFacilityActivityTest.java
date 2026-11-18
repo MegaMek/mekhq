@@ -34,6 +34,7 @@ package mekhq.campaign.digitalGM.stratCon.facility;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
@@ -102,6 +103,8 @@ class StratConEnemyFacilityActivityTest {
     void setUp() {
         contract = mock(AbstractContract.class);
         when(contract.getScale()).thenReturn(6);
+        when(contract.getExactScale()).thenReturn(6.0);
+        when(contract.getLengthInMonths()).thenReturn(6);
         when(contract.getStartDate()).thenReturn(TODAY.minusDays(10));
         when(contract.getEndingDate()).thenReturn(TODAY.plusMonths(6));
         when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.STALEMATE);
@@ -251,28 +254,6 @@ class StratConEnemyFacilityActivityTest {
     @Nested
     class Counterattacks {
         @Test
-        void aMonthWithoutOneGuaranteesTheNext() {
-            assertTrue(StratConEnemyFacilityActivity.isCounterattack(1.0, 30, 99));
-            assertFalse(StratConEnemyFacilityActivity.isCounterattack(1.0, 29, 99));
-        }
-
-        @Test
-        void otherwiseTheChanceScalesWithActivity() {
-            assertTrue(StratConEnemyFacilityActivity.isCounterattack(1.0, 0, 24));
-            assertFalse(StratConEnemyFacilityActivity.isCounterattack(1.0, 0, 25));
-            assertTrue(StratConEnemyFacilityActivity.isCounterattack(2.0, 0, 49));
-        }
-
-        @Test
-        void noActivityMeansNoCounterattacks() {
-            assertFalse(StratConEnemyFacilityActivity.isCounterattack(0, 365, 0));
-            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(0.0);
-            placeFacility(ForceAlignment.Player);
-
-            assertEquals(0, StratConEnemyFacilityActivity.launchCounterattacks(campaign, contract, campaignState, 3));
-        }
-
-        @Test
         void onlyTheSideOfThePlayerIsCounterattackedAndNeverWhereAFightIsUnderWay() {
             placeFacility(ForceAlignment.Opposing);
             assertTrue(StratConEnemyFacilityActivity.getCounterattackTargets(campaignState).isEmpty());
@@ -295,14 +276,15 @@ class StratConEnemyFacilityActivityTest {
         }
 
         @Test
-        void ignoringOneOnAFacilityThePlayerHoldsLosesItAndTheCrisisPoint() {
+        void ignoringOneOnAFacilityThePlayerHoldsLosesItButNoVictoryPoint() {
             StratConFacility facility = placeFacility(ForceAlignment.Player);
-            StratConScenario scenario = placeScenario(true, true);
+            // Counterattacks are never Crises, so nothing costs a victory point
+            StratConScenario scenario = placeScenario(true, false);
 
             StratConRulesManager.processIgnoredStratConScenario(scenario, track, campaignState);
 
             assertEquals(ForceAlignment.Opposing, facility.getOwner());
-            assertEquals(-1, campaignState.getVictoryPoints());
+            assertEquals(0, campaignState.getVictoryPoints());
             assertFalse(track.getScenarios().containsKey(FACILITY_COORDS));
         }
 
@@ -317,9 +299,9 @@ class StratConEnemyFacilityActivityTest {
         }
 
         @Test
-        void anEmployerGarrisonThatHoldsOffScreenKeepsTheFacilityAndThePoint() {
+        void anEmployerGarrisonThatHoldsOffScreenKeepsTheFacility() {
             StratConFacility facility = placeFacility(ForceAlignment.Allied);
-            StratConScenario scenario = placeScenario(true, true);
+            StratConScenario scenario = placeScenario(true, false);
 
             try (MockedStatic<Compute> dice = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
                 dice.when(() -> Compute.d6(anyInt())).thenReturn(12);
@@ -361,27 +343,60 @@ class StratConEnemyFacilityActivityTest {
     @Nested
     class EnemyEngineers {
         @Test
-        void oneAMonthPerThreeScaleOrPerNineWithSupportPointsInScale() {
-            assertEquals(2, StratConEnemyFacilityActivity.getMonthlyEngineerCount(6, false, 1.0));
-            assertEquals(0, StratConEnemyFacilityActivity.getMonthlyEngineerCount(2, false, 1.0));
-            assertEquals(1, StratConEnemyFacilityActivity.getMonthlyEngineerCount(9, true, 1.0));
-            assertEquals(0, StratConEnemyFacilityActivity.getMonthlyEngineerCount(9, false, 0));
+        void engineersComeOnceAMonthPerPointOfScaleWithinTheContract() {
+            StratConEnemyFacilityActivity.scheduleEnemyEngineers(contract, campaignState, TODAY.minusDays(10));
+
+            List<LocalDate> engineerDates = campaignState.getEnemyEngineerDates();
+            assertEquals(6 * 6, engineerDates.size(), "one a month per point of Scale, over six months");
+            for (LocalDate engineerDate : engineerDates) {
+                assertFalse(engineerDate.isBefore(TODAY.minusDays(10)));
+                assertTrue(engineerDate.isBefore(TODAY.plusMonths(6)));
+            }
+            assertEquals(TODAY.plusMonths(6), campaignState.getEnemyEngineersScheduledUntil());
         }
 
         @Test
-        void aMonthIsScheduledAtATimeWithinTheContract() {
-            try (MockedStatic<Compute> dice = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
-                dice.when(() -> Compute.randomInt(anyInt())).thenReturn(10);
-                StratConEnemyFacilityActivity.processEnemyEngineers(campaign, contract, campaignState);
+        void aContractNeverScheduledIsScheduledFromToday() {
+            StratConEnemyFacilityActivity.processEnemyEngineers(campaign, contract, campaignState);
+
+            assertEquals(TODAY.plusMonths(6), campaignState.getEnemyEngineersScheduledUntil());
+            assertFalse(campaignState.getEnemyEngineerDates().isEmpty());
+            for (LocalDate engineerDate : campaignState.getEnemyEngineerDates()) {
+                assertTrue(engineerDate.isAfter(TODAY), "those due today were already taken");
             }
 
-            assertEquals(List.of(TODAY.plusDays(10), TODAY.plusDays(10)), campaignState.getEnemyEngineerDates());
-            assertEquals(TODAY.plusMonths(1), campaignState.getEnemyEngineersScheduledUntil());
-
-            // The next day, nothing more is scheduled until the month runs out.
+            // The next day, nothing more is scheduled.
+            int scheduledCount = campaignState.getEnemyEngineerDates().size();
             when(campaign.getLocalDate()).thenReturn(TODAY.plusDays(1));
             StratConEnemyFacilityActivity.processEnemyEngineers(campaign, contract, campaignState);
-            assertEquals(2, campaignState.getEnemyEngineerDates().size());
+            assertTrue(campaignState.getEnemyEngineerDates().size() <= scheduledCount);
+        }
+
+        @Test
+        void schedulingAgainReplacesOnlyTheDaysToCome() {
+            campaignState.getEnemyEngineerDates().add(TODAY.minusDays(1));
+            campaignState.getEnemyEngineerDates().add(TODAY.plusDays(3));
+
+            StratConEnemyFacilityActivity.scheduleEnemyEngineers(contract, campaignState, TODAY);
+
+            assertTrue(campaignState.getEnemyEngineerDates().contains(TODAY.minusDays(1)));
+            for (LocalDate engineerDate : campaignState.getEnemyEngineerDates()) {
+                if (!engineerDate.equals(TODAY.minusDays(1))) {
+                    assertFalse(engineerDate.isBefore(TODAY));
+                }
+            }
+        }
+
+        @Test
+        void noneAppearWithoutFacilityOperations() {
+            when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(false);
+            campaignState.setEnemyEngineersScheduledUntil(TODAY.plusDays(5));
+            campaignState.getEnemyEngineerDates().add(TODAY);
+
+            StratConEnemyFacilityActivity.processEnemyEngineers(campaign, contract, campaignState);
+
+            assertTrue(campaignState.getEnemyEngineerDates().isEmpty(), "the due date is used up");
+            assertTrue(track.getPointsOfInterest().isEmpty());
         }
 
         @Test
@@ -398,7 +413,6 @@ class StratConEnemyFacilityActivityTest {
         @Test
         void theScheduleIsSaved() throws Exception {
             StratConCampaignState saved = new StratConCampaignState();
-            saved.setLastCounterattackDate(TODAY);
             saved.setEnemyEngineersScheduledUntil(TODAY.plusMonths(1));
             saved.getEnemyEngineerDates().add(TODAY.plusDays(4));
 
@@ -410,7 +424,6 @@ class StratConEnemyFacilityActivityTest {
                                                        StratConCampaignState.class)
                                                  .getValue();
 
-            assertEquals(TODAY, loaded.getLastCounterattackDate());
             assertEquals(TODAY.plusMonths(1), loaded.getEnemyEngineersScheduledUntil());
             assertEquals(List.of(TODAY.plusDays(4)), loaded.getEnemyEngineerDates());
         }
@@ -418,26 +431,6 @@ class StratConEnemyFacilityActivityTest {
 
     @Nested
     class AwkwardCases {
-        @Test
-        void lowerActivityWaitsLongerBeforeACounterattackIsCertain() {
-            assertFalse(StratConEnemyFacilityActivity.isCounterattack(0.5, 59, 99));
-            assertTrue(StratConEnemyFacilityActivity.isCounterattack(0.5, 60, 99));
-        }
-
-        @Test
-        void aContractWithNoStartDateCountsNoDaysSinceTheLastCounterattack() {
-            when(contract.getStartDate()).thenReturn(null);
-
-            assertEquals(0, StratConEnemyFacilityActivity.getDaysSinceLastCounterattack(contract,
-                  campaignState,
-                  TODAY));
-
-            campaignState.setLastCounterattackDate(TODAY.minusDays(12));
-            assertEquals(12, StratConEnemyFacilityActivity.getDaysSinceLastCounterattack(contract,
-                  campaignState,
-                  TODAY));
-        }
-
         @Test
         void counterattacksCanFallOnAnySectorOfTheContract() {
             placeFacility(ForceAlignment.Player);
@@ -456,7 +449,7 @@ class StratConEnemyFacilityActivityTest {
         void anEmployerGarrisonAlreadyEmptyNeverGoesBelowNothing() {
             StratConFacility facility = placeFacility(ForceAlignment.Allied);
             facility.setGarrison(0);
-            StratConScenario scenario = placeScenario(true, true);
+            StratConScenario scenario = placeScenario(true, false);
 
             try (MockedStatic<Compute> dice = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
                 dice.when(() -> Compute.d6(anyInt())).thenReturn(12);
@@ -467,10 +460,10 @@ class StratConEnemyFacilityActivityTest {
         }
 
         @Test
-        void anEmployerGarrisonThatFailsOffScreenLosesTheFacilityAndThePoint() {
+        void anEmployerGarrisonThatFailsOffScreenLosesTheFacilityButNoVictoryPoint() {
             StratConFacility facility = placeFacility(ForceAlignment.Allied);
             facility.setGarrison(0);
-            StratConScenario scenario = placeScenario(true, true);
+            StratConScenario scenario = placeScenario(true, false);
 
             try (MockedStatic<Compute> dice = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
                 dice.when(() -> Compute.d6(anyInt())).thenReturn(2);
@@ -478,7 +471,7 @@ class StratConEnemyFacilityActivityTest {
             }
 
             assertEquals(ForceAlignment.Opposing, facility.getOwner());
-            assertEquals(-1, campaignState.getVictoryPoints());
+            assertEquals(0, campaignState.getVictoryPoints());
         }
 
         @Test
@@ -508,25 +501,21 @@ class StratConEnemyFacilityActivityTest {
         }
 
         @Test
-        void aNegativeScaleSendsNoEngineers() {
-            assertEquals(0, StratConEnemyFacilityActivity.getMonthlyEngineerCount(-4, false, 3.0));
-            assertEquals(1, StratConEnemyFacilityActivity.getMonthlyEngineerCount(2, false, 1.5));
+        void aContractWithNoStartDateSchedulesNoEngineers() {
+            when(contract.getStartDate()).thenReturn(null);
+
+            StratConEnemyFacilityActivity.scheduleEnemyEngineers(contract, campaignState, TODAY);
+
+            assertTrue(campaignState.getEnemyEngineerDates().isEmpty());
+            assertNull(campaignState.getEnemyEngineersScheduledUntil());
         }
     }
 
     @Test
     void aReliefForceIsNeverGuaranteed() {
-        // A counterattack's chance is 25% at normal activity; a long quiet spell doesn't change that for relief.
+        // 25% at normal activity, however long the siege has gone unrelieved
         assertTrue(StratConEnemyFacilityActivity.isReliefSent(1.0, 24));
         assertFalse(StratConEnemyFacilityActivity.isReliefSent(1.0, 25));
         assertFalse(StratConEnemyFacilityActivity.isReliefSent(0, 0));
-    }
-
-    @Test
-    void theQuietSpellCountsFromTheFirstDayCounterattacksCouldCome() {
-        // A contract loaded partway through must not owe a counterattack for the days before.
-        StratConEnemyFacilityActivity.launchCounterattacks(campaign, contract, campaignState, 0);
-
-        assertEquals(TODAY, campaignState.getLastCounterattackDate());
     }
 }

@@ -313,11 +313,20 @@ class ContractXmlCodecTest {
 
     @Test
     void aLegacyGarrisonStillInTheRoutItBeganWithHasNotBeenRaided() throws Exception {
-        // The contract's first rout always ended within three months of its start
+        // The contract's first rout began on its start date and ended a whole number of months later, less a day
         AbstractContract reloaded = reparse(legacyRoutedXml(ContractObjectiveType.GARRISON_DUTY,
-              START.plusMonths(2).toString()));
+              START.plusMonths(2).minusDays(1).toString()));
 
         assertFalse(reloaded.hasBeenRaided(), "its first raid, and any Batchall, are still to come");
+    }
+
+    @Test
+    void aLegacyGarrisonInALaterRoutEndingWithinThreeMonthsHasBeenRaided() throws Exception {
+        // A rout begun mid-month, after the enemy's first raid, can still end within three months of the start
+        AbstractContract reloaded = reparse(legacyRoutedXml(ContractObjectiveType.GARRISON_DUTY,
+              START.plusMonths(1).plusDays(14).plusMonths(1).minusDays(1).toString()));
+
+        assertTrue(reloaded.hasBeenRaided(), "the enemy came back from its first rout, bringing any Batchall then");
     }
 
     @Test
@@ -353,13 +362,29 @@ class ContractXmlCodecTest {
     }
 
     @Test
-    void aGarrisonWithAnActiveEnemyInACurrentSaveKeepsItsOwnRecord() throws Exception {
+    void aGarrisonWithAnActiveEnemyInAnEarlierReleaseOfTheSameVersionHasBeenRaided() throws Exception {
+        // Releases of 0.51.01 shipped before the raid model did, so the version alone cannot tell the models apart
         AbstractContract contract = fullyPopulatedContract();
         contract.setObjectiveData(new ContractObjectiveData(ContractObjectiveType.GARRISON_DUTY,
               ContractObjectiveType.PLANETARY_ASSAULT));
         contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING));
 
-        assertFalse(reparse(write(contract)).hasBeenRaided(), "a current save records the first raid itself");
+        AbstractContract reloaded = parse(write(contract), new Version("0.51.01.8"));
+
+        assertTrue(reloaded.hasBeenRaided(), "an active enemy has always raided, so its Batchall has come");
+    }
+
+    @Test
+    void aPeacefulGarrisonInACurrentSaveKeepsItsOwnRecord() throws Exception {
+        AbstractContract contract = fullyPopulatedContract();
+        contract.setObjectiveData(new ContractObjectiveData(ContractObjectiveType.GARRISON_DUTY,
+              ContractObjectiveType.PLANETARY_ASSAULT));
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING, true, null));
+
+        assertFalse(reparse(write(contract)).hasBeenRaided(), "the first raid, and its Batchall, are still to come");
+
+        contract.setHasBeenRaided(true);
+        assertTrue(reparse(write(contract)).hasBeenRaided(), "a garrison between raids remembers the raids before");
     }
 
     /**

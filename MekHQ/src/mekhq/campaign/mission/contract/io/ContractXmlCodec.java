@@ -516,7 +516,7 @@ public final class ContractXmlCodec {
         readers.put("activeNegotiationData",
               (contract, node, campaign, version) -> contract.setActiveNegotiationData(
                     parseActiveNegotiationData(node)));
-        readers.put("moraleData", (contract, node, campaign, version) -> readMoraleData(contract, node, version));
+        readers.put("moraleData", (contract, node, campaign, version) -> readMoraleData(contract, node));
         readers.put("negotiationData",
               (contract, node, campaign, version) -> contract.setNegotiationData(parseNegotiationData(node)));
         readers.put(StratConCampaignState.ROOT_XML_ELEMENT_NAME,
@@ -1002,9 +1002,6 @@ public final class ContractXmlCodec {
               builder.transportDelta, builder.salvageDelta, builder.commandDelta, builder.attempts);
     }
 
-    /** The version that brought in the garrison raid model, and with it the record of a contract's first raid. */
-    private static final Version RAID_MODEL_VERSION = new Version("0.51.01");
-
     private static final class MoraleDataBuilder {
         ContractMoraleLevel moraleLevel;
         boolean peaceful;
@@ -1041,17 +1038,23 @@ public final class ContractXmlCodec {
      * Reads the contract's morale data. It relies on the {@code objectiveData} and {@code scheduleData} written before
      * it, for the contract's objective and start date.
      *
-     * <p>A save from before the raid model (one from before 0.51.01, or any with a rout end date) records no first
-     * raid on a garrison-type contract, so whether the enemy has already raided - and so whether its
-     * Batchall has already come - is worked out from the old rout instead (see
-     * {@link LegacyContractConverter#hasRaidedBeforeRaidModel}).</p>
+     * <p>A save from before the raid model records no first raid on a garrison-type contract, so whether
+     * the enemy has already raided - and so whether its Batchall has already come - is worked out here. It is not
+     * worked out from the save's version, as releases of 0.51.01 shipped before the raid model did:</p>
+     *
+     * <ul>
+     *     <li>A save with a rout end date predates the raid model; the old rout says whether the enemy had raided (see
+     *     {@link LegacyContractConverter#hasRaidedBeforeRaidModel}).</li>
+     *     <li>An enemy that is active has raided, under either model: the old model only brought it into the fight once
+     *     its first rout had ended, and under the raid model only a raid (or an emergency extension, which counts as
+     *     one) ends a garrison's peace.</li>
+     *     <li>A peaceful contract keeps the record its save holds.</li>
+     * </ul>
      *
      * @param contract the contract being read
      * @param wn       the {@code moraleData} element
-     * @param version  the version the save was written by, or {@code null} if unknown
      */
-    private static void readMoraleData(final AbstractContract contract, final Node wn,
-          final @Nullable Version version) {
+    private static void readMoraleData(final AbstractContract contract, final Node wn) {
         final ContractObjectiveType objectiveType = (contract.getObjectiveData() == null)
                                                           ? null
                                                           : contract.getObjectiveType();
@@ -1066,11 +1069,13 @@ public final class ContractXmlCodec {
             contract.setMoraleData(new MoraleData(builder.moraleLevel, builder.peaceful, builder.finalPayout));
         }
 
-        final boolean isBeforeRaidModel = hasLegacyRout
-                                                || ((version != null) && version.isLowerThan(RAID_MODEL_VERSION));
-        if (isBeforeRaidModel && (objectiveType != null) && objectiveType.isGarrisonType()) {
-            contract.setHasBeenRaided(LegacyContractConverter.hasRaidedBeforeRaidModel(contract.getStartDate(),
-                  builder.legacyRoutEndDate));
+        if ((objectiveType != null) && objectiveType.isGarrisonType()) {
+            if (hasLegacyRout) {
+                contract.setHasBeenRaided(LegacyContractConverter.hasRaidedBeforeRaidModel(contract.getStartDate(),
+                      builder.legacyRoutEndDate));
+            } else if (!builder.peaceful) {
+                contract.setHasBeenRaided(true);
+            }
         }
     }
 

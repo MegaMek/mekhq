@@ -53,6 +53,7 @@ import megamek.common.enums.SkillLevel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.digitalGM.stratCon.StratConSpawnRates;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
@@ -188,9 +189,9 @@ class ContractCharacteristicsTest {
         assertEquals(base, ContractCharacteristics.bakeCombatPay(base, contractWith(HIGH_PAY)));
     }
 
-    /** An intensity step changes the track count combat pay was worked out from, so it is recomputed and rebaked. */
+    /** Intensity changes how many bonuses combat pay is spread across, so it is recomputed and rebaked. */
     @Test
-    void refreshCombatPayRecomputesFromTheFinalTrackCountAndRebakesTheCharacteristic() {
+    void refreshCombatPayRecomputesForTheIntensityAndRebakesTheCharacteristic() {
         AbstractContract contract = contractWith(HIGH_INTENSITY, HAZARD_PAY);
         Campaign campaign = mock(Campaign.class);
         Money recomputed = Money.of(200);
@@ -199,7 +200,7 @@ class ContractCharacteristicsTest {
             generation.when(() -> AbstractContractGeneration.determineCombatPay(campaign, contract))
                   .thenReturn(recomputed);
 
-            ContractCharacteristics.refreshCombatPayForTrackCount(contract, campaign);
+            ContractCharacteristics.refreshCombatPayForIntensity(contract, campaign);
         }
 
         assertEquals(recomputed.multipliedBy(HAZARD_PAY.getMagnitude()),
@@ -249,24 +250,40 @@ class ContractCharacteristicsTest {
     }
 
     @Test
-    void bakeTrackCountStepsByTheIntensityCharacteristic() {
-        int base = 3;
-        assertEquals(Math.max(1, base + (int) Math.round(HIGH_INTENSITY.getMagnitude())),
-              ContractCharacteristics.bakeTrackCount(base, contractWith(HIGH_INTENSITY)));
-        assertEquals(Math.max(1, base + (int) Math.round(LOW_INTENSITY.getMagnitude())),
-              ContractCharacteristics.bakeTrackCount(base, contractWith(LOW_INTENSITY)));
+    void intensityStepsTheScaleStratConCountsAgainst() {
+        int step = (int) Math.round(HIGH_INTENSITY.getMagnitude());
+        AbstractContract busy = contractWith(HIGH_INTENSITY);
+        busy.setScale(3);
+        assertEquals(3 + step, StratConSpawnRates.getSpawnScale(busy, true));
+
+        AbstractContract quiet = contractWith(LOW_INTENSITY);
+        quiet.setScale(3);
+        assertEquals(3 + (int) Math.round(LOW_INTENSITY.getMagnitude()), StratConSpawnRates.getSpawnScale(quiet, true));
     }
 
     @Test
-    void bakeTrackCountNeverDropsBelowOne() {
-        // LOW_INTENSITY lowers the track count; from a base of 1 it must clamp at 1.
-        assertEquals(1, ContractCharacteristics.bakeTrackCount(1, contractWith(LOW_INTENSITY)));
+    void intensityStepsTheScaleAfterSupportPointsAreAccountedFor() {
+        AbstractContract busy = contractWith(HIGH_INTENSITY);
+        busy.setScale(9);
+        assertEquals(9.0 / StratConSpawnRates.SUPPORT_POINT_SCALE_RATIO
+                           + (int) Math.round(HIGH_INTENSITY.getMagnitude()),
+              StratConSpawnRates.getSpawnScale(busy, false));
     }
 
     @Test
-    void bakeTrackCountLeavesCountUnchangedWithoutAnIntensityCharacteristic() {
-        assertEquals(3, ContractCharacteristics.bakeTrackCount(3, contractWith()));
-        assertEquals(3, ContractCharacteristics.bakeTrackCount(3, contractWith(HIGH_PAY)));
+    void lowIntensityStillBringsAtLeastOneOfEverything() {
+        AbstractContract quiet = contractWith(LOW_INTENSITY);
+        quiet.setScale(0.5);
+        assertEquals(0, StratConSpawnRates.getSpawnScale(quiet, true));
+        assertEquals(1, StratConSpawnRates.getCount(quiet, true, StratConSpawnRates.ESSENTIAL_SCENARIOS_PER_SCALE));
+    }
+
+    @Test
+    void scaleIsUnchangedWithoutAnIntensityCharacteristic() {
+        AbstractContract plain = contractWith(HIGH_PAY);
+        plain.setScale(3);
+        assertEquals(3, StratConSpawnRates.getSpawnScale(plain, true));
+        assertEquals(0, StratConSpawnRates.getIntensityScaleStep(plain));
     }
 
     // endregion generation-time bakes

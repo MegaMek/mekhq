@@ -206,6 +206,13 @@ class StratConScheduledParadeBehaviorTest {
     }
 
     @Test
+    void aRiotIsNotFoughtAgainstTheContractsEnemy() {
+        assertFalse(new StratConScheduledParadeBehavior().isOpposedByContractEnemy(),
+              "civil unrest is not the enemy's fight, so the enemy's morale does not shape it");
+        assertTrue(VULNERABLE_INFRASTRUCTURE.createBehavior().isOpposedByContractEnemy());
+    }
+
+    @Test
     void ignoringThePeaceLeavesTheUsualOdds() {
         AbstractContract peacefulContract = mock(AbstractContract.class);
         when(peacefulContract.getMoraleLevel()).thenReturn(ContractMoraleLevel.STALEMATE);

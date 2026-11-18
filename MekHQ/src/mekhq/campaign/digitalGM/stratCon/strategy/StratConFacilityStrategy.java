@@ -39,6 +39,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityAttacks;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySiege;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply;
@@ -85,13 +86,7 @@ public class StratConFacilityStrategy implements IFacilityStrategy {
     public void processEnemyActivity(Campaign campaign, AbstractContract contract,
           StratConCampaignState campaignState) {
         StratConEnemyFacilityActivity.processEnemyEngineers(campaign, contract, campaignState);
-        StratConFacilitySupply.processSupplyInterdictions(campaign, contract, campaignState);
-    }
-
-    @Override
-    public int launchCounterattacks(Campaign campaign, AbstractContract contract,
-          StratConCampaignState campaignState, int scenarioCount) {
-        return StratConEnemyFacilityActivity.launchCounterattacks(campaign, contract, campaignState, scenarioCount);
+        StratConFacilityAttacks.processFacilityAttacks(campaign, contract, campaignState);
     }
 
     @Override

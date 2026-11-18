@@ -41,6 +41,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.chaosCampaign.ChaosCampaignUtilities;
 import mekhq.campaign.chaosCampaign.ChaosScaleLimits;
+import mekhq.campaign.digitalGM.stratCon.StratConCombatBonusProjection;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.ContractExpenseProjection;
 import mekhq.campaign.finances.Money;
@@ -68,18 +69,12 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
         if (campaign.getCampaignOptions().get(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE)) {
             combatPayInSupportPoints = DEFAULT_COMBAT_PAY_MULTIPLIER * ChaosScaleLimits.getTaperedScale(economicScale);
         }
-        // When "Multiply Track Intensity by Scale" is set, a contract fields scale times as many scenarios. Divide
-        // combat pay by scale so it stays flat across those extra scenarios rather than growing with their number.
-        // The track rolls are a whole number, so this divides by the whole Scale even under Fractional Scale.
-        int rollScale = contract.getScale();
-        if ((rollScale > 0) && campaign.getCampaignOptions().get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)) {
-            combatPayInSupportPoints /= rollScale;
-        }
-        // Likewise for the extra scenarios the minimum track and weekly rolling options bring.
-        double trackRollingMultiplier = TrackIntensityTable.getCombatPayMultiplier(contract.getTrackCount(),
-              campaign.getCampaignOptions().get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL),
-              campaign.getCampaignOptions().get(CampaignOption.ROLL_TRACKS_WEEKLY));
-        int roundedCombatPayInSupportPoints = (int) round(combatPayInSupportPoints * trackRollingMultiplier);
+        // A contract brings its combat bonuses a set number of times a month per point of Scale (see
+        // StratConSpawnRates), so combat pay is spread across them: it stays flat however many come, and every contract
+        // type - whether paid through Essential scenarios or the Nav Points that replace them - offers the same total.
+        combatPayInSupportPoints /= StratConCombatBonusProjection.getMonthlyCombatBonusCount(
+              campaign.getCampaignOptions(), contract);
+        int roundedCombatPayInSupportPoints = (int) round(combatPayInSupportPoints);
         return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(roundedCombatPayInSupportPoints,
               shouldConvertSupportPoints(campaign));
     }

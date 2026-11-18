@@ -193,32 +193,42 @@ public final class ContractCharacteristics {
                 case COMBAT_PAY -> applyCombatPayMultiplier(contract, characteristic.getMagnitude());
                 case LENGTH -> applyLengthMultiplier(contract, characteristic.getMagnitude());
                 case OBJECTIVES -> applyObjectiveStep(contract, (int) Math.round(characteristic.getMagnitude()));
-                case INTENSITY -> applyTrackStep(contract, (int) Math.round(characteristic.getMagnitude()));
                 case NEGOTIATOR -> syncNegotiatorTier(contract, campaign);
                 default -> {
                     // COMPLETION_PAYMENT, UNIT_REPUTATION, EMPLOYER_STANDING and ENEMY_STANDING are applied at their
-                    // own lifecycle points (accept / completion), not at generation.
+                    // own lifecycle points (accept / completion), not at generation. INTENSITY is read by StratCon
+                    // whenever it counts how many of anything the contract brings (see StratConSpawnRates).
                 }
             }
         }
 
-        if (contract.getCharacteristic(Category.INTENSITY) != null) {
-            refreshCombatPayForTrackCount(contract, campaign);
+        // The Essential scenario schedule was laid out before the characteristics were rolled, so it is laid out again
+        // if they changed what it is counted from: the length, or the Scale it is counted against (intensity)
+        final boolean isIntensityChanged = contract.getCharacteristic(Category.INTENSITY) != null;
+        if (isIntensityChanged || (contract.getCharacteristic(Category.LENGTH) != null)) {
+            contract.setScenarioSchedule(AbstractContractGeneration.rollScenarioSchedule(campaign,
+                  contract,
+                  contract.getLengthInMonths()));
+        }
+
+        if (isIntensityChanged) {
+            refreshCombatPayForIntensity(contract, campaign);
         }
     }
 
     /**
-     * Combat pay was worked out from the track count before the intensity characteristic stepped it, and under the
-     * minimum-track and weekly-rolling options combat pay depends on the track count. So it is recomputed from the
-     * final track count, with the combat-pay characteristic baked back on top.
+     * Combat pay was worked out before the intensity characteristic was rolled, and the combat pay offered for each
+     * bonus depends on how many bonuses a month the contract can pay (see
+     * {@code StratConCombatBonusProjection#getMonthlyCombatBonusCount}), which the intensity characteristic changes.
+     * So it is worked out again, with the combat-pay characteristic baked back on top.
      *
-     * @param contract the contract whose track count has changed
+     * @param contract the contract whose intensity has changed
      * @param campaign the campaign, for the pay scheme and its options
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static void refreshCombatPayForTrackCount(final AbstractContract contract, final Campaign campaign) {
+    static void refreshCombatPayForIntensity(final AbstractContract contract, final Campaign campaign) {
         contract.updateCombatPay(bakeCombatPay(AbstractContractGeneration.determineCombatPay(campaign, contract),
               contract));
     }
@@ -244,10 +254,6 @@ public final class ContractCharacteristics {
 
     private static void applyObjectiveStep(final AbstractContract contract, final int delta) {
         contract.setRequiredVictoryPoints(Math.max(1, contract.getRequiredVictoryPoints() + delta));
-    }
-
-    private static void applyTrackStep(final AbstractContract contract, final int delta) {
-        contract.setTrackCount(Math.max(1, contract.getTrackCount() + delta));
     }
 
     // endregion Roll & generation-time application
@@ -406,17 +412,6 @@ public final class ContractCharacteristics {
      */
     public static int bakeRequiredVictoryPoints(final int base, final AbstractContract contract) {
         final ContractCharacteristic characteristic = contract.getCharacteristic(Category.OBJECTIVES);
-        return (characteristic == null) ? base : Math.max(1, base + (int) Math.round(characteristic.getMagnitude()));
-    }
-
-    /**
-     * Applies the intensity characteristic ({@link Category#INTENSITY}) to a freshly-computed track count. As
-     * {@link #bakeMonthlyPay}, for use when the track count is on "Automatic".
-     *
-     * @return {@code base} stepped by the intensity characteristic (never below 1), or {@code base} if there is none
-     */
-    public static int bakeTrackCount(final int base, final AbstractContract contract) {
-        final ContractCharacteristic characteristic = contract.getCharacteristic(Category.INTENSITY);
         return (characteristic == null) ? base : Math.max(1, base + (int) Math.round(characteristic.getMagnitude()));
     }
 

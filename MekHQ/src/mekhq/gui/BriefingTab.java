@@ -42,21 +42,13 @@ import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Component;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.GridLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.File;
 import java.time.LocalDate;
 import java.util.*;
+import java.util.List;
 import javax.swing.*;
 import javax.swing.table.JTableHeader;
 import javax.swing.table.TableCellRenderer;
@@ -87,6 +79,7 @@ import mekhq.campaign.autoResolve.AutoResolveMethod;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.gm.MaplessStratCon;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.events.GMModeEvent;
@@ -1043,7 +1036,10 @@ public final class BriefingTab extends CampaignGuiTab {
 
         StratConCampaignState campaignState = contract.getStratConCampaignState();
         if (campaignState != null) {
-            generateDailyScenariosForTrack(getCampaign(), campaignState, contract, 1);
+            // One scenario, in a random sector
+            List<StratConTrackState> scenarioSectors = new ArrayList<>();
+            scenarioSectors.add(null);
+            generateDailyScenariosForTrack(getCampaign(), campaignState, contract, scenarioSectors);
             this.refreshAll(); // We need to refresh otherwise the scenario won't show up in the GUI
             return;
         }

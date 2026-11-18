@@ -1654,9 +1654,9 @@ public class ContractEditorDialog extends JDialog {
 
     /**
      * Writes every edited field back onto the contract, then closes. The player's chosen negotiator is preserved
-     * untouched. If the contract's scale, track count, dates, command rights, or employer changed, its StratCon schedule
-     * is rolled again (see {@link StratConScenarioTempo#regenerateSchedules}). A market offer that has not been
-     * accepted has only its Essential scenario schedule rolled again (see
+     * untouched. If the contract's scale, track count, intensity, dates, command rights, or employer changed, its
+     * StratCon schedule is rolled again (see {@link StratConScenarioTempo#regenerateSchedules}). A market offer that has
+     * not been accepted has only its Essential scenario schedule rolled again (see
      * {@link AbstractContractGeneration#rollScenarioSchedule}), and a newly created offer always has one rolled.
      *
      * @author Illiani
@@ -1664,8 +1664,12 @@ public class ContractEditorDialog extends JDialog {
      */
     private void saveAction() {
         // What StratCon's pre-rolled schedule was rolled from, so an edit to any of it rolls the schedule again below.
-        int previousScale = contract.getScale();
+        // The exact Scale, not the rounded one: how many of each thing a contract brings is the exact Scale times a
+        // rate, rounded afterward (see StratConSpawnRates), so even an edit within the same whole Scale can change it.
+        double previousExactScale = contract.getExactScale();
         int previousTrackCount = contract.getTrackCount();
+        // The intensity characteristic steps the Scale the schedule is counted against
+        ContractCharacteristic previousIntensity = contract.getCharacteristic(ContractCharacteristic.Category.INTENSITY);
         LocalDate previousStartDate = contract.getStartDate();
         LocalDate previousEndDate = contract.getEndingDate();
         int previousLengthInMonths = contract.getLengthInMonths();
@@ -1713,8 +1717,7 @@ public class ContractEditorDialog extends JDialog {
                   campaign.getPlayerForce().getForceDetachment().getHangar(), contract)
                                     : getEditedScale());
             contract.setTrackCount(trackCountAutomatic.isSelected()
-                                         ? ContractCharacteristics.bakeTrackCount(
-                  AbstractContractGeneration.determineTrackCount(contract), contract)
+                                         ? AbstractContractGeneration.determineTrackCount(contract)
                                          : intValue(trackCountSpinner));
             contract.setRequiredVictoryPoints(victoryPointsAutomatic.isSelected()
                                                     ? ContractCharacteristics.bakeRequiredVictoryPoints(
@@ -1872,8 +1875,9 @@ public class ContractEditorDialog extends JDialog {
         // what StratCon spawns the Essential scenarios from once the offer is accepted. A created offer has never had
         // one rolled, so it is always rolled here; an edited offer is rolled again only when its inputs changed.
         StratConCampaignState campaignState = contract.getStratConCampaignState();
-        boolean isScheduleChanged = (contract.getScale() != previousScale)
+        boolean isScheduleChanged = (Double.compare(contract.getExactScale(), previousExactScale) != 0)
                                           || (contract.getTrackCount() != previousTrackCount)
+                                          || (contract.getCharacteristic(ContractCharacteristic.Category.INTENSITY) != previousIntensity)
                                           || !Objects.equals(contract.getStartDate(), previousStartDate)
                                           || !Objects.equals(contract.getEndingDate(), previousEndDate)
                                           || (contract.getLengthInMonths() != previousLengthInMonths)

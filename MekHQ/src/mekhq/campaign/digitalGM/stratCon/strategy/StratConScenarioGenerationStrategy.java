@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.digitalGM.stratCon.strategy;
 
+import java.util.List;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.IScenarioGenerationStrategy;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
@@ -49,14 +51,13 @@ import mekhq.campaign.mission.contract.AbstractContract;
 public class StratConScenarioGenerationStrategy implements IScenarioGenerationStrategy {
     @Override
     public void generateWeeklyScenarioDates(Campaign campaign, StratConCampaignState campaignState,
-          AbstractContract contract, StratConTrackState track, boolean singleDropMode) {
-        StratConRulesManager.generateScenariosDatesForWeek(campaign, campaignState, contract, track, singleDropMode);
+          AbstractContract contract, boolean singleDropMode) {
+        StratConRulesManager.generateScenariosDatesForWeek(campaign, campaignState, contract, singleDropMode);
     }
 
     @Override
     public void generateDailyScenarios(Campaign campaign, StratConCampaignState campaignState,
-          AbstractContract contract,
-          int scenarioCount) {
-        StratConRulesManager.generateDailyScenariosForTrack(campaign, campaignState, contract, scenarioCount);
+          AbstractContract contract, List<StratConTrackState> scenarioSectors) {
+        StratConRulesManager.generateDailyScenariosForTrack(campaign, campaignState, contract, scenarioSectors);
     }
 }
