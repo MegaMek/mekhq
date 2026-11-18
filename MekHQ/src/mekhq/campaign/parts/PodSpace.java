@@ -588,6 +588,14 @@ public class PodSpace implements IPartWork {
     }
 
     /**
+     * Replacing the pod's parts shows their stock; salvaging lists the parts left instead.
+     */
+    @Override
+    public @Nullable StockCount getShownStock() {
+        return isSalvaging() ? null : countStock();
+    }
+
+    /**
      * Counts the pods this location needs replaced, how many of them have a replacement in stock, and how many have
      * one on its way or on order. Ammunition bins are reloaded, not replaced, so they are left out.
      *

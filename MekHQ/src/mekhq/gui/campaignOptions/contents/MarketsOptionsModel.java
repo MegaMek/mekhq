@@ -74,9 +74,6 @@ class MarketsOptionsModel {
     boolean useDynamicDifficulty;
     boolean useBolsterContractSkill;
     boolean useChaosScaleSupportPointConversion;
-    boolean multiplyTrackIntensityByScale;
-    boolean minimumOneTrackPerRoll;
-    boolean rollTracksWeekly;
     boolean useContractFactionModifiers;
     boolean useIntelObfuscation;
     boolean useNonNegotiableTerms;
@@ -94,7 +91,6 @@ class MarketsOptionsModel {
     double contractBattlefieldLossMultiplier;
     double contractTransportMultiplier;
     double contractSalvageMultiplier;
-    double scenarioTempoMultiplier;
     boolean useChaosSupportPointConversion;
     boolean basePayOnlyConsidersScale;
     boolean capContractScaleByHiringHall;
@@ -143,9 +139,6 @@ class MarketsOptionsModel {
         useDynamicDifficulty = options.get(CampaignOption.USE_DYNAMIC_DIFFICULTY);
         useBolsterContractSkill = options.get(CampaignOption.USE_BOLSTER_CONTRACT_SKILL);
         useChaosScaleSupportPointConversion = options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
-        multiplyTrackIntensityByScale = options.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE);
-        minimumOneTrackPerRoll = options.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL);
-        rollTracksWeekly = options.get(CampaignOption.ROLL_TRACKS_WEEKLY);
         useContractFactionModifiers = options.get(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS);
         useIntelObfuscation = options.get(CampaignOption.USE_INTEL_OBFUSCATION);
         useNonNegotiableTerms = options.get(CampaignOption.USE_NON_NEGOTIABLE_TERMS);
@@ -163,7 +156,6 @@ class MarketsOptionsModel {
         contractBattlefieldLossMultiplier = options.get(CampaignOption.CONTRACT_BATTLEFIELD_LOSS_MULTIPLIER);
         contractTransportMultiplier = options.get(CampaignOption.CONTRACT_TRANSPORT_MULTIPLIER);
         contractSalvageMultiplier = options.get(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER);
-        scenarioTempoMultiplier = options.get(CampaignOption.SCENARIO_TEMPO_MULTIPLIER);
         useChaosSupportPointConversion = options.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION);
         basePayOnlyConsidersScale = options.get(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE);
         capContractScaleByHiringHall = options.get(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL);
@@ -230,9 +222,6 @@ class MarketsOptionsModel {
         options.set(CampaignOption.USE_DYNAMIC_DIFFICULTY, useDynamicDifficulty);
         options.set(CampaignOption.USE_BOLSTER_CONTRACT_SKILL, useBolsterContractSkill);
         options.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, useChaosScaleSupportPointConversion);
-        options.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, multiplyTrackIntensityByScale);
-        options.set(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL, minimumOneTrackPerRoll);
-        options.set(CampaignOption.ROLL_TRACKS_WEEKLY, rollTracksWeekly);
         options.set(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS, useContractFactionModifiers);
         options.set(CampaignOption.USE_INTEL_OBFUSCATION, useIntelObfuscation);
         options.set(CampaignOption.USE_NON_NEGOTIABLE_TERMS, useNonNegotiableTerms);
@@ -250,7 +239,6 @@ class MarketsOptionsModel {
         options.set(CampaignOption.CONTRACT_BATTLEFIELD_LOSS_MULTIPLIER, contractBattlefieldLossMultiplier);
         options.set(CampaignOption.CONTRACT_TRANSPORT_MULTIPLIER, contractTransportMultiplier);
         options.set(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER, contractSalvageMultiplier);
-        options.set(CampaignOption.SCENARIO_TEMPO_MULTIPLIER, scenarioTempoMultiplier);
         options.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, useChaosSupportPointConversion);
         options.set(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE, basePayOnlyConsidersScale);
         options.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, capContractScaleByHiringHall);

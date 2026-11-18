@@ -33,9 +33,11 @@
 package mekhq.campaign.mission.contract.contractGeneration;
 
 import static java.lang.Math.ceil;
+import static java.lang.Math.max;
 
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.utilities.MHQMorale;
 
 public class ChaosContractDeterminationRequiredVictoryPoints {
     // the share of scenarios that are Turning Points, whatever the contract's command rights
@@ -61,10 +63,7 @@ public class ChaosContractDeterminationRequiredVictoryPoints {
 
         double baseRequirement = contract.getScale();
 
-        int duration = contract.getLengthInMonths();
-        if (contract.getObjectiveType().isGarrisonType()) {
-            duration = (int) ceil(duration * 0.75); // We assume around 25% of the contract will be peaceful
-        }
+        double duration = getActiveMonths(contract);
 
         double trackCount = 0;
         int totalScenarioOdds = 0;
@@ -78,5 +77,30 @@ public class ChaosContractDeterminationRequiredVictoryPoints {
 
         // This result gives us the average number of Turning Points expected for the contract
         return (int) ceil(baseRequirement * duration * scenarioOdds * TURNING_POINT_CHANCE);
+    }
+
+    /**
+     * The number of months the enemy is expected to be active over the contract, and so able to offer Turning Points.
+     *
+     * <p>Most contracts are active throughout. A garrison-type contract follows the raid model instead
+     * (see {@link mekhq.campaign.mission.contract.contractData.ContractObjectiveType#isGarrisonType()}): it begins
+     * peaceful, and each month after the first the enemy raids with a 1 in {@link MHQMorale#RAID_DIE_SIZE} chance (see
+     * {@link MHQMorale#checkMorale}). No scenarios spawn between raids, so only the expected raid months count, though
+     * never less than one.</p>
+     *
+     * @param contract the contract
+     *
+     * @return the expected number of active months
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static double getActiveMonths(AbstractContract contract) {
+        int lengthInMonths = contract.getLengthInMonths();
+        if (!contract.getObjectiveType().isGarrisonType()) {
+            return lengthInMonths;
+        }
+
+        return max(1.0, (lengthInMonths - 1) / (double) MHQMorale.RAID_DIE_SIZE);
     }
 }

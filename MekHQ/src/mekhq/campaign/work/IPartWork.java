@@ -38,6 +38,7 @@ import megamek.common.equipment.MiscType;
 import megamek.common.equipment.WeaponType;
 import megamek.common.rolls.TargetRoll;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.parts.StockCount;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
@@ -69,6 +70,15 @@ public interface IPartWork extends IWork {
 
     default boolean canChangeWorkMode() {
         return false;
+    }
+
+    /**
+     * Gives the stock this task's Repair Bay text shows, so its tooltip can add what that short line leaves out.
+     *
+     * @return the stock the task's line describes, or {@code null} if its text has no stock line
+     */
+    default @Nullable StockCount getShownStock() {
+        return null;
     }
 
     TargetRoll getAllModsForMaintenance();

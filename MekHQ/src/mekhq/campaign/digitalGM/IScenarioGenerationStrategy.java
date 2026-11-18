@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.digitalGM;
 
+import java.util.List;
+
 import mekhq.campaign.Campaign;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
@@ -54,25 +56,26 @@ import mekhq.campaign.mission.contract.AbstractContract;
 public interface IScenarioGenerationStrategy {
 
     /**
-     * Schedules the dates on which scenarios will occur across the coming week for a single track.
+     * Makes the week's scenario scheduling for a contract, on a Monday: in Single Drop play, its one scenario of the
+     * week; otherwise, the week's normal scenario rolls against each sector's threat.
      *
      * @param campaign       the active campaign
      * @param campaignState  the StratCon state for the contract
-     * @param contract       the contract owning the track
-     * @param track          the track to schedule scenarios for
-     * @param singleDropMode {@code true} to restrict scheduling to a single drop for the week
+     * @param contract       the contract
+     * @param singleDropMode {@code true} to schedule Single Drop play's one scenario for the week
      */
     void generateWeeklyScenarioDates(Campaign campaign, StratConCampaignState campaignState, AbstractContract contract,
-          StratConTrackState track, boolean singleDropMode);
+          boolean singleDropMode);
 
     /**
-     * Generates the scenarios due today for a track.
+     * Generates the normal scenarios due today, one for each entry in {@code scenarioSectors}.
      *
-     * @param campaign      the active campaign
-     * @param campaignState the StratCon state for the contract
-     * @param contract      the contract owning the track
-     * @param scenarioCount how many scenarios are scheduled for today
+     * @param campaign        the active campaign
+     * @param campaignState   the StratCon state for the contract
+     * @param contract        the contract
+     * @param scenarioSectors the sector each scenario appears in, one entry per scenario; a {@code null} entry for a
+     *                        random sector
      */
     void generateDailyScenarios(Campaign campaign, StratConCampaignState campaignState, AbstractContract contract,
-          int scenarioCount);
+          List<StratConTrackState> scenarioSectors);
 }

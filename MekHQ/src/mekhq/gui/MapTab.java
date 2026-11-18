@@ -174,6 +174,8 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     private DossierIdentity presentedDossierIdentity;
     private MapTabLayoutState layoutState;
     private transient RoutePlanningIntent routePlanningIntent;
+    /** The system the fleet was in when the planned route was last brought up to date. */
+    private transient PlanetarySystem lastFleetSystem;
     private int inspectorDividerSize;
     private int inspectorWidth = INSPECTOR_PREFERRED_WIDTH;
     private boolean applyingLayoutState;
@@ -214,6 +216,17 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
                             && ((activePath == null) || activePath.isEmpty()) && (routeAssessment != null)
                             && (routeAssessment.severity() != Severity.BLOCKED);
         }
+
+    /**
+     * @return {@code true} if a planned route should move its start to follow the fleet: the fleet has moved to
+     *       another system, and the route started where the fleet was. A route plotted from somewhere else is a what-if
+     *       route and stays where it is.
+     */
+    static boolean shouldRouteFollowFleet(@Nullable PlanetarySystem routeOrigin,
+          @Nullable PlanetarySystem previousFleetSystem, @Nullable PlanetarySystem currentFleetSystem) {
+        return (currentFleetSystem != null) && !Objects.equals(previousFleetSystem, currentFleetSystem)
+              && Objects.equals(routeOrigin, previousFleetSystem);
+    }
 
                                         static boolean canQuickPlotRoute(PlanetarySystem selectedSystem, PlanetarySystem campaignCurrentSystem) {
                   return (selectedSystem != null) && (campaignCurrentSystem != null)
@@ -290,6 +303,9 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     public void initTab() {
         layoutState = initializeLayoutState(layoutState);
         routePlanningIntent = initializeRoutePlanningIntent(routePlanningIntent, getCampaign().getCurrentSystem());
+        if (lastFleetSystem == null) {
+            lastFleetSystem = getCampaign().getCurrentSystem();
+        }
 
         panMapView = new JPanel(new BorderLayout());
         panMapView.add(createNavigationHud(), BorderLayout.PAGE_START);
@@ -1524,6 +1540,7 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
 
         if (!jumpReport.isBlank()) {
             getCampaign().addReport(GENERAL, jumpReport);
+            return;
         }
 
         currentLocation.setJumpPath(jumpPath);
@@ -1858,18 +1875,49 @@ public final class MapTab extends CampaignGuiTab implements ActionListener,
     }
 
     /**
-     * Redraws the map for the new date, resets an unplanned route to start from the current system, and refreshes the
+     * Redraws the map for the new date, moves the start of the planned route to follow the fleet, and refreshes the
      * route strip and the system names, which can change with the date.
      */
     private void updateForNewDay() {
         panMap.requestStaticCartographyPreparation();
         panMap.repaint();
-        if (!hasPlannedRoute()) {
-            routePlanningIntent.clear(getCampaign().getCurrentSystem());
-            setRouteFieldSystem(suggestRouteOrigin, routePlanningIntent.getOrigin());
-        }
-        updateRouteStrip();
         refreshSystemSearchFields();
+        if (updateRouteForFleetPosition()) {
+            refreshPlanetView();
+        } else {
+            updateRouteStrip();
+        }
+    }
+
+    /**
+     * Keeps the planned route starting from the fleet's current system. Without a planned route, the route origin is
+     * simply reset. With one that started where the fleet was, the route is moved along with the fleet: systems already
+     * reached are dropped, and a route the fleet has finished is cleared. What-if routes plotted from elsewhere are
+     * left alone.
+     *
+     * @return {@code true} if the planned route changed
+     */
+    private boolean updateRouteForFleetPosition() {
+        PlanetarySystem currentSystem = getCampaign().getCurrentSystem();
+        PlanetarySystem previousSystem = lastFleetSystem;
+        lastFleetSystem = currentSystem;
+
+        if (!hasPlannedRoute()) {
+            routePlanningIntent.clear(currentSystem);
+            setRouteFieldSystem(suggestRouteOrigin, routePlanningIntent.getOrigin());
+            return false;
+        }
+        if (!shouldRouteFollowFleet(routePlanningIntent.getOrigin(), previousSystem, currentSystem)
+              || !routePlanningIntent.moveOriginTo(currentSystem, this::calculateRouteSegment).changed()) {
+            return false;
+        }
+
+        panMap.setJumpPath(routePlanningIntent.getJumpPath());
+        setRouteFieldSystem(suggestRouteOrigin, routePlanningIntent.getOrigin());
+        List<PlanetarySystem> requestedStops = routePlanningIntent.getRequestedStops();
+        setRouteFieldSystem(suggestRouteDestination,
+              requestedStops.isEmpty() ? panMap.getSelectedSystem() : requestedStops.getLast());
+        return true;
     }
 
     /**

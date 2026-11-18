@@ -44,6 +44,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.StockCount;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
@@ -423,6 +424,17 @@ public class LargeCraftAmmoBin extends AmmoBin {
             return space;
         }
         return 0.0;
+    }
+
+    /**
+     * Removing excess shots needs no stock, so that task shows none.
+     */
+    @Override
+    public @Nullable StockCount getShownStock() {
+        if (!isSalvaging() && (shotsNeeded < 0)) {
+            return null;
+        }
+        return super.getShownStock();
     }
 
     @Override

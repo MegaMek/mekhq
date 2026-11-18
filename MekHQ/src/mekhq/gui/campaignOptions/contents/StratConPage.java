@@ -481,7 +481,7 @@ class StratConPage {
         lblMoraleDecisiveVictory = new CampaignOptionsLabel("MoraleDecisiveVictory",
               getMetadata(MILESTONE_BEFORE_METADATA));
         spnMoraleDecisiveVictory = new CampaignOptionsSpinner("MoraleDecisiveVictory",
-              4, 1, 10, 1,
+              3, 1, 10, 1,
               getMetadata(MILESTONE_BEFORE_METADATA));
         lblMoraleVictory = new CampaignOptionsLabel("MoraleVictory",
               getMetadata(MILESTONE_BEFORE_METADATA));
@@ -491,12 +491,12 @@ class StratConPage {
         lblMoraleDefeat = new CampaignOptionsLabel("MoraleDefeat",
               getMetadata(MILESTONE_BEFORE_METADATA));
         spnMoraleDefeat = new CampaignOptionsSpinner("MoraleDefeat",
-              -3, -10, -1, 1,
+              -2, -10, -1, 1,
               getMetadata(MILESTONE_BEFORE_METADATA));
         lblMoraleDecisiveDefeat = new CampaignOptionsLabel("MoraleDecisiveDefeat",
               getMetadata(MILESTONE_BEFORE_METADATA));
         spnMoraleDecisiveDefeat = new CampaignOptionsSpinner("MoraleDecisiveDefeat",
-              -5, -10, -1, 1,
+              -3, -10, -1, 1,
               getMetadata(MILESTONE_BEFORE_METADATA));
 
         // Auto Resolve

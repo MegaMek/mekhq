@@ -84,7 +84,8 @@ import mekhq.campaign.mission.contract.contractGeneration.ChaosObjectiveType;
  * higher than the current Escalation raises the enemy's morale by one level, on top of whatever the check itself did.
  * On a Garrison Duty contract the roll cuts both ways: a roll above the current Escalation lowers the enemy's morale by
  * one level instead, so a garrison that calms the region wears the enemy down rather than merely holding it steady.
- * </p>
+ * A garrison's enemy is only checked after a month in which it raided (see
+ * {@link mekhq.campaign.mission.contract.utilities.MHQMorale#checkMorale}).</p>
  *
  * <p>A Diversionary Raid's strategic objective is to raise Escalation to 50 per point of scale before the contract ends
  * (see {@link StrategicObjectiveType#Escalation}).</p>
@@ -473,8 +474,7 @@ public final class StratConEscalation {
     /**
      * Applies an Escalation morale roll: if it is no higher than the current Escalation, the enemy's morale rises by
      * one level. Otherwise it is left alone - except on a Garrison Duty contract, where it falls by one level instead:
-     * the calmer the region, the likelier the enemy is to lose heart. A fall may rout the enemy; the morale check
-     * handles the rout afterwards, as it does for its own results.
+     * the calmer the region, the likelier the enemy is to lose heart.
      *
      * @param contract the contract whose morale is being checked; it must have a StratCon state
      * @param roll     the roll, from 1 to the contract's maximum Escalation

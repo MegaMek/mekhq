@@ -39,15 +39,19 @@ import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Map;
 import javax.swing.JTable;
 import javax.swing.table.TableCellRenderer;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.rolls.TargetRoll;
 import mekhq.IconPackage;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartDemand;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.PodSpace;
 import mekhq.campaign.parts.Refit;
@@ -84,6 +88,59 @@ public class TaskTableModel extends DataTableModel<IPartWork> {
         data = new ArrayList<>();
         this.gui = gui;
         this.panel = panel;
+    }
+
+    /**
+     * Sets the tasks to show, and works out once which other units need each salvaged part. A task's text is built
+     * every time its row is drawn, so the check is done here rather than there.
+     *
+     * @param tasks the tasks to show
+     */
+    @Override
+    public void setData(List<IPartWork> tasks) {
+        recordSalvageDemand(tasks);
+        super.setData(tasks);
+    }
+
+    /**
+     * Tells each salvage task which other units need its part. The gaps in each hangar are gathered once and shared by
+     * every task drawing on it.
+     *
+     * @param tasks the tasks about to be shown
+     */
+    static void recordSalvageDemand(List<IPartWork> tasks) {
+        Map<LocalHangar, List<MissingPart>> gapsByHangar = new IdentityHashMap<>();
+        for (IPartWork task : tasks) {
+            if ((task instanceof Part part) && part.isSalvaging()) {
+                List<MissingPart> gaps = gapsByHangar.computeIfAbsent(part.findHangarAtPlace(),
+                      hangar -> PartDemand.findGaps(hangar.getUnits()));
+                part.setTaskDemand(part.countDemand(gaps));
+            }
+        }
+    }
+
+    /**
+     * Adds what a task's short lines leave out: when its stock line says only how many are coming, when they arrive and
+     * how many are on order; and for a salvage task, the names of the units that need its part.
+     *
+     * @param task the task under the mouse
+     *
+     * @return the tooltip, or {@code null} for none
+     */
+    static @Nullable String getTaskTooltip(IPartWork task) {
+        List<String> sections = new ArrayList<>();
+        StockCount stock = task.getShownStock();
+        String stockDetails = (stock != null) ? stock.describeDetails() : null;
+        if (stockDetails != null) {
+            sections.add(stockDetails);
+        }
+        if ((task instanceof Part part) && part.isSalvaging()) {
+            String units = part.getTaskDemand().describeUnits();
+            if (units != null) {
+                sections.add(units);
+            }
+        }
+        return sections.isEmpty() ? null : "<html>" + String.join("<br>", sections) + "</html>";
     }
 
     @Override
@@ -157,10 +214,12 @@ public class TaskTableModel extends DataTableModel<IPartWork> {
         public Component getTableCellRendererComponent(JTable table, Object value,
               boolean isSelected, boolean hasFocus,
               int row, int column) {
-            table.setRowHeight(UIUtil.scaleForGUI(100));
+            // Tall enough for six lines: a salvage task naming the units that need its part has one more than most
+            table.setRowHeight(UIUtil.scaleForGUI(115));
             Component c = this;
             int actualCol = table.convertColumnIndexToModel(column);
             int actualRow = table.convertRowIndexToModel(row);
+            setToolTipText(getTaskTooltip(getTaskAt(actualRow)));
 
             String taskDescription = getValueAt(actualRow, actualCol).toString();
             String requiredSkillText = getRequiredSkillText(getTaskAt(actualRow));

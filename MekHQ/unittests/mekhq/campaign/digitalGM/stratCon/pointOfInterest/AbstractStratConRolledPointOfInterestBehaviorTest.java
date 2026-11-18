@@ -149,7 +149,8 @@ class AbstractStratConRolledPointOfInterestBehaviorTest {
                   eq(template),
                   eq(true),
                   isNull())).thenReturn(isSetUpSuccessful ? scenario : null);
-            rules.when(() -> StratConRulesManager.finalizeBackingScenario(campaign, contract, track, false, scenario))
+            rules.when(() -> StratConRulesManager.finalizeBackingScenario(campaign, contract, track, false, scenario,
+                  true))
                   .thenAnswer(invocation -> {
                       events.add("finalize");
                       return null;
@@ -163,7 +164,8 @@ class AbstractStratConRolledPointOfInterestBehaviorTest {
                       any(),
                       any(),
                       anyBoolean(),
-                      any()), never());
+                      any(),
+                      anyBoolean()), never());
             }
             return placed;
         }

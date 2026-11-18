@@ -40,6 +40,7 @@ import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColo
 
 import java.io.PrintWriter;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 
 import jakarta.annotation.Nullable;
@@ -63,9 +64,11 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartDemand;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.StockCount;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -827,6 +830,14 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     }
 
     /**
+     * A bin on a unit shows the ammunition stock whether it is being reloaded or salvaged.
+     */
+    @Override
+    public @Nullable StockCount getShownStock() {
+        return (unit != null) ? countStock() : null;
+    }
+
+    /**
      * Counts the spare ammunition this bin can use, in shots: with ammunition by type on, compatible ammunition is
      * converted to this bin's shots. A reload is short when there are fewer shots here than the bin needs; salvaging
      * needs none.
@@ -837,6 +848,16 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     public StockCount countStock() {
         int shotsToLoad = isSalvaging() ? 0 : Math.max(0, getShotsNeeded());
         return new StockCount(getAmountAvailable(), shotsToLoad, getPartInventory(getNewPart()));
+    }
+
+    /**
+     * A salvaged bin is thrown away once unloaded, and a missing one is rebuilt for free, so no unit waits on it.
+     *
+     * @return {@link PartDemand#NONE}
+     */
+    @Override
+    public PartDemand countDemand(List<MissingPart> gaps) {
+        return PartDemand.NONE;
     }
 
     @Override

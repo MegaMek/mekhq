@@ -302,16 +302,17 @@ class StratConPointOfInterestObjectiveTest {
         when(contract.getStartDate()).thenReturn(TODAY);
         when(contract.getLengthInMonths()).thenReturn(3);
         when(contract.getScale()).thenReturn(1);
+        when(contract.getExactScale()).thenReturn(1.0);
         when(contract.getTrackCount()).thenReturn(3);
         StratConCampaignState campaignState = new StratConCampaignState();
         StratConContractDefinition definition = contractDefinition(
               List.of(pointOfInterestObjective(1, TYPE_ID)),
               List.of(ordinaryPointOfInterest(OTHER_TYPE_ID, 1)));
 
-        StratConContractInitializer.schedulePointsOfInterest(contract, definition, campaignState, true, true);
+        StratConContractInitializer.schedulePointsOfInterest(contract, definition, campaignState, true);
 
         List<StratConScheduledPointOfInterest> scheduled = campaignState.getScheduledPointsOfInterest();
-        assertEquals(4, scheduled.size(), "one objective, plus one roll of the three-track column");
+        assertEquals(10, scheduled.size(), "one objective, plus three ordinary ones a month at Scale 1");
         assertEquals(1, countStrategicObjectives(scheduled));
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertNotNull(pointOfInterest.getSpawnDate());
@@ -330,7 +331,7 @@ class StratConPointOfInterestObjectiveTest {
         StratConContractDefinition definition = contractDefinition(List.of(),
               List.of(ordinaryPointOfInterest(TYPE_ID, 2)));
 
-        StratConContractInitializer.schedulePointsOfInterest(contract, definition, campaignState, true, true);
+        StratConContractInitializer.schedulePointsOfInterest(contract, definition, campaignState, true);
 
         assertTrue(campaignState.getScheduledPointsOfInterest().isEmpty());
     }

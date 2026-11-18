@@ -51,7 +51,8 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link StratConCombatBonusProjection}: Essential scenarios pay from their known schedule, replacing Nav Points
- * pay their average count, and an Objective Raid's target intelligence is capped by Scale.
+ * pay three a month per point of Scale, an Objective Raid's target intelligence is capped by Scale, and a contract type
+ * with no Essential scenarios of its own pays nothing.
  */
 class StratConCombatBonusProjectionTest {
     private static final double DELTA = 0.0001;
@@ -64,9 +65,6 @@ class StratConCombatBonusProjectionTest {
         campaignOptions = new CampaignOptions();
         campaignOptions.set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.NORMAL);
         campaignOptions.set(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS, true);
-        campaignOptions.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, true);
-        campaignOptions.set(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL, false);
-        campaignOptions.set(CampaignOption.ROLL_TRACKS_WEEKLY, false);
         campaign = mock(Campaign.class);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
     }
@@ -79,25 +77,37 @@ class StratConCombatBonusProjectionTest {
         when(contract.getLengthInMonths()).thenReturn(6);
         when(contract.getTrackCount()).thenReturn(3);
         when(contract.getScale()).thenReturn(4);
+        when(contract.getExactScale()).thenReturn(4.0);
         return contract;
     }
 
     @Test
     void essentialScenariosPayFromTheirSchedule() {
+        // Planetary Assault keeps its Essential scenarios alongside its strategic positions
         StratConCombatBonusProjection projection = StratConCombatBonusProjection.project(campaign,
-              contract(ContractObjectiveType.GARRISON_DUTY));
+              contract(ContractObjectiveType.PLANETARY_ASSAULT));
 
         assertEquals(5.0, projection.bonusCount(), DELTA);
         assertFalse(projection.isFromNavPoint());
     }
 
     @Test
-    void navPointsReplacingEssentialScenariosPayTheirAverageCount() {
-        // Espionage's data caches replace its Essential scenarios: 4 rolls x 3 tracks
+    void aContractTypeWithoutEssentialScenariosPaysNothing() {
+        // Garrison Duty's definition has no Essential scenarios, and its shows of force do not replace them
+        StratConCombatBonusProjection projection = StratConCombatBonusProjection.project(campaign,
+              contract(ContractObjectiveType.GARRISON_DUTY));
+
+        assertEquals(0.0, projection.bonusCount(), DELTA);
+        assertFalse(projection.isFromNavPoint());
+    }
+
+    @Test
+    void navPointsReplacingEssentialScenariosPayThreeAMonthPerPointOfScale() {
+        // Espionage's data caches replace its Essential scenarios: 3 x Scale 4 x 6 months
         StratConCombatBonusProjection projection = StratConCombatBonusProjection.project(campaign,
               contract(ContractObjectiveType.ESPIONAGE));
 
-        assertEquals(12.0, projection.bonusCount(), DELTA);
+        assertEquals(72.0, projection.bonusCount(), DELTA);
         assertTrue(projection.isFromNavPoint());
     }
 
@@ -126,7 +136,7 @@ class StratConCombatBonusProjectionTest {
         campaignOptions.set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.MAPLESS);
 
         assertEquals(0.0, StratConCombatBonusProjection.project(campaign,
-              contract(ContractObjectiveType.GARRISON_DUTY)).bonusCount(), DELTA);
+              contract(ContractObjectiveType.PLANETARY_ASSAULT)).bonusCount(), DELTA);
     }
 
     @Test
@@ -134,6 +144,75 @@ class StratConCombatBonusProjectionTest {
         campaignOptions.set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.DISABLED);
 
         assertEquals(0.0, StratConCombatBonusProjection.project(campaign,
-              contract(ContractObjectiveType.GARRISON_DUTY)).bonusCount(), DELTA);
+              contract(ContractObjectiveType.PLANETARY_ASSAULT)).bonusCount(), DELTA);
+    }
+
+    // Combat bonuses a month, which combat pay is spread across
+
+    @Test
+    void essentialScenarioContractsSpreadCombatPayOverOneBonusAMonthPerPointOfScale() {
+        assertEquals(4, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions,
+              contract(ContractObjectiveType.PLANETARY_ASSAULT)));
+    }
+
+    @Test
+    void navPointContractsSpreadCombatPayOverThreeBonusesAMonthPerPointOfScale() {
+        assertEquals(12, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions,
+              contract(ContractObjectiveType.ESPIONAGE)));
+    }
+
+    @Test
+    void withoutSpecialMechanicsEveryContractIsPaidThroughEssentialScenarios() {
+        campaignOptions.set(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS, false);
+
+        assertEquals(4, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions,
+              contract(ContractObjectiveType.ESPIONAGE)));
+    }
+
+    @Test
+    void targetIntelligenceIsPaidAsItsFacilityFightsAre() {
+        assertEquals(4, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions,
+              contract(ContractObjectiveType.OBJECTIVE_RAID)));
+    }
+
+    /**
+     * Nav Points and Essential scenarios are rounded separately, so at a fractional Scale the Nav Points are not always
+     * exactly three times as many. Combat pay is spread across the bonuses a contract actually brings, so each contract
+     * still pays its whole monthly combat pay.
+     */
+    @Test
+    void combatPayIsSpreadAcrossTheBonusesTheScheduleBringsAtAFractionalScale() {
+        AbstractContract navPointContract = contract(ContractObjectiveType.ESPIONAGE);
+        when(navPointContract.getExactScale()).thenReturn(1.4);
+        AbstractContract essentialContract = contract(ContractObjectiveType.PLANETARY_ASSAULT);
+        when(essentialContract.getExactScale()).thenReturn(1.4);
+
+        // 3 x 1.4 = 4.2 Nav Points a month, rounded to 4; 1.4 Essential scenarios, rounded to 1
+        double navPointsPerMonth = StratConCombatBonusProjection.project(campaign, navPointContract).bonusCount() / 6;
+        assertEquals(4, navPointsPerMonth, DELTA);
+        assertEquals(4, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions, navPointContract));
+        assertEquals(1, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions, essentialContract));
+    }
+
+    @Test
+    void withoutSupportPointsInScaleEveryThreePointsOfScaleCountAsOne() {
+        campaignOptions.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, false);
+        AbstractContract contract = contract(ContractObjectiveType.ESPIONAGE);
+        when(contract.getExactScale()).thenReturn(12.0);
+
+        // Scale 12 counts as 4: 3 x 4 Nav Points a month, over 6 months
+        assertEquals(12, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions, contract));
+        assertEquals(72.0, StratConCombatBonusProjection.project(campaign, contract).bonusCount(), DELTA);
+    }
+
+    @Test
+    void anAcceptedContractKeepsHowItsScaleWasCounted() {
+        AbstractContract contract = contract(ContractObjectiveType.PLANETARY_ASSAULT);
+        StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.setSupportPointsFactoredIntoScale(false);
+        when(contract.getStratConCampaignState()).thenReturn(campaignState);
+
+        // The option is on now, but the contract's Scale 4 was counted without support points: it counts as 4 / 3
+        assertEquals(1, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions, contract));
     }
 }

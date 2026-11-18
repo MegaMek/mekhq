@@ -515,8 +515,8 @@ public class PrisonerEventManager {
      *
      * <p>If at least one breach occurs, the selected contract’s morale level is improved by the number of breaches,
      * and a corresponding {@link PrisonerIntelBreachDialog} is displayed to the user. Contracts at
-     * {@link ContractMoraleLevel#OVERWHELMING} or {@link ContractMoraleLevel#ROUTED} morale are excluded from
-     * selection.</p>
+     * {@link ContractMoraleLevel#OVERWHELMING} morale, and garrison-type contracts that are peaceful
+     * between raids (see {@link AbstractContract#isPeaceful()}), are excluded from selection.</p>
      *
      * @param campaign           the {@link Campaign} context in which the event occurs
      * @param freedPrisonerCount the total number of prisoners freed by the player
@@ -533,7 +533,7 @@ public class PrisonerEventManager {
         // Shell contracts have no morale to shift
         activeContracts.removeIf(contract -> contract instanceof ShellContract ||
                                                    contract.getMoraleLevel().isOverwhelming() ||
-                                                   contract.getMoraleLevel().isRouted());
+                                                   contract.isPeaceful());
         if (activeContracts.isEmpty()) {
             return; // No risk of event
         }

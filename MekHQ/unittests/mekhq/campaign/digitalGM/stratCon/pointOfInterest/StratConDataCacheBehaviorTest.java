@@ -225,8 +225,9 @@ class StratConDataCacheBehaviorTest {
     }
 
     @Test
-    void aRoutedEnemyCannotContestTheCache() {
-        Campaign campaign = deploymentCampaign(MEK, ContractMoraleLevel.ROUTED, false);
+    void noEnemyCanContestTheCacheWhileTheContractIsPeaceful() {
+        Campaign campaign = deploymentCampaign(MEK, ContractMoraleLevel.STALEMATE, false);
+        when(contract.isPeaceful()).thenReturn(true);
 
         assertEquals(PointOfInterestDeploymentOutcome.SUPPRESS_SCENARIO, deploy(campaign));
         assertSecured();

@@ -373,7 +373,7 @@ public class CamOpsSalvageUtilities {
     /**
      * Ends a contract the player has breached by stealing salvage.
      *
-     * <p>As with a routed OpFor, the contract ends the next day. It is to be recorded as a breach, and pays nothing
+     * <p>As with any contract ended early, the contract ends the next day. It is to be recorded as a breach, and pays nothing
      * more.</p>
      *
      * @param campaign the current campaign
