@@ -1042,7 +1042,7 @@ public final class ContractXmlCodec {
      * it, for the contract's objective and start date.
      *
      * <p>A save from before the raid model (one from before 0.51.01, or any with a rout end date) records no first
-     * raid on a Garrison Duty or Retainer contract, so whether the enemy has already raided - and so whether its
+     * raid on a garrison-type contract, so whether the enemy has already raided - and so whether its
      * Batchall has already come - is worked out from the old rout instead (see
      * {@link LegacyContractConverter#hasRaidedBeforeRaidModel}).</p>
      *
@@ -1068,7 +1068,7 @@ public final class ContractXmlCodec {
 
         final boolean isBeforeRaidModel = hasLegacyRout
                                                 || ((version != null) && version.isLowerThan(RAID_MODEL_VERSION));
-        if (isBeforeRaidModel && (objectiveType != null) && objectiveType.hasGarrisonRaids()) {
+        if (isBeforeRaidModel && (objectiveType != null) && objectiveType.isGarrisonType()) {
             contract.setHasBeenRaided(LegacyContractConverter.hasRaidedBeforeRaidModel(contract.getStartDate(),
                   builder.legacyRoutEndDate));
         }

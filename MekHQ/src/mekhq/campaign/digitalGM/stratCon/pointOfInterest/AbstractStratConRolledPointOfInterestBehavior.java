@@ -185,7 +185,7 @@ public abstract class AbstractStratConRolledPointOfInterestBehavior implements I
     }
 
     /**
-     * @return {@code true} if a scenario can break out here even while a Garrison Duty or Retainer contract is
+     * @return {@code true} if a scenario can break out here even while a garrison-type contract is
      *       peaceful, between raids, rolled against the usual odds as if it were not; by default, it cannot - with no
      *       enemy activity, nothing is fought over. Civil unrest, which does not answer to the enemy, can.
      *

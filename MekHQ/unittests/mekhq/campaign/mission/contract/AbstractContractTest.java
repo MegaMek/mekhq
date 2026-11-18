@@ -199,7 +199,7 @@ class AbstractContractTest {
               ContractObjectiveType.GARRISON_DUTY));
         contract.setPeaceful(true);
 
-        assertFalse(contract.isPeaceful(), "only Garrison Duty and Retainer contracts have spells between raids");
+        assertFalse(contract.isPeaceful(), "only garrison-type contracts have spells between raids");
     }
 
     // endregion morale

@@ -515,7 +515,7 @@ public class PrisonerEventManager {
      *
      * <p>If at least one breach occurs, the selected contract’s morale level is improved by the number of breaches,
      * and a corresponding {@link PrisonerIntelBreachDialog} is displayed to the user. Contracts at
-     * {@link ContractMoraleLevel#OVERWHELMING} morale, and Garrison Duty and Retainer contracts that are peaceful
+     * {@link ContractMoraleLevel#OVERWHELMING} morale, and garrison-type contracts that are peaceful
      * between raids (see {@link AbstractContract#isPeaceful()}), are excluded from selection.</p>
      *
      * @param campaign           the {@link Campaign} context in which the event occurs

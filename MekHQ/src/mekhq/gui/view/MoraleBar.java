@@ -134,7 +134,7 @@ public class MoraleBar extends JPanel {
      * Builds a self-contained panel wrapping a {@link MoraleBar}, suitable for embedding in dialogs such as the
      * immersive "Morale Update" notification. The bar is given generous horizontal padding so it reads as a centered
      * gauge rather than spanning the full dialog width. The label beneath the active segment honours the contract's
-     * special "Peaceful" wording for Garrison Duty and Retainer contracts between raids, matching the briefing-room
+     * special "Peaceful" wording for garrison-type contracts between raids, matching the briefing-room
      * contract panel.
      *
      * @param contract the contract whose enemy morale should be displayed
@@ -167,7 +167,7 @@ public class MoraleBar extends JPanel {
     }
 
     /**
-     * Computes the morale label, tooltip, and gauge level for a contract. A Garrison Duty or Retainer contract between
+     * Computes the morale label, tooltip, and gauge level for a contract. A garrison-type contract between
      * raids (see {@link AbstractContract#isPeaceful()}) reads "Peaceful", with the gauge at its lowest; the enemy's
      * morale is held for the next raid but not shown. This is the single source of truth shared by the briefing-room
      * contract panel and the morale dialog so the two never diverge.

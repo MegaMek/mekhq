@@ -55,8 +55,8 @@ import org.junit.jupiter.params.provider.EnumSource;
 /**
  * Tests {@link ChaosContractDeterminationRequiredVictoryPoints#getRequiredVictoryPoints(AbstractContract)}: the
  * short-circuit for a contract with no StratCon state, and the expected-turning-points formula
- * {@code ceil(scale * duration * meanScenarioOdds/100 * 0.33)} - where garrisons shorten the effective duration to 75%,
- * and every command right has the same one-in-three turning-point chance.
+ * {@code ceil(scale * duration * meanScenarioOdds/100 * 0.33)} - where garrison-type contracts count only
+ * their expected raid months, and every command right has the same one-in-three turning-point chance.
  *
  * <p>The final block also covers the composition {@code StratConContractInitializer.initializeCampaignState} performs
  * at contract acceptance - {@code bakeRequiredVictoryPoints(getRequiredVictoryPoints(contract), contract)} - which is
@@ -116,19 +116,56 @@ class ChaosContractDeterminationRequiredVictoryPointsTest {
         assertEquals(4, ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract));
     }
 
-    @Test
-    void garrisonContractsShortenTheEffectiveDuration() {
+    private static AbstractContract contractOf(final ContractObjectiveType objectiveType, final int scale,
+          final int lengthInMonths) {
         StratConCampaignState state = stateWithTracks(track(100));
         AbstractContract contract = mock(AbstractContract.class);
         when(contract.getStratConCampaignState()).thenReturn(state);
         when(contract.getCommandRights()).thenReturn(ContractCommandRights.INTEGRATED);
-        when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.GARRISON_DUTY);
-        when(contract.getScale()).thenReturn(4);
-        when(contract.getLengthInMonths()).thenReturn(4);
+        when(contract.getObjectiveType()).thenReturn(objectiveType);
+        when(contract.getScale()).thenReturn(scale);
+        when(contract.getLengthInMonths()).thenReturn(lengthInMonths);
+        return contract;
+    }
 
-        // duration -> ceil(4 * 0.75) = 3; ceil(4 * 3 * 1.0 * 0.33) = ceil(3.96) = 4, where the full 4 months would
-        // give ceil(5.28) = 6
+    @Test
+    void garrisonContractsShortenTheEffectiveDuration() {
+        AbstractContract contract = contractOf(ContractObjectiveType.GARRISON_DUTY, 4, 4);
+
+        // active months -> max(1, (4 - 1) / 4) = 1; ceil(4 * 1 * 1.0 * 0.33) = ceil(1.32) = 2, where the full 4 months
+        // would give ceil(5.28) = 6
+        assertEquals(2, ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ContractObjectiveType.class,
+          names = { "GARRISON_DUTY", "CADRE_DUTY", "SECURITY_DUTY", "RIOT_DUTY", "RETAINER" })
+    void raidedContractsCountOnlyTheExpectedRaidMonths(ContractObjectiveType objectiveType) {
+        AbstractContract contract = contractOf(objectiveType, 4, 12);
+
+        // The first month is always peaceful, then each of the other 11 has a 1 in 4 chance of a raid: 2.75 active
+        // months. ceil(4 * 2.75 * 1.0 * 0.33) = ceil(3.63) = 4, where the old 75% assumption (9 months) gave 12.
+        assertEquals(2.75, ChaosContractDeterminationRequiredVictoryPoints.getActiveMonths(contract), 1e-9);
         assertEquals(4, ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract));
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ContractObjectiveType.class,
+          names = { "GARRISON_DUTY", "CADRE_DUTY", "SECURITY_DUTY", "RIOT_DUTY", "RETAINER" })
+    void raidedContractsAlwaysCountAtLeastOneActiveMonth(ContractObjectiveType objectiveType) {
+        AbstractContract contract = contractOf(objectiveType, 4, 1);
+
+        assertEquals(1.0, ChaosContractDeterminationRequiredVictoryPoints.getActiveMonths(contract), 1e-9);
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = ContractObjectiveType.class, names = { "PLANETARY_ASSAULT", "RELIEF_DUTY", "OBJECTIVE_RAID" })
+    void contractsWithoutRaidsCountTheirFullLength(ContractObjectiveType objectiveType) {
+        AbstractContract contract = contractOf(objectiveType, 3, 3);
+
+        // These face an active enemy throughout: ceil(3 * 3 * 1.0 * 0.33) = ceil(2.97) = 3
+        assertEquals(3.0, ChaosContractDeterminationRequiredVictoryPoints.getActiveMonths(contract), 1e-9);
+        assertEquals(3, ChaosContractDeterminationRequiredVictoryPoints.getRequiredVictoryPoints(contract));
     }
 
     /**

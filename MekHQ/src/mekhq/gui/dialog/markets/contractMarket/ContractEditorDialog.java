@@ -1847,7 +1847,7 @@ public class ContractEditorDialog extends JDialog {
         }
         boolean isPeaceful = (contract.getObjectiveType() == previousObjectiveType)
                                    ? contract.getMoraleData().peaceful()
-                                   : contract.getObjectiveType().hasGarrisonRaids();
+                                   : contract.getObjectiveType().isGarrisonType();
         contract.setMoraleData(new MoraleData(selectedOr(moralePicker, contract.getMoraleLevel()), isPeaceful,
               finalPayout));
 

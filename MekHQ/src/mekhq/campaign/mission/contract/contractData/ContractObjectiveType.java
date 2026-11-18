@@ -263,21 +263,13 @@ public enum ContractObjectiveType {
         return this == UNDEFINED;
     }
 
+    /**
+     * @return {@code true} for the garrison-type objectives: Garrison Duty, Cadre Duty, Security Duty, Riot Duty, and
+     *       Retainer. These follow the garrison raid model: the contract begins peaceful, and each month there is a
+     *       chance the enemy raids (see {@link mekhq.campaign.mission.contract.utilities.MHQMorale#checkMorale}).
+     */
     public boolean isGarrisonType() {
         return isGarrisonDuty() || isCadreDuty() || isSecurityDuty() || isRiotDuty() || isRetainer();
-    }
-
-    /**
-     * @return {@code true} if a contract with this objective follows the garrison raid model: it begins peaceful, and
-     *       each month there is a chance the enemy raids (see
-     *       {@link mekhq.campaign.mission.contract.utilities.MHQMorale#checkMorale}). Only Garrison Duty and Retainer
-     *       contracts do; the other garrison-type contracts face an active enemy throughout.
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public boolean hasGarrisonRaids() {
-        return isGarrisonDuty() || isRetainer();
     }
 
     public boolean isRaidType() {

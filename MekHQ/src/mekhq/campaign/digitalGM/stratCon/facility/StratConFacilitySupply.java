@@ -544,7 +544,7 @@ public final class StratConFacilitySupply {
      * schedule runs out - as many as the enemy sends engineers (see
      * {@link StratConEnemyFacilityActivity#getMonthlyEngineerCount}) - and places those due today across the player's
      * supply routes in a random sector. One that finds no route to sit on is dropped. None are sent while supply lines
-     * are out of use or the enemy is idle, and none are placed while a Garrison Duty or Retainer contract is peaceful,
+     * are out of use or the enemy is idle, and none are placed while a garrison-type contract is peaceful,
      * between raids.
      *
      * @param campaign      the current campaign

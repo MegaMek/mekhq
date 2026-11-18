@@ -47,7 +47,7 @@ import mekhq.campaign.universe.factionStanding.PerformBatchall;
 
 /**
  * Offers the player a Batchall from a contract's enemy: when most contracts begin, and when the enemy first raids a
- * Garrison Duty or Retainer contract (see {@link MHQMorale#checkMorale}).
+ * garrison-type contract (see {@link MHQMorale#checkMorale}).
  *
  * @author Illiani
  * @since 0.51.01
