@@ -41,6 +41,7 @@ import java.util.Map;
 import java.util.Objects;
 import javax.xml.parsers.DocumentBuilder;
 
+import jakarta.annotation.Nullable;
 import megamek.codeUtilities.StringUtility;
 import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
@@ -158,7 +159,7 @@ public class Clan {
      * @return whether the Clan is active or not in the specified year
      */
     public boolean isActive(int year) {
-        return ((startDate < year) && ((endDate == 0) || (endDate > year)));
+        return ((startDate <= year) && ((endDate == 0) || (endDate > year)));
     }
 
     /**
@@ -182,11 +183,11 @@ public class Clan {
      */
     public List<Clan> getRivals(int year) {
         List<Clan> retVal = new ArrayList<>();
-        for (DatedRecord r : rivals) {
-            if (r.isActive(year)) {
-                Clan c = allClans.get(r.getDescription());
-                if (c.isActive(year)) {
-                    retVal.add(c);
+        for (DatedRecord rival : rivals) {
+            if (rival.isActive(year)) {
+                Clan rivalClan = allClans.get(rival.getDescription());
+                if ((rivalClan != null) && rivalClan.isActive(year)) {
+                    retVal.add(rivalClan);
                 }
             }
         }
@@ -203,13 +204,14 @@ public class Clan {
     /**
      * @param year the year to get a single rival clan in
      *
-     * @return a rival clan to the current Clan
+     * @return a rival clan to the current Clan, or this Clan if no other Clan is active in that year
      */
     public Clan getRivalClan(int year) {
         List<Clan> rivals = getRivals(year);
         int roll = Compute.randomInt(rivals.size() + 1);
         if (roll > rivals.size() - 1) {
-            return randomClan(year, isHomeClan());
+            Clan randomClan = randomClan(year, isHomeClan());
+            return (randomClan == null) ? this : randomClan;
         }
         return rivals.get(roll);
     }
@@ -218,9 +220,9 @@ public class Clan {
      * @param year     the year to get a random Clan for
      * @param homeClan whether the Clan is a Home Clan
      *
-     * @return a random Clan
+     * @return a random Clan, or {@code null} if no Clan is active in that year
      */
-    public static Clan randomClan(int year, boolean homeClan) {
+    public static @Nullable Clan randomClan(int year, boolean homeClan) {
         List<Clan> list = new ArrayList<>();
         for (Clan c : getClans()) {
             if ((year > 3075) && (homeClan != c.isHomeClan())) {
@@ -229,6 +231,9 @@ public class Clan {
             if (c.isActive(year)) {
                 list.add(c);
             }
+        }
+        if (list.isEmpty()) {
+            return null;
         }
         return list.get(Compute.randomInt(list.size()));
     }
@@ -340,7 +345,7 @@ public class Clan {
         }
 
         public boolean isActive(int year) {
-            return (getStartDate() < year) && ((getEndDate() == 0) || (getEndDate() > year));
+            return (getStartDate() <= year) && ((getEndDate() == 0) || (getEndDate() > year));
         }
 
         public int getStartDate() {
