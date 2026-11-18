@@ -37,6 +37,8 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
@@ -58,14 +60,18 @@ import mekhq.MekHQ;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.utilities.ContractUtilities;
+import mekhq.campaign.mission.utilities.TransportCostCalculations;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Planet;
+import mekhq.campaign.utilities.JumpBlockers;
+import mekhq.gui.CampaignGUI;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -596,6 +602,52 @@ class ContractAutomationTest {
 
                 verify(f.unit(), never()).startMothballing(null, true);
             }
+        }
+
+        /**
+         * Runs {@link ContractAutomation#performContractStart} with travel requested along a jump path, the journey
+         * charge failing or succeeding as given, and returns the jump path that was offered.
+         */
+        private static JumpPath startWithTravel(Fixture f, boolean chargeSucceeds) {
+            JumpPath jumpPath = mock(JumpPath.class);
+            when(f.campaign().getGUI()).thenReturn(mock(CampaignGUI.class));
+            when(f.campaign().getTransportCostCalculation(anyInt())).thenReturn(mock(TransportCostCalculations.class));
+
+            try (MockedStatic<MekHQ> ignoredMekHQ = mockStatic(MekHQ.class);
+                  MockedStatic<ContractUtilities> utilities = mockStatic(ContractUtilities.class);
+                  MockedStatic<JumpBlockers> jumpBlockers = mockStatic(JumpBlockers.class);
+                  MockedStatic<TransportCostCalculations> transport = mockStatic(TransportCostCalculations.class)) {
+                utilities.when(() -> ContractUtilities.getJumpPath(any(), any(), any())).thenReturn(jumpPath);
+                utilities.when(() -> ContractUtilities.getTravelDays(any(), any(), any(), anyBoolean(), any()))
+                      .thenReturn(10);
+                jumpBlockers.when(() -> JumpBlockers.areAllUnitsJumpCapable(any())).thenReturn(true);
+                transport.when(() -> TransportCostCalculations.performJumpTransaction(any(), any(), any(), any(),
+                      any())).thenReturn(chargeSucceeds ? "" : "You cannot afford to make the jump!");
+
+                ContractAutomation.performContractStart(f.campaign(), f.contract(), false, true);
+            }
+            return jumpPath;
+        }
+
+        @Test
+        void doesNotDepartWhenTheJourneyCannotBeAfforded() {
+            Fixture f = fixture(false);
+
+            startWithTravel(f, false);
+
+            // The force stays put rather than travelling for free...
+            verify(f.detachment().getCurrentLocation(), never()).setJumpPath(any());
+            // ...but the contract is still dated to the projected arrival day.
+            verify(f.contract()).setStartAndEndDate(f.today().plusDays(10));
+        }
+
+        @Test
+        void departsOnceTheJourneyIsPaidFor() {
+            Fixture f = fixture(false);
+
+            JumpPath jumpPath = startWithTravel(f, true);
+
+            verify(f.detachment().getCurrentLocation()).setJumpPath(jumpPath);
         }
     }
 
