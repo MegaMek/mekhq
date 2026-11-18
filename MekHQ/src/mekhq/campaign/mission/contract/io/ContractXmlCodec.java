@@ -1038,7 +1038,7 @@ public final class ContractXmlCodec {
      * Reads the contract's morale data. It relies on the {@code objectiveData} and {@code scheduleData} written before
      * it, for the contract's objective and start date.
      *
-     * <p>A save from before the raid model records no first raid on a Garrison Duty or Retainer contract, so whether
+     * <p>A save from before the raid model records no first raid on a garrison-type contract, so whether
      * the enemy has already raided - and so whether its Batchall has already come - is worked out here. It is not
      * worked out from the save's version, as releases of 0.51.01 shipped before the raid model did:</p>
      *
@@ -1069,7 +1069,7 @@ public final class ContractXmlCodec {
             contract.setMoraleData(new MoraleData(builder.moraleLevel, builder.peaceful, builder.finalPayout));
         }
 
-        if ((objectiveType != null) && objectiveType.hasGarrisonRaids()) {
+        if ((objectiveType != null) && objectiveType.isGarrisonType()) {
             if (hasLegacyRout) {
                 contract.setHasBeenRaided(LegacyContractConverter.hasRaidedBeforeRaidModel(contract.getStartDate(),
                       builder.legacyRoutEndDate));

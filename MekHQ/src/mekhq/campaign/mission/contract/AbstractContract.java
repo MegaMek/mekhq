@@ -124,7 +124,7 @@ public abstract class AbstractContract {
      */
     private @Nullable LocalDate emergencyExtensionStartDate;
     /**
-     * Whether the enemy has raided this Garrison Duty or Retainer contract yet (see
+     * Whether the enemy has raided this garrison-type contract yet (see
      * {@link mekhq.campaign.mission.contract.utilities.MHQMorale#checkMorale}). The first raid brings a Batchall.
      */
     private boolean hasBeenRaided = false;
@@ -461,7 +461,7 @@ public abstract class AbstractContract {
     }
 
     /**
-     * @return {@code true} if the enemy has raided this Garrison Duty or Retainer contract yet
+     * @return {@code true} if the enemy has raided this garrison-type contract yet
      *
      * @author Illiani
      * @since 0.51.01
@@ -471,7 +471,7 @@ public abstract class AbstractContract {
     }
 
     /**
-     * @param hasBeenRaided whether the enemy has raided this Garrison Duty or Retainer contract yet
+     * @param hasBeenRaided whether the enemy has raided this garrison-type contract yet
      *
      * @author Illiani
      * @since 0.51.01
@@ -577,7 +577,7 @@ public abstract class AbstractContract {
 
     /**
      * Sets whether this contract is between raids, with no enemy activity in the Area of Operations. Only has an effect
-     * on Garrison Duty and Retainer contracts (see {@link #isPeaceful()}).
+     * on garrison-type contracts (see {@link #isPeaceful()}).
      *
      * @param isPeaceful {@code true} if the contract is now between raids
      *
@@ -1424,19 +1424,19 @@ public abstract class AbstractContract {
     }
 
     /**
-     * A contract that follows the garrison raid model (see {@link ContractObjectiveType#hasGarrisonRaids()}) is
+     * A contract that follows the garrison raid model (see {@link ContractObjectiveType#isGarrisonType()}) is
      * peaceful between raids: there is no enemy activity in the Area of Operations. Each month there is a chance of a
      * raid (see
      * {@link mekhq.campaign.mission.contract.utilities.MHQMorale#checkMorale(Campaign, AbstractContract, boolean)}).
      *
-     * @return {@code true} if this is a Garrison Duty or Retainer contract between raids
+     * @return {@code true} if this is a garrison-type contract between raids
      */
     public boolean isPeaceful() {
         // The flag is checked first: most contracts are never peaceful, and some have no objective data to read
         return moraleData.peaceful()
                      && (objectiveData != null)
                      && (objectiveData.playerObjectiveType() != null)
-                     && objectiveData.playerObjectiveType().hasGarrisonRaids();
+                     && objectiveData.playerObjectiveType().isGarrisonType();
     }
 
     /**

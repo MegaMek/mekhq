@@ -121,7 +121,7 @@ public final class NewContractFactory {
         // A new contract begins peaceful if its objective follows the garrison raid model. No final payout is set, so
         // the remaining escrow is paid as normal if it ends early.
         contract.setMoraleData(new MoraleData(ContractMoraleLevel.STALEMATE,
-              contract.getObjectiveType().hasGarrisonRaids(), null));
+              contract.getObjectiveType().isGarrisonType(), null));
 
         return contract;
     }

@@ -830,7 +830,7 @@ public class StratConTab extends CampaignGuiTab {
      * <p>This is the number a deploying force actually rolls against, so it is taken from
      * {@link StratConRulesManager#calculateScenarioOdds} rather than read off the track: the track carries the base
      * odds and the facility adjustment, but the enemy's morale shifts the real figure by anywhere from -15 to +50, and
-     * a Garrison Duty or Retainer contract between raids sees no attacks at all. Showing the track's own numbers
+     * a garrison-type contract between raids sees no attacks at all. Showing the track's own numbers
      * understated a dominant enemy badly and promised a threat that a peaceful contract could not deliver.</p>
      *
      * @param track the currently selected sector's track, or {@code null}

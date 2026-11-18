@@ -303,11 +303,12 @@ public class Maintenance {
 
     /**
      * Checks whether the campaign is on a contract that runs maintenance at the full, weekly pace. Only active
-     * contracts other than Garrison Duty and Retainer count; otherwise maintenance progresses at x0.25 speed.
+     * contracts that are not garrison-type (see {@link ContractObjectiveType#isGarrisonType()}) count; otherwise
+     * maintenance progresses at x0.25 speed.
      *
      * @param campaign the campaign to check
      *
-     * @return {@code true} if any active contract is neither Garrison Duty nor a Retainer
+     * @return {@code true} if any active contract is not garrison-type
      *
      * @author Illiani
      * @since 0.51.01
@@ -315,7 +316,7 @@ public class Maintenance {
     public static boolean isOnCombatContract(Campaign campaign) {
         for (AbstractContract contract : campaign.getActiveContracts()) {
             ContractObjectiveType objectiveType = contract.getObjectiveType();
-            if (!objectiveType.isGarrisonDuty() && !objectiveType.isRetainer()) {
+            if (!objectiveType.isGarrisonType()) {
                 return true;
             }
         }
@@ -409,7 +410,7 @@ public class Maintenance {
      *
      * @param campaignOptions    the campaign options
      * @param unit               the unit being maintained
-     * @param isOnCombatContract whether a contract other than Garrison Duty or a Retainer is active
+     * @param isOnCombatContract whether a contract that is not garrison-type is active
      * @param isUnitInTransit    whether the unit is travelling
      *
      * @return the combined situational cost multiplier
@@ -443,7 +444,7 @@ public class Maintenance {
      * @param campaign           the campaign providing options
      * @param unit               the unit to project
      * @param isOnContract       whether a contract will be active
-     * @param isOnCombatContract whether that contract is neither Garrison Duty nor a Retainer
+     * @param isOnCombatContract whether that contract is not garrison-type
      * @param isTravelling       whether the force will be travelling; a unit with no location never travels
      *
      * @return the average daily maintenance cost, or zero if the unit will not be charged maintenance

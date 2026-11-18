@@ -44,9 +44,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.PartInventory;
 import mekhq.utilities.MHQXMLUtility;
-import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -455,25 +453,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
             return getType().getDesc() + ", " + (-shotsNeeded) + " shots to remove";
         }
         if (null != unit) {
-            String availability = "";
-            int shotsAvailable = getAmountAvailable();
-            PartInventory inventories = getPartInventory(getNewPart());
-            if (shotsAvailable == 0) {
-                availability = "<br><font color='" +
-                                     ReportingUtilities.getNegativeColor() +
-                                     "'>No ammo (" +
-                                     inventories.getTransitOrderedDetails() +
-                                     ")</font>";
-            } else if (shotsAvailable < shotsNeeded) {
-                availability = "<br><font color='" +
-                                     ReportingUtilities.getNegativeColor() +
-                                     "'>Only " +
-                                     shotsAvailable +
-                                     " available (" +
-                                     inventories.getTransitOrderedDetails() +
-                                     ")</font>";
-            }
-            return getType().getDesc() + ", " + shotsNeeded + " shots needed" + availability;
+            return getType().getDesc() + ", " + shotsNeeded + " shots needed<br/>" + countStock().describe();
         } else {
             return "";
         }

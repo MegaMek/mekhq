@@ -93,7 +93,7 @@ public class MHQMorale {
     public static final int DECISIVE_MARGIN = 3;
 
     /**
-     * A Garrison Duty or Retainer contract's enemy raids on a roll of 0 on a die of this size each month: a 1 in 4
+     * A garrison-type contract's enemy raids on a roll of 0 on a die of this size each month: a 1 in 4
      * chance.
      */
     public static final int RAID_DIE_SIZE = 4;
@@ -662,9 +662,9 @@ public class MHQMorale {
     /**
      * Runs the monthly morale update for a contract.
      *
-     * <p>On most contracts this is the morale check (see {@link #rollMorale}). A Garrison Duty or Retainer contract
+     * <p>On most contracts this is the morale check (see {@link #rollMorale}). A garrison-type contract
      * follows a raid model instead (see
-     * {@link mekhq.campaign.mission.contract.contractData.ContractObjectiveType#hasGarrisonRaids()}): the enemy is only
+     * {@link mekhq.campaign.mission.contract.contractData.ContractObjectiveType#isGarrisonType()}): the enemy is only
      * tested after a month in which it raided, so between raids its morale holds where it was, and each month there is
      * then a {@link #RAID_DIE_SIZE 1 in 4} chance of a raid (see {@link #applyRaidRoll}). Throughout an emergency
      * extension (see {@link #isInEmergencyExtension}) the enemy raids every month.</p>
@@ -701,7 +701,7 @@ public class MHQMorale {
             }
         }
 
-        if (contract.getObjectiveType().hasGarrisonRaids()) {
+        if (contract.getObjectiveType().isGarrisonType()) {
             // The surge that prompted an emergency extension keeps the enemy raiding until the contract ends
             boolean isRaid = isInEmergencyExtension(contract, campaign.getLocalDate())
                                    || (randomInt(RAID_DIE_SIZE) == 0);
@@ -855,7 +855,7 @@ public class MHQMorale {
     }
 
     /**
-     * Applies a Garrison Duty or Retainer contract's monthly raid roll. A raid ends the peace: the enemy, at whatever
+     * Applies a garrison-type contract's monthly raid roll. A raid ends the peace: the enemy, at whatever
      * morale it held after its last raid, is active in the Area of Operations for the month. Otherwise the contract is
      * peaceful for the month, with no enemy activity at all.
      *
@@ -864,7 +864,7 @@ public class MHQMorale {
      * {@link ContractBatchall#offerBatchall}).</p>
      *
      * @param campaign   the current campaign
-     * @param contract   the Garrison Duty or Retainer contract
+     * @param contract   the garrison-type contract
      * @param isRaid     whether the enemy raids this month
      * @param showDialog whether to show the player a raid that begins, and the Batchall the first one brings
      *
@@ -902,9 +902,9 @@ public class MHQMorale {
 
     /**
      * Sets a newly generated contract's starting morale with a morale check. The enemy never starts
-     * {@link ContractMoraleLevel#SCATTERED}, and on a Relief Duty contract it starts a level higher. A Garrison Duty or
-     * Retainer contract also starts peaceful (see
-     * {@link mekhq.campaign.mission.contract.contractData.ContractObjectiveType#hasGarrisonRaids()}), so its first raid
+     * {@link ContractMoraleLevel#SCATTERED}, and on a Relief Duty contract it starts a level higher. A garrison-type
+     * contract also starts peaceful (see
+     * {@link mekhq.campaign.mission.contract.contractData.ContractObjectiveType#isGarrisonType()}), so its first raid
      * roll comes at the start of the next month.
      *
      * @param contract the newly generated contract
@@ -921,6 +921,6 @@ public class MHQMorale {
             contract.changeMorale(1);
         }
 
-        contract.setPeaceful(contract.getObjectiveType().hasGarrisonRaids());
+        contract.setPeaceful(contract.getObjectiveType().isGarrisonType());
     }
 }

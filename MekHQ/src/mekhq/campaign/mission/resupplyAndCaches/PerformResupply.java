@@ -382,7 +382,7 @@ public class PerformResupply {
         // First, we need to identify whether the convoy has been intercepted.
         ContractMoraleLevel morale = contract.getMoraleLevel();
 
-        // There isn't any chance of an interception while a Garrison Duty or Retainer contract is peaceful, so
+        // There isn't any chance of an interception while a garrison-type contract is peaceful, so
         // early-exit
         if (contract.isPeaceful()) {
             completeSuccessfulDelivery(resupply, convoyContents);

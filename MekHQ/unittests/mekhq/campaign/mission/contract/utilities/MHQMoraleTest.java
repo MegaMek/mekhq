@@ -706,7 +706,7 @@ class MHQMoraleTest {
 
     @ParameterizedTest
     @MethodSource("raidedGarrisonTypes")
-    void aGarrisonDutyOrRetainerContractStartsPeaceful(ContractObjectiveType objectiveType) {
+    void aGarrisonTypeContractStartsPeaceful(ContractObjectiveType objectiveType) {
         AbstractContract contract = newContractOfType(objectiveType);
 
         MHQMorale.determineStartingMorale(contract, moraleCheckCampaign());
@@ -715,7 +715,11 @@ class MHQMoraleTest {
     }
 
     private static Stream<ContractObjectiveType> raidedGarrisonTypes() {
-        return Stream.of(ContractObjectiveType.GARRISON_DUTY, ContractObjectiveType.RETAINER);
+        return Stream.of(ContractObjectiveType.GARRISON_DUTY,
+              ContractObjectiveType.CADRE_DUTY,
+              ContractObjectiveType.SECURITY_DUTY,
+              ContractObjectiveType.RIOT_DUTY,
+              ContractObjectiveType.RETAINER);
     }
 
     @ParameterizedTest
@@ -729,11 +733,10 @@ class MHQMoraleTest {
     }
 
     private static Stream<ContractObjectiveType> contractsWithAnActiveEnemy() {
-        // Cadre, Security, and Riot Duty are garrison-type contracts, but face an active enemy throughout
         return Stream.of(ContractObjectiveType.PLANETARY_ASSAULT,
-              ContractObjectiveType.CADRE_DUTY,
-              ContractObjectiveType.SECURITY_DUTY,
-              ContractObjectiveType.RIOT_DUTY);
+              ContractObjectiveType.RELIEF_DUTY,
+              ContractObjectiveType.OBJECTIVE_RAID,
+              ContractObjectiveType.GUERRILLA_WARFARE);
     }
 
     // Emergency extensions

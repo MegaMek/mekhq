@@ -325,8 +325,8 @@ public final class LegacyContractConverter {
     }
 
     /**
-     * Reads a rout from a save from before 0.51.01, which gave the rout an end date. On a Garrison Duty or Retainer
-     * contract (see {@link ContractObjectiveType#hasGarrisonRaids()}) that rout was a lull with no enemy activity, which
+     * Reads a rout from a save from before 0.51.01, which gave the rout an end date. On a garrison-type
+     * contract (see {@link ContractObjectiveType#isGarrisonType()}) that rout was a lull with no enemy activity, which
      * is now a peaceful spell between raids; on any other contract the lull simply ends. Either way the enemy does not
      * stay at its lowest level: as when a lull used to end, it returns no lower than Stalemate.
      *
@@ -341,7 +341,7 @@ public final class LegacyContractConverter {
      */
     static MoraleData convertLegacyRout(@Nullable ContractMoraleLevel moraleLevel,
           @Nullable ContractObjectiveType objectiveType, @Nullable Money finalPayout) {
-        boolean isPeaceful = (objectiveType != null) && objectiveType.hasGarrisonRaids();
+        boolean isPeaceful = (objectiveType != null) && objectiveType.isGarrisonType();
         ContractMoraleLevel level = ((moraleLevel == null) || moraleLevel.isScattered())
                                           ? ContractMoraleLevel.STALEMATE
                                           : moraleLevel;
@@ -349,7 +349,7 @@ public final class LegacyContractConverter {
     }
 
     /**
-     * Works out whether the enemy has already raided a Garrison Duty or Retainer contract saved under the old rout
+     * Works out whether the enemy has already raided a garrison-type contract saved under the old rout
      * model, which began such a contract with the enemy routed. An enemy that is active had come back from a rout, so
      * it has raided - and brought any Batchall - already. One that is routed has too, unless this is still the rout the
      * contract began with.

@@ -352,13 +352,13 @@ class ContractXmlCodecTest {
     @Test
     void anyOtherContractInASaveFromBeforeTheRaidModelHasNotBeenRaided() throws Exception {
         AbstractContract contract = fullyPopulatedContract();
-        contract.setObjectiveData(new ContractObjectiveData(ContractObjectiveType.CADRE_DUTY,
-              ContractObjectiveType.PLANETARY_ASSAULT));
+        contract.setObjectiveData(new ContractObjectiveData(ContractObjectiveType.PLANETARY_ASSAULT,
+              ContractObjectiveType.CADRE_DUTY));
         contract.setMoraleData(new MoraleData(ContractMoraleLevel.ADVANCING));
 
         AbstractContract reloaded = parse(write(contract), new Version("0.51.00"));
 
-        assertFalse(reloaded.hasBeenRaided(), "only Garrison Duty and Retainer contracts are raided");
+        assertFalse(reloaded.hasBeenRaided(), "only garrison-type contracts are raided");
     }
 
     @Test

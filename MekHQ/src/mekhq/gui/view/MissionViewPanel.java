@@ -426,7 +426,7 @@ public class MissionViewPanel extends JScrollablePanel {
 
     /**
      * Builds the battle record shown in the briefing room: the rating the next morale check would give, followed by
-     * the victory and defeat points behind it, for example "Victory (6–4)". While the enemy's morale would cost the
+     * the victory and defeat points behind it, for example "Victory (6-4)". While the enemy's morale would cost the
      * employer a monthly setback at that check (see {@link MHQMorale#isSetbackDue}), a warning follows.
      *
      * @param today    the current date

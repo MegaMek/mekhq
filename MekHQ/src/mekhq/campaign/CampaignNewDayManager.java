@@ -1371,8 +1371,8 @@ public class CampaignNewDayManager {
                 continue;
             }
 
-            // Batchalls. Garrison-type contracts get none as they begin: on Garrison Duty and Retainer contracts the
-            // enemy issues one when it first raids instead (see MHQMorale#checkMorale)
+            // Batchalls. Garrison-type contracts get none as they begin: the enemy issues one when it first raids
+            // instead (see MHQMorale#checkMorale)
             if (!contract.getObjectiveType().isGarrisonType() && today.equals(contract.getStartDate())) {
                 ContractBatchall.offerBatchall(campaign, contract);
             }

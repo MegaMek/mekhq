@@ -119,11 +119,11 @@ public class ContractEmergencyExtension {
         roll = d6(2) / 2;
         moraleOrdinal = min(moraleOrdinal + roll, OVERWHELMING.ordinal());
         contract.changeMorale(ContractMoraleLevel.values()[moraleOrdinal]);
-        // The enemy surge that prompts the clause ends any peace a Garrison Duty or Retainer contract was enjoying. On
+        // The enemy surge that prompts the clause ends any peace a garrison-type contract was enjoying. On
         // such a contract the surge counts as a raid, so if the enemy has not raided yet, it brings the Batchall the
         // first raid would have.
         contract.setPeaceful(false);
-        boolean isFirstRaid = contract.getObjectiveType().hasGarrisonRaids() && !contract.hasBeenRaided();
+        boolean isFirstRaid = contract.getObjectiveType().isGarrisonType() && !contract.hasBeenRaided();
         if (isFirstRaid) {
             contract.setHasBeenRaided(true);
         }
