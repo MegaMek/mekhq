@@ -126,8 +126,7 @@ class StratConScenarioTempoTest {
         AbstractContract contract = contract(START_DATE, START_DATE.plusMonths(3), 3, 3);
         StratConCampaignState campaignState = campaignStateWithSectors(100, 100);
 
-        int scheduledCount = StratConScenarioTempo.rollWeeklyScenarios(campaign(monday, false, true), contract,
-              campaignState, monday);
+        int scheduledCount = StratConScenarioTempo.rollWeeklyScenarios(contract, campaignState, monday);
 
         assertEquals(3, scheduledCount);
         assertEquals(3, campaignState.getScheduledScenarios().size());
@@ -144,8 +143,7 @@ class StratConScenarioTempoTest {
         when(contract.getExactScale()).thenReturn(2.6);
         StratConCampaignState campaignState = campaignStateWithSectors(100);
 
-        assertEquals(3, StratConScenarioTempo.rollWeeklyScenarios(campaign(START_DATE, false, true), contract,
-              campaignState, START_DATE));
+        assertEquals(3, StratConScenarioTempo.rollWeeklyScenarios(contract, campaignState, START_DATE));
     }
 
     @Test
@@ -153,8 +151,7 @@ class StratConScenarioTempoTest {
         AbstractContract contract = contract(START_DATE, START_DATE.plusMonths(3), 3, 5);
         StratConCampaignState campaignState = campaignStateWithSectors(0, 0);
 
-        assertEquals(0, StratConScenarioTempo.rollWeeklyScenarios(campaign(START_DATE, false, true), contract,
-              campaignState, START_DATE));
+        assertEquals(0, StratConScenarioTempo.rollWeeklyScenarios(contract, campaignState, START_DATE));
         assertTrue(campaignState.getScheduledScenarios().isEmpty());
     }
 
@@ -164,8 +161,7 @@ class StratConScenarioTempoTest {
         when(contract.isPeaceful()).thenReturn(true);
         StratConCampaignState campaignState = campaignStateWithSectors(100);
 
-        assertEquals(0, StratConScenarioTempo.rollWeeklyScenarios(campaign(START_DATE, false, true), contract,
-              campaignState, START_DATE));
+        assertEquals(0, StratConScenarioTempo.rollWeeklyScenarios(contract, campaignState, START_DATE));
     }
 
     @RepeatedTest(10)
@@ -174,8 +170,7 @@ class StratConScenarioTempoTest {
         AbstractContract contract = contract(START_DATE, endDate, 1, 10);
         StratConCampaignState campaignState = campaignStateWithSectors(100);
 
-        StratConScenarioTempo.rollWeeklyScenarios(campaign(START_DATE, false, true), contract, campaignState,
-              START_DATE);
+        StratConScenarioTempo.rollWeeklyScenarios(contract, campaignState, START_DATE);
 
         for (StratConScheduledScenario scheduledScenario : campaignState.getScheduledScenarios()) {
             assertTrue(scheduledScenario.getDate().isBefore(endDate), scheduledScenario.toString());
@@ -188,8 +183,7 @@ class StratConScenarioTempoTest {
         AbstractContract contract = contract(START_DATE, START_DATE.plusMonths(3), 3, 5);
         StratConCampaignState campaignState = campaignStateWithSectors(100);
 
-        StratConScenarioTempo.rollWeeklyScenarios(campaign(START_DATE, false, true), contract, campaignState,
-              START_DATE);
+        StratConScenarioTempo.rollWeeklyScenarios(contract, campaignState, START_DATE);
 
         assertEquals(5, campaignState.getScheduledScenarios().size());
         for (StratConScheduledScenario scheduledScenario : campaignState.getScheduledScenarios()) {

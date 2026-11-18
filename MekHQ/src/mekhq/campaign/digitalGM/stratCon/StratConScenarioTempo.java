@@ -215,7 +215,6 @@ public final class StratConScenarioTempo {
      * hit schedules a normal scenario in that sector on a random day of what is left of the week, today included. One
      * that would fall on or after the contract's last day is not scheduled.
      *
-     * @param campaign      the current campaign
      * @param contract      the contract
      * @param campaignState the contract's StratCon campaign state
      * @param today         the day of the rolls: ordinarily a Monday (see {@link #isWeeklyRollDue})
@@ -225,8 +224,8 @@ public final class StratConScenarioTempo {
      * @author Illiani
      * @since 0.51.01
      */
-    public static int rollWeeklyScenarios(Campaign campaign, AbstractContract contract,
-          StratConCampaignState campaignState, LocalDate today) {
+    public static int rollWeeklyScenarios(AbstractContract contract, StratConCampaignState campaignState,
+          LocalDate today) {
         List<StratConTrackState> tracks = campaignState.getTracks();
         if (tracks.isEmpty()) {
             return 0;

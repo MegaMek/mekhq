@@ -261,7 +261,7 @@ public class StratConRulesManager {
         // Important note: we don't check to see whether the contract is peaceful when scheduling a Single Drop
         // scenario. This is because a raid may begin between the start of the week and when the scenario is scheduled.
         if (!isUseStratConSingles) {
-            StratConScenarioTempo.rollWeeklyScenarios(campaign, contract, campaignState, campaign.getLocalDate());
+            StratConScenarioTempo.rollWeeklyScenarios(contract, campaignState, campaign.getLocalDate());
             return;
         }
 
