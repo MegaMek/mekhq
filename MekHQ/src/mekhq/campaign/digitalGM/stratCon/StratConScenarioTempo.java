@@ -74,12 +74,6 @@ import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGenera
 public final class StratConScenarioTempo {
     private static final MMLogger LOGGER = MMLogger.create(StratConScenarioTempo.class);
 
-    /**
-     * How many points of a contract's Scale make one when battlefield support points are factored into scale, which
-     * makes for smaller scales; used to size facilities (see {@link StratConContractInitializer}).
-     */
-    static final int SUPPORT_POINT_SCALE_ROLL_MULTIPLIER = 3;
-
     /** The day each week's normal scenario roll is due. */
     static final DayOfWeek WEEK_START = DayOfWeek.MONDAY;
 
@@ -239,7 +233,9 @@ public final class StratConScenarioTempo {
         }
 
         LocalDate contractEnd = contract.getEndingDate();
-        int rollCount = StratConSpawnRates.getCount(contract, StratConSpawnRates.NORMAL_SCENARIO_ROLLS_PER_SCALE);
+        int rollCount = StratConSpawnRates.getCount(contract,
+              StratConSpawnRates.isFactorSupportPointsIntoScale(campaignState),
+              StratConSpawnRates.NORMAL_SCENARIO_ROLLS_PER_SCALE);
         int scheduledCount = 0;
         for (int roll = 0; roll < rollCount; roll++) {
             int sectorIndex = Compute.randomInt(tracks.size());
@@ -313,6 +309,7 @@ public final class StratConScenarioTempo {
           StratConCampaignState campaignState) {
         LocalDate today = campaign.getLocalDate();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        StratConSpawnRates.recordSupportPointsFactoredIntoScale(campaignOptions, campaignState);
 
         if (!campaignOptions.isUseStratConSinglesMode() && campaignState.isNormalTempoScheduled()) {
             campaignState.getScheduledScenarioDates().removeIf(scenarioDate -> !scenarioDate.isBefore(today));

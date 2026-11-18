@@ -69,16 +69,10 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
         if (campaign.getCampaignOptions().get(CampaignOption.TAPER_COMBAT_PAY_AND_SALVAGE_BY_SCALE)) {
             combatPayInSupportPoints = DEFAULT_COMBAT_PAY_MULTIPLIER * ChaosScaleLimits.getTaperedScale(economicScale);
         }
-        // A contract fields one Essential scenario a month per point of Scale (see StratConSpawnRates), so divide
-        // combat pay by Scale: it stays flat across those extra scenarios rather than growing with their number. Their
-        // count is a whole number, so this divides by the whole Scale even under Fractional Scale.
-        int rollScale = contract.getScale();
-        if (rollScale > 0) {
-            combatPayInSupportPoints /= rollScale;
-        }
-        // Nav Points that replace a contract's Essential scenarios come more often, so each pays proportionately less:
-        // every contract type offers the same total combat pay.
-        combatPayInSupportPoints *= StratConCombatBonusProjection.getCombatPayRateMultiplier(
+        // A contract brings its combat bonuses a set number of times a month per point of Scale (see
+        // StratConSpawnRates), so combat pay is spread across them: it stays flat however many come, and every contract
+        // type - whether paid through Essential scenarios or the Nav Points that replace them - offers the same total.
+        combatPayInSupportPoints /= StratConCombatBonusProjection.getMonthlyCombatBonusCount(
               campaign.getCampaignOptions(), contract);
         int roundedCombatPayInSupportPoints = (int) round(combatPayInSupportPoints);
         return ChaosCampaignUtilities.getMoneyFromChaosSupportPoints(roundedCombatPayInSupportPoints,

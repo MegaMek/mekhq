@@ -37,6 +37,8 @@ import static java.lang.Math.max;
 import java.util.ArrayList;
 import java.util.List;
 
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.contract.AbstractContract;
 
 /**
@@ -55,6 +57,11 @@ import mekhq.campaign.mission.contract.AbstractContract;
  *
  * <p>Anything that comes at all comes at least once, so a contract whose Scale rounds to nothing still gets one.</p>
  *
+ * <p>The rates are for Scale counted with battlefield support points factored in, which makes for smaller Scales.
+ * Without that option, every {@value #SUPPORT_POINT_SCALE_RATIO} points of Scale count as one (see
+ * {@link #getSpawnScale}), as they do for sizing facilities, so the option does not change how often anything
+ * comes.</p>
+ *
  * @author Illiani
  * @since 0.51.01
  */
@@ -69,6 +76,12 @@ public final class StratConSpawnRates {
     public static final int FACILITY_ATTACKS_PER_SCALE = 1;
     /** Normal scenario rolls each week, per point of Scale. */
     public static final int NORMAL_SCENARIO_ROLLS_PER_SCALE = 1;
+
+    /**
+     * How many points of a contract's Scale count as one when battlefield support points are not factored into Scale,
+     * which makes for larger Scales; also used to size facilities (see {@link StratConContractInitializer}).
+     */
+    public static final int SUPPORT_POINT_SCALE_RATIO = 3;
 
     private StratConSpawnRates() {}
 
@@ -92,18 +105,36 @@ public final class StratConSpawnRates {
     }
 
     /**
+     * @param exactScale                     the contract's exact Scale (see {@link AbstractContract#getExactScale()})
+     * @param isFactorSupportPointsIntoScale whether the contract's Scale was worked out with battlefield support
+     *                                       points factored in
+     *
+     * @return the Scale the rates are counted against: the exact Scale with support points factored in, and a
+     *       {@value #SUPPORT_POINT_SCALE_RATIO}th of it without
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getSpawnScale(double exactScale, boolean isFactorSupportPointsIntoScale) {
+        return isFactorSupportPointsIntoScale ? exactScale : (exactScale / SUPPORT_POINT_SCALE_RATIO);
+    }
+
+    /**
      * As {@link #getCount(double, double)}, for a contract.
      *
-     * @param contract     the contract
-     * @param ratePerScale how many come per point of Scale; zero or less for none
+     * @param contract                       the contract
+     * @param isFactorSupportPointsIntoScale whether the contract's Scale was worked out with battlefield support
+     *                                       points factored in (see {@link #isFactorSupportPointsIntoScale})
+     * @param ratePerScale                   how many come per point of Scale; zero or less for none
      *
      * @return the count
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static int getCount(AbstractContract contract, double ratePerScale) {
-        return getCount(contract.getExactScale(), ratePerScale);
+    public static int getCount(AbstractContract contract, boolean isFactorSupportPointsIntoScale,
+          double ratePerScale) {
+        return getCount(getSpawnScale(contract.getExactScale(), isFactorSupportPointsIntoScale), ratePerScale);
     }
 
     /**
@@ -129,15 +160,88 @@ public final class StratConSpawnRates {
     /**
      * As {@link #getMonthlySchedule(int, int)}, at the given rate for the contract's Scale and over its length.
      *
-     * @param contract     the contract
-     * @param ratePerScale how many come each month per point of Scale; zero or less for none
+     * @param contract                       the contract
+     * @param isFactorSupportPointsIntoScale whether the contract's Scale was worked out with battlefield support
+     *                                       points factored in (see {@link #isFactorSupportPointsIntoScale})
+     * @param ratePerScale                   how many come each month per point of Scale; zero or less for none
      *
      * @return one entry per month
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static List<Integer> getMonthlySchedule(AbstractContract contract, double ratePerScale) {
-        return getMonthlySchedule(contract.getLengthInMonths(), getCount(contract, ratePerScale));
+    public static List<Integer> getMonthlySchedule(AbstractContract contract, boolean isFactorSupportPointsIntoScale,
+          double ratePerScale) {
+        return getMonthlySchedule(contract.getLengthInMonths(),
+              getCount(contract, isFactorSupportPointsIntoScale, ratePerScale));
+    }
+
+    /**
+     * Whether a contract's Scale was worked out with battlefield support points factored in. A contract that has been
+     * accepted keeps the option as it stood then (see
+     * {@link StratConCampaignState#getSupportPointsFactoredIntoScale()}); an offer, or a contract from before that was
+     * recorded, reads the option as it stands now.
+     *
+     * @param campaignOptions the campaign options
+     * @param contract        the contract
+     *
+     * @return {@code true} if support points were factored into the contract's Scale
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isFactorSupportPointsIntoScale(CampaignOptions campaignOptions, AbstractContract contract) {
+        StratConCampaignState campaignState = contract.getStratConCampaignState();
+        if ((campaignState != null) && (campaignState.getSupportPointsFactoredIntoScale() != null)) {
+            return campaignState.getSupportPointsFactoredIntoScale();
+        }
+        return isFactorSupportPointsIntoScale(campaignOptions);
+    }
+
+    /**
+     * @param campaignOptions the campaign options
+     *
+     * @return the "Use Chaos Scale Support Point Conversion" option; on, its default, if the options do not say (as a
+     *       mocked options object does not)
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isFactorSupportPointsIntoScale(CampaignOptions campaignOptions) {
+        return !Boolean.FALSE.equals(campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION));
+    }
+
+    /**
+     * As {@link #isFactorSupportPointsIntoScale(CampaignOptions, AbstractContract)}, for scheduling that has only the
+     * contract's StratCon state to go on. A state from before the option was recorded reads as the option's default,
+     * on; the daily StratCon lifecycle records it from the campaign options for such a state (see
+     * {@link #recordSupportPointsFactoredIntoScale}).
+     *
+     * @param campaignState the contract's StratCon campaign state
+     *
+     * @return {@code true} if support points were factored into the contract's Scale
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isFactorSupportPointsIntoScale(StratConCampaignState campaignState) {
+        return !Boolean.FALSE.equals(campaignState.getSupportPointsFactoredIntoScale());
+    }
+
+    /**
+     * Records on a contract's StratCon state whether its Scale was worked out with battlefield support points factored
+     * in, if it has not been recorded yet: from the campaign options as they stand now.
+     *
+     * @param campaignOptions the campaign options
+     * @param campaignState   the contract's StratCon campaign state
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void recordSupportPointsFactoredIntoScale(CampaignOptions campaignOptions,
+          StratConCampaignState campaignState) {
+        if (campaignState.getSupportPointsFactoredIntoScale() == null) {
+            campaignState.setSupportPointsFactoredIntoScale(isFactorSupportPointsIntoScale(campaignOptions));
+        }
     }
 }

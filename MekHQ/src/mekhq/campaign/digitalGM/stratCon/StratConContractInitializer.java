@@ -171,6 +171,10 @@ public class StratConContractInitializer {
         // work properly
         contract.setStratConCampaignState(campaignState);
 
+        // Fixed for the contract's life, as its Scale was worked out under it: StratCon counts how often things come in
+        // the same terms (see StratConSpawnRates#getSpawnScale)
+        StratConSpawnRates.recordSupportPointsFactoredIntoScale(campaign.getCampaignOptions(), campaignState);
+
         // First, initialize the proper number of tracks. Then: for each objective:
         // step 1: calculate objective count if scaled, multiply # required lances by factor, round up, otherwise just
         // fixed number
@@ -560,7 +564,7 @@ public class StratConContractInitializer {
      * @author Illiani
      * @since 0.51.01
      */
-    // Public so the other schedules laid out month by month (engineers, facility attacks) share the calendar rules.
+    // Public so tests, and the other schedules laid out month by month (see layOutSpawnDates), share the calendar rules.
     public static List<LocalDate> rollSpawnDates(LocalDate startDate, List<Integer> schedule, int lengthInMonths) {
         List<LocalDate> spawnDates = new ArrayList<>();
         int contractMonths = max(1, lengthInMonths);
@@ -585,6 +589,38 @@ public class StratConContractInitializer {
             }
         }
 
+        return spawnDates;
+    }
+
+    /**
+     * Lays a per-month schedule out as calendar days (see {@link #rollSpawnDates}), the way the schedules that run to
+     * the contract's last day - Deployment Orders, ordinary points of interest, enemy engineers and facility attacks -
+     * share. A day on or after the contract's last day is moved to the day before, so whatever falls on it has a chance
+     * to be dealt with. Only days from {@code fromDate} on are kept, so a schedule laid out again partway through
+     * leaves the days already past alone.
+     *
+     * @param startDate      the contract's start date, which opens its first month
+     * @param endDate        the contract's end date, or {@code null} for none to keep days before
+     * @param schedule       the per-month item counts
+     * @param lengthInMonths the contract's length in months
+     * @param fromDate       the first day to keep, or {@code null} to keep every day
+     *
+     * @return one day per item kept, in schedule order
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<LocalDate> layOutSpawnDates(LocalDate startDate, @Nullable LocalDate endDate,
+          List<Integer> schedule, int lengthInMonths, @Nullable LocalDate fromDate) {
+        List<LocalDate> spawnDates = new ArrayList<>();
+        for (LocalDate spawnDate : rollSpawnDates(startDate, schedule, lengthInMonths)) {
+            if ((endDate != null) && endDate.isAfter(startDate) && !spawnDate.isBefore(endDate)) {
+                spawnDate = endDate.minusDays(1);
+            }
+            if ((fromDate == null) || !spawnDate.isBefore(fromDate)) {
+                spawnDates.add(spawnDate);
+            }
+        }
         return spawnDates;
     }
 
@@ -745,17 +781,11 @@ public class StratConContractInitializer {
 
         // As many as the contract's special points of interest would be (see StratConSpawnRates)
         List<Integer> schedule = StratConSpawnRates.getMonthlySchedule(contract,
+              StratConSpawnRates.isFactorSupportPointsIntoScale(campaignState),
               StratConSpawnRates.NAV_POINTS_PER_SCALE);
 
-        LocalDate endDate = contract.getEndingDate();
-        for (LocalDate spawnDate : rollSpawnDates(startDate, schedule, contract.getLengthInMonths())) {
-            if ((fromDate != null) && spawnDate.isBefore(fromDate)) {
-                continue;
-            }
-            if ((endDate != null) && endDate.isAfter(startDate) && !spawnDate.isBefore(endDate)) {
-                spawnDate = endDate.minusDays(1);
-            }
-
+        for (LocalDate spawnDate : layOutSpawnDates(startDate, contract.getEndingDate(), schedule,
+              contract.getLengthInMonths(), fromDate)) {
             String typeId = drawWeightedTypeId(weights, totalWeight);
             campaignState.addScheduledPointOfInterest(new StratConScheduledPointOfInterest(spawnDate, typeId, false));
         }
@@ -937,6 +967,7 @@ public class StratConContractInitializer {
 
         // A scale-0 contract (auto-scaled from an empty hangar) still gets one a month, or it would have no objectives.
         List<Integer> schedule = StratConSpawnRates.getMonthlySchedule(contract,
+              StratConSpawnRates.isFactorSupportPointsIntoScale(campaignState),
               StratConSpawnRates.NAV_POINTS_PER_SCALE);
 
         boolean isStrategicObjective = isSpecialPointOfInterestObjective(typeId);
@@ -1203,7 +1234,7 @@ public class StratConContractInitializer {
     static FacilityTier getFacilityTier(int scale, boolean isFactorSupportPointsIntoScale, boolean isObjective) {
         int normalizedScale = isFactorSupportPointsIntoScale ?
                                     scale :
-                                    scale / StratConScenarioTempo.SUPPORT_POINT_SCALE_ROLL_MULTIPLIER;
+                                    scale / StratConSpawnRates.SUPPORT_POINT_SCALE_RATIO;
 
         FacilityTier tier;
         if (normalizedScale <= OUTPOST_SCALE_LIMIT) {
@@ -1251,7 +1282,7 @@ public class StratConContractInitializer {
     static int getObjectiveFacilityCount(int scale, boolean isFactorSupportPointsIntoScale) {
         int divisor = isFactorSupportPointsIntoScale ?
                             OBJECTIVE_FACILITY_SCALE_DIVISOR :
-                            OBJECTIVE_FACILITY_SCALE_DIVISOR * StratConScenarioTempo.SUPPORT_POINT_SCALE_ROLL_MULTIPLIER;
+                            OBJECTIVE_FACILITY_SCALE_DIVISOR * StratConSpawnRates.SUPPORT_POINT_SCALE_RATIO;
         return max(1, scale / divisor);
     }
 
@@ -1290,7 +1321,7 @@ public class StratConContractInitializer {
           int objectiveFacilityCount, double density) {
         int facilityShare = isFactorSupportPointsIntoScale ?
                                   scale :
-                                  scale / StratConScenarioTempo.SUPPORT_POINT_SCALE_ROLL_MULTIPLIER;
+                                  scale / StratConSpawnRates.SUPPORT_POINT_SCALE_RATIO;
         return max(0, (int) Math.round(facilityShare * density) - objectiveFacilityCount);
     }
 

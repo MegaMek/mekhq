@@ -67,8 +67,11 @@ import mekhq.campaign.mission.contract.contractData.ContractObjectiveData;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
 import mekhq.campaign.mission.scenarios.ScenarioType;
+import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
+import mekhq.campaign.mission.scenarios.atb.ScenarioModifierManifest;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -580,6 +583,28 @@ class MHQMoraleTest {
             assertTrue(List.of(MHQMorale.LOW_AMMUNITION_MODIFIER, MHQMorale.POOR_REPAIR_MODIFIER)
                              .contains(keys.get(0)), keys.get(0));
         }
+    }
+
+    /** The production data the morale modifiers are read from, which would otherwise only fail when played. */
+    @Test
+    void theMoraleModifiersAreShippedAndListedInTheManifest() {
+        ScenarioModifierManifest manifest = ScenarioModifierManifest.Deserialize(
+              "data/scenariomodifiers/modifiermanifest.json");
+        assertNotNull(manifest);
+
+        for (String key : MHQMorale.getMoraleScenarioModifierKeys(SCATTERED)) {
+            assertTrue(manifest.fileNameList.stream().map(String::trim).anyMatch(key::equals), key);
+
+            AtBScenarioModifier modifier = AtBScenarioModifier.Deserialize("data/scenariomodifiers/" + key);
+            assertNotNull(modifier, key);
+            assertEquals(ForceAlignment.Opposing, modifier.getEventRecipient(), key);
+            assertEquals(Boolean.TRUE, modifier.getBenefitsPlayer(), key);
+        }
+
+        assertNotNull(AtBScenarioModifier.Deserialize("data/scenariomodifiers/" + MHQMorale.LOW_AMMUNITION_MODIFIER)
+                            .getAmmoExpenditureIntensity());
+        assertNotNull(AtBScenarioModifier.Deserialize("data/scenariomodifiers/" + MHQMorale.POOR_REPAIR_MODIFIER)
+                            .getBattleDamageIntensity());
     }
 
     @ParameterizedTest

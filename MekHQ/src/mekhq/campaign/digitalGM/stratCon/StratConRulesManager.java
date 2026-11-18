@@ -596,17 +596,13 @@ public class StratConRulesManager {
             return availableForceIDs;
         }
 
-        List<Integer> suitableForceIDs = new ArrayList<>();
+        // Sorted and without repeats, as a force may suit more than one location
+        Set<Integer> suitableForceIDs = new TreeSet<>();
         for (List<Integer> forceIDs : sortedAvailableForceIDs.values()) {
-            for (int forceID : forceIDs) {
-                if (!suitableForceIDs.contains(forceID)) {
-                    suitableForceIDs.add(forceID);
-                }
-            }
+            suitableForceIDs.addAll(forceIDs);
         }
-        Collections.sort(suitableForceIDs);
 
-        return suitableForceIDs.isEmpty() ? availableForceIDs : suitableForceIDs;
+        return suitableForceIDs.isEmpty() ? availableForceIDs : new ArrayList<>(suitableForceIDs);
     }
 
     /**

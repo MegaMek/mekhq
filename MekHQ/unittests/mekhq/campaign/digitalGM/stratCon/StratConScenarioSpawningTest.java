@@ -49,6 +49,8 @@ import java.util.List;
 import java.util.Map;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
 import mekhq.campaign.digitalGM.stratCon.facility.FacilityOperation;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
@@ -349,12 +351,76 @@ class StratConScenarioSpawningTest {
         return contract;
     }
 
+    private static Campaign campaign(boolean isFactorSupportPointsIntoScale) {
+        CampaignOptions campaignOptions = new CampaignOptions();
+        campaignOptions.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, isFactorSupportPointsIntoScale);
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        return campaign;
+    }
+
     @Test
     void essentialScenariosComeOnceAMonthPerPointOfScale() {
         AbstractContract contract = contract(ContractObjectiveType.PLANETARY_ASSAULT, 2.6);
 
         assertEquals(List.of(3, 3, 3, 3),
-              AbstractContractGeneration.rollScenarioSchedule(mock(Campaign.class), contract, 4));
+              AbstractContractGeneration.rollScenarioSchedule(campaign(true), contract, 4));
+    }
+
+    @Test
+    void withoutSupportPointsInScaleEveryThreePointsOfScaleBringOneEssentialScenario() {
+        // Scale 7.8 counted without support points is Scale 2.6 counted with them
+        AbstractContract contract = contract(ContractObjectiveType.PLANETARY_ASSAULT, 7.8);
+
+        assertEquals(List.of(3, 3, 3, 3),
+              AbstractContractGeneration.rollScenarioSchedule(campaign(false), contract, 4));
+    }
+
+    @Test
+    void anAcceptedContractCountsItsScaleAsItWasCountedWhenAccepted() {
+        AbstractContract contract = contract(ContractObjectiveType.PLANETARY_ASSAULT, 7.8);
+        StratConCampaignState campaignState = new StratConCampaignState();
+        campaignState.setSupportPointsFactoredIntoScale(false);
+        when(contract.getStratConCampaignState()).thenReturn(campaignState);
+
+        // The option is on now, but the contract's Scale was worked out without support points
+        assertEquals(List.of(3, 3, 3, 3),
+              AbstractContractGeneration.rollScenarioSchedule(campaign(true), contract, 4));
+        assertFalse(StratConSpawnRates.isFactorSupportPointsIntoScale(campaignState));
+    }
+
+    @ParameterizedTest
+    @CsvSource({ "6.0, true, 6.0", "6.0, false, 2.0", "0.0, false, 0.0" })
+    void spawnScaleCountsThreePointsAsOneWithoutSupportPoints(double exactScale,
+          boolean isFactorSupportPointsIntoScale, double expected) {
+        assertEquals(expected, StratConSpawnRates.getSpawnScale(exactScale, isFactorSupportPointsIntoScale), 0.0001);
+    }
+
+    @Test
+    void aStateFromBeforeTheOptionWasRecordedTakesItFromTheCampaign() {
+        StratConCampaignState campaignState = new StratConCampaignState();
+        assertNull(campaignState.getSupportPointsFactoredIntoScale());
+        assertTrue(StratConSpawnRates.isFactorSupportPointsIntoScale(campaignState), "unrecorded reads as the default");
+
+        StratConSpawnRates.recordSupportPointsFactoredIntoScale(campaign(false).getCampaignOptions(), campaignState);
+        assertEquals(Boolean.FALSE, campaignState.getSupportPointsFactoredIntoScale());
+
+        // Once recorded, it holds whatever the option becomes
+        StratConSpawnRates.recordSupportPointsFactoredIntoScale(campaign(true).getCampaignOptions(), campaignState);
+        assertEquals(Boolean.FALSE, campaignState.getSupportPointsFactoredIntoScale());
+    }
+
+    @Test
+    void layingOutSpawnDatesMovesDaysPastTheEndToTheDayBeforeAndDropsDaysBeforeTheFirst() {
+        LocalDate start = LocalDate.of(3050, 1, 1);
+        LocalDate end = LocalDate.of(3050, 1, 20);
+        // Ten days in the contract's one (cut-short) month; any past the end moves to the 19th
+        List<LocalDate> spawnDates = StratConContractInitializer.layOutSpawnDates(start, end, List.of(10), 1, null);
+        assertEquals(10, spawnDates.size());
+        assertTrue(spawnDates.stream().allMatch(date -> date.isBefore(end) && !date.isBefore(start)));
+
+        // A first day after the day before the end keeps nothing - not even a day moved back from past the end
+        assertTrue(StratConContractInitializer.layOutSpawnDates(start, end, List.of(10), 1, end).isEmpty());
     }
 
     @Test

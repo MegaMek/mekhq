@@ -98,7 +98,9 @@ public record StratConCombatBonusProjection(double bonusCount, boolean isFromNav
 
         StratConContractMechanics mechanics = StratConContractMechanics.forContract(contract);
         double navPointCount = (double) max(1, contract.getLengthInMonths())
-                                     * StratConSpawnRates.getCount(contract, StratConSpawnRates.NAV_POINTS_PER_SCALE);
+                                     * StratConSpawnRates.getCount(contract,
+              StratConSpawnRates.isFactorSupportPointsIntoScale(campaignOptions, contract),
+              StratConSpawnRates.NAV_POINTS_PER_SCALE);
 
         if (StratConTargetIntelligenceBehavior.TYPE_ID.equals(mechanics.pointOfInterestTypeId())) {
             // Only one piece of intelligence per point of Scale leads to a facility (see its onScheduled)
@@ -109,36 +111,42 @@ public record StratConCombatBonusProjection(double bonusCount, boolean isFromNav
     }
 
     /**
-     * Works out how much each combat bonus a contract pays is scaled by, so every contract type offers the same total
-     * combat pay at the same Scale and length.
+     * Works out how many combat bonuses a month a contract's combat pay is spread across, so every contract type offers
+     * the same total combat pay at the same Scale and length: combat pay per bonus is the contract's monthly combat pay
+     * divided by this.
      *
-     * <p>Combat pay per bonus assumes one bonus a month per point of Scale, the rate Essential scenarios come at (see
-     * {@link StratConSpawnRates#ESSENTIAL_SCENARIOS_PER_SCALE}). Nav Points that replace a contract's Essential
-     * scenarios come {@value StratConSpawnRates#NAV_POINTS_PER_SCALE} times as often, so each pays that much less.
-     * Target intelligence is the exception: it pays nothing itself, and the Essential scenarios at the facilities it
-     * leads to pay in full.</p>
+     * <p>Ordinarily that is the contract's Essential scenarios, {@value StratConSpawnRates#ESSENTIAL_SCENARIOS_PER_SCALE}
+     * a month per point of Scale. Nav Points that replace a contract's Essential scenarios come
+     * {@value StratConSpawnRates#NAV_POINTS_PER_SCALE} a month per point of Scale, so each pays proportionately less.
+     * Both counts are rounded as the contract's schedules round them (see {@link StratConSpawnRates#getCount}), so the
+     * monthly total holds at any Scale, not only a whole one. Target intelligence is the exception: it pays nothing
+     * itself, and the Essential scenarios at the facilities it leads to are paid as Essential scenarios are.</p>
      *
-     * @param campaignOptions the campaign options, for "Contracts Use Special Mechanics"
+     * @param campaignOptions the campaign options, for "Contracts Use Special Mechanics" and how the contract's Scale
+     *                        is counted
      * @param contract        the contract
      *
-     * @return the multiplier for each bonus's combat pay: {@code 1} for contracts paid through Essential scenarios
+     * @return the combat bonuses a month, never below one
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static double getCombatPayRateMultiplier(CampaignOptions campaignOptions, AbstractContract contract) {
+    public static int getMonthlyCombatBonusCount(CampaignOptions campaignOptions, AbstractContract contract) {
         // Compared rather than unboxed, so a mocked options object (which returns null) reads as off
         boolean isContractsUseSpecialMechanics =
               Boolean.TRUE.equals(campaignOptions.get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS));
-        if (!StratConContractInitializer.isReplacingEssentialScenarios(contract, isContractsUseSpecialMechanics)) {
-            return 1.0;
-        }
+        boolean isFactorSupportPointsIntoScale = StratConSpawnRates.isFactorSupportPointsIntoScale(campaignOptions,
+              contract);
 
-        StratConContractMechanics mechanics = StratConContractMechanics.forContract(contract);
-        if (StratConTargetIntelligenceBehavior.TYPE_ID.equals(mechanics.pointOfInterestTypeId())) {
-            return 1.0;
-        }
+        boolean isPaidThroughNavPoints =
+              StratConContractInitializer.isReplacingEssentialScenarios(contract, isContractsUseSpecialMechanics)
+                    && !StratConTargetIntelligenceBehavior.TYPE_ID.equals(
+                    StratConContractMechanics.forContract(contract).pointOfInterestTypeId());
 
-        return (double) StratConSpawnRates.ESSENTIAL_SCENARIOS_PER_SCALE / StratConSpawnRates.NAV_POINTS_PER_SCALE;
+        return StratConSpawnRates.getCount(contract,
+              isFactorSupportPointsIntoScale,
+              isPaidThroughNavPoints
+                    ? StratConSpawnRates.NAV_POINTS_PER_SCALE
+                    : StratConSpawnRates.ESSENTIAL_SCENARIOS_PER_SCALE);
     }
 }

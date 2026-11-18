@@ -261,23 +261,6 @@ public final class StratConEnemyFacilityActivity {
     }
 
     /**
-     * @param campaignState the contract's StratCon campaign state
-     *
-     * @return a random facility the enemy can attack (see {@link #getCounterattackTargets}), or {@code null} if
-     *       there is none
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    static @Nullable CounterattackTarget pickCounterattackTarget(StratConCampaignState campaignState) {
-        List<CounterattackTarget> targets = getCounterattackTargets(campaignState);
-        if (targets.isEmpty()) {
-            return null;
-        }
-        return targets.get(Compute.randomInt(targets.size()));
-    }
-
-    /**
      * Tells the player the enemy is attacking one of their side's facilities: in the daily report, and with a warning
      * when there is a GUI.
      *
@@ -506,6 +489,7 @@ public final class StratConEnemyFacilityActivity {
     public static void scheduleEnemyEngineers(AbstractContract contract, StratConCampaignState campaignState,
           @Nullable LocalDate fromDate) {
         LocalDate scheduledUntil = scheduleMonthlyDates(contract,
+              campaignState,
               campaignState.getEnemyEngineerDates(),
               StratConSpawnRates.ENGINEERS_PER_SCALE,
               fromDate);
@@ -520,9 +504,11 @@ public final class StratConEnemyFacilityActivity {
      * dates already in the list from that day on are replaced; earlier ones are left alone. A date on or after the
      * contract's last day is moved to the day before.
      *
-     * @param contract     the contract
-     * @param dates        the list to schedule into
-     * @param ratePerScale how many come each month per point of Scale
+     * @param contract      the contract
+     * @param campaignState the contract's StratCon campaign state, for how its Scale is counted (see
+     *                      {@link StratConSpawnRates#isFactorSupportPointsIntoScale(StratConCampaignState)})
+     * @param dates         the list to schedule into
+     * @param ratePerScale  how many come each month per point of Scale
      * @param fromDate     the first day to schedule on, or {@code null} for the contract's start
      *
      * @return the day the schedule runs to - the contract's end - or {@code null} if the contract has no settled start
@@ -531,8 +517,8 @@ public final class StratConEnemyFacilityActivity {
      * @author Illiani
      * @since 0.51.01
      */
-    static @Nullable LocalDate scheduleMonthlyDates(AbstractContract contract, List<LocalDate> dates,
-          double ratePerScale, @Nullable LocalDate fromDate) {
+    static @Nullable LocalDate scheduleMonthlyDates(AbstractContract contract, StratConCampaignState campaignState,
+          List<LocalDate> dates, double ratePerScale, @Nullable LocalDate fromDate) {
         LocalDate startDate = contract.getStartDate();
         if (startDate == null) {
             return null;
@@ -545,16 +531,11 @@ public final class StratConEnemyFacilityActivity {
         }
 
         dates.removeIf(date -> !date.isBefore(firstDate));
-        List<Integer> schedule = StratConSpawnRates.getMonthlySchedule(contract, ratePerScale);
-        for (LocalDate date : StratConContractInitializer.rollSpawnDates(startDate, schedule,
-              contract.getLengthInMonths())) {
-            if (endDate.isAfter(startDate) && !date.isBefore(endDate)) {
-                date = endDate.minusDays(1);
-            }
-            if (!date.isBefore(firstDate)) {
-                dates.add(date);
-            }
-        }
+        List<Integer> schedule = StratConSpawnRates.getMonthlySchedule(contract,
+              StratConSpawnRates.isFactorSupportPointsIntoScale(campaignState),
+              ratePerScale);
+        dates.addAll(StratConContractInitializer.layOutSpawnDates(startDate, endDate, schedule,
+              contract.getLengthInMonths(), firstDate));
         return endDate;
     }
 

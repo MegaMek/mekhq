@@ -486,8 +486,16 @@ class ChaosContractDeterminationPayTest {
             // Espionage's data caches replace its Essential scenarios and come three times as often
             when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.ESPIONAGE);
 
-            // 1500 / 3, then a third: 167 (rounded)
+            // 1500, spread across 3 x 3 = 9 Nav Points a month: 167 (rounded)
             assertEquals(Money.of(167), payScheme.getCombatPay(campaign, contract));
+        }
+
+        @Test
+        void withoutSupportPointsInScaleEveryThreePointsOfScaleBringOneEssentialScenario() {
+            campaignOptions.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, false);
+
+            // 3000, spread across the 2 Essential scenarios a month that Scale 6 brings counted this way
+            assertEquals(Money.of(1_500), payScheme.getCombatPay(campaign, contract(6, 1.0)));
         }
 
         @Test
@@ -620,6 +628,19 @@ class ChaosContractDeterminationPayTest {
 
             // Scale 2.5 brings 3 Essential scenarios a month: 1250 / 3 = 416.67, paid as 417
             assertEquals(Money.of(417), payScheme.getCombatPay(campaign, contract(2.5, 1.0)));
+        }
+
+        @Test
+        void navPointContractsPayTheirWholeMonthlyCombatPayAtAFractionalScale() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
+            campaignOptions.set(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS, true);
+            AbstractContract contract = contract(1.4, 1.0);
+            when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.ESPIONAGE);
+
+            // 700 a month, spread across the 4 Nav Points (3 x 1.4 = 4.2, rounded) the contract brings each month - as
+            // an Essential scenario contract's 700 is spread across its 1
+            assertEquals(Money.of(175), payScheme.getCombatPay(campaign, contract));
+            assertEquals(Money.of(700), payScheme.getCombatPay(campaign, contract(1.4, 1.0)));
         }
 
         @Test

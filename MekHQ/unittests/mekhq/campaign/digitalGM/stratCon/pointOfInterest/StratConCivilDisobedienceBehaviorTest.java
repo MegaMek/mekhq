@@ -184,6 +184,13 @@ class StratConCivilDisobedienceBehaviorTest {
     }
 
     @Test
+    void aRiotIsNotFoughtAgainstTheContractsEnemy() {
+        assertFalse(new StratConCivilDisobedienceBehavior().isOpposedByContractEnemy(),
+              "civil unrest is not the enemy's fight, so the enemy's morale does not shape it");
+        assertTrue(DATA_CACHE.createBehavior().isOpposedByContractEnemy());
+    }
+
+    @Test
     void theObjectiveHasItsOwnText() {
         String description = unrest.getBehavior().getObjectiveDescription(unrest, track);
 

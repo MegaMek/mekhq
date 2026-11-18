@@ -91,6 +91,9 @@ public class StratConCampaignState {
     // whether "Contracts Use Special Mechanics" was on when the contract was accepted; see
     // isContractsUseSpecialMechanics
     private boolean contractsUseSpecialMechanics;
+    // whether battlefield support points were factored into the contract's Scale; see
+    // getSupportPointsFactoredIntoScale. Null in a state from before it was recorded.
+    private Boolean supportPointsFactoredIntoScale;
     // whether the contract's ordinary scenarios were scheduled up front, as contracts accepted before they were rolled
     // each week were; see isNormalTempoScheduled
     private boolean normalTempoScheduled;
@@ -541,6 +544,26 @@ public class StratConCampaignState {
      */
     public void setEscalation(int escalation) {
         this.escalation = escalation;
+    }
+
+    /**
+     * Whether battlefield support points were factored into the contract's Scale ("Use Chaos Scale Support Point
+     * Conversion") when it was accepted. StratCon counts how often things come per point of Scale in those terms (see
+     * {@link StratConSpawnRates#getSpawnScale}), and the contract's Scale cannot change its terms mid-contract, so
+     * neither can the option.
+     *
+     * @return {@code true} or {@code false} as the option stood, or {@code null} for a state from before it was
+     *       recorded (see {@link StratConSpawnRates#recordSupportPointsFactoredIntoScale})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable Boolean getSupportPointsFactoredIntoScale() {
+        return supportPointsFactoredIntoScale;
+    }
+
+    public void setSupportPointsFactoredIntoScale(@Nullable Boolean supportPointsFactoredIntoScale) {
+        this.supportPointsFactoredIntoScale = supportPointsFactoredIntoScale;
     }
 
     /**

@@ -113,6 +113,7 @@ public final class StratConFacilityAttacks {
     public static void scheduleFacilityAttacks(AbstractContract contract, StratConCampaignState campaignState,
           @Nullable LocalDate fromDate) {
         LocalDate scheduledUntil = StratConEnemyFacilityActivity.scheduleMonthlyDates(contract,
+              campaignState,
               campaignState.getFacilityAttackDates(),
               StratConSpawnRates.FACILITY_ATTACKS_PER_SCALE,
               fromDate);
@@ -165,7 +166,9 @@ public final class StratConFacilityAttacks {
      */
     static @Nullable FacilityAttackType launchFacilityAttack(Campaign campaign, AbstractContract contract,
           StratConCampaignState campaignState) {
-        if (StratConEnemyFacilityActivity.getCounterattackTargets(campaignState).isEmpty()) {
+        // Worked out once: placing a Supply Interdiction below changes no facility, so the targets still stand after it
+        List<CounterattackTarget> targets = StratConEnemyFacilityActivity.getCounterattackTargets(campaignState);
+        if (targets.isEmpty()) {
             LOGGER.info("Facility attack on contract {} dropped: the player's side holds no facility to attack.",
                   contract.getName());
             return null;
@@ -186,10 +189,7 @@ public final class StratConFacilityAttacks {
             attackType = pickAttackType(false);
         }
 
-        CounterattackTarget target = StratConEnemyFacilityActivity.pickCounterattackTarget(campaignState);
-        if (target == null) {
-            return null;
-        }
+        CounterattackTarget target = targets.get(Compute.randomInt(targets.size()));
 
         int warningDays = 0;
         if (attackType == FacilityAttackType.COUNTERATTACK) {

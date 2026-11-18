@@ -125,7 +125,8 @@ public final class StratConDeploymentOrders {
      * Works out how many Deployment Orders arrive each month.
      *
      * @param commandStep the contract's command step (see {@link #getCommandStep})
-     * @param exactScale  the contract's exact Scale
+     * @param exactScale  the contract's exact Scale, as StratCon counts it (see
+     *                    {@link StratConSpawnRates#getSpawnScale})
      *
      * @return the command step times the Scale, rounded normally and never below one; none at command step 0
      *
@@ -174,20 +175,16 @@ public final class StratConDeploymentOrders {
             return;
         }
 
+        double spawnScale = StratConSpawnRates.getSpawnScale(contract.getExactScale(),
+              StratConSpawnRates.isFactorSupportPointsIntoScale(campaignState));
         List<Integer> schedule = StratConSpawnRates.getMonthlySchedule(contract.getLengthInMonths(),
-              getMonthlyOrderCount(commandStep, contract.getExactScale()));
+              getMonthlyOrderCount(commandStep, spawnScale));
 
-        LocalDate endDate = contract.getEndingDate();
-        for (LocalDate spawnDate : StratConContractInitializer.rollSpawnDates(startDate,
+        for (LocalDate spawnDate : StratConContractInitializer.layOutSpawnDates(startDate,
+              contract.getEndingDate(),
               schedule,
-              contract.getLengthInMonths())) {
-            if ((fromDate != null) && spawnDate.isBefore(fromDate)) {
-                continue;
-            }
-            if ((endDate != null) && endDate.isAfter(startDate) && !spawnDate.isBefore(endDate)) {
-                spawnDate = endDate.minusDays(1);
-            }
-
+              contract.getLengthInMonths(),
+              fromDate)) {
             campaignState.addScheduledPointOfInterest(new StratConScheduledPointOfInterest(spawnDate,
                   StratConDeploymentOrderBehavior.TYPE_ID,
                   true));

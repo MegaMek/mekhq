@@ -719,7 +719,8 @@ public abstract class AbstractContractGeneration {
      * month per point of the contract's Scale, rounded normally and never below one. Whether the contract fights any
      * of them at all is up to StratCon (see {@link StratConContractInitializer#usesEssentialScenarios}).
      *
-     * @param campaign       the campaign; unused, kept so every caller reads the same
+     * @param campaign       the campaign, for how the contract's Scale is counted (see
+     *                       {@link StratConSpawnRates#isFactorSupportPointsIntoScale(CampaignOptions, AbstractContract)})
      * @param contract       the contract, whose Scale sets the count
      * @param lengthInMonths the contract's length in months
      *
@@ -730,8 +731,11 @@ public abstract class AbstractContractGeneration {
      */
     public static List<Integer> rollScenarioSchedule(Campaign campaign, AbstractContract contract,
           int lengthInMonths) {
+        boolean isFactorSupportPointsIntoScale = StratConSpawnRates.isFactorSupportPointsIntoScale(
+              campaign.getCampaignOptions(), contract);
         return StratConSpawnRates.getMonthlySchedule(lengthInMonths,
-              StratConSpawnRates.getCount(contract, StratConSpawnRates.ESSENTIAL_SCENARIOS_PER_SCALE));
+              StratConSpawnRates.getCount(contract, isFactorSupportPointsIntoScale,
+                    StratConSpawnRates.ESSENTIAL_SCENARIOS_PER_SCALE));
     }
 
     private static @Nonnull EnemyData pickEnemy(Campaign campaign, LocalDate currentDate, ILocation currentLocation,

@@ -51,6 +51,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
 import mekhq.campaign.digitalGM.stratCon.StratConScheduledScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConSpawnRates;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
@@ -215,6 +216,9 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
             if (campaignState == null) {
                 continue;
             }
+
+            // A contract accepted before StratCon recorded how its Scale is counted takes the option as it stands
+            StratConSpawnRates.recordSupportPointsFactoredIntoScale(campaign.getCampaignOptions(), campaignState);
 
             // Strategic-objective scenarios trickle in over the contract's months, paced by its scenario schedule,
             // rather than all being placed at contract start.

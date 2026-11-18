@@ -92,6 +92,17 @@ public class StratConScheduledParadeBehavior extends StratConAmbushPointOfIntere
     }
 
     /**
+     * A riot at a parade is civil unrest, not the contract's enemy's fight, so the enemy's morale does not shape it.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    protected boolean isOpposedByContractEnemy() {
+        return false;
+    }
+
+    /**
      * Riots are fought as "Crowd Control", which is not in the scenario manifest, so it is read from its file (see
      * {@link StratConRiots#loadScenarioTemplate}).
      *
