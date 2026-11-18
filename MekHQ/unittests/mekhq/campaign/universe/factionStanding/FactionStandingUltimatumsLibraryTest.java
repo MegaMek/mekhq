@@ -162,11 +162,7 @@ class FactionStandingUltimatumsLibraryTest {
     @DisplayName("Every ultimatum has all of its dialog resource keys")
     void testEveryUltimatumHasResourceKeys() {
         for (FactionStandingUltimatumData ultimatum : getDistinctFixtureUltimatums()) {
-            List<String> sideIds = new ArrayList<>();
-            for (FactionStandingUltimatumSide side : ultimatum.sides()) {
-                sideIds.add(side.id());
-            }
-            for (String key : FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), sideIds)) {
+            for (String key : getRequiredKeys(ultimatum)) {
                 String text = getTextAt(RESOURCE_BUNDLE, key);
                 assertFalse(text.startsWith(MISSING_RESOURCE_TAG), "Missing resource key: " + key);
             }
@@ -358,6 +354,9 @@ class FactionStandingUltimatumsLibraryTest {
     }
 
     /**
+     * Lists the text keys the ultimatum needs, for the ways of going rogue it actually offers: a Pirate card needs
+     * {@code .rogue.pirate.pitch} and a Bandit Caste card needs {@code .rogue.banditCaste.pitch}.
+     *
      * @author Illiani
      * @since 0.51.01
      */
@@ -366,7 +365,10 @@ class FactionStandingUltimatumsLibraryTest {
         for (FactionStandingUltimatumSide side : ultimatum.sides()) {
             sideIds.add(side.id());
         }
-        return FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), sideIds);
+        return FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), sideIds,
+              ultimatum.hasNoDissent(), ultimatum.hasSharedResult(),
+              FactionStandingUltimatumDialog.getRogueKinds(ultimatum.isMercenaryOffered(),
+                    ultimatum.isPirateOffered(), ultimatum.isBanditCasteOffered()));
     }
 
     // ----- malformed data -----
