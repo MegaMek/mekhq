@@ -658,7 +658,8 @@ public class FactionStandingUltimatumEditorDialog extends JDialog {
             purposes.add(getTextAt(RESOURCE_BUNDLE, KEY_PREFIX + switch (rogueKind) {
                 case MERCENARY -> "textKeys.purpose.mercenary";
                 case PIRATE -> "textKeys.purpose.pirate";
-                default -> "textKeys.purpose.banditCaste";
+                case BANDIT_CASTE -> "textKeys.purpose.banditCaste";
+                case SIDE -> throw new IllegalArgumentException("Choosing a side doesn't go rogue");
             }));
         }
 

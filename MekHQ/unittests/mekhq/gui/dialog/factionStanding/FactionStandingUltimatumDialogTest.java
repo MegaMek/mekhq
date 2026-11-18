@@ -300,6 +300,39 @@ class FactionStandingUltimatumDialogTest {
     }
 
     @Test
+    @DisplayName("Pirates need the .pirate appeal and the Bandit Caste needs the .banditCaste appeal")
+    void testRogueKindsUseTheirOwnKeys() {
+        assertEquals(List.of("FactionStandingUltimatumDialog.EXODUS.initialOffer",
+                    "FactionStandingUltimatumDialog.EXODUS.for",
+                    "FactionStandingUltimatumDialog.EXODUS.rogue.pirate.pitch"),
+              FactionStandingUltimatumDialog.getRequiredTextKeys("EXODUS", List.of(), true,
+                    List.of(ChoiceKind.PIRATE)));
+        assertEquals(List.of("FactionStandingUltimatumDialog.EXODUS.initialOffer",
+                    "FactionStandingUltimatumDialog.EXODUS.for",
+                    "FactionStandingUltimatumDialog.EXODUS.rogue.banditCaste.pitch"),
+              FactionStandingUltimatumDialog.getRequiredTextKeys("EXODUS", List.of(), true,
+                    List.of(ChoiceKind.BANDIT_CASTE)));
+    }
+
+    @Test
+    @DisplayName("A Bandit Caste card never borrows the ultimatum's Pirate appeal")
+    void testBanditCasteCardDoesNotUsePirateAppeal() {
+        Faction federatedCommonwealth = buildFaction("FC", false);
+        List<UltimatumSide> sides = List.of(buildSide("LA", buildFaction("LA", false)));
+
+        List<PickerChoice> choices = FactionStandingUltimatumDialog.buildChoices(sides, "FED_COM_CIVIL_WAR",
+              federatedCommonwealth, false, false, "LA", GAME_YEAR,
+              List.of(ChoiceKind.PIRATE, ChoiceKind.BANDIT_CASTE), key -> key);
+
+        assertEquals(ChoiceKind.PIRATE, choices.get(1).kind());
+        assertEquals("FactionStandingUltimatumDialog.FED_COM_CIVIL_WAR.rogue.pirate.pitch", choices.get(1).pitch());
+        assertEquals(ChoiceKind.BANDIT_CASTE, choices.get(2).kind());
+        // FED_COM_CIVIL_WAR has no Bandit Caste appeal written, so the shared Bandit Caste default is shown
+        assertEquals(getTextAt("mekhq.resources.FactionStandingUltimatumDialog",
+              "FactionStandingUltimatumDialog.picker.banditCaste.pitch"), choices.get(2).pitch());
+    }
+
+    @Test
     @DisplayName("Leaving the current faction in a violent transition is a defection")
     void testIsDefection() {
         Faction currentFaction = mock(Faction.class);
