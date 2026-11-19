@@ -39,6 +39,7 @@ import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -49,15 +50,19 @@ import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.RenderingHints;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 
+import megamek.client.ui.WrapLayout;
 import mekhq.gui.baseComponents.ImmersiveScrollBarStyle;
 
 /**
@@ -287,6 +292,73 @@ public final class Hud {
         JPanel panel = new JPanel(layout);
         panel.setOpaque(false);
         return panel;
+    }
+
+    /**
+     * Plain text that wraps to the width it is given, for lines such as a window's subtitle that must never be cut off
+     * when the window is narrow or the font is large. It grows taller, and asks its container to lay out again, when it
+     * needs more lines.
+     *
+     * @param text  the text
+     * @param color the text colour
+     * @param font  the font
+     *
+     * @return the text component
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static JTextArea wrappingText(String text, Color color, Font font) {
+        JTextArea area = new JTextArea(text);
+        area.setEditable(false);
+        area.setFocusable(false);
+        area.setOpaque(false);
+        area.setLineWrap(true);
+        area.setWrapStyleWord(true);
+        area.setBorder(BorderFactory.createEmptyBorder());
+        area.setForeground(color);
+        area.setFont(font);
+        area.setAlignmentX(Component.LEFT_ALIGNMENT);
+        area.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent event) {
+                // Wrapping depends on the width, so the height it needs is only known once it has one
+                if (area.getHeight() != area.getPreferredSize().height) {
+                    area.revalidate();
+                }
+            }
+        });
+        return area;
+    }
+
+    /**
+     * A row of small boxed labels, tinted with one colour, that wraps to the width of its container. Used for short
+     * lists such as the option groups a campaign preset replaces.
+     *
+     * @param labels the labels
+     * @param tone   the tint of the boxes and their outlines
+     *
+     * @return the row
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static JPanel chipRow(List<String> labels, Color tone) {
+        JPanel row = transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(6), scaleForGUI(6)));
+        // WrapLayout pads the outside of the row by its gaps; pull the row back so the first chip lines up
+        row.setBorder(BorderFactory.createEmptyBorder(-scaleForGUI(6), -scaleForGUI(6), 0, 0));
+        for (String label : labels) {
+            JLabel chip = new JLabel(label);
+            chip.setOpaque(true);
+            chip.setBackground(translucent(tone, 18));
+            chip.setForeground(TEXT);
+            chip.setFont(hudFont(Font.PLAIN, 0.85f, 0.0f));
+            chip.setBorder(BorderFactory.createCompoundBorder(
+                  BorderFactory.createLineBorder(translucent(tone, 140), scaleForGUI(1)),
+                  BorderFactory.createEmptyBorder(scaleForGUI(3), scaleForGUI(8), scaleForGUI(3), scaleForGUI(8))));
+            row.add(chip);
+        }
+        return row;
     }
 
     // endregion Containers

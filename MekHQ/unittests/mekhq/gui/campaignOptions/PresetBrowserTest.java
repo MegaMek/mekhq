@@ -30,15 +30,22 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog;
+package mekhq.gui.campaignOptions;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.File;
+import java.util.List;
+
 import mekhq.CampaignPreset;
+import mekhq.MHQConstants;
 import org.junit.jupiter.api.Test;
 
-class CampaignUpgradeConsoleTest {
+class PresetBrowserTest {
     private static CampaignPreset titled(String title) {
         CampaignPreset preset = new CampaignPreset();
         preset.setTitle(title);
@@ -47,25 +54,40 @@ class CampaignUpgradeConsoleTest {
 
     @Test
     void dropsTheSortNumberFromStockTitles() {
-        assertEquals("Veteran Experience", CampaignUpgradeConsole.displayTitle(titled("2 - Veteran Experience")));
-        assertEquals("My Rules", CampaignUpgradeConsole.displayTitle(titled("My Rules")));
-        assertEquals("3025 Start", CampaignUpgradeConsole.displayTitle(titled("3025 Start")));
+        assertEquals("Veteran Experience", PresetBrowser.displayTitle(titled("2 - Veteran Experience")));
+        assertEquals("My Rules", PresetBrowser.displayTitle(titled("My Rules")));
+        assertEquals("3025 Start", PresetBrowser.displayTitle(titled("3025 Start")));
     }
 
     @Test
     void presetKeysMatchTheResourceKeys() {
         assertEquals("new_players_start_here",
-              CampaignUpgradeConsole.presetKey(titled("1 - New Players Start Here")));
-        assertEquals("veteran_experience", CampaignUpgradeConsole.presetKey(titled("2 - Veteran Experience")));
+              PresetBrowser.presetKey(titled("1 - New Players Start Here")));
+        assertEquals("veteran_experience", PresetBrowser.presetKey(titled("2 - Veteran Experience")));
     }
 
     @Test
     void firstSentenceStripsHtmlAndShortens() {
-        assertEquals("Expect pain.", CampaignUpgradeConsole.firstSentence("<b>Expect</b> pain. <br>More text."));
+        assertEquals("Expect pain.", PresetBrowser.firstSentence("<b>Expect</b> pain. <br>More text."));
         String longText = "A".repeat(200) + ". Second.";
-        String sentence = CampaignUpgradeConsole.firstSentence(longText);
+        String sentence = PresetBrowser.firstSentence(longText);
         assertTrue(sentence.length() <= 80);
         assertTrue(sentence.endsWith("…"));
-        assertEquals("", CampaignUpgradeConsole.firstSentence(null));
+        assertEquals("", PresetBrowser.firstSentence(null));
+    }
+
+    @Test
+    void everyStockPresetHasATagAndSummary() {
+        List<CampaignPreset> stock = CampaignPreset.loadCampaignPresetsFromDirectory(
+              new File(MHQConstants.CAMPAIGN_PRESET_DIRECTORY));
+        assertFalse(stock.isEmpty(), "no stock presets found");
+        for (CampaignPreset preset : stock) {
+            assertTrue(PresetBrowser.isStockPreset(preset), preset.getTitle());
+            String prefix = "PresetBrowser.preset." + PresetBrowser.presetKey(preset);
+            assertTrue(isResourceKeyValid(getTextAt(PresetBrowser.RESOURCE_BUNDLE, prefix + ".tag")),
+                  preset.getTitle() + " has no tag");
+            assertTrue(isResourceKeyValid(getTextAt(PresetBrowser.RESOURCE_BUNDLE, prefix + ".sub")),
+                  preset.getTitle() + " has no summary line");
+        }
     }
 }

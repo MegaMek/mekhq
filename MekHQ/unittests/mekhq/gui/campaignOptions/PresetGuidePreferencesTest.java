@@ -30,7 +30,7 @@
  * <https://www.xbox.com/en-US/developers/rules> and it is not endorsed by or
  * affiliated with Microsoft.
  */
-package mekhq.gui.dialog;
+package mekhq.gui.campaignOptions;
 
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -38,37 +38,46 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.nio.file.Path;
 
 import megamek.client.ui.preferences.SuitePreferences;
+import mekhq.gui.campaignOptions.PresetGuidePreferences.GuideScreen;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
-class CampaignUpgradeGuidePreferencesTest {
-    private static CampaignUpgradeGuidePreferences fresh(SuitePreferences preferences) {
-        return new CampaignUpgradeGuidePreferences(preferences.forClass(CampaignUpgradeGuidePreferences.class));
+class PresetGuidePreferencesTest {
+    private static PresetGuidePreferences fresh(SuitePreferences preferences) {
+        return new PresetGuidePreferences(preferences.forClass(PresetGuidePreferences.class));
     }
 
     @Test
     void opensTheFirstTimeOnly() {
-        CampaignUpgradeGuidePreferences preferences = fresh(new SuitePreferences());
-        assertTrue(preferences.shouldOpenGuide());
-        preferences.setGuideSeen(true);
-        assertFalse(preferences.shouldOpenGuide());
-        preferences.setGuideAlwaysOpen(true);
-        assertTrue(preferences.shouldOpenGuide());
+        PresetGuidePreferences preferences = fresh(new SuitePreferences());
+        assertTrue(preferences.shouldOpenGuide(GuideScreen.UPGRADE));
+        preferences.setGuideSeen(GuideScreen.UPGRADE, true);
+        assertFalse(preferences.shouldOpenGuide(GuideScreen.UPGRADE));
+        preferences.setGuideAlwaysOpen(GuideScreen.UPGRADE, true);
+        assertTrue(preferences.shouldOpenGuide(GuideScreen.UPGRADE));
+    }
+
+    @Test
+    void screensAreRememberedSeparately() {
+        PresetGuidePreferences preferences = fresh(new SuitePreferences());
+        preferences.setGuideSeen(GuideScreen.UPGRADE, true);
+        assertTrue(preferences.shouldOpenGuide(GuideScreen.NEW_CAMPAIGN));
     }
 
     @Test
     void settingsSurviveSavingAndLoadingThePreferencesFile(@TempDir Path directory) throws Exception {
         String file = directory.resolve("mhq.preferences").toString();
         SuitePreferences saved = new SuitePreferences();
-        CampaignUpgradeGuidePreferences before = fresh(saved);
-        before.setGuideSeen(true);
-        before.setGuideAlwaysOpen(true);
+        PresetGuidePreferences before = fresh(saved);
+        before.setGuideSeen(GuideScreen.NEW_CAMPAIGN, true);
+        before.setGuideAlwaysOpen(GuideScreen.UPGRADE, true);
         saved.saveToFile(file);
 
         SuitePreferences loaded = new SuitePreferences();
         loaded.loadFromFile(file);
-        CampaignUpgradeGuidePreferences after = fresh(loaded);
-        assertTrue(after.isGuideSeen());
-        assertTrue(after.isGuideAlwaysOpen());
+        PresetGuidePreferences after = fresh(loaded);
+        assertTrue(after.isGuideSeen(GuideScreen.NEW_CAMPAIGN));
+        assertFalse(after.isGuideSeen(GuideScreen.UPGRADE));
+        assertTrue(after.isGuideAlwaysOpen(GuideScreen.UPGRADE));
     }
 }
