@@ -112,6 +112,8 @@ public final class HudChoice<T> extends JPanel {
     private boolean leadOnOwnRow;
     /** Whether the first entry is a Random entry even though its value is not {@code null}. */
     private boolean firstIsRandom;
+    /** Whether labels too long for two to a row stack one per row rather than turning into a drop-down. */
+    private boolean singleColumnAllowed;
     private final JComboBox<Item> dropDown = new JComboBox<>();
     private boolean filling;
     /** Whether the entries have been laid out at least once, and the Random setting they were laid out with. */
@@ -251,7 +253,7 @@ public final class HudChoice<T> extends JPanel {
     /**
      * How many segments to put in a row so that every label fits: as many as the width takes, then balanced across
      * the rows so the last row is not left with one. A list that would need more than one segment per row but cannot
-     * fit two is better as a drop-down.
+     * fit two is better as a drop-down, unless {@link #setSingleColumnAllowed} lets it stack one per row.
      *
      * @return the segments per row, or {@code 0} to use a drop-down instead
      */
@@ -277,7 +279,7 @@ public final class HudChoice<T> extends JPanel {
             return entries.size();
         }
         if (fit < 2) {
-            return (entries.size() <= 1) ? 1 : 0;
+            return singleColumnAllowed ? 1 : 0;
         }
         int rows = (entries.size() + fit - 1) / fit;
         return (entries.size() + rows - 1) / rows;
@@ -292,6 +294,16 @@ public final class HudChoice<T> extends JPanel {
      */
     public void setFirstIsRandom(boolean firstIsRandom) {
         this.firstIsRandom = firstIsRandom;
+    }
+
+    /**
+     * Lets a list whose labels are too long for two to a row stack its segments one per row instead of falling back
+     * to a drop-down. Set before the first {@link #setChoices}.
+     *
+     * @param singleColumnAllowed {@code true} to stack long labels one per row
+     */
+    public void setSingleColumnAllowed(boolean singleColumnAllowed) {
+        this.singleColumnAllowed = singleColumnAllowed;
     }
 
     /** Selects a value without telling the listener; one that is not offered leaves nothing selected. */
