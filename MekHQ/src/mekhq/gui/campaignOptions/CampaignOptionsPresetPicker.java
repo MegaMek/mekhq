@@ -38,13 +38,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
-import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.GraphicsConfiguration;
-import java.awt.GraphicsEnvironment;
-import java.awt.Insets;
-import java.awt.Rectangle;
-import java.awt.Toolkit;
 import java.awt.Window;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -52,7 +45,6 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-import java.util.Locale;
 import java.util.Map;
 import javax.swing.*;
 
@@ -66,6 +58,8 @@ import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer;
 import mekhq.gui.campaignOptions.PresetGuidePreferences.GuideScreen;
+import mekhq.gui.utilities.WindowUtilities;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * The preset picker: a heads-up display, in the style of the campaign upgrade console and the Oracle Console, for
@@ -166,11 +160,7 @@ public class CampaignOptionsPresetPicker extends JDialog {
         content.setOpaque(true);
         content.setBackground(GROUND);
         content.add(buildCommandBar(), BorderLayout.NORTH);
-        JPanel body = new JPanel(new BorderLayout());
-        body.setOpaque(true);
-        body.setBackground(GROUND);
-        body.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(16), scaleForGUI(16),
-              scaleForGUI(16)));
+        JPanel body = Hud.windowBody(new BorderLayout());
         body.add(browser, BorderLayout.CENTER);
         content.add(body, BorderLayout.CENTER);
         content.add(buildFooter(), BorderLayout.SOUTH);
@@ -196,61 +186,27 @@ public class CampaignOptionsPresetPicker extends JDialog {
         setMinimumSize(scaleForGUI(900, 600));
         getContentPane().setPreferredSize(scaleForGUI(1060, 720));
         pack();
-        fitToScreen(parentFrame);
+        WindowUtilities.fitToScreen(this, parentFrame);
         setVisible(true);
     }
 
     // region Layout
 
     private JPanel buildCommandBar() {
-        JPanel commandBar = new JPanel(new BorderLayout(scaleForGUI(24), 0));
-        commandBar.setOpaque(true);
-        commandBar.setBackground(GROUND);
-        commandBar.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
-              BorderFactory.createEmptyBorder(scaleForGUI(14), scaleForGUI(16), scaleForGUI(12), scaleForGUI(16))));
-
-        JPanel identity = new JPanel();
-        identity.setLayout(new BoxLayout(identity, BoxLayout.Y_AXIS));
-        identity.setOpaque(false);
-        JLabel eyebrow = new JLabel(text(isStartup ? "eyebrow.startup" : "eyebrow.load").toUpperCase(Locale.ROOT));
-        eyebrow.setForeground(TEXT_FAINT);
-        eyebrow.setFont(hudFont(Font.BOLD, 0.72f, 0.18f));
-        JLabel title = new JLabel(text("heading").toUpperCase(Locale.ROOT));
-        title.setForeground(ACCENT_BRIGHT);
-        title.setFont(hudFont(Font.BOLD, 1.35f, 0.16f));
-        JTextArea subtitle = Hud.wrappingText(text(isStartup ? "subtitle.startup" : "subtitle.load"), TEXT_MUTED,
-              hudFont(Font.PLAIN, 0.92f, 0.0f));
-        identity.add(leftAligned(eyebrow));
-        identity.add(Box.createVerticalStrut(scaleForGUI(3)));
-        identity.add(leftAligned(title));
-        identity.add(Box.createVerticalStrut(scaleForGUI(4)));
-        identity.add(leftAligned(subtitle));
-        commandBar.add(identity, BorderLayout.CENTER);
+        JPanel commandBar = Hud.commandBar(new BorderLayout(scaleForGUI(24), 0));
+        commandBar.add(Hud.identity(text(isStartup ? "eyebrow.startup" : "eyebrow.load"), text("heading"),
+              text(isStartup ? "subtitle.startup" : "subtitle.load")), BorderLayout.CENTER);
 
         // The guide teaches starting a campaign, so it isn't offered when loading a preset into Campaign Options
-        if (!isStartup) {
-            return commandBar;
+        if (isStartup) {
+            HudButton guideButton = new HudButton(text("guide.open"), false, true);
+            guideButton.addActionListener(event -> openGuide());
+            commandBar.add(Hud.topAligned(guideButton), BorderLayout.EAST);
         }
-        HudButton guideButton = new HudButton(text("guide.open"), false, true);
-        guideButton.addActionListener(event -> openGuide());
-        JPanel guideHolder = Hud.transparentPanel(new BorderLayout());
-        guideHolder.add(guideButton, BorderLayout.NORTH);
-        commandBar.add(guideHolder, BorderLayout.EAST);
         return commandBar;
     }
 
     private JPanel buildFooter() {
-        JPanel footer = new JPanel(new BorderLayout(scaleForGUI(16), 0));
-        footer.setOpaque(true);
-        footer.setBackground(SURFACE_DEEP);
-        footer.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(scaleForGUI(1), 0, 0, 0, BORDER),
-              BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(18), scaleForGUI(10), scaleForGUI(18))));
-
-        summary.setForeground(TEXT_MUTED);
-        summary.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
-
         HudButton cancelButton = new HudButton(text("button.cancel"), false);
         cancelButton.addActionListener(event -> {
             returnState = PresetSelection.CANCELLED;
@@ -258,21 +214,12 @@ public class CampaignOptionsPresetPicker extends JDialog {
         });
         primaryButton.addActionListener(event -> commitSelection(PresetSelection.APPLY));
 
-        JPanel actions = Hud.transparentPanel(null);
-        actions.setLayout(new BoxLayout(actions, BoxLayout.X_AXIS));
-        actions.add(cancelButton);
-        if (customizeButton != null) {
-            customizeButton.setToolTipText(text("button.customize.toolTipText"));
-            customizeButton.addActionListener(event -> commitSelection(PresetSelection.CUSTOMIZE));
-            actions.add(Box.createHorizontalStrut(scaleForGUI(8)));
-            actions.add(customizeButton);
+        if (customizeButton == null) {
+            return Hud.footer(summary, cancelButton, primaryButton);
         }
-        actions.add(Box.createHorizontalStrut(scaleForGUI(8)));
-        actions.add(primaryButton);
-
-        footer.add(summary, BorderLayout.CENTER);
-        footer.add(actions, BorderLayout.EAST);
-        return footer;
+        customizeButton.setToolTipText(text("button.customize.toolTipText"));
+        customizeButton.addActionListener(event -> commitSelection(PresetSelection.CUSTOMIZE));
+        return Hud.footer(summary, cancelButton, customizeButton, primaryButton);
     }
 
     /**
@@ -357,7 +304,8 @@ public class CampaignOptionsPresetPicker extends JDialog {
         } else {
             String name = PresetBrowser.displayTitle(preset);
             summary.setText("<html>" + getFormattedTextAt(RESOURCE_BUNDLE,
-                  KEY + (isStartup ? "summary.startup" : "summary.load"), escape(name)) + "</html>");
+                  KEY + (isStartup ? "summary.startup" : "summary.load"), StringEscapeUtils.escapeHtml4(name))
+                                 + "</html>");
             primaryButton.setText(getFormattedTextAt(RESOURCE_BUNDLE,
                   KEY + (isStartup ? "button.start" : "button.load"), name));
         }
@@ -418,51 +366,9 @@ public class CampaignOptionsPresetPicker extends JDialog {
         return ((parentFrame != null) && parentFrame.isShowing()) ? parentFrame : null;
     }
 
-    /**
-     * Limits the dialog's size and position so it always fits within the usable area of the screen it is shown on
-     * (for example, without slipping beneath the Windows taskbar).
-     *
-     * <p>The screen bounds and insets are taken from the parent's {@link GraphicsConfiguration}, so the calculation
-     * honors the active display's resolution and the operating system's DPI/zoom scaling, as well as multi-monitor
-     * setups.</p>
-     *
-     * @param parentFrame the parent frame the dialog is shown relative to, used to pick the correct display
-     */
-    private void fitToScreen(@Nullable JFrame parentFrame) {
-        GraphicsConfiguration graphicsConfiguration = (parentFrame != null)
-              ? parentFrame.getGraphicsConfiguration()
-              : null;
-        if (graphicsConfiguration == null) {
-            graphicsConfiguration = GraphicsEnvironment.getLocalGraphicsEnvironment()
-                                          .getDefaultScreenDevice()
-                                          .getDefaultConfiguration();
-        }
-
-        final Rectangle screenBounds = graphicsConfiguration.getBounds();
-        final Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(graphicsConfiguration);
-        final int usableWidth = screenBounds.width - screenInsets.left - screenInsets.right;
-        final int usableHeight = screenBounds.height - screenInsets.top - screenInsets.bottom;
-
-        setMinimumSize(new Dimension(Math.min(getMinimumSize().width, usableWidth),
-              Math.min(getMinimumSize().height, usableHeight)));
-        setSize(Math.min(getWidth(), usableWidth), Math.min(getHeight(), usableHeight));
-
-        // Center on the parent, then nudge it so its edges stay out from under the taskbar.
-        setLocationRelativeTo(parentFrame);
-        final int minX = screenBounds.x + screenInsets.left;
-        final int minY = screenBounds.y + screenInsets.top;
-        final int clampedX = Math.max(minX, Math.min(getX(), minX + usableWidth - getWidth()));
-        final int clampedY = Math.max(minY, Math.min(getY(), minY + usableHeight - getHeight()));
-        setLocation(clampedX, clampedY);
-    }
-
     // endregion Window
 
     private static String text(String key) {
         return getTextAt(RESOURCE_BUNDLE, KEY + key);
-    }
-
-    private static String escape(String text) {
-        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 }

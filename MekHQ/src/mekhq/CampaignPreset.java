@@ -625,7 +625,12 @@ public class CampaignPreset {
 
         final String versionString = element.getAttribute("version");
         final Version version = new Version(versionString);
-        return parseFromXML(element.getChildNodes(), version);
+        final CampaignPreset preset = parseFromXML(element.getChildNodes(), version);
+        if (preset != null) {
+            // Lets screens tell the stock presets from the player's own
+            preset.setPresetFile(file);
+        }
+        return preset;
     }
 
     public static @Nullable CampaignPreset parseFromXML(final NodeList nl, final Version version) {

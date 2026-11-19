@@ -87,6 +87,7 @@ import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
+import mekhq.gui.baseComponents.hud.HudWrappingLabel;
 import mekhq.gui.utilities.WrapLayout;
 
 /**
@@ -368,7 +369,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
                     BorderFactory.createMatteBorder(0, scaleForGUI(3), 0, 0, AMBER),
                     BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(12), scaleForGUI(8),
                           scaleForGUI(12)))));
-        JLabel text = new MarketHud.WrappingLabel();
+        JLabel text = new HudWrappingLabel();
         text.setForeground(TEXT);
         text.setFont(hudFont(Font.PLAIN, 0.92f, 0.0f));
         text.setText("<html><b style='color:" + hex(AMBER) + "'>"
@@ -502,7 +503,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
               BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(14), scaleForGUI(8), scaleForGUI(14))));
 
         // The hint wraps onto a second line rather than being cut short beside the buttons.
-        JLabel hint = new MarketHud.WrappingLabel();
+        JLabel hint = new HudWrappingLabel();
         hint.setForeground(TEXT_MUTED);
         hint.setFont(hudFont(Font.PLAIN, 0.88f, 0.0f));
         String hintKey = isFallback() ? "picker.contractMarket.negotiator.footer.fallback"
@@ -954,7 +955,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
                                       target);
             legend.append(separator).append(MarketHud.escape(them));
         }
-        JLabel legendLabel = new MarketHud.WrappingLabel();
+        JLabel legendLabel = new HudWrappingLabel();
         legendLabel.setForeground(TEXT_FAINT);
         legendLabel.setFont(hudFont(Font.PLAIN, 0.8f, 0.0f));
         legendLabel.setText(legend.append("</html>").toString());

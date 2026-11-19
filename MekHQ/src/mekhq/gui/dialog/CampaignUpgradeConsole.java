@@ -68,6 +68,7 @@ import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
 import mekhq.campaign.campaignOptions.CampaignOptionsSystemChanges;
 import mekhq.campaign.campaignOptions.CampaignOptionsSystemChanges.SystemChange;
 import mekhq.campaign.io.CampaignSaveBackup;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudConfirmButton;
@@ -79,6 +80,8 @@ import mekhq.gui.baseComponents.hud.HudVerdictBanner;
 import mekhq.gui.campaignOptions.PresetBrowser;
 import mekhq.gui.campaignOptions.PresetGuidePreferences;
 import mekhq.gui.campaignOptions.PresetGuidePreferences.GuideScreen;
+import mekhq.gui.utilities.WindowUtilities;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * The campaign upgrade console: the window shown when a campaign saved in an older release is loaded, drawn as a
@@ -99,7 +102,6 @@ public class CampaignUpgradeConsole extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(CampaignUpgradeConsole.class);
     static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignUpgradeDialog";
     private static final String KEY = "CampaignUpgradeConsole.";
-    private static final int CLOSE_CONFIRM_MILLIS = 3000;
     private static final int TEXT_WIDTH = 720;
 
     /** The paths the player can take. */
@@ -138,8 +140,6 @@ public class CampaignUpgradeConsole extends JDialog {
     private @Nullable File backupFile;
     private @Nullable String backupError;
     private Choice choice = new Choice(Decision.QUIT, null);
-    private boolean isCloseArmed;
-    private final Timer closeDisarmTimer;
 
     private final HudSegmentedControl<UpgradePath> pathSelector;
     private final HudStatTile backupTile = new HudStatTile(text("tile.backup"), "");
@@ -180,12 +180,6 @@ public class CampaignUpgradeConsole extends JDialog {
         guideDrawer = PresetBrowser.createGuideDrawer(GuideScreen.UPGRADE, text("guide.alwaysOpen"),
               this::closeGuide);
 
-        closeDisarmTimer = new Timer(CLOSE_CONFIRM_MILLIS, event -> {
-            isCloseArmed = false;
-            refreshFooter();
-        });
-        closeDisarmTimer.setRepeats(false);
-
         buildUI();
         refreshAll();
 
@@ -193,7 +187,8 @@ public class CampaignUpgradeConsole extends JDialog {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosing(WindowEvent event) {
-                onWindowClosing();
+                // Closing the window quits too, so it asks for the same second click as the quit button
+                quitButton.click();
             }
 
             @Override
@@ -207,7 +202,7 @@ public class CampaignUpgradeConsole extends JDialog {
         setMinimumSize(scaleForGUI(980, 680));
         getContentPane().setPreferredSize(scaleForGUI(1120, 760));
         pack();
-        setLocationRelativeTo(null);
+        WindowUtilities.fitToScreen(this, null);
     }
 
     /**
@@ -218,7 +213,6 @@ public class CampaignUpgradeConsole extends JDialog {
     public Choice showAndWait() {
         choice = new Choice(Decision.QUIT, null);
         quitButton.reset();
-        isCloseArmed = false;
         refreshFooter();
         setVisible(true);
         return choice;
@@ -238,28 +232,8 @@ public class CampaignUpgradeConsole extends JDialog {
     }
 
     private JPanel buildCommandBar() {
-        JPanel commandBar = new JPanel(new BorderLayout(0, scaleForGUI(12)));
-        commandBar.setOpaque(true);
-        commandBar.setBackground(GROUND);
-        commandBar.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
-              BorderFactory.createEmptyBorder(scaleForGUI(14), scaleForGUI(16), scaleForGUI(12), scaleForGUI(16))));
-
-        JPanel identity = new JPanel();
-        identity.setLayout(new BoxLayout(identity, BoxLayout.Y_AXIS));
-        identity.setOpaque(false);
-        JLabel eyebrow = new JLabel(text("eyebrow").toUpperCase(Locale.ROOT));
-        eyebrow.setForeground(TEXT_FAINT);
-        eyebrow.setFont(hudFont(Font.BOLD, 0.72f, 0.18f));
-        JLabel title = new JLabel(campaign.getPlayerForce().getName().toUpperCase(Locale.ROOT));
-        title.setForeground(ACCENT_BRIGHT);
-        title.setFont(hudFont(Font.BOLD, 1.35f, 0.16f));
-        JTextArea subtitle = Hud.wrappingText(text("subtitle"), TEXT_MUTED, hudFont(Font.PLAIN, 0.92f, 0.0f));
-        identity.add(leftAligned(eyebrow));
-        identity.add(Box.createVerticalStrut(scaleForGUI(3)));
-        identity.add(leftAligned(title));
-        identity.add(Box.createVerticalStrut(scaleForGUI(4)));
-        identity.add(leftAligned(subtitle));
+        JPanel commandBar = Hud.commandBar(new BorderLayout(0, scaleForGUI(12)));
+        JPanel identity = Hud.identity(text("eyebrow"), campaign.getPlayerForce().getName(), text("subtitle"));
 
         HudStatTile savedTile = new HudStatTile(text("tile.saved"), getFormattedTextAt(RESOURCE_BUNDLE,
               KEY + "tile.saved.sub", MekHQ.getMHQOptions().getDisplayFormattedDate(campaign.getLocalDate())));
@@ -275,12 +249,10 @@ public class CampaignUpgradeConsole extends JDialog {
 
         HudButton guideButton = new HudButton(text("guide.open"), false, true);
         guideButton.addActionListener(event -> openGuide());
-        JPanel guideHolder = Hud.transparentPanel(new BorderLayout());
-        guideHolder.add(guideButton, BorderLayout.NORTH);
         JPanel pathRow = new JPanel(new BorderLayout(scaleForGUI(8), 0));
         pathRow.setOpaque(false);
         pathRow.add(pathSelector, BorderLayout.CENTER);
-        pathRow.add(guideHolder, BorderLayout.EAST);
+        pathRow.add(Hud.topAligned(guideButton), BorderLayout.EAST);
 
         commandBar.add(topRow, BorderLayout.CENTER);
         commandBar.add(pathRow, BorderLayout.SOUTH);
@@ -288,11 +260,7 @@ public class CampaignUpgradeConsole extends JDialog {
     }
 
     private JPanel buildBody() {
-        JPanel body = new JPanel(new BorderLayout(0, scaleForGUI(12)));
-        body.setOpaque(true);
-        body.setBackground(GROUND);
-        body.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(16), scaleForGUI(16),
-              scaleForGUI(16)));
+        JPanel body = Hud.windowBody(new BorderLayout(0, scaleForGUI(12)));
 
         backupActions.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(8), 0, 0, 0));
         backupBanner.add(backupActions, BorderLayout.SOUTH);
@@ -368,34 +336,15 @@ public class CampaignUpgradeConsole extends JDialog {
         title.setFont(hudFont(Font.BOLD, 0.78f, 0.12f));
         step.add(leftAligned(title));
         step.add(Box.createVerticalStrut(scaleForGUI(3)));
-        step.add(leftAligned(wrapped(text(key + ".text"), TEXT_MUTED, (TEXT_WIDTH / 3) - 80)));
+        step.add(leftAligned(wrapped(text(key + ".text"), TEXT_MUTED)));
         return step;
     }
 
     private JPanel buildFooter() {
-        JPanel footer = new JPanel(new BorderLayout(scaleForGUI(16), 0));
-        footer.setOpaque(true);
-        footer.setBackground(SURFACE_DEEP);
-        footer.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(scaleForGUI(1), 0, 0, 0, BORDER),
-              BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(18), scaleForGUI(10), scaleForGUI(18))));
-
-        summary.setForeground(TEXT_MUTED);
-        summary.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
-
         quitButton.setToolTipText(text("button.quit.toolTipText"));
         quitButton.addActionListener(event -> decide(new Choice(Decision.QUIT, null)));
         primaryButton.addActionListener(event -> onPrimary());
-
-        JPanel actions = Hud.transparentPanel(null);
-        actions.setLayout(new BoxLayout(actions, BoxLayout.X_AXIS));
-        actions.add(quitButton);
-        actions.add(Box.createHorizontalStrut(scaleForGUI(8)));
-        actions.add(primaryButton);
-
-        footer.add(summary, BorderLayout.CENTER);
-        footer.add(actions, BorderLayout.EAST);
-        return footer;
+        return Hud.footer(summary, quitButton, primaryButton);
     }
 
     // endregion Layout
@@ -429,23 +378,13 @@ public class CampaignUpgradeConsole extends JDialog {
         setVisible(false);
     }
 
-    private void onWindowClosing() {
-        if (isCloseArmed) {
-            closeDisarmTimer.stop();
-            decide(new Choice(Decision.QUIT, null));
-            return;
-        }
-        isCloseArmed = true;
-        closeDisarmTimer.restart();
-        refreshFooter();
-    }
-
     private void backUp() {
         if (saveFile == null || backupState == BackupState.WORKING) {
             return;
         }
         backupState = BackupState.WORKING;
         refreshBackup();
+        refreshFooter();
         new SwingWorker<File, Void>() {
             @Override
             protected File doInBackground() throws IOException {
@@ -578,8 +517,8 @@ public class CampaignUpgradeConsole extends JDialog {
                           text("backup.none.badge"), CAUTION);
                 } else {
                     showBackupVerdict(text("backup.none.verdict"), getFormattedTextAt(RESOURCE_BUNDLE,
-                          KEY + "backup.none.reason", escape(saveFile.getName())), text("backup.none.badge"),
-                          CAUTION);
+                          KEY + "backup.none.reason", StringEscapeUtils.escapeHtml4(saveFile.getName())),
+                          text("backup.none.badge"), CAUTION);
                     HudButton backUpButton = new HudButton(text("backup.button"), true, true);
                     backUpButton.addActionListener(event -> backUp());
                     backupActions.add(backUpButton);
@@ -599,8 +538,9 @@ public class CampaignUpgradeConsole extends JDialog {
                 File file = (backupFile == null) ? new File("") : backupFile;
                 File folder = file.getAbsoluteFile().getParentFile();
                 showBackupVerdict(text("backup.done.verdict"), getFormattedTextAt(RESOURCE_BUNDLE,
-                      KEY + "backup.done.reason", escape(file.getName()),
-                      escape((folder == null) ? "" : folder.getPath())), text("backup.done.badge"), READY);
+                      KEY + "backup.done.reason", StringEscapeUtils.escapeHtml4(file.getName()),
+                      StringEscapeUtils.escapeHtml4((folder == null) ? "" : folder.getPath())),
+                      text("backup.done.badge"), READY);
                 if (Desktop.isDesktopSupported() && Desktop.getDesktop().isSupported(Desktop.Action.OPEN)) {
                     backupActions.add(Hud.link(text("backup.showFolder"), this::showBackupFolder));
                 }
@@ -618,7 +558,7 @@ public class CampaignUpgradeConsole extends JDialog {
                 backupTile.setValue(text("tile.backup.failed"), DANGER);
                 backupTile.setSub(text("tile.backup.none.sub"));
                 showBackupVerdict(text("backup.failed.verdict"), getFormattedTextAt(RESOURCE_BUNDLE,
-                      KEY + "backup.failed.reason", escape(String.valueOf(backupError))),
+                      KEY + "backup.failed.reason", StringEscapeUtils.escapeHtml4(String.valueOf(backupError))),
                       text("backup.failed.badge"), DANGER);
                 HudButton retry = new HudButton(text("backup.retry"), true, true);
                 retry.addActionListener(event -> backUp());
@@ -659,7 +599,7 @@ public class CampaignUpgradeConsole extends JDialog {
                         long followUps = changesFor(selectedPreset).stream().filter(SystemChange::hasFollowUp)
                                                .count();
                         message = getFormattedTextAt(RESOURCE_BUNDLE, KEY + "summary.preset",
-                              escape(PresetBrowser.displayTitle(selectedPreset)));
+                              StringEscapeUtils.escapeHtml4(PresetBrowser.displayTitle(selectedPreset)));
                         if (followUps > 0) {
                             message += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, KEY + "summary.preset.followUps",
                                   followUps);
@@ -679,11 +619,17 @@ public class CampaignUpgradeConsole extends JDialog {
                 default -> throw new IllegalStateException("Unexpected path: " + path);
             }
         }
-        if (backupState == BackupState.NONE || backupState == BackupState.FAILED) {
-            message += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, KEY + "summary.noBackup", hex(AMBER));
-        }
-        if (isCloseArmed) {
-            message = getFormattedTextAt(RESOURCE_BUNDLE, KEY + "summary.closeArmed", hex(DANGER));
+        switch (backupState) {
+            case NONE, FAILED -> message += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, KEY + "summary.noBackup",
+                  hex(AMBER));
+            case WORKING -> {
+                // Wait for the copy, so the save isn't changed while it is still being read
+                message += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, KEY + "summary.backupWorking", hex(AMBER));
+                isReady = false;
+            }
+            case DONE, OWN -> {
+                // Nothing to add
+            }
         }
         summary.setText("<html>" + message + "</html>");
         primaryButton.setArmed(isReady);
@@ -728,23 +674,12 @@ public class CampaignUpgradeConsole extends JDialog {
         return getTextAt(RESOURCE_BUNDLE, KEY + key);
     }
 
-    private static String escape(String text) {
-        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
-    }
-
     private static String wrapHtml(String html, int width) {
         return "<html><div style='width:" + scaleForGUI(width) + "px'>" + html + "</div></html>";
     }
 
     private static JLabel wrapped(String html, Color color) {
-        return wrapped(html, color, TEXT_WIDTH);
-    }
-
-    private static JLabel wrapped(String html, Color color, int width) {
-        JLabel label = new JLabel(wrapHtml(html, width));
-        label.setForeground(color);
-        label.setFont(hudFont(Font.PLAIN, 0.92f, 0.0f));
-        return label;
+        return Hud.wrappingHtml(html, color, hudFont(Font.PLAIN, 0.92f, 0.0f));
     }
 
     private static JLabel pageTitle(String title) {
@@ -765,7 +700,9 @@ public class CampaignUpgradeConsole extends JDialog {
     }
 
     private static JComponent pageOf(JPanel column) {
-        JPanel framed = new JPanel(new BorderLayout());
+        // Takes the viewport's width, so the text wraps instead of running off to the side
+        JPanel framed = new JScrollablePanel();
+        framed.setLayout(new BorderLayout());
         framed.setOpaque(true);
         framed.setBackground(SURFACE_DEEP);
         framed.setBorder(BorderFactory.createLineBorder(BORDER, scaleForGUI(1)));

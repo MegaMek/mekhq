@@ -36,16 +36,29 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
+import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Path;
 import java.util.List;
 
 import mekhq.CampaignPreset;
 import mekhq.MHQConstants;
+import mekhq.campaign.personnel.ranks.Ranks;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.io.TempDir;
 
 class PresetBrowserTest {
+    @BeforeAll
+    static void loadRankSystems() {
+        // Full presets carry a rank system, which can only be read once the rank systems are loaded
+        Ranks.initializeRankSystems();
+    }
+
     private static CampaignPreset titled(String title) {
         CampaignPreset preset = new CampaignPreset();
         preset.setTitle(title);
@@ -80,8 +93,12 @@ class PresetBrowserTest {
     void everyStockPresetHasATagAndSummary() {
         List<CampaignPreset> stock = CampaignPreset.loadCampaignPresetsFromDirectory(
               new File(MHQConstants.CAMPAIGN_PRESET_DIRECTORY));
-        assertFalse(stock.isEmpty(), "no stock presets found");
+        File[] stockFiles = new File(MHQConstants.CAMPAIGN_PRESET_DIRECTORY)
+                                  .listFiles((dir, name) -> name.endsWith(".xml"));
+        assertNotNull(stockFiles);
+        assertEquals(stockFiles.length, stock.size(), "a stock preset failed to load");
         for (CampaignPreset preset : stock) {
+            assertNotNull(preset.getPresetFile(), preset.getTitle() + " has no source file");
             assertTrue(PresetBrowser.isStockPreset(preset), preset.getTitle());
             String prefix = "PresetBrowser.preset." + PresetBrowser.presetKey(preset);
             assertTrue(isResourceKeyValid(getTextAt(PresetBrowser.RESOURCE_BUNDLE, prefix + ".tag")),
@@ -89,5 +106,19 @@ class PresetBrowserTest {
             assertTrue(isResourceKeyValid(getTextAt(PresetBrowser.RESOURCE_BUNDLE, prefix + ".sub")),
                   preset.getTitle() + " has no summary line");
         }
+    }
+
+    @Test
+    void presetsOutsideTheStockFolderAreThePlayers(@TempDir Path userFolder) throws IOException {
+        File[] stockFiles = new File(MHQConstants.CAMPAIGN_PRESET_DIRECTORY)
+                                  .listFiles((dir, name) -> name.endsWith(".xml"));
+        assertNotNull(stockFiles);
+        assertTrue(stockFiles.length > 0, "no stock presets found");
+        Path copy = Files.copy(stockFiles[0].toPath(), userFolder.resolve(stockFiles[0].getName()));
+
+        CampaignPreset preset = CampaignPreset.parseFromFile(copy.toFile());
+
+        assertNotNull(preset);
+        assertFalse(PresetBrowser.isStockPreset(preset), "a fully loaded user preset counted as stock");
     }
 }

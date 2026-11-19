@@ -48,7 +48,6 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.io.FileInputStream;
-import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -114,6 +113,7 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.campaignOptions.CampaignOptionsPresetPicker;
+import mekhq.gui.utilities.EventDispatch;
 
 public class DataLoadingDialog extends AbstractMHQDialogBasic implements PropertyChangeListener {
     private static final MMLogger LOGGER = MMLogger.create(DataLoadingDialog.class);
@@ -357,8 +357,14 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 isNewCampaign = true;
 
                 // Campaign Preset
-                final CampaignOptionsPresetPicker campaignOptionsPresetPicker =
-                      new CampaignOptionsPresetPicker(getFrame(), true);
+                // This method runs in a worker thread; build and show the picker on the EDT
+                final CampaignOptionsPresetPicker campaignOptionsPresetPicker;
+                try {
+                    campaignOptionsPresetPicker = EventDispatch.callAndWait(
+                          () -> new CampaignOptionsPresetPicker(getFrame(), true));
+                } catch (InterruptedException exception) {
+                    return null;
+                }
                 CampaignPreset preset;
                 boolean isSelect;
 
@@ -384,29 +390,19 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 CampaignOptionsDialogMode mode = isSelect ? STARTUP_ABRIDGED : STARTUP;
                 // This method runs in a worker thread, but the construction of the UI for Campaign Options must run on
-                // the EDT, so dispatch it there using invokeAndWait.
-                final boolean[] optionsCanceled = { false };
+                // the EDT. A UI-construction failure propagates through the worker so done() reports it via its
+                // ExecutionException handling, rather than returning null (which looks like a normal cancel).
+                final boolean isOptionsCanceled;
                 try {
-                    SwingUtilities.invokeAndWait(
-                          () -> optionsCanceled[0] = showStartupCampaignOptionsDialog(campaign, preset, mode));
+                    isOptionsCanceled = EventDispatch.callAndWait(
+                          () -> showStartupCampaignOptionsDialog(campaign, preset, mode));
                 } catch (InterruptedException exception) {
-                    Thread.currentThread().interrupt();
                     return null;
-                } catch (InvocationTargetException exception) {
-                    // Let a genuine UI-construction failure propagate through the worker so done() reports it via its
-                    // ExecutionException handling, rather than returning null (which looks like a normal cancel and
-                    // silently hides the error). The Runnable can only fail with an unchecked throwable, so unwrap the
-                    // cause to keep done()'s per-type error dialogs working.
+                } catch (RuntimeException | Error exception) {
                     LOGGER.error("Failed to display the Campaign Options dialog", exception);
-                    if (exception.getCause() instanceof RuntimeException runtimeException) {
-                        throw runtimeException;
-                    }
-                    if (exception.getCause() instanceof Error error) {
-                        throw error;
-                    }
                     throw exception;
                 }
-                if (optionsCanceled[0]) {
+                if (isOptionsCanceled) {
                     return null;
                 }
 
@@ -578,7 +574,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          * Builds and shows the modal Campaign Options dialog for a brand-new campaign, then reports whether the user
          * canceled it.
          *
-         * <p>Must run on the Event Dispatch Thread (it is invoked through {@link SwingUtilities#invokeAndWait} from
+         * <p>Must run on the Event Dispatch Thread (it is invoked through {@link EventDispatch#callAndWait} from
          * the worker thread) because it constructs the dialog's entire Swing component tree.</p>
          *
          * @param campaign the new campaign being configured

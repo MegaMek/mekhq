@@ -40,9 +40,10 @@ import java.util.function.Predicate;
  * Works out which of the campaign's major systems switch on or off when one set of campaign options replaces another,
  * and which of those switches open a follow-up dialog afterward.
  *
- * <p>The systems are the ones {@link CampaignOptionsFreebieTracker} records, because those are the switches that
- * {@code CampaignOptionsPane.triggerUpgradeFreebies} reacts to. The follow-up rules here mirror that method, so the
- * campaign upgrade console can warn the player about each dialog before it appears.</p>
+ * <p>The systems are the ones {@link CampaignOptionsFreebieTracker} records. {@code
+ * CampaignOptionsPane.triggerUpgradeFreebies} reacts to exactly this list, in this order, so the campaign upgrade
+ * console can warn the player about each follow-up dialog before it appears. Keep each system's {@link FollowUp} in
+ * step with what that method does for it.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -67,8 +68,8 @@ public final class CampaignOptionsSystemChanges {
         FACTION_STANDING(CampaignOptionsFreebieTracker::trackFactionStanding, FollowUp.ALWAYS),
         VETERANCY_AWARDS(CampaignOptionsFreebieTracker::awardVeterancySPAs, FollowUp.WHEN_TURNED_ON),
         SUPPORT_TEAMS(CampaignOptionsFreebieTracker::useSupportTeams, FollowUp.WHEN_TURNED_ON),
-        PRISONERS(CampaignOptionsFreebieTracker::trackPrisoners, FollowUp.WHEN_TURNED_ON),
         MASH_THEATRES(CampaignOptionsFreebieTracker::useMASHTheatres, FollowUp.WHEN_TURNED_ON),
+        PRISONERS(CampaignOptionsFreebieTracker::trackPrisoners, FollowUp.WHEN_TURNED_ON),
         FATIGUE(CampaignOptionsFreebieTracker::useFatigue, FollowUp.WHEN_TURNED_ON),
         SALVAGE_OPERATIONS(CampaignOptionsFreebieTracker::useAdvancedSalvage, FollowUp.WHEN_TURNED_ON),
         STRATCON(CampaignOptionsFreebieTracker::useStratCon, FollowUp.WHEN_TURNED_ON),

@@ -36,11 +36,8 @@ import static mekhq.gui.campaignOptions.CampaignOptionsPane.triggerUpgradeFreebi
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
-import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Supplier;
 import javax.swing.SwingUtilities;
 
 import jakarta.annotation.Nullable;
@@ -57,6 +54,7 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.dialog.CampaignUpgradeConsole.Choice;
+import mekhq.gui.utilities.EventDispatch;
 
 /**
  * Upgrades a {@link Campaign} that was saved in an older release.
@@ -98,16 +96,38 @@ public class CampaignUpgradeDialog {
             return;
         }
 
-        CampaignUpgradeConsole console = onEventDispatchThread(
+        try {
+            if (!runUpgradeConsole(app, campaign, presets, saveFile)) {
+                return;
+            }
+        } catch (InterruptedException exception) {
+            throw new IllegalStateException("Interrupted while waiting for the upgrade console", exception);
+        }
+
+        SwingUtilities.invokeLater(() -> campaign.addReport(DailyReportType.GENERAL,
+              getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.upgrading",
+                    MHQConstants.VERSION.toString())));
+    }
+
+    /**
+     * Shows the upgrade console until the player's choice has been applied.
+     *
+     * @return {@code true} if the campaign was upgraded; {@code false} if the player quit and MekHQ is closing
+     *
+     * @throws InterruptedException if the loader thread is interrupted while the console is open
+     */
+    private static boolean runUpgradeConsole(MekHQ app, Campaign campaign, List<CampaignPreset> presets,
+          @Nullable File saveFile) throws InterruptedException {
+        CampaignUpgradeConsole console = EventDispatch.callAndWait(
               () -> new CampaignUpgradeConsole(campaign, presets, saveFile));
         try {
             while (true) {
-                Choice choice = onEventDispatchThread(console::showAndWait);
+                Choice choice = EventDispatch.callAndWait(console::showAndWait);
                 switch (choice.decision()) {
                     case QUIT -> {
                         LOGGER.info("Player quit instead of upgrading {}", campaign.getPlayerForce().getName());
                         exitApp(app);
-                        return;
+                        return false;
                     }
                     case APPLY_PRESET -> {
                         if (choice.preset() == null) {
@@ -118,7 +138,7 @@ public class CampaignUpgradeDialog {
                     }
                     case KEEP_SETTINGS -> LOGGER.info("Keeping the current settings during upgrade process");
                     case REVIEW_BY_HAND -> {
-                        boolean isCanceled = onEventDispatchThread(() -> {
+                        boolean isCanceled = EventDispatch.callAndWait(() -> {
                             CampaignOptionsDialog optionsDialog = CampaignOptionsDialog.create(null, campaign, null,
                                   CampaignOptionsDialogMode.NORMAL);
                             optionsDialog.setVisible(true);
@@ -129,15 +149,11 @@ public class CampaignUpgradeDialog {
                         }
                     }
                 }
-                break;
+                return true;
             }
         } finally {
             SwingUtilities.invokeLater(console::dispose);
         }
-
-        SwingUtilities.invokeLater(() -> campaign.addReport(DailyReportType.GENERAL,
-              getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.upgrading",
-                    MHQConstants.VERSION.toString())));
     }
 
     /**
@@ -211,30 +227,6 @@ public class CampaignUpgradeDialog {
             LOGGER.info("Applying '{}' during upgrade process", chosenPreset.getTitle());
             MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
         });
-    }
-
-    /**
-     * Runs a task on the Event Dispatch Thread and waits for its result. Runs it directly if already on that thread.
-     *
-     * @param task the task
-     * @param <T>  the result type
-     *
-     * @return the task's result
-     */
-    private static <T> T onEventDispatchThread(Supplier<T> task) {
-        if (SwingUtilities.isEventDispatchThread()) {
-            return task.get();
-        }
-        AtomicReference<T> result = new AtomicReference<>();
-        try {
-            SwingUtilities.invokeAndWait(() -> result.set(task.get()));
-        } catch (InterruptedException exception) {
-            Thread.currentThread().interrupt();
-            throw new IllegalStateException("Interrupted while waiting for the upgrade console", exception);
-        } catch (InvocationTargetException exception) {
-            throw new IllegalStateException("The upgrade console failed", exception.getCause());
-        }
-        return result.get();
     }
 
     /**

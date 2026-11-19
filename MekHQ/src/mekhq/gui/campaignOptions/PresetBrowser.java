@@ -61,6 +61,7 @@ import jakarta.annotation.Nullable;
 import mekhq.CampaignPreset;
 import mekhq.MHQConstants;
 import mekhq.campaign.campaignOptions.CampaignOptionsSystemChanges.TrackedSystem;
+import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudCard;
 import mekhq.gui.baseComponents.hud.HudCard.Tag;
@@ -128,7 +129,7 @@ public class PresetBrowser extends JPanel {
         this.onActivate = onActivate;
         this.extraDetail = extraDetail;
 
-        JPanel list = new WidthTrackingPanel();
+        JPanel list = new JScrollablePanel();
         list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
         list.setOpaque(true);
         list.setBackground(SURFACE_DEEP);
@@ -311,7 +312,7 @@ public class PresetBrowser extends JPanel {
     }
 
     private JComponent buildDetailBody(CampaignPreset preset) {
-        JPanel column = new WidthTrackingPanel();
+        JPanel column = new JScrollablePanel();
         column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
         column.setOpaque(true);
         column.setBackground(SURFACE_DEEP);
@@ -522,33 +523,5 @@ public class PresetBrowser extends JPanel {
 
     private static String text(String key) {
         return getTextAt(RESOURCE_BUNDLE, KEY + key);
-    }
-
-    /** A panel that takes the width of the scroll pane it sits in, so wrapped text never scrolls sideways. */
-    private static final class WidthTrackingPanel extends JPanel implements Scrollable {
-        @Override
-        public Dimension getPreferredScrollableViewportSize() {
-            return getPreferredSize();
-        }
-
-        @Override
-        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return scaleForGUI(16);
-        }
-
-        @Override
-        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return visibleRect.height;
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportWidth() {
-            return true;
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportHeight() {
-            return false;
-        }
     }
 }
