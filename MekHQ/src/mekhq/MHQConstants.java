@@ -261,7 +261,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final String INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH = "individualRankSystemDirectoryPath";
     public static final String UNIT_SPRITE_EXPORT_DIRECTORY_PATH = "unitSpriteExportDirectoryPath";
     public static final String LAYERED_FORCE_ICON_DIRECTORY_PATH = "layeredFormationIconDirectoryPath";
-    public static final String LAUNCHER_NEW_PLAYER_QUICKSTART_PATH = "campaigns/The Learning Ropes.cpnx.gz";
     // endregion File Paths
 
     // region Nag Tab

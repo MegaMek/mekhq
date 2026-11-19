@@ -60,6 +60,7 @@ import megamek.common.preference.PreferenceManager;
 import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
 import mekhq.campaign.campaignOptions.CampaignOptionsUnmarshaller;
@@ -306,6 +307,76 @@ public class CampaignPreset {
     }
     // endregion Continuous
     // endregion Getters/Setters
+
+    /**
+     * Applies this preset's continuous options to a campaign without going through Campaign Options: the campaign and
+     * MegaMek options, random skill preferences, skill costs and milestones, and special abilities. Startup values
+     * (date, faction, planet, rank system) are left to the caller, since only a new campaign takes them.
+     *
+     * <p>Any section the preset does not carry is skipped rather than overwriting the campaign's with {@code null}
+     * (issue #8945).</p>
+     *
+     * <p>Fires no events and shows nothing, so it is safe to call off the Event Dispatch Thread.</p>
+     *
+     * @param campaign the campaign to apply the preset to
+     */
+    public void applyContinuousOptions(final Campaign campaign) {
+        if (campaignOptions != null) {
+            campaign.setCampaignOptions(campaignOptions);
+        }
+        if (gameOptions != null) {
+            campaign.setGameOptions(gameOptions);
+        }
+        if (randomSkillPreferences != null) {
+            campaign.setRandomSkillPreferences(randomSkillPreferences);
+        }
+
+        // Keep the MegaMek options that mirror campaign options (armor kits, edge, tech level, ...) in step
+        final CampaignOptions appliedOptions = campaign.getCampaignOptions();
+        appliedOptions.updateGameOptionsFromCampaignOptions(campaign.getGameOptions());
+        appliedOptions.applyGlobalSettings();
+        campaign.resetRandomDeath();
+
+        applySkills();
+        SpecialAbility.replaceSpecialAbilities(specialAbilities);
+    }
+
+    /**
+     * Copies this preset's skill target numbers, costs, and milestones onto the global {@link SkillType} definitions.
+     * Skills the preset does not know (or that no longer exist) are left as they are.
+     */
+    private void applySkills() {
+        for (final String skillName : SkillType.getSkillList()) {
+            final SkillType storedType = SkillType.getType(skillName);
+            final SkillType presetType = skills.get(skillName);
+
+            if ((storedType == null) || (presetType == null)) {
+                LOGGER.info("Skipping outdated or missing skill: {}", skillName);
+                continue;
+            }
+
+            storedType.setTarget(presetType.getTarget());
+
+            final int size = storedType.getCosts().length;
+            final Integer[] presetCosts = presetType.getCosts();
+            for (int level = 0; level < size; level++) {
+                try {
+                    SkillType.setCost(skillName, presetCosts[level], level);
+                } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+                    LOGGER.info("Skipping outdated or missing skill level: {}", skillName);
+                }
+            }
+
+            storedType.setNaturalAptitudeCost(presetType.getNaturalAptitudeCost());
+
+            storedType.setGreenLevel(presetType.getGreenLevel());
+            storedType.setRegularLevel(presetType.getRegularLevel());
+            storedType.setVeteranLevel(presetType.getVeteranLevel());
+            storedType.setEliteLevel(presetType.getEliteLevel());
+            storedType.setHeroicLevel(presetType.getHeroicLevel());
+            storedType.setLegendaryLevel(presetType.getLegendaryLevel());
+        }
+    }
 
     /**
      * Returns the directory where user-created campaign presets should be saved. If a custom user directory is
