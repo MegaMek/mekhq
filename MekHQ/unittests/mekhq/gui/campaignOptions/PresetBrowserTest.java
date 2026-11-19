@@ -85,7 +85,7 @@ class PresetBrowserTest {
         String longText = "A".repeat(200) + ". Second.";
         String sentence = PresetBrowser.firstSentence(longText);
         assertTrue(sentence.length() <= 80);
-        assertTrue(sentence.endsWith("…"));
+        assertTrue(sentence.endsWith("\u2026"));
         assertEquals("", PresetBrowser.firstSentence(null));
     }
 

@@ -484,7 +484,7 @@ public class CampaignUpgradeConsole extends JDialog {
         row.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
               BorderFactory.createEmptyBorder(scaleForGUI(6), scaleForGUI(10), scaleForGUI(6), scaleForGUI(10))));
-        JLabel symbol = new JLabel(change.isNowOn() ? "+" : "−", SwingConstants.CENTER);
+        JLabel symbol = new JLabel(change.isNowOn() ? "+" : "-", SwingConstants.CENTER);
         symbol.setForeground(change.isNowOn() ? READY : TEXT_FAINT);
         symbol.setFont(hudFont(Font.BOLD, 1.1f, 0.0f));
         symbol.setPreferredSize(scaleForGUI(16, 16));
@@ -596,8 +596,12 @@ public class CampaignUpgradeConsole extends JDialog {
                         primaryButton.setText(text("button.choose"));
                         isReady = false;
                     } else {
-                        long followUps = changesFor(selectedPreset).stream().filter(SystemChange::hasFollowUp)
-                                               .count();
+                        int followUps = 0;
+                        for (SystemChange change : changesFor(selectedPreset)) {
+                            if (change.hasFollowUp()) {
+                                followUps++;
+                            }
+                        }
                         message = getFormattedTextAt(RESOURCE_BUNDLE, KEY + "summary.preset",
                               StringEscapeUtils.escapeHtml4(PresetBrowser.displayTitle(selectedPreset)));
                         if (followUps > 0) {
