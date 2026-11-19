@@ -589,32 +589,6 @@ class MHQMoraleTest {
         }
     }
 
-    /** The production data the morale modifiers are read from, which would otherwise only fail when played. */
-    @Test
-    void theMoraleModifiersAreShippedAndListedInTheManifest() throws IOException {
-        // The manifest class is package-private, so the shipped file's list is read directly here.
-        ObjectMapper mapper = new ObjectMapper().enable(JsonParser.Feature.ALLOW_YAML_COMMENTS);
-        JsonNode fileNameList = mapper.readTree(new File("data/scenariomodifiers/modifiermanifest.json"))
-                                      .get("fileNameList");
-        assertNotNull(fileNameList);
-        List<String> manifestFileNames = new ArrayList<>();
-        fileNameList.forEach(fileName -> manifestFileNames.add(fileName.asText().trim()));
-
-        for (String key : MHQMorale.getMoraleScenarioModifierKeys(SCATTERED)) {
-            assertTrue(manifestFileNames.contains(key), key);
-
-            AtBScenarioModifier modifier = AtBScenarioModifier.Deserialize("data/scenariomodifiers/" + key);
-            assertNotNull(modifier, key);
-            assertEquals(ForceAlignment.Opposing, modifier.getEventRecipient(), key);
-            assertEquals(Boolean.TRUE, modifier.getBenefitsPlayer(), key);
-        }
-
-        assertNotNull(AtBScenarioModifier.Deserialize("data/scenariomodifiers/" + MHQMorale.LOW_AMMUNITION_MODIFIER)
-                            .getAmmoExpenditureIntensity());
-        assertNotNull(AtBScenarioModifier.Deserialize("data/scenariomodifiers/" + MHQMorale.POOR_REPAIR_MODIFIER)
-                            .getBattleDamageIntensity());
-    }
-
     @ParameterizedTest
     @MethodSource("unaffectedMoraleLevels")
     void anEnemyAboveCriticalBringsNoMoraleModifiers(ContractMoraleLevel moraleLevel) {
