@@ -54,7 +54,6 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.concurrent.CancellationException;
-import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutionException;
 import java.util.function.Consumer;
 import javax.swing.JDialog;
@@ -507,7 +506,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // This needs to be the final stage in Progress 7 as otherwise the display of any confirmation
                 // dialogs will get 'stuck' behind other dialogs
                 if (isUpgradePromptRequired(campaignVersion, MHQConstants.VERSION)) {
-                    handleCampaignUpgrading(application, campaign);
+                    handleCampaignUpgrading(application, campaign, getCampaignFile());
                 }
                 // endregion Progress 7
             }
@@ -532,25 +531,23 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
         /**
          * Handles the upgrade process for a campaign in a thread-safe and blocking manner.
          *
-         * <p>This method initiates the campaign upgrade dialog for the specified {@link Campaign}. While the upgrade
-         * is in progress, the method blocks further execution by using a {@link CountDownLatch}. This ensures that
-         * campaign loading or other interactions do not proceed while the campaign data may be in an inconsistent,
-         * mid-upgrade state, which can prevent a variety of random and challenging-to-debug errors.</p>
-         *
-         * <p>Once the upgrade dialog completes, the provided callback triggers an {@link OptionsChangedEvent}
-         * and signals the latch, allowing the method to return.</p>
+         * <p>This method shows the campaign upgrade console for the specified {@link Campaign} and blocks until the
+         * player's choice has been applied. This ensures that campaign loading or other interactions do not proceed
+         * while the campaign data may be in an inconsistent, mid-upgrade state, which can prevent a variety of random
+         * and challenging-to-debug errors.</p>
          *
          * <p><b>Note:</b> This method should not be called from the Event Dispatch Thread (EDT), as it will block
          * the thread until the upgrade is finished.</p>
          *
          * @param app      the application context
          * @param campaign the {@link Campaign} instance to be upgraded
+         * @param saveFile the save the campaign was loaded from, offered to the player for backup; may be {@code null}
          *
          * @author Illiani
          * @since 0.50.07
          */
-        private static void handleCampaignUpgrading(MekHQ app, Campaign campaign) {
-            CampaignUpgradeDialog.campaignUpgradeDialog(app, campaign);
+        private static void handleCampaignUpgrading(MekHQ app, Campaign campaign, @Nullable File saveFile) {
+            CampaignUpgradeDialog.campaignUpgradeDialog(app, campaign, saveFile);
         }
 
         /**

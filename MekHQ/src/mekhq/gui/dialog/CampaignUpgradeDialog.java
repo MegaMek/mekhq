@@ -32,25 +32,18 @@
  */
 package mekhq.gui.dialog;
 
-import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsPane.triggerUpgradeFreebies;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
-import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
-import java.awt.Component;
+import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.util.List;
 import java.util.Map;
-import javax.swing.DefaultListCellRenderer;
-import javax.swing.DefaultListModel;
-import javax.swing.JLabel;
-import javax.swing.JList;
-import javax.swing.JPanel;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Supplier;
 import javax.swing.SwingUtilities;
-import javax.swing.SwingWorker;
 
 import jakarta.annotation.Nullable;
-import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.MHQConstants;
@@ -61,181 +54,85 @@ import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogCore;
-import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogWidth;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
+import mekhq.gui.dialog.CampaignUpgradeConsole.Choice;
 
 /**
- * Provides a user interface dialog for upgrading a {@link Campaign} across versions.
+ * Upgrades a {@link Campaign} that was saved in an older release.
  *
- * <p>The {@link CampaignUpgradeDialog} guides the user through upgrading their campaign via interactive dialogs. The
- * dialog offers several options, such as selecting a predefined campaign preset, customizing options before upgrade, or
- * canceling the process. It manages all aspects of the dialog flow, including preset selection, application of
- * settings, handling user cancellation, and displaying a loading indicator during long-running operations.</p>
- *
- * <p><b>Functionality</b></p>
- * <ul>
- *   <li>Lists available campaign presets for upgrade and allows user selection.</li>
- *   <li>Supports campaign customization via a manual campaign options dialog.</li>
- *   <li>Performs the upgrade operation in a background thread, showing a loading UI to the user.</li>
- *   <li>Handles error cases, such as missing presets or failed upgrades, with proper messaging and application exit
- *   handling.</li>
- * </ul>
+ * <p>The player makes their choice in the {@link CampaignUpgradeConsole}: apply a preset, keep their current settings,
+ * or review everything in Campaign Options. This class acts on that choice. Canceling Campaign Options returns the
+ * player to the console; only an explicit, confirmed quit closes MekHQ, which leaves the save untouched.</p>
  *
  * <p><b>Thread Safety</b></p>
- * <p>This class encapsulates all user interactions on the Event Dispatch Thread and handles background work using
- * {@link SwingWorker}.</p>
+ * <p>Called from the campaign loader's worker thread, which this blocks until the upgrade is finished so the campaign
+ * is never used mid-upgrade. Every window is built and shown on the Event Dispatch Thread.</p>
  *
  * @author Illiani
  * @since 0.50.07
  */
 public class CampaignUpgradeDialog {
     private static final MMLogger LOGGER = MMLogger.create(CampaignUpgradeDialog.class);
-    private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignUpgradeDialog";
+    private static final String RESOURCE_BUNDLE = CampaignUpgradeConsole.RESOURCE_BUNDLE;
 
-    private static final List<ImmersiveDialogCore.ButtonLabelTooltipPair> BUTTONS = List.of(
-          new ImmersiveDialogCore.ButtonLabelTooltipPair(getTextAt(RESOURCE_BUNDLE,
-                "CampaignUpgradeDialog.button.cancel"), null),
-          new ImmersiveDialogCore.ButtonLabelTooltipPair(getTextAt(RESOURCE_BUNDLE,
-                "CampaignUpgradeDialog.button.confirm"), null),
-          new ImmersiveDialogCore.ButtonLabelTooltipPair(getTextAt(RESOURCE_BUNDLE,
-                "CampaignUpgradeDialog.button.manual"), null));
-
-    public static final int PRESET_SELECTION_CANCELLED = 0;
-    public static final int PRESET_SELECTION_SELECT = 1;
-    public static final int PRESET_SELECTION_CUSTOMIZE = 2;
-
-    private static final List<CampaignPreset> presets = CampaignPreset.getCampaignPresets();
+    private CampaignUpgradeDialog() {}
 
     /**
-     * Shows and manages the campaign upgrade dialog for the given campaign.
+     * Shows the upgrade console for the given campaign and applies the player's choice.
      *
-     * <p>The dialog displays available presets and options for customizing or canceling. On selection, it applies
-     * the chosen preset, optionally runs a completion callback, or allows further customization via a campaign options
-     * dialog.</p>
-     *
-     * @param app      The application context
-     * @param campaign The campaign being upgraded; must not be {@code null}.
+     * @param app      the application context
+     * @param campaign the campaign being upgraded; must not be {@code null}
+     * @param saveFile the save the campaign was loaded from, offered for backup; {@code null} if unknown
      *
      * @author Illiani
      * @since 0.50.07
      */
-    public static void campaignUpgradeDialog(MekHQ app, Campaign campaign) {
-        JPanel supplementalPanel = createSupplementalPanel();
+    public static void campaignUpgradeDialog(MekHQ app, Campaign campaign, @Nullable File saveFile) {
+        List<CampaignPreset> presets = CampaignPreset.getCampaignPresets();
 
-        // This will occur if there are no presets available. This should never occur under normal circumstances as
-        // MekHQ always ships with a battery of presets.
-        if (supplementalPanel == null) {
+        // This should never happen under normal circumstances, as MekHQ always ships with a battery of presets.
+        if (presets.isEmpty()) {
+            LOGGER.errorDialog("Error", "No campaign presets found");
             exitApp(app);
             return;
         }
 
-        ImmersiveDialogCore upgradeDialog = new ImmersiveDialogCore(campaign,
-                campaign.getPlayerForce().getHumanResources()
-                      .getSeniorAdminPerson(campaign.getCampaignOptions(),
-                                campaign.getPlayerForce().isClanForce(),
-                                campaign.getLocalDate()),
-              null,
-              getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.inCharacter", campaign.getCommanderAddress()),
-              BUTTONS,
-              getFormattedTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.outOfCharacter"),
-              ImmersiveDialogWidth.LARGE.getWidth(),
-              false,
-              supplementalPanel,
-              null,
-              true);
-
-        int dialogChoiceIndex = upgradeDialog.getDialogChoice();
-        int comboChoiceIndex = upgradeDialog.getComboBoxChoiceIndex();
-
-        switch (dialogChoiceIndex) {
-            case PRESET_SELECTION_CANCELLED -> exitApp(app);
-            case PRESET_SELECTION_SELECT -> {
-                if (comboChoiceIndex < 0 || comboChoiceIndex >= presets.size()) {
-                    LOGGER.errorDialog("Error",
-                          "Invalid campaign preset index {}. Please report to the MekHQ team",
-                          comboChoiceIndex);
-                    exitApp(app);
-                    // This is wholly unnecessary as the app will have already been closed.
-                    // We include it because otherwise the IDE complains.
-                    return;
-                }
-
-                CampaignPreset chosenPreset = presets.get(comboChoiceIndex);
-
-                // This needs to be before we start changing options
-                CampaignOptionsFreebieTracker oldOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
-
-                // Preset getters are @Nullable; skip any section the preset does not provide so we
-                // do not overwrite the campaign's existing options with null (issue #8945).
-                if (chosenPreset.getCampaignOptions() != null) {
-                    campaign.setCampaignOptions(chosenPreset.getCampaignOptions());
-                }
-                if (chosenPreset.getGameOptions() != null) {
-                    campaign.setGameOptions(chosenPreset.getGameOptions());
-                }
-                if (chosenPreset.getRandomSkillPreferences() != null) {
-                    campaign.setRandomSkillPreferences(chosenPreset.getRandomSkillPreferences());
-                }
-
-                // Keep the MegaMek options that mirror campaign options (armor kits, edge, tech level, ...) in step
-                campaign.getCampaignOptions().updateGameOptionsFromCampaignOptions(campaign.getGameOptions());
-
-                Map<String, SkillType> presetSkills = chosenPreset.getSkills();
-                for (final String skillName : SkillType.getSkillList()) {
-                    SkillType storedType = SkillType.getType(skillName);
-                    SkillType presetType = presetSkills.get(skillName);
-
-                    if (storedType == null || presetType == null) {
-                        LOGGER.info("Skipping outdated or missing skill: {}", skillName);
-                        continue;
+        CampaignUpgradeConsole console = onEventDispatchThread(
+              () -> new CampaignUpgradeConsole(campaign, presets, saveFile));
+        try {
+            while (true) {
+                Choice choice = onEventDispatchThread(console::showAndWait);
+                switch (choice.decision()) {
+                    case QUIT -> {
+                        LOGGER.info("Player quit instead of upgrading {}", campaign.getPlayerForce().getName());
+                        exitApp(app);
+                        return;
                     }
-
-                    // Update Target Number
-                    storedType.setTarget(presetType.getTarget());
-
-                    // Update Skill Costs
-                    int size = storedType.getCosts().length;
-                    Integer[] presetCosts = presetType.getCosts();
-                    for (int level = 0; level < size; level++) {
-                        try {
-                            int cost = presetCosts[level];
-                            SkillType.setCost(skillName, cost, level);
-                        } catch (IllegalArgumentException e) {
-                            LOGGER.info("Skipping outdated or missing skill level: {}", skillName);
+                    case APPLY_PRESET -> {
+                        if (choice.preset() == null) {
+                            LOGGER.error("No preset chosen; returning to the upgrade console");
+                            continue;
+                        }
+                        applyPreset(campaign, choice.preset());
+                    }
+                    case KEEP_SETTINGS -> LOGGER.info("Keeping the current settings during upgrade process");
+                    case REVIEW_BY_HAND -> {
+                        boolean isCanceled = onEventDispatchThread(() -> {
+                            CampaignOptionsDialog optionsDialog = CampaignOptionsDialog.create(null, campaign, null,
+                                  CampaignOptionsDialogMode.NORMAL);
+                            optionsDialog.setVisible(true);
+                            return optionsDialog.wasCanceled();
+                        });
+                        if (isCanceled) {
+                            continue;
                         }
                     }
-
-                    storedType.setNaturalAptitudeCost(presetType.getNaturalAptitudeCost());
-
-                    // Update Skill Milestones
-                    storedType.setGreenLevel(presetType.getGreenLevel());
-                    storedType.setRegularLevel(presetType.getRegularLevel());
-                    storedType.setVeteranLevel(presetType.getVeteranLevel());
-                    storedType.setEliteLevel(presetType.getEliteLevel());
-                    storedType.setHeroicLevel(presetType.getHeroicLevel());
-                    storedType.setLegendaryLevel(presetType.getLegendaryLevel());
                 }
-
-                SpecialAbility.replaceSpecialAbilities(chosenPreset.getSpecialAbilities());
-
-                CampaignOptionsFreebieTracker newOptions = new CampaignOptionsFreebieTracker(chosenPreset.getCampaignOptions());
-                SwingUtilities.invokeLater(() -> {
-                    triggerUpgradeFreebies(campaign, oldOptions, newOptions, false);
-
-                    LOGGER.info("Applying '{}' during upgrade process", chosenPreset.getTitle());
-                    MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
-                });
+                break;
             }
-            case PRESET_SELECTION_CUSTOMIZE -> {
-                CampaignOptionsDialog optionsDialog = CampaignOptionsDialog.create(null, campaign, null,
-                      CampaignOptionsDialogMode.NORMAL);
-                optionsDialog.setVisible(true);
-                if (optionsDialog.wasCanceled()) {
-                    exitApp(app);
-                }
-            }
+        } finally {
+            SwingUtilities.invokeLater(console::dispose);
         }
 
         SwingUtilities.invokeLater(() -> campaign.addReport(DailyReportType.GENERAL,
@@ -244,11 +141,107 @@ public class CampaignUpgradeDialog {
     }
 
     /**
+     * Replaces the campaign's options, skills, and special abilities with a preset's, then (on the Event Dispatch
+     * Thread) runs the follow-up dialogs for any system the preset switched on.
+     *
+     * @param campaign     the campaign being upgraded
+     * @param chosenPreset the preset to apply
+     */
+    private static void applyPreset(Campaign campaign, CampaignPreset chosenPreset) {
+        // This needs to be before we start changing options
+        CampaignOptionsFreebieTracker oldOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
+
+        // Preset getters are @Nullable; skip any section the preset does not provide so we
+        // do not overwrite the campaign's existing options with null (issue #8945).
+        if (chosenPreset.getCampaignOptions() != null) {
+            campaign.setCampaignOptions(chosenPreset.getCampaignOptions());
+        }
+        if (chosenPreset.getGameOptions() != null) {
+            campaign.setGameOptions(chosenPreset.getGameOptions());
+        }
+        if (chosenPreset.getRandomSkillPreferences() != null) {
+            campaign.setRandomSkillPreferences(chosenPreset.getRandomSkillPreferences());
+        }
+
+        // Keep the MegaMek options that mirror campaign options (armor kits, edge, tech level, ...) in step
+        campaign.getCampaignOptions().updateGameOptionsFromCampaignOptions(campaign.getGameOptions());
+
+        Map<String, SkillType> presetSkills = chosenPreset.getSkills();
+        for (final String skillName : SkillType.getSkillList()) {
+            SkillType storedType = SkillType.getType(skillName);
+            SkillType presetType = presetSkills.get(skillName);
+
+            if (storedType == null || presetType == null) {
+                LOGGER.info("Skipping outdated or missing skill: {}", skillName);
+                continue;
+            }
+
+            // Update Target Number
+            storedType.setTarget(presetType.getTarget());
+
+            // Update Skill Costs
+            int size = storedType.getCosts().length;
+            Integer[] presetCosts = presetType.getCosts();
+            for (int level = 0; level < size; level++) {
+                try {
+                    int cost = presetCosts[level];
+                    SkillType.setCost(skillName, cost, level);
+                } catch (IllegalArgumentException e) {
+                    LOGGER.info("Skipping outdated or missing skill level: {}", skillName);
+                }
+            }
+
+            storedType.setNaturalAptitudeCost(presetType.getNaturalAptitudeCost());
+
+            // Update Skill Milestones
+            storedType.setGreenLevel(presetType.getGreenLevel());
+            storedType.setRegularLevel(presetType.getRegularLevel());
+            storedType.setVeteranLevel(presetType.getVeteranLevel());
+            storedType.setEliteLevel(presetType.getEliteLevel());
+            storedType.setHeroicLevel(presetType.getHeroicLevel());
+            storedType.setLegendaryLevel(presetType.getLegendaryLevel());
+        }
+
+        SpecialAbility.replaceSpecialAbilities(chosenPreset.getSpecialAbilities());
+
+        CampaignOptionsFreebieTracker newOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
+        SwingUtilities.invokeLater(() -> {
+            triggerUpgradeFreebies(campaign, oldOptions, newOptions, false);
+
+            LOGGER.info("Applying '{}' during upgrade process", chosenPreset.getTitle());
+            MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+        });
+    }
+
+    /**
+     * Runs a task on the Event Dispatch Thread and waits for its result. Runs it directly if already on that thread.
+     *
+     * @param task the task
+     * @param <T>  the result type
+     *
+     * @return the task's result
+     */
+    private static <T> T onEventDispatchThread(Supplier<T> task) {
+        if (SwingUtilities.isEventDispatchThread()) {
+            return task.get();
+        }
+        AtomicReference<T> result = new AtomicReference<>();
+        try {
+            SwingUtilities.invokeAndWait(() -> result.set(task.get()));
+        } catch (InterruptedException exception) {
+            Thread.currentThread().interrupt();
+            throw new IllegalStateException("Interrupted while waiting for the upgrade console", exception);
+        } catch (InvocationTargetException exception) {
+            throw new IllegalStateException("The upgrade console failed", exception.getCause());
+        }
+        return result.get();
+    }
+
+    /**
      * Exits the application gracefully.
      *
      * <p><b>Notes:</b> This is used to ensure that any campaign passing through the upgrader is upgraded. If the
-     * player performs an action that would result in the upgrade failing, such as canceling out of a manual Campaign
-     * Options dialog, we want the application to exit.</p>
+     * player chooses to quit instead, we want the application to exit without the campaign being opened.</p>
      *
      * @param mekHQ The instance of MekHQ to close.
      *
@@ -257,57 +250,5 @@ public class CampaignUpgradeDialog {
      */
     private static void exitApp(MekHQ mekHQ) {
         mekHQ.exit(false);
-    }
-
-    /**
-     * Creates a panel for displaying and selecting available campaign presets.
-     *
-     * <p>The panel shows a drop-down with all known campaign presets. If no presets are available, this method
-     * returns {@code null} (and an error is logged).</p>
-     *
-     * @return the supplemental panel for preset selection, or {@code null} if no presets found.
-     *
-     * @author Illiani
-     * @since 0.50.07
-     */
-    private static @Nullable JPanel createSupplementalPanel() {
-        final DefaultListModel<CampaignPreset> campaignPresets = new DefaultListModel<>();
-        campaignPresets.addAll(presets);
-
-        if (campaignPresets.isEmpty()) {
-            LOGGER.errorDialog("Error", "No campaign presets found");
-            return null;
-        }
-
-        JLabel lblPresetName = new JLabel(getTextAt(RESOURCE_BUNDLE, "CampaignUpgradeDialog.label.presetPicker"));
-        MMComboBox<CampaignPreset> comboBox = new MMComboBox<>("cboPresets", presets);
-        comboBox.setSelectedIndex(0);
-        comboBox.setRenderer(new DefaultListCellRenderer() {
-            @Override
-            public Component getListCellRendererComponent(JList<?> list,
-                  Object value,
-                  int index,
-                  boolean isSelected,
-                  boolean cellHasFocus) {
-                super.getListCellRendererComponent(list, value, index, isSelected, cellHasFocus);
-
-                if (value instanceof CampaignPreset preset) {
-                    setText(preset.getTitle());
-                    String tooltipText = preset.getDescription();
-                    setToolTipText(wordWrap(tooltipText));
-                } else {
-                    setText("-");
-                    setToolTipText(null);
-                }
-
-                return this;
-            }
-        });
-
-        JPanel panel = new JPanel();
-        panel.add(lblPresetName, BorderLayout.WEST);
-        panel.add(comboBox, BorderLayout.CENTER);
-
-        return panel;
     }
 }
