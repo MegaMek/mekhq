@@ -64,8 +64,8 @@ import org.mockito.MockedStatic;
  * (a look-and-feel rescale and a settings file written to disk). To keep this test hermetic, those two singletons are
  * mocked so no rescale or disk write happens, and the two escapee fields ({@code guiScaleValue} and {@code userDir})
  * are excluded from the mutate/verify pass because they cannot round-trip through the mocked singletons. The shared
- * section-expansion preference uses a stateful mock and participates in the round-trip. The shared preferences
- * store is snapshotted through the model itself before the test mutates it and restored afterwards.
+ * section-expansion and hide-unit-fluff-text preferences use stateful mocks and participate in the round-trip. The
+ * shared preferences store is snapshotted through the model itself before the test mutates it and restored afterwards.
  * </p>
  */
 class MHQOptionsModelTest {
@@ -84,6 +84,12 @@ class MHQOptionsModelTest {
         }).when(guiPreferences).setExpandOptionSections(org.mockito.ArgumentMatchers.anyBoolean());
         ClientPreferences clientPreferences = mock(ClientPreferences.class);
         when(clientPreferences.getUserDir()).thenReturn("test-user-dir");
+        AtomicBoolean showUnitFluffText = new AtomicBoolean(true);
+        when(clientPreferences.getShowUnitFluffText()).thenAnswer(invocation -> showUnitFluffText.get());
+        doAnswer(invocation -> {
+            showUnitFluffText.set(invocation.getArgument(0));
+            return null;
+        }).when(clientPreferences).setShowUnitFluffText(org.mockito.ArgumentMatchers.anyBoolean());
         PreferenceManager preferenceManager = mock(PreferenceManager.class);
 
         try (MockedStatic<GUIPreferences> guiStatic = mockStatic(GUIPreferences.class);

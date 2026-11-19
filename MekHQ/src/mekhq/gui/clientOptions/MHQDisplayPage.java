@@ -74,6 +74,7 @@ class MHQDisplayPage extends MHQOptionsPage {
     private JSlider guiScaleSlider;
     private SettingsCheckBox chkExpandOptionSections;
     private SettingsCheckBox chkHideUnitFluff;
+    private SettingsCheckBox chkShowUnitFluffText;
     private SettingsCheckBox chkUseAlternateStratConFogOfWar;
     private SettingsCheckBox chkHistoricalDailyLog;
     private SettingsCheckBox chkShowCommandGenerator;
@@ -185,6 +186,8 @@ class MHQDisplayPage extends MHQOptionsPage {
         panel.addRow(guiScaleLabel, guiScaleControl);
 
         chkHideUnitFluff = checkBox("optionHideUnitFluff", model.hideUnitFluff);
+        chkShowUnitFluffText = checkBox("optionShowUnitFluffText", model.showUnitFluffText,
+              getMetadata(new Version(0, 51, 1)));
         chkUseAlternateStratConFogOfWar = checkBox("optionUseAlternateStratConFogOfWar",
               model.useAlternateStratConFogOfWarDisplay, getMetadata(new Version(0, 51, 1)));
         chkHistoricalDailyLog = checkBox("optionHistoricalDailyLog", model.historicalDailyLog);
@@ -199,6 +202,7 @@ class MHQDisplayPage extends MHQOptionsPage {
               getMetadata(new Version(0, 51, 1)));
         panel.addCheckBoxGrid(2,
               chkHideUnitFluff,
+              chkShowUnitFluffText,
               chkUseAlternateStratConFogOfWar,
               chkHistoricalDailyLog,
               chkShowCommandGenerator,
@@ -452,6 +456,7 @@ class MHQDisplayPage extends MHQOptionsPage {
         model.guiScaleValue = guiScaleSlider.getValue();
         model.expandOptionSections = chkExpandOptionSections.isSelected();
         model.hideUnitFluff = chkHideUnitFluff.isSelected();
+        model.showUnitFluffText = chkShowUnitFluffText.isSelected();
         model.useAlternateStratConFogOfWarDisplay = chkUseAlternateStratConFogOfWar.isSelected();
         model.historicalDailyLog = chkHistoricalDailyLog.isSelected();
         model.showCommandGenerator = chkShowCommandGenerator.isSelected();

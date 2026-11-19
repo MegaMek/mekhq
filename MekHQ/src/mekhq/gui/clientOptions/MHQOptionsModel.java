@@ -115,6 +115,8 @@ class MHQOptionsModel {
     int guiScaleValue;
     boolean expandOptionSections;
     boolean hideUnitFluff;
+    /** MegaMek's suite-wide client setting, so one checkbox controls the fluff text in MegaMek, MegaMekLab and MekHQ. */
+    boolean showUnitFluffText;
     boolean useAlternateStratConFogOfWarDisplay;
     boolean historicalDailyLog;
     boolean showCommandGenerator;
@@ -237,6 +239,7 @@ class MHQOptionsModel {
         guiScaleValue = (int) (GUIPreferences.getInstance().getGUIScale() * 10);
         expandOptionSections = GUIPreferences.getInstance().getExpandOptionSections();
         hideUnitFluff = options.getHideUnitFluff();
+        showUnitFluffText = PreferenceManager.getClientPreferences().getShowUnitFluffText();
         useAlternateStratConFogOfWarDisplay = options.getUseAlternateStratConFogOfWarDisplay();
         historicalDailyLog = options.getHistoricalDailyLog();
         showCommandGenerator = options.getShowCommandGenerator();
@@ -438,6 +441,7 @@ class MHQOptionsModel {
             MekHQ.updateGuiScaling();
         }
         options.setHideUnitFluff(hideUnitFluff);
+        PreferenceManager.getClientPreferences().setShowUnitFluffText(showUnitFluffText);
         options.setUseAlternateStratConFogOfWarDisplay(useAlternateStratConFogOfWarDisplay);
         options.setHistoricalDailyLog(historicalDailyLog);
         options.setShowCommandGenerator(showCommandGenerator);
