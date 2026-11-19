@@ -67,6 +67,18 @@ class CampaignSaveBackupTest {
     }
 
     @Test
+    void leavesOutTheBuildExtra() {
+        Version nightly = new Version("0.50.11");
+        nightly.setExtra("nightly-abc1234");
+        assertEquals("0.50.11", CampaignSaveBackup.versionLabel(nightly));
+    }
+
+    @Test
+    void keepsThePointReleaseRevision() {
+        assertEquals("0.49.19.1", CampaignSaveBackup.versionLabel(new Version("0.49.19.1")));
+    }
+
+    @Test
     void copiesTheSaveWithoutOverwriting() throws IOException {
         Path save = folder.resolve("Lancers.cpnx.gz");
         byte[] contents = { 1, 2, 3, 4 };

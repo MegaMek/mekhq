@@ -133,8 +133,13 @@ public class PresetBrowser extends JPanel {
         list.setLayout(new BoxLayout(list, BoxLayout.Y_AXIS));
         list.setOpaque(true);
         list.setBackground(SURFACE_DEEP);
-        addGroup(list, text("list.stock"), presets.stream().filter(PresetBrowser::isStockPreset).toList());
-        addGroup(list, text("list.yours"), presets.stream().filter(preset -> !isStockPreset(preset)).toList());
+        List<CampaignPreset> stockPresets = new ArrayList<>();
+        List<CampaignPreset> userPresets = new ArrayList<>();
+        for (CampaignPreset preset : presets) {
+            (isStockPreset(preset) ? stockPresets : userPresets).add(preset);
+        }
+        addGroup(list, text("list.stock"), stockPresets);
+        addGroup(list, text("list.yours"), userPresets);
         refreshCards(); // fill the cards so the list can be measured
 
         // The list itself is the view, so it takes the viewport's width and long rows shorten instead of spilling out

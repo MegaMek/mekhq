@@ -72,7 +72,7 @@ public final class CampaignSaveBackup {
         String name = save.getName();
         String extension = extensionOf(name);
         String base = name.substring(0, name.length() - extension.length());
-        String stem = base + " (backup from " + fromVersion + ")";
+        String stem = base + " (backup from " + versionLabel(fromVersion) + ")";
 
         File parent = save.getAbsoluteFile().getParentFile();
         File candidate = new File(parent, stem + extension);
@@ -83,6 +83,21 @@ public final class CampaignSaveBackup {
             candidate = new File(parent, stem + " " + number + extension);
         }
         return candidate;
+    }
+
+    /**
+     * Formats a version from its numbers alone. {@link Version#toString()} is not used because it appends the extra
+     * text, and a version without extra text of its own picks up the running build's branch and git hash, which would
+     * name the version being upgraded to rather than the one the save came from.
+     *
+     * @param version the version to format
+     *
+     * @return the version as {@code major.minor.patch}, plus {@code .revision} for a point release
+     */
+    static String versionLabel(Version version) {
+        String label = String.format(Locale.ROOT, "%d.%02d.%02d", version.getMajor(), version.getMinor(),
+              version.getPatch());
+        return version.hasRevision() ? label + "." + version.getRevision() : label;
     }
 
     /**
