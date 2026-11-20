@@ -73,7 +73,8 @@ class CrewAssignmentStateSkillsTest {
         when(person.getPrimaryRole()).thenReturn(primary);
         when(person.getSecondaryRole()).thenReturn(secondary);
         Map<String, SkillEntry> byName = new HashMap<>();
-        for (int index = 0; index < skills.length; index += 2) {
+
+        for (int index = 0; (index + 1) < skills.length; index += 2) {
             String name = (String) skills[index];
             int level = (Integer) skills[index + 1];
             byName.put(name, new SkillEntry(name, 10 - level, level));
