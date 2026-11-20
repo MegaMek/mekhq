@@ -16,27 +16,28 @@
 # affiliated with Microsoft.
 
 {
-  "name": "COMSTAR_SCHISM",
-  "date": "3052-09-21",
-  "notes": "Represents the date commemorating the schism within ComStar. Primus Myndo Waterly was killed June 6th 3025, a week later (June 13th) Sharilar Mori was elected as Primus. This caused Precentor Demona Aziz to head to Atreus (FWL) and kick off the ComStar Schism. It's a 100-day journey from Terra to Atreus, which is how we got this date. There is an argument to be made that Precentor Aziz probably could have traveled via command circuit or similar. I think that's very valid, however, I still went with the below date as it factors time needed to get a meeting with Thomas Marik and then to arrange the HPG message that officially starts the schism.",
-  "affectedFactionCodes": [
-    "CS"
-  ],
-  "sides": [
-    {
-      "id": "WOB",
-      "name": "Precentor Demona Aziz",
-      "role": "RELIGIOUS_LEADER",
-      "factionCode": "WOB"
-    },
-    {
-      "id": "CS",
-      "name": "Precentor Martial Anastasius Focht",
-      "role": "NOBLE",
-      "factionCode": "CS"
-    }
-  ],
-  "dissenterPreference": "CS",
-  "isViolentTransition": true,
-  "divisiveness": 0
+  "name" : "COMSTAR_SCHISM",
+  "date" : "3052-09-21",
+  "notes" : "Represents the date commemorating the schism within ComStar. Primus Myndo Waterly was killed June 6th 3025, a week later (June 13th) Sharilar Mori was elected as Primus. This caused Precentor Demona Aziz to head to Atreus (FWL) and kick off the ComStar Schism. It's a 100-day journey from Terra to Atreus, which is how we got this date. There is an argument to be made that Precentor Aziz probably could have traveled via command circuit or similar. I think that's very valid, however, I still went with the below date as it factors time needed to get a meeting with Thomas Marik and then to arrange the HPG message that officially starts the schism.",
+  "affectedFactionCodes" : [ "CS" ],
+  "sides" : [ {
+    "id" : "WOB",
+    "name" : "Precentor Demona Aziz",
+    "role" : "RELIGIOUS_LEADER",
+    "factionCode" : "WOB"
+  }, {
+    "id" : "CS",
+    "name" : "Precentor Martial Anastasius Focht",
+    "role" : "NOBLE",
+    "factionCode" : "CS"
+  } ],
+  "dissenterPreference" : "CS",
+  "isViolentTransition" : true,
+  "divisiveness" : 0,
+  "isIntroducedByThirdParty" : false,
+  "hasNoDissent" : false,
+  "offersMercenary" : true,
+  "offersPirate" : true,
+  "offersBanditCaste" : false,
+  "hasSharedResult" : false
 }

@@ -16,27 +16,33 @@
 # affiliated with Microsoft.
 
 {
-  "name": "RASALHAGUE_INDEPENDENCE",
-  "date": "3034-03-14",
-  "notes": "This is the exact day that the Free Rasalhague Republic was recognized as a legitmate state by the Draconis Combine, one day after the independence proclamation went out.",
-  "affectedFactionCodes": [
-    "DC"
-  ],
-  "sides": [
-    {
-      "id": "FRR",
-      "name": "Elected Prince Haakon Magnusson",
-      "role": "NOBLE",
-      "factionCode": "FRR"
-    },
-    {
-      "id": "DC",
-      "name": "Gunji-no-Kanrei Theodore Kurita",
-      "role": "NOBLE",
-      "factionCode": "DC"
-    }
-  ],
-  "dissenterPreference": "DC",
-  "isViolentTransition": false,
-  "divisiveness": 0
+  "name" : "RASALHAGUE_INDEPENDENCE",
+  "date" : "3034-03-14",
+  "notes" : "This is the exact day that the Free Rasalhague Republic was recognized as a legitmate state by the Draconis Combine, one day after the independence proclamation went out.",
+  "affectedFactionCodes" : [ "DC" ],
+  "sides" : [ {
+    "id" : "FRR",
+    "name" : "Elected Prince Haakon Magnusson",
+    "role" : "NOBLE",
+    "factionCode" : "FRR"
+  }, {
+    "id" : "DC",
+    "name" : "Gunji-no-Kanrei Theodore Kurita",
+    "role" : "NOBLE",
+    "factionCode" : "DC"
+  }, {
+    "id" : "RON",
+    "name" : "Warlord Marcus Kurita",
+    "role" : "NOBLE",
+    "factionCode" : "RON"
+  } ],
+  "dissenterPreference" : "DC",
+  "isViolentTransition" : false,
+  "divisiveness" : 0,
+  "isIntroducedByThirdParty" : false,
+  "hasNoDissent" : false,
+  "offersMercenary" : true,
+  "offersPirate" : true,
+  "offersBanditCaste" : false,
+  "hasSharedResult" : false
 }

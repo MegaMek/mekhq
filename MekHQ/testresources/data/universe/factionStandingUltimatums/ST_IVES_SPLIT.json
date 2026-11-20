@@ -16,27 +16,28 @@
 # affiliated with Microsoft.
 
 {
-  "name": "ST_IVES_SPLIT",
-  "date": "3030-02-19",
-  "notes": "This date represents the end of the fourth succession war and when the Federated Suns officially recognize the St. Ives Compact",
-  "affectedFactionCodes": [
-    "CC"
-  ],
-  "sides": [
-    {
-      "id": "SIC",
-      "name": "Duchess Candace Liao",
-      "role": "NOBLE",
-      "factionCode": "SIC"
-    },
-    {
-      "id": "CC",
-      "name": "Romano Liao",
-      "role": "MEKWARRIOR",
-      "factionCode": "CC"
-    }
-  ],
-  "dissenterPreference": "CC",
-  "isViolentTransition": true,
-  "divisiveness": 0
+  "name" : "ST_IVES_SPLIT",
+  "date" : "3030-02-19",
+  "notes" : "This date represents the end of the fourth succession war and when the Federated Suns officially recognize the St. Ives Compact",
+  "affectedFactionCodes" : [ "CC" ],
+  "sides" : [ {
+    "id" : "SIC",
+    "name" : "Duchess Candace Liao",
+    "role" : "NOBLE",
+    "factionCode" : "SIC"
+  }, {
+    "id" : "CC",
+    "name" : "Romano Liao",
+    "role" : "MEKWARRIOR",
+    "factionCode" : "CC"
+  } ],
+  "dissenterPreference" : "CC",
+  "isViolentTransition" : true,
+  "divisiveness" : 0,
+  "isIntroducedByThirdParty" : false,
+  "hasNoDissent" : false,
+  "offersMercenary" : true,
+  "offersPirate" : true,
+  "offersBanditCaste" : false,
+  "hasSharedResult" : false
 }

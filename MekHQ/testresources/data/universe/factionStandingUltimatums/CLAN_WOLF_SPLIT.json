@@ -16,27 +16,33 @@
 # affiliated with Microsoft.
 
 {
-  "name": "CLAN_WOLF_SPLIT",
-  "date": "3057-10-05",
-  "notes": "This is the date that Phelan Kell takes Delta Galaxy towards Arc-Royale and effective becomes Clan Wolf-In-Exile",
-  "affectedFactionCodes": [
-    "CW"
-  ],
-  "sides": [
-    {
-      "id": "CWIE",
-      "name": "Khan Phelan Kell",
-      "role": "MEKWARRIOR",
-      "factionCode": "CWIE"
-    },
-    {
-      "id": "CW",
-      "name": "Khan Vlad Ward",
-      "role": "MEKWARRIOR",
-      "factionCode": "CW"
-    }
-  ],
-  "dissenterPreference": "CW",
-  "isViolentTransition": false,
-  "divisiveness": 0
+  "name" : "CLAN_WOLF_SPLIT",
+  "date" : "3057-10-05",
+  "notes" : "This is the date that Phelan Kell takes Delta Galaxy towards Arc-Royale and effective becomes Clan Wolf-In-Exile",
+  "affectedFactionCodes" : [ "CW" ],
+  "sides" : [ {
+    "id" : "CLAN",
+    "name" : "Star Colonel Ulric Kerensky",
+    "role" : "MEKWARRIOR",
+    "factionCode" : "CLAN"
+  }, {
+    "id" : "CWIE",
+    "name" : "Khan Phelan Kell",
+    "role" : "MEKWARRIOR",
+    "factionCode" : "CWIE"
+  }, {
+    "id" : "CW",
+    "name" : "Khan Vlad Ward",
+    "role" : "MEKWARRIOR",
+    "factionCode" : "CW"
+  } ],
+  "dissenterPreference" : "CW",
+  "isViolentTransition" : false,
+  "divisiveness" : 0,
+  "isIntroducedByThirdParty" : true,
+  "hasNoDissent" : false,
+  "offersMercenary" : true,
+  "offersPirate" : false,
+  "offersBanditCaste" : true,
+  "hasSharedResult" : false
 }
