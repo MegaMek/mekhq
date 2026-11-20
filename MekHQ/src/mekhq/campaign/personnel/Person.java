@@ -1196,26 +1196,33 @@ public class Person implements ILocatable {
      */
     public ImageIcon getPortraitImageIconWithFallback(boolean useOriginFactionBackup,
           @Nullable Integer targetPixelWidth) {
-        final boolean isPortraitNull = portrait == null;
-        final String portraitFileName = isPortraitNull ? NO_PORTRAIT_NAME : portrait.getFilename();
-
-        final boolean isDefaultPortrait = isPortraitNull ||
-                                                portraitFileName.equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
-                                                portraitFileName.equalsIgnoreCase(NO_PORTRAIT_NAME);
-
-        if (isDefaultPortrait && useOriginFactionBackup) {
+        if (hasDefaultPortrait() && useOriginFactionBackup) {
             return targetPixelWidth == null ?
                          getFallbackPortrait(DEFAULT_IMAGE_WIDTH) :
                          getFallbackPortrait(targetPixelWidth);
         }
 
-        if (isPortraitNull) {
+        if (portrait == null) {
             return new ImageIcon();
         }
 
         return targetPixelWidth == null ?
                      portrait.getImageIcon(DEFAULT_IMAGE_WIDTH) :
                      portrait.getImageIcon(targetPixelWidth);
+    }
+
+    /**
+     * @return {@code true} when this person has no portrait of their own (none, or a default/placeholder one), so
+     *       {@link #getPortraitImageIconWithFallback(boolean)} would show their origin faction's logo instead
+     */
+    public boolean hasDefaultPortrait() {
+        if (portrait == null) {
+            return true;
+        }
+        String portraitFileName = portrait.getFilename();
+        return portraitFileName == null
+                     || portraitFileName.equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME)
+                     || portraitFileName.equalsIgnoreCase(NO_PORTRAIT_NAME);
     }
 
     private ImageIcon getFallbackPortrait(int targetPixelWidth) {
