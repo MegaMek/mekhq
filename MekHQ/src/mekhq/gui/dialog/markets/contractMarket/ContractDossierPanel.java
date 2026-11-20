@@ -65,6 +65,7 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudConfirmButton;
+import mekhq.gui.baseComponents.hud.HudWrappingTextLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.gui.utilities.WrapLayout;
 import mekhq.gui.view.PlanetViewPanel;
@@ -86,6 +87,10 @@ public class ContractDossierPanel extends JPanel {
     private static final String RESOURCE_BUNDLE = ChaosContractMarketDialog.RESOURCE_BUNDLE;
 
     private static final int PORTRAIT_SIZE = 48;
+    /** The narrowest the terms, intel and money columns may be; terms and money also widen to fit their rows. */
+    private static final int OVERVIEW_COLUMN_WIDTH = 260;
+    /** The narrowest the briefing (portrait and pitch) may be before the route preview moves beneath it. */
+    private static final int BRIEFING_MINIMUM_WIDTH = 380;
     private static final int COPIED_CONFIRMATION_MILLIS = 1800;
 
     private final transient Campaign campaign;
@@ -197,14 +202,15 @@ public class ContractDossierPanel extends JPanel {
     private JPanel buildIdentity() {
         JPanel identity = MarketHud.column();
 
-        JLabel eyebrow = Hud.eyebrow(joined(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.eyebrow"),
-              contract.getEmployerMarketDisplayName()));
+        // Each line wraps when the badges and buttons beside the identity leave it too little room.
+        JLabel eyebrow = HudWrappingTextLabel.copyOf(Hud.eyebrow(joined(
+              getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.eyebrow"), contract.getEmployerMarketDisplayName())));
         eyebrow.setIcon(new MarketHud.SwatchIcon(contract.getEmployerColor().getColour()));
         eyebrow.setIconTextGap(scaleForGUI(6));
         identity.add(leftAligned(eyebrow));
         identity.add(Box.createVerticalStrut(scaleForGUI(3)));
 
-        JLabel title = new JLabel(marketName(contract).toUpperCase(Locale.ROOT));
+        JLabel title = new HudWrappingTextLabel(marketName(contract).toUpperCase(Locale.ROOT));
         title.setForeground(ACCENT_BRIGHT);
         title.setFont(hudFont(Font.BOLD, 1.12f, 0.12f));
         identity.add(leftAligned(title));
@@ -221,7 +227,7 @@ public class ContractDossierPanel extends JPanel {
                          ? getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.status.transit",
                                estimate.transitDays())
                          : getTextAt(RESOURCE_BUNDLE, "value.contractMarket.noRoute"));
-        JLabel statusLabel = new JLabel(joined(status));
+        JLabel statusLabel = new HudWrappingTextLabel(joined(status));
         statusLabel.setForeground(TEXT_MUTED);
         statusLabel.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
         identity.add(leftAligned(statusLabel));
@@ -300,21 +306,27 @@ public class ContractDossierPanel extends JPanel {
 
     /**
      * The briefing first, then terms, intel and money in three columns, so the numbers that decide an offer sit
-     * together.
+     * together. When the dossier is too narrow for three, they wrap: terms and intel over money, then one above
+     * another.
      */
     private JPanel buildOverview() {
-        JPanel columns = Hud.transparentPanel(new GridLayout(1, 3, scaleForGUI(16), 0));
-        columns.add(MarketHud.topAligned(buildTerms()));
+        JPanel columns = Hud.transparentPanel(new MarketHud.ColumnWrapLayout(scaleForGUI(OVERVIEW_COLUMN_WIDTH),
+              scaleForGUI(16), scaleForGUI(14)));
+        // Terms and money are read whole, so their columns never get narrower than their rows; intel's long names
+        // (an opposition's full title, say) may be cut short, with a tooltip to read them.
+        columns.add(MarketHud.topAlignedWhole(buildTerms()));
         columns.add(MarketHud.topAligned(buildIntel()));
-        columns.add(MarketHud.topAligned(buildMoney()));
+        columns.add(MarketHud.topAlignedWhole(buildMoney()));
 
-        // The route preview sits beside the briefing, in the space the pitch leaves, rather than adding height.
-        JPanel top = Hud.transparentPanel(new BorderLayout(scaleForGUI(18), 0));
+        // The route preview sits beside the briefing, in the space the pitch leaves, rather than adding height - unless
+        // that would squeeze the pitch, when it moves beneath it.
+        JPanel top = Hud.transparentPanel(new MarketHud.SidebarWrapLayout(scaleForGUI(BRIEFING_MINIMUM_WIDTH),
+              scaleForGUI(18), scaleForGUI(12)));
         top.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
               BorderFactory.createEmptyBorder(0, 0, scaleForGUI(12), 0)));
-        top.add(buildBriefing(), BorderLayout.CENTER);
-        top.add(MarketHud.topAligned(buildRoute()), BorderLayout.EAST);
+        top.add(buildBriefing());
+        top.add(MarketHud.topAligned(buildRoute()));
 
         JPanel overview = MarketHud.column();
         overview.add(leftAligned(top));
