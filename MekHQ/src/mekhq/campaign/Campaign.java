@@ -4037,6 +4037,20 @@ public class Campaign implements ITechManager {
         this.lifePathLibrary = lifePathLibrary;
     }
 
+    /**
+     * Builds the opening {@code campaign} tag of a save, recording the version and release channel that wrote it.
+     *
+     * @param version the version writing the save
+     * @param channel the release channel of the build writing the save, or {@code null} for a development build, in
+     *                which case the {@code channel} attribute is left out
+     *
+     * @return the tag, ending in a newline
+     */
+    static String campaignOpenTag(Version version, @Nullable ReleaseChannel channel) {
+        return "<campaign version=\"" + MHQXMLUtility.escape(version.toString()) + '"'
+              + ((channel == null) ? "" : " channel=\"" + channel.getKey() + '"') + ">\n";
+    }
+
     public void writeToXML(final PrintWriter writer, boolean isBugReportPrep) {
         int indent = 0;
 
@@ -4044,9 +4058,7 @@ public class Campaign implements ITechManager {
         writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
         // Start the XML root. The release channel cannot be derived from the version, so it is saved alongside it.
-        final ReleaseChannel buildChannel = Version.getBuildChannel();
-        writer.println("<campaign version=\"" + MHQConstants.VERSION + '"'
-              + ((buildChannel == null) ? "" : " channel=\"" + buildChannel.getKey() + '"') + '>');
+        writer.print(campaignOpenTag(MHQConstants.VERSION, Version.getBuildChannel()));
         indent++;
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "pastVersions");
         for (final Version pastVersion : pastVersions) {
