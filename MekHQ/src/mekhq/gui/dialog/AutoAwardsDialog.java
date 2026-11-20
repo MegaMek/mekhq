@@ -60,6 +60,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.model.AutoAwardsTableModel;
@@ -260,32 +261,7 @@ public class AutoAwardsDialog extends JDialog {
                         Person person = campaign.getPlayerForce().getHumanResources().getPerson((UUID) data.get(rowIndex).getFirst());
                         Award award = (Award) data.get(rowIndex).get(1);
 
-                        List<Award> awardsForRemoval = new ArrayList<>();
-
-                        if ((award.canBeAwarded(person))
-                                  && (award.getItem().equalsIgnoreCase("rank"))
-                                  && (award.getRange().equalsIgnoreCase("Promotion"))) {
-                            for (Award existingAward : person.getAwardController().getAwards()) {
-                                if ((!existingAward.getItem().equalsIgnoreCase("rank"))
-                                          || (!existingAward.getRange().equalsIgnoreCase("promotion"))) {
-                                    continue;
-                                }
-
-                                awardsForRemoval.add(existingAward);
-                            }
-                        }
-
-                        if (!awardsForRemoval.isEmpty()) {
-                            for (Award awardPendingRemoval : awardsForRemoval) {
-                                person.getAwardController().removeAwardSilent(
-                                      awardPendingRemoval.getSet(),
-                                      awardPendingRemoval.getName(),
-                                      null);
-                            }
-                        }
-
-                        person.getAwardController().addAndLogAward(campaign, award.getSet(),
-                              award.getName(), campaign.getLocalDate());
+                        AutoAwardsController.issueAward(campaign, person, award);
                     }
                 }
 
@@ -331,4 +307,3 @@ public class AutoAwardsDialog extends JDialog {
         });
     }
 }
-

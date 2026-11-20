@@ -32,12 +32,23 @@
  */
 package mekhq.campaign.personnel.skills;
 
+import static megamek.common.compute.Compute.randomInt;
+import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
+import java.time.LocalDate;
 import java.util.List;
 
 import jakarta.annotation.Nullable;
+import megamek.codeUtilities.ObjectUtility;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.log.PerformanceLogger;
 import mekhq.campaign.personnel.Person;
 
 public class ScoutingSkills {
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.AdvancedScoutingCampaignOptionsChangedConfirmationDialog";
+
     /**
      * Unmodifiable list of all skill type strings considered to be scouting skills.
      */
@@ -63,5 +74,47 @@ public class ScoutingSkills {
         }
 
         return bestSkill;
+    }
+
+    /**
+     * Gives roughly a quarter of the campaign's combat personnel level 1 in a random scouting skill, skipping anyone
+     * who already has that skill at level 1 or higher. Used when Advanced Scouting is turned on.
+     *
+     * @param campaign the campaign whose personnel gain skills
+     * @param isSilent {@code true} to skip the daily report and personnel log entries
+     */
+    public static void processFreeSkills(Campaign campaign, boolean isSilent) {
+        List<Person> personnel = campaign.getPlayerForce().getHumanResources().getPersonnelFilteringOutDeparted();
+        boolean logSkillGain = campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN);
+        LocalDate today = campaign.getLocalDate();
+        for (Person person : personnel) {
+            if (!person.isCombat() || randomInt(4) != 0) {
+                continue;
+            }
+
+            String skillName = ObjectUtility.getRandomItem(SCOUTING_SKILLS);
+            int bonus = 0;
+            if (person.hasSkill(skillName)) {
+                Skill skill = person.getSkill(skillName);
+                if (person.getSkill(skillName).getLevel() >= 1) {
+                    continue;
+                }
+                bonus = skill.getBonus();
+            }
+
+            person.addSkill(skillName, 1, bonus);
+
+            if (!isSilent) {
+                PerformanceLogger.improvedSkill(logSkillGain,
+                      person,
+                      today,
+                      skillName,
+                      1);
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "improved.format",
+                      person.getHyperlinkedName(),
+                      SkillType.getType(skillName).getName()));
+            }
+            campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
+        }
     }
 }

@@ -37,7 +37,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.io.File;
 import java.util.List;
-import java.util.Map;
 import javax.swing.SwingUtilities;
 
 import jakarta.annotation.Nullable;
@@ -49,8 +48,6 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.OptionsChangedEvent;
-import mekhq.campaign.personnel.SpecialAbility;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog;
 import mekhq.gui.campaignOptions.CampaignOptionsDialog.CampaignOptionsDialogMode;
 import mekhq.gui.dialog.CampaignUpgradeConsole.Choice;
@@ -167,58 +164,7 @@ public class CampaignUpgradeDialog {
         // This needs to be before we start changing options
         CampaignOptionsFreebieTracker oldOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
 
-        // Preset getters are @Nullable; skip any section the preset does not provide so we
-        // do not overwrite the campaign's existing options with null (issue #8945).
-        if (chosenPreset.getCampaignOptions() != null) {
-            campaign.setCampaignOptions(chosenPreset.getCampaignOptions());
-        }
-        if (chosenPreset.getGameOptions() != null) {
-            campaign.setGameOptions(chosenPreset.getGameOptions());
-        }
-        if (chosenPreset.getRandomSkillPreferences() != null) {
-            campaign.setRandomSkillPreferences(chosenPreset.getRandomSkillPreferences());
-        }
-
-        // Keep the MegaMek options that mirror campaign options (armor kits, edge, tech level, ...) in step
-        campaign.getCampaignOptions().updateGameOptionsFromCampaignOptions(campaign.getGameOptions());
-
-        Map<String, SkillType> presetSkills = chosenPreset.getSkills();
-        for (final String skillName : SkillType.getSkillList()) {
-            SkillType storedType = SkillType.getType(skillName);
-            SkillType presetType = presetSkills.get(skillName);
-
-            if (storedType == null || presetType == null) {
-                LOGGER.info("Skipping outdated or missing skill: {}", skillName);
-                continue;
-            }
-
-            // Update Target Number
-            storedType.setTarget(presetType.getTarget());
-
-            // Update Skill Costs
-            int size = storedType.getCosts().length;
-            Integer[] presetCosts = presetType.getCosts();
-            for (int level = 0; level < size; level++) {
-                try {
-                    int cost = presetCosts[level];
-                    SkillType.setCost(skillName, cost, level);
-                } catch (IllegalArgumentException e) {
-                    LOGGER.info("Skipping outdated or missing skill level: {}", skillName);
-                }
-            }
-
-            storedType.setNaturalAptitudeCost(presetType.getNaturalAptitudeCost());
-
-            // Update Skill Milestones
-            storedType.setGreenLevel(presetType.getGreenLevel());
-            storedType.setRegularLevel(presetType.getRegularLevel());
-            storedType.setVeteranLevel(presetType.getVeteranLevel());
-            storedType.setEliteLevel(presetType.getEliteLevel());
-            storedType.setHeroicLevel(presetType.getHeroicLevel());
-            storedType.setLegendaryLevel(presetType.getLegendaryLevel());
-        }
-
-        SpecialAbility.replaceSpecialAbilities(chosenPreset.getSpecialAbilities());
+        chosenPreset.applyContinuousOptions(campaign);
 
         CampaignOptionsFreebieTracker newOptions = new CampaignOptionsFreebieTracker(campaign.getCampaignOptions());
         SwingUtilities.invokeLater(() -> {

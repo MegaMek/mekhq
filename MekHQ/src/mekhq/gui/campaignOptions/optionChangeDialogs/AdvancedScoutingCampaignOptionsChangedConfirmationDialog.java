@@ -35,9 +35,7 @@ package mekhq.gui.campaignOptions.optionChangeDialogs;
 import static java.lang.Integer.MAX_VALUE;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static megamek.common.compute.Compute.randomInt;
 import static megamek.utilities.ImageUtilities.scaleImageIcon;
-import static mekhq.campaign.enums.DailyReportType.PERSONNEL;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getText;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -51,8 +49,6 @@ import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
-import java.time.LocalDate;
-import java.util.List;
 import javax.swing.Box;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -62,17 +58,11 @@ import javax.swing.JLabel;
 import javax.swing.JPanel;
 import javax.swing.border.EmptyBorder;
 
-import megamek.codeUtilities.ObjectUtility;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.log.PerformanceLogger;
-import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.ScoutingSkills;
-import mekhq.campaign.personnel.skills.Skill;
-import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
-import mekhq.campaign.campaignOptions.CampaignOption;
 
 public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(AdvancedScoutingCampaignOptionsChangedConfirmationDialog.class);
@@ -186,7 +176,7 @@ public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JD
         RoundedJButton btnConfirm = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "AdvancedScoutingCampaignOptionsChangedConfirmationDialog.confirm"));
         btnConfirm.addActionListener(evt -> {
-            processFreeSkills(campaign, false);
+            ScoutingSkills.processFreeSkills(campaign, false);
             dispose();
         });
 
@@ -195,40 +185,5 @@ public class AdvancedScoutingCampaignOptionsChangedConfirmationDialog extends JD
         pnlButtons.add(btnConfirm);
 
         return pnlButtons;
-    }
-
-    public static void processFreeSkills(Campaign campaign, boolean isSilent) {
-        List<Person> personnel = campaign.getPlayerForce().getHumanResources().getPersonnelFilteringOutDeparted();
-        boolean logSkillGain = campaign.getCampaignOptions().get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN);
-        LocalDate today = campaign.getLocalDate();
-        for (Person person : personnel) {
-            if (!person.isCombat() || randomInt(4) != 0) {
-                continue;
-            }
-
-            String skillName = ObjectUtility.getRandomItem(ScoutingSkills.SCOUTING_SKILLS);
-            int bonus = 0;
-            if (person.hasSkill(skillName)) {
-                Skill skill = person.getSkill(skillName);
-                if (person.getSkill(skillName).getLevel() >= 1) {
-                    continue;
-                }
-                bonus = skill.getBonus();
-            }
-
-            person.addSkill(skillName, 1, bonus);
-
-            if (!isSilent) {
-                PerformanceLogger.improvedSkill(logSkillGain,
-                      person,
-                      today,
-                      skillName,
-                      1);
-                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "improved.format",
-                      person.getHyperlinkedName(),
-                      SkillType.getType(skillName).getName()));
-            }
-            campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
-        }
     }
 }

@@ -80,6 +80,7 @@ import mekhq.MekHQ;
 import mekhq.NullEntityException;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignFactory;
+import mekhq.campaign.NewPlayerQuickstart;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OptionsChangedEvent;
@@ -125,6 +126,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     private RawImagePanel splash;
     private JProgressBar progressBar;
     private final boolean isInAppNewCampaign;
+    private final boolean isNewPlayerQuickstart;
     private final Consumer<Campaign> completionHandler;
 
     private static final LocalDate DEFAULT_START_DATE = LocalDate.of(3151, 1, 1);
@@ -139,6 +141,27 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
     public DataLoadingDialog(final JFrame frame, final MekHQ application, final @Nullable File campaignFile,
           final boolean isInAppNewCampaign, Consumer<Campaign> completionHandler) {
+        this(frame, application, campaignFile, isInAppNewCampaign, false, completionHandler);
+    }
+
+    /**
+     * Starts loading the New Player Quickstart: a new campaign set up and populated without asking the player anything.
+     * See {@link NewPlayerQuickstart}.
+     *
+     * @param frame             the frame hidden while loading
+     * @param application       the running application
+     * @param completionHandler receives the finished campaign, or {@code null} if loading failed
+     *
+     * @return the loading dialog
+     */
+    public static DataLoadingDialog newPlayerQuickstart(final JFrame frame, final MekHQ application,
+          final Consumer<Campaign> completionHandler) {
+        return new DataLoadingDialog(frame, application, null, false, true, completionHandler);
+    }
+
+    private DataLoadingDialog(final JFrame frame, final MekHQ application, final @Nullable File campaignFile,
+          final boolean isInAppNewCampaign, final boolean isNewPlayerQuickstart,
+          final Consumer<Campaign> completionHandler) {
         // Every caller hides its frame before loading, and Windows leaves windows owned by a hidden frame out of the
         // taskbar and Alt+Tab, so the loading screen has no owner and carries the MekHQ icon itself.
         super((JDialog) null, frame, false, "DataLoadingDialog", "DataLoadingDialog.title");
@@ -146,6 +169,7 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
         this.application = application;
         this.campaignFile = campaignFile;
         this.isInAppNewCampaign = isInAppNewCampaign;
+        this.isNewPlayerQuickstart = isNewPlayerQuickstart;
         this.completionHandler = completionHandler;
         this.task = new Task(this);
         getTask().addPropertyChangeListener(this);
@@ -251,9 +275,15 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                                                                 "loadingCampaign.text"));
                 break;
             case 7:
-                progressBar.setString(resources.getString((getCampaignFile() == null) ?
-                                                                "applyingNewCampaign.text" :
-                                                                "applyingLoadedCampaign.text"));
+                final String applyingKey;
+                if (isNewPlayerQuickstart) {
+                    applyingKey = "generatingNewPlayerCompany.text";
+                } else if (getCampaignFile() == null) {
+                    applyingKey = "applyingNewCampaign.text";
+                } else {
+                    applyingKey = "applyingLoadedCampaign.text";
+                }
+                progressBar.setString(resources.getString(applyingKey));
                 break;
             case 8:
                 progressBar.setString(resources.getString("performingFinalSteps.text"));
@@ -356,60 +386,11 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign = CampaignFactory.createCampaign();
                 isNewCampaign = true;
 
-                // Campaign Preset
-                // This method runs in a worker thread; build and show the picker on the EDT
-                final CampaignOptionsPresetPicker campaignOptionsPresetPicker;
-                try {
-                    campaignOptionsPresetPicker = EventDispatch.callAndWait(
-                          () -> new CampaignOptionsPresetPicker(getFrame(), true));
-                } catch (InterruptedException exception) {
+                if (isNewPlayerQuickstart) {
+                    NewPlayerQuickstart.configure(campaign);
+                    MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+                } else if (!configureNewCampaign(campaign)) {
                     return null;
-                }
-                CampaignPreset preset;
-                boolean isSelect;
-
-                if (campaignOptionsPresetPicker.wasCanceled()) {
-                    if (isInAppNewCampaign) {
-                        application.exit(false);
-                    }
-                    return null;
-                }
-
-                preset = campaignOptionsPresetPicker.getSelectedPreset();
-                isSelect = campaignOptionsPresetPicker.wasApplied();
-
-                // MegaMek Options
-                if ((preset != null) && (preset.getGameOptions() != null)) {
-                    campaign.setGameOptions(preset.getGameOptions());
-                }
-
-                // Campaign Options
-                // This needs to be before we trigger the customize preset dialog
-                campaign.setLocalDate(DEFAULT_START_DATE);
-                campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
-
-                CampaignOptionsDialogMode mode = isSelect ? STARTUP_ABRIDGED : STARTUP;
-                // This method runs in a worker thread, but the construction of the UI for Campaign Options must run on
-                // the EDT. A UI-construction failure propagates through the worker so done() reports it via its
-                // ExecutionException handling, rather than returning null (which looks like a normal cancel).
-                final boolean isOptionsCanceled;
-                try {
-                    isOptionsCanceled = EventDispatch.callAndWait(
-                          () -> showStartupCampaignOptionsDialog(campaign, preset, mode));
-                } catch (InterruptedException exception) {
-                    return null;
-                } catch (RuntimeException | Error exception) {
-                    LOGGER.error("Failed to display the Campaign Options dialog", exception);
-                    throw exception;
-                }
-                if (isOptionsCanceled) {
-                    return null;
-                }
-
-                // Starting planet: the campaign options General page resolves and sets the starting system during
-                // apply. A preset with a pinned planet overrides that choice.
-                if ((preset != null) && (preset.getPlanet() != null)) {
-                    campaign.setStartingSystem(preset.getPlanet());
                 }
 
                 // initialize reputation
@@ -461,9 +442,6 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 campaign.reloadNews();
                 campaign.readNews();
 
-                // GM Mode
-                campaign.setGMMode((preset == null) || preset.isGM());
-
                 // AtB
                 if (campaignOptions.isUseStratCon()) {
                     campaign.initAtB(true);
@@ -471,6 +449,12 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 // Turnover
                 campaign.initTurnover();
+
+                if (isNewPlayerQuickstart) {
+                    // The mercenary organization's welcome is a dialog over the campaign window, so it waits until
+                    // the campaign is open; see NewPlayerQuickstart#welcome
+                    NewPlayerQuickstart.generateCommand(campaign, null);
+                }
                 // endregion Progress 7
             } else {
                 // region progress 6
@@ -522,6 +506,76 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
             // endregion Progress 8
 
             return campaign;
+        }
+
+        /**
+         * Lets the player set up a new campaign: pick a preset, then review it in Campaign Options. Runs on the worker
+         * thread, showing each dialog on the Event Dispatch Thread.
+         *
+         * @param campaign the new campaign to set up
+         *
+         * @return {@code true} once the campaign is set up, or {@code false} if the player canceled
+         */
+        private boolean configureNewCampaign(final Campaign campaign) {
+            // Campaign Preset
+            // This method runs in a worker thread; build and show the picker on the EDT
+            final CampaignOptionsPresetPicker campaignOptionsPresetPicker;
+            try {
+                campaignOptionsPresetPicker = EventDispatch.callAndWait(
+                      () -> new CampaignOptionsPresetPicker(getFrame(), true));
+            } catch (InterruptedException exception) {
+                return false;
+            }
+            CampaignPreset preset;
+            boolean isSelect;
+
+            if (campaignOptionsPresetPicker.wasCanceled()) {
+                if (isInAppNewCampaign) {
+                    application.exit(false);
+                }
+                return false;
+            }
+
+            preset = campaignOptionsPresetPicker.getSelectedPreset();
+            isSelect = campaignOptionsPresetPicker.wasApplied();
+
+            // MegaMek Options
+            if ((preset != null) && (preset.getGameOptions() != null)) {
+                campaign.setGameOptions(preset.getGameOptions());
+            }
+
+            // Campaign Options
+            // This needs to be before we trigger the customize preset dialog
+            campaign.setLocalDate(DEFAULT_START_DATE);
+            campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(campaign.getGameYear());
+
+            CampaignOptionsDialogMode mode = isSelect ? STARTUP_ABRIDGED : STARTUP;
+            // This method runs in a worker thread, but the construction of the UI for Campaign Options must run on
+            // the EDT. A UI-construction failure propagates through the worker so done() reports it via its
+            // ExecutionException handling, rather than returning false (which looks like a normal cancel).
+            final boolean isOptionsCanceled;
+            try {
+                isOptionsCanceled = EventDispatch.callAndWait(
+                      () -> showStartupCampaignOptionsDialog(campaign, preset, mode));
+            } catch (InterruptedException exception) {
+                return false;
+            } catch (RuntimeException | Error exception) {
+                LOGGER.error("Failed to display the Campaign Options dialog", exception);
+                throw exception;
+            }
+            if (isOptionsCanceled) {
+                return false;
+            }
+
+            // Starting planet: the campaign options General page resolves and sets the starting system during
+            // apply. A preset with a pinned planet overrides that choice.
+            if ((preset != null) && (preset.getPlanet() != null)) {
+                campaign.setStartingSystem(preset.getPlanet());
+            }
+
+            // GM Mode
+            campaign.setGMMode((preset == null) || preset.isGM());
+            return true;
         }
 
         /**
