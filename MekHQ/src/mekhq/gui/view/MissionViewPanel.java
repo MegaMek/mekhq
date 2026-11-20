@@ -343,6 +343,12 @@ public class MissionViewPanel extends JScrollablePanel {
         txtCommand.setToolTipText(wordWrap(mission.getCommandRights().getToolTipText()));
         addStatRow(lblCommand, txtCommand, y++);
 
+        JLabel lblStraightSupport = new JLabel(getTextAt(RESOURCE_BUNDLE, "lblSupport.text"));
+        lblStraightSupport.setName("lblStraightSupport");
+        JLabel txtStraightSupport = new JLabel((int) round(mission.getSupportMultiplier() * 100) + "%");
+        txtStraightSupport.setName("txtStraightSupport");
+        addStatRow(lblStraightSupport, txtStraightSupport, y++);
+
         lblBLC.setName("lblBLC");
         lblBLC.setText(getTextAt(RESOURCE_BUNDLE, "lblBLC.text"));
         txtBLC.setName("txtBLC");

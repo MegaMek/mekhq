@@ -32,78 +32,71 @@
  */
 package mekhq.gui.campaignOptions;
 
-import static megamek.utilities.ImageUtilities.scaleImageIcon;
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.baseComponents.hud.HudStyle.*;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.*;
+import java.awt.BorderLayout;
+import java.awt.Window;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.io.File;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import javax.swing.*;
 
 import jakarta.annotation.Nullable;
-import megamek.client.ui.util.UIUtil;
 import megamek.common.ui.AppIcons;
 import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
-import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
+import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
+import mekhq.campaign.campaignOptions.CampaignOptionsSystemChanges.TrackedSystem;
+import mekhq.gui.baseComponents.hud.Hud;
+import mekhq.gui.baseComponents.hud.HudButton;
+import mekhq.gui.baseComponents.hud.HudGuideDrawer;
+import mekhq.gui.campaignOptions.PresetGuidePreferences.GuideScreen;
+import mekhq.gui.utilities.WindowUtilities;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
- * Dialog for selecting and managing campaign option presets in MekHQ.
+ * The preset picker: a heads-up display, in the style of the campaign upgrade console and the Oracle Console, for
+ * choosing a campaign preset.
  *
- * <p>This dialog allows users to choose from a list of predefined campaign presets, view a description for each, and
- * optionally customize or apply a preset.</p>
+ * <p>It is used in two places. When a new campaign is started it offers "Start" (which then asks only for the
+ * essentials, such as the start date and faction) and "Customize" (which shows every option first), and its guide
+ * opens by itself the first time. Inside Campaign Options it loads a preset into the options being edited.</p>
+ *
+ * <p>The list reads only each preset's title and description, so it opens quickly. The full preset is read when the
+ * player selects it, which also lets the details show which major systems the preset switches on.</p>
  *
  * @author Illiani
  * @since 0.50.07
  */
 public class CampaignOptionsPresetPicker extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsPresetPicker";
+    private static final String KEY = "CampaignOptionsPresetPicker.";
     private static final MMLogger LOGGER = MMLogger.create(CampaignOptionsPresetPicker.class);
 
-    // While these values can be local, it makes more sense to define them at a class level so that it's easier to
-    // find and adjust as necessary.
-    @SuppressWarnings("FieldCanBeLocal")
-    private final int INSERT_SIZE = UIUtil.scaleForGUI(10);
-
-    @SuppressWarnings("FieldCanBeLocal")
-    private final int IMAGE_HEIGHT = 160; // This is scaled elsewhere
-
-    private final int DIALOG_WIDTH = UIUtil.scaleForGUI(400);
-
-    @SuppressWarnings("FieldCanBeLocal")
-    private final int SINGLE_LINE_HEIGHT = UIUtil.scaleForGUI(30);
-
-    @SuppressWarnings("FieldCanBeLocal")
-    private final int BUTTON_WIDTH = UIUtil.scaleForGUI(100);
-
-    @SuppressWarnings("FieldCanBeLocal")
-    private final String IMAGE_ADDRESS = "data/images/misc/MekHQ.png";
-
-    private int returnState;
-    private CampaignPreset selectedPreset;
-
     /**
-     * Preset selection result enumerations.
+     * Preset selection results.
      */
     private enum PresetSelection {
-        CANCELLED(0),
-        APPLY(1),
-        CUSTOMIZE(2);
-
-        private final int value;
-
-        PresetSelection(int value) {
-            this.value = value;
-        }
-
-        /**
-         * Returns the numerical value for this selection.
-         *
-         * @return the value associated with the selection
-         */
-        public int getValue() {
-            return value;
-        }
+        CANCELLED, APPLY, CUSTOMIZE
     }
+
+    private final boolean isStartup;
+    private final Map<CampaignPreset, CampaignPreset> fullPresets = new HashMap<>();
+    private final PresetBrowser browser;
+    private final JLabel summary = new JLabel();
+    private final HudButton primaryButton = new HudButton("", true);
+    private final @Nullable HudButton customizeButton;
+    private final HudGuideDrawer guideDrawer;
+
+    private PresetSelection returnState = PresetSelection.CANCELLED;
+    private @Nullable CampaignPreset selectedPreset;
 
     /**
      * Indicates if the user canceled the dialog.
@@ -111,36 +104,37 @@ public class CampaignOptionsPresetPicker extends JDialog {
      * @return {@code true} if canceled, {@code false} otherwise
      */
     public boolean wasCanceled() {
-        return returnState == PresetSelection.CANCELLED.getValue();
+        return returnState == PresetSelection.CANCELLED;
     }
 
     /**
-     * Indicates if the user selected the 'apply' option.
+     * Indicates if the user chose to use the preset as it is, rather than customize it.
      *
      * @return {@code true} if 'apply' was selected, {@code false} otherwise
      */
     public boolean wasApplied() {
-        return returnState == PresetSelection.APPLY.getValue();
+        return returnState == PresetSelection.APPLY;
     }
 
     /**
-     * Gets the selected campaign preset.
+     * Gets the selected campaign preset, fully loaded.
      *
-     * @return the selected {@link CampaignPreset}, or {@code null} if none selected
+     * @return the selected {@link CampaignPreset}, or {@code null} if none was chosen
      */
-    public CampaignPreset getSelectedPreset() {
+    public @Nullable CampaignPreset getSelectedPreset() {
         return selectedPreset;
     }
 
     /**
-     * Constructs and displays the campaign options preset picker dialog.
+     * Constructs and displays the campaign options preset picker dialog, returning once the player has chosen.
      *
      * <p>If {@code parentFrame} is showing, the dialog is owned by it. Otherwise, such as while a new campaign is
      * being created and the startup screen is hidden, the dialog has no owner window and carries the MekHQ icon,
      * because Windows leaves windows owned by a hidden frame out of the taskbar and Alt+Tab.</p>
      *
      * @param parentFrame                  The parent {@link JFrame} for modal display, or {@code null}.
-     * @param includeCustomizePresetOption If {@code true}, enables the "Customize" button.
+     * @param includeCustomizePresetOption {@code true} when starting a new campaign: offers "Customize" and the new
+     *                                     campaign guide. {@code false} when loading a preset into Campaign Options.
      */
     public CampaignOptionsPresetPicker(@Nullable JFrame parentFrame, boolean includeCustomizePresetOption) {
         super(resolveOwner(parentFrame), ModalityType.APPLICATION_MODAL);
@@ -149,120 +143,215 @@ public class CampaignOptionsPresetPicker extends JDialog {
         }
         // With no owner window to clean it up, closing the window must release it like the Cancel button does
         setDefaultCloseOperation(DISPOSE_ON_CLOSE);
+        this.isStartup = includeCustomizePresetOption;
+        setTitle(text("title"));
 
-        setTitle(getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.title"));
-
-        JPanel contentPanel = new JPanel(new BorderLayout(INSERT_SIZE, INSERT_SIZE));
-        contentPanel.setBorder(BorderFactory.createEmptyBorder(INSERT_SIZE, INSERT_SIZE, INSERT_SIZE, INSERT_SIZE));
-
-        JLabel picLabel = new JLabel();
-        picLabel.setHorizontalAlignment(JLabel.CENTER);
-        ImageIcon imageIcon = new ImageIcon(IMAGE_ADDRESS);
-        imageIcon = scaleImageIcon(imageIcon, IMAGE_HEIGHT, false);
-        picLabel.setIcon(imageIcon);
-        contentPanel.add(picLabel, BorderLayout.NORTH);
-
-        JPanel centerPanel = new JPanel(new BorderLayout(0, INSERT_SIZE));
-
-        JPanel headerPanel = new JPanel();
-        headerPanel.setLayout(new BoxLayout(headerPanel, BoxLayout.Y_AXIS));
-        headerPanel.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        JTextPane txtInstructions = new JTextPane();
-        txtInstructions.setContentType("text/html");
-        txtInstructions.setText(String.format("<body><div style='width:%spx;'><center>%s</center></div></body>",
-              DIALOG_WIDTH, getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.instructions")));
-        txtInstructions.setEditable(false);
-        txtInstructions.setOpaque(false);
-        txtInstructions.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-        txtInstructions.setBorder(
-              BorderFactory.createCompoundBorder(
-                    RoundedLineBorder.createRoundedLineBorder(),
-                    BorderFactory.createEmptyBorder(INSERT_SIZE, INSERT_SIZE, INSERT_SIZE, INSERT_SIZE)
-              )
-        );
-        txtInstructions.setAlignmentX(Component.CENTER_ALIGNMENT);
-
-        // This prevents the instructions from resizing vertically
-        Dimension instructionsPreferredSize = txtInstructions.getPreferredSize();
-        txtInstructions.setMaximumSize(new Dimension(Integer.MAX_VALUE, instructionsPreferredSize.height));
-        txtInstructions.setPreferredSize(new Dimension(DIALOG_WIDTH, instructionsPreferredSize.height));
-
-        headerPanel.add(txtInstructions);
-        headerPanel.add(Box.createVerticalStrut(INSERT_SIZE));
-
-        // The description needs to be initialized before the combobox, else we won't be able to update the text based
-        // on the selected item
-        JTextPane txtDescription = new JTextPane();
-        txtDescription.setContentType("text/html");
-        txtDescription.setText(getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.missingDescription"));
-        txtDescription.setEditable(false);
-        txtDescription.setOpaque(false);
-        txtDescription.setBorder(BorderFactory.createEmptyBorder(INSERT_SIZE, INSERT_SIZE, INSERT_SIZE, INSERT_SIZE));
-        txtDescription.putClientProperty(JEditorPane.HONOR_DISPLAY_PROPERTIES, Boolean.TRUE);
-
-        JScrollPane paneDescription = new JScrollPane(txtDescription);
-        paneDescription.setBorder(RoundedLineBorder.createRoundedLineBorder());
-        paneDescription.setAlignmentX(Component.CENTER_ALIGNMENT);
-        paneDescription.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-
-        final DefaultListModel<CampaignPreset> campaignPresets = new DefaultListModel<>();
-        campaignPresets.addAll(CampaignPreset.getCampaignPresetsMetadata());
-
-        if (campaignPresets.isEmpty()) {
+        List<CampaignPreset> presets = CampaignPreset.getCampaignPresetsMetadata();
+        if (presets.isEmpty()) {
             LOGGER.errorDialog("Error", "No campaign presets found");
         }
 
-        JComboBox<CampaignPreset> cboPresets = new JComboBox<>();
-        cboPresets.setModel(convertPresetListModelToComboBoxModel(campaignPresets));
-        cboPresets.setAlignmentX(Component.CENTER_ALIGNMENT);
-        cboPresets.setPreferredSize(new Dimension(DIALOG_WIDTH, SINGLE_LINE_HEIGHT));
-        cboPresets.setMaximumSize(new Dimension(DIALOG_WIDTH, SINGLE_LINE_HEIGHT));
-        cboPresets.addActionListener(e -> updateDescription(cboPresets, txtDescription));
+        browser = new PresetBrowser(presets, preset -> refreshFooter(), this::activate, this::addSystemsDetail);
+        customizeButton = isStartup ? new HudButton(text("button.customize"), false) : null;
+        guideDrawer = PresetBrowser.createGuideDrawer(GuideScreen.NEW_CAMPAIGN, text("guide.alwaysOpen"),
+              this::closeGuide);
 
-        updateDescription(cboPresets, txtDescription);
+        JPanel content = new JPanel(new BorderLayout());
+        content.setOpaque(true);
+        content.setBackground(GROUND);
+        content.add(buildCommandBar(), BorderLayout.NORTH);
+        JPanel body = Hud.windowBody(new BorderLayout());
+        body.add(browser, BorderLayout.CENTER);
+        content.add(body, BorderLayout.CENTER);
+        content.add(buildFooter(), BorderLayout.SOUTH);
+        setContentPane(content);
+        guideDrawer.install(getRootPane());
 
-        headerPanel.add(cboPresets);
+        if (!presets.isEmpty()) {
+            browser.setSelected(presets.get(0));
+        }
+        refreshFooter();
 
-        centerPanel.add(headerPanel, BorderLayout.NORTH);
-        centerPanel.add(paneDescription, BorderLayout.CENTER);
-
-        contentPanel.add(centerPanel, BorderLayout.CENTER);
-
-        JPanel buttonPanel = new JPanel(new FlowLayout(FlowLayout.CENTER, INSERT_SIZE, 0));
-        Dimension buttonSize = new Dimension(BUTTON_WIDTH, SINGLE_LINE_HEIGHT);
-
-        JButton btnApply = new JButton(getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.button.apply"));
-        btnApply.setPreferredSize(buttonSize);
-        btnApply.addActionListener(e -> commitSelection(cboPresets, PresetSelection.APPLY));
-        buttonPanel.add(btnApply);
-
-        // The customize option is only offered in some contexts; when it is not available we omit the button entirely
-        // rather than showing it disabled.
-        if (includeCustomizePresetOption) {
-            JButton btnCustomize = new JButton(getTextAt(RESOURCE_BUNDLE,
-                  "CampaignOptionsPresetPicker.button.customize"));
-            btnCustomize.setPreferredSize(buttonSize);
-            btnCustomize.addActionListener(e -> commitSelection(cboPresets, PresetSelection.CUSTOMIZE));
-            buttonPanel.add(btnCustomize);
+        if (isStartup) {
+            addWindowListener(new WindowAdapter() {
+                @Override
+                public void windowOpened(WindowEvent event) {
+                    if (PresetGuidePreferences.getInstance().shouldOpenGuide(GuideScreen.NEW_CAMPAIGN)) {
+                        openGuide();
+                    }
+                }
+            });
         }
 
-        JButton btnCancel = new JButton(getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.button.cancel"));
-        btnCancel.setPreferredSize(buttonSize);
-        btnCancel.addActionListener(e -> {
-            returnState = PresetSelection.CANCELLED.getValue();
-            dispose();
-        });
-        buttonPanel.add(btnCancel);
-
-        contentPanel.add(buttonPanel, BorderLayout.SOUTH);
-
-        setContentPane(contentPanel);
-        getRootPane().setDefaultButton(btnApply);
+        setMinimumSize(scaleForGUI(900, 600));
+        getContentPane().setPreferredSize(scaleForGUI(1060, 720));
         pack();
-        fitToScreen(parentFrame);
+        WindowUtilities.fitToScreen(this, parentFrame);
         setVisible(true);
     }
+
+    // region Layout
+
+    private JPanel buildCommandBar() {
+        JPanel commandBar = Hud.commandBar(new BorderLayout(scaleForGUI(24), 0));
+        commandBar.add(Hud.identity(text(isStartup ? "eyebrow.startup" : "eyebrow.load"), text("heading"),
+              text(isStartup ? "subtitle.startup" : "subtitle.load")), BorderLayout.CENTER);
+
+        // The guide teaches starting a campaign, so it isn't offered when loading a preset into Campaign Options
+        if (isStartup) {
+            HudButton guideButton = new HudButton(text("guide.open"), false, true);
+            guideButton.addActionListener(event -> openGuide());
+            commandBar.add(Hud.topAligned(guideButton), BorderLayout.EAST);
+        }
+        return commandBar;
+    }
+
+    private JPanel buildFooter() {
+        HudButton cancelButton = new HudButton(text("button.cancel"), false);
+        cancelButton.addActionListener(event -> {
+            returnState = PresetSelection.CANCELLED;
+            dispose();
+        });
+        primaryButton.addActionListener(event -> commitSelection(PresetSelection.APPLY));
+
+        if (customizeButton == null) {
+            return Hud.footer(summary, cancelButton, primaryButton);
+        }
+        customizeButton.setToolTipText(text("button.customize.toolTipText"));
+        customizeButton.addActionListener(event -> commitSelection(PresetSelection.CUSTOMIZE));
+        return Hud.footer(summary, cancelButton, customizeButton, primaryButton);
+    }
+
+    /**
+     * Adds the preset's major systems, on and off, to its details.
+     */
+    private void addSystemsDetail(JPanel column, CampaignPreset preset) {
+        CampaignPreset fullPreset = fullPresetFor(preset);
+        if (fullPreset == null) {
+            column.add(leftAligned(Hud.notice(text("detail.loadFailed"))));
+            return;
+        }
+        if (fullPreset.getCampaignOptions() == null) {
+            return;
+        }
+        CampaignOptionsFreebieTracker systems = new CampaignOptionsFreebieTracker(fullPreset.getCampaignOptions());
+        List<String> on = new ArrayList<>();
+        List<String> off = new ArrayList<>();
+        for (TrackedSystem system : TrackedSystem.values()) {
+            (system.isOn(systems) ? on : off).add(PresetBrowser.systemName(system));
+        }
+        if (!on.isEmpty()) {
+            column.add(leftAligned(Hud.eyebrow(text("detail.systemsOn"))));
+            column.add(Box.createVerticalStrut(scaleForGUI(6)));
+            column.add(leftAligned(Hud.chipRow(on, READY)));
+            column.add(Box.createVerticalStrut(scaleForGUI(14)));
+        }
+        if (!off.isEmpty()) {
+            column.add(leftAligned(Hud.eyebrow(text("detail.systemsOff"))));
+            column.add(Box.createVerticalStrut(scaleForGUI(6)));
+            column.add(leftAligned(Hud.chipRow(off, TEXT_FAINT)));
+            column.add(Box.createVerticalStrut(scaleForGUI(14)));
+        }
+        column.add(leftAligned(Hud.hint(text("detail.systemsNote"))));
+    }
+
+    // endregion Layout
+
+    // region Behaviour
+
+    private void activate(CampaignPreset preset) {
+        commitSelection(PresetSelection.APPLY);
+    }
+
+    /**
+     * Records the chosen outcome with the fully loaded preset and closes the dialog. If the preset can't be loaded, the
+     * dialog stays open and says so, so the action never completes with no selection.
+     *
+     * @param selection the outcome to record
+     */
+    private void commitSelection(PresetSelection selection) {
+        CampaignPreset chosen = browser.getSelected();
+        if (chosen == null) {
+            return;
+        }
+        CampaignPreset preset = fullPresetFor(chosen);
+        if (preset == null) {
+            JOptionPane.showMessageDialog(this, text("loadFailed.message"), text("loadFailed.title"),
+                  JOptionPane.ERROR_MESSAGE);
+            return;
+        }
+        selectedPreset = preset;
+        returnState = selection;
+        closeGuide();
+        dispose();
+    }
+
+    private void openGuide() {
+        PresetGuidePreferences.getInstance().setGuideSeen(GuideScreen.NEW_CAMPAIGN, true);
+        guideDrawer.open(PresetBrowser.buildGuide(RESOURCE_BUNDLE, KEY));
+    }
+
+    private void closeGuide() {
+        guideDrawer.close();
+    }
+
+    private void refreshFooter() {
+        CampaignPreset preset = browser.getSelected();
+        boolean isLoadable = (preset != null) && (fullPresetFor(preset) != null);
+        if (preset == null) {
+            summary.setText(text("summary.none"));
+            primaryButton.setText(text("button.choose"));
+        } else {
+            String name = PresetBrowser.displayTitle(preset);
+            summary.setText("<html>" + getFormattedTextAt(RESOURCE_BUNDLE,
+                  KEY + (isStartup ? "summary.startup" : "summary.load"), StringEscapeUtils.escapeHtml4(name))
+                                 + "</html>");
+            primaryButton.setText(getFormattedTextAt(RESOURCE_BUNDLE,
+                  KEY + (isStartup ? "button.start" : "button.load"), name));
+        }
+        primaryButton.setArmed(isLoadable);
+        if (customizeButton != null) {
+            customizeButton.setArmed(isLoadable);
+        }
+    }
+
+    // endregion Behaviour
+
+    // region Presets
+
+    /**
+     * Fully loads the campaign preset behind a lightweight list entry, once, and keeps it for later.
+     *
+     * <p>For speed, the picker only parses preset titles and descriptions up front (see
+     * {@link CampaignPreset#getCampaignPresetsMetadata()}). The complete preset - campaign options, game options,
+     * skills, and so on - is read from disk the first time the player selects it.</p>
+     *
+     * @param metadataPreset the lightweight preset from the list
+     *
+     * @return the fully parsed {@link CampaignPreset}, or {@code null} if it could not be loaded
+     */
+    private @Nullable CampaignPreset fullPresetFor(CampaignPreset metadataPreset) {
+        if (fullPresets.containsKey(metadataPreset)) {
+            return fullPresets.get(metadataPreset);
+        }
+        CampaignPreset fullPreset = null;
+        File presetFile = metadataPreset.getPresetFile();
+        if (presetFile == null) {
+            // Every preset offered by the picker is read from a file, so a missing file is unexpected.
+            LOGGER.error("Selected campaign preset '{}' has no source file and cannot be loaded.", metadataPreset);
+        } else {
+            fullPreset = CampaignPreset.parseFromFile(presetFile);
+            if (fullPreset == null) {
+                LOGGER.error("Failed to fully load campaign preset from {}.", presetFile);
+            }
+        }
+        fullPresets.put(metadataPreset, fullPreset);
+        return fullPreset;
+    }
+
+    // endregion Presets
+
+    // region Window
 
     /**
      * Picks the owner window for this dialog: the parent frame when it is showing, otherwise none. An explicit
@@ -277,135 +366,9 @@ public class CampaignOptionsPresetPicker extends JDialog {
         return ((parentFrame != null) && parentFrame.isShowing()) ? parentFrame : null;
     }
 
-    /**
-     * Limits the dialog's height and vertical position so it always fits within the usable area of the screen it is
-     * shown on (for example, without slipping beneath the Windows taskbar). The width is left untouched, since it is
-     * driven by {@code DIALOG_WIDTH} and always fits.
-     *
-     * <p>The screen bounds and insets are taken from the parent's {@link GraphicsConfiguration}, so the calculation
-     * honors the active display's resolution and the operating system's DPI/zoom scaling, as well as multi-monitor
-     * setups. The height is clamped to the usable height, the dialog is centered on the parent, and then nudged
-     * vertically so its top and bottom edges stay within the usable bounds.</p>
-     *
-     * @param parentFrame the parent frame the dialog is shown relative to, used to pick the correct display
-     */
-    private void fitToScreen(@Nullable JFrame parentFrame) {
-        GraphicsConfiguration graphicsConfiguration = (parentFrame != null)
-              ? parentFrame.getGraphicsConfiguration()
-              : null;
-        if (graphicsConfiguration == null) {
-            graphicsConfiguration = GraphicsEnvironment.getLocalGraphicsEnvironment()
-                                          .getDefaultScreenDevice()
-                                          .getDefaultConfiguration();
-        }
+    // endregion Window
 
-        final Rectangle screenBounds = graphicsConfiguration.getBounds();
-        final Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(graphicsConfiguration);
-
-        final int usableHeight = screenBounds.height - screenInsets.top - screenInsets.bottom;
-
-        // Never let the dialog grow taller than the usable area of the screen (for example, under the Windows
-        // taskbar). The width is driven by DIALOG_WIDTH and always fits, so only the height needs clamping.
-        setSize(getWidth(), Math.min(getHeight(), usableHeight));
-
-        // Center on the parent, then nudge it vertically so its top and bottom edges stay out from under the taskbar.
-        setLocationRelativeTo(parentFrame);
-
-        final int minY = screenBounds.y + screenInsets.top;
-        final int clampedY = Math.max(minY, Math.min(getY(), minY + usableHeight - getHeight()));
-        setLocation(getX(), clampedY);
-    }
-
-    /**
-     * Loads the preset currently selected in the combo box and, if it loads successfully, records the chosen outcome
-     * and closes the dialog. If the preset cannot be loaded the dialog is left open and an error is shown, so the
-     * action never silently completes with no selection.
-     *
-     * @param cboPresets the combo box holding the selectable presets
-     * @param selection  the outcome to record when the selected preset loads successfully
-     */
-    private void commitSelection(JComboBox<CampaignPreset> cboPresets, PresetSelection selection) {
-        final CampaignPreset preset = loadFullPreset((CampaignPreset) cboPresets.getSelectedItem());
-        if (preset == null) {
-            JOptionPane.showMessageDialog(this,
-                  getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.loadFailed.message"),
-                  getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.loadFailed.title"),
-                  JOptionPane.ERROR_MESSAGE);
-            return;
-        }
-
-        selectedPreset = preset;
-        returnState = selection.getValue();
-        dispose();
-    }
-
-    /**
-     * Fully loads the campaign preset backing the lightweight metadata entry selected in the picker.
-     *
-     * <p>For speed, the picker only parses preset titles and descriptions up front (see
-     * {@link CampaignPreset#getCampaignPresetsMetadata()}). The complete preset - campaign options, game options,
-     * skills, and so on - is read from disk here, when the user commits to a selection.</p>
-     *
-     * @param metadataPreset the lightweight preset selected in the combo box, or {@code null} if none was selected
-     *
-     * @return the fully parsed {@link CampaignPreset}, or {@code null} if nothing was selected or it could not be
-     *       loaded
-     */
-    private @Nullable CampaignPreset loadFullPreset(@Nullable CampaignPreset metadataPreset) {
-        if (metadataPreset == null) {
-            return null;
-        }
-
-        final File presetFile = metadataPreset.getPresetFile();
-        if (presetFile == null) {
-            // Every preset offered by the picker is read from a file, so a missing file is unexpected.
-            LOGGER.error("Selected campaign preset '{}' has no source file and cannot be loaded.", metadataPreset);
-            return null;
-        }
-
-        final CampaignPreset fullPreset = CampaignPreset.parseFromFile(presetFile);
-        if (fullPreset == null) {
-            LOGGER.error("Failed to fully load campaign preset from {}.", presetFile);
-        }
-
-        return fullPreset;
-    }
-
-    /**
-     * Updates the description text pane with information about the selected campaign preset.
-     *
-     * @param cboPresets     The combo box containing the list of presets.
-     * @param txtDescription The text pane to display the description.
-     */
-    private void updateDescription(JComboBox<CampaignPreset> cboPresets, JTextPane txtDescription) {
-        Object selectedItem = cboPresets.getSelectedItem();
-        String description = getTextAt(RESOURCE_BUNDLE, "CampaignOptionsPresetPicker.missingDescription");
-        if (selectedItem instanceof CampaignPreset preset) {
-            description = preset.getDescription();
-        }
-
-        txtDescription.setText(String.format("<body><div style='width:%spx;'><center>%s</center></div></body>",
-              DIALOG_WIDTH, description));
-
-        // Reset the scroll position to the top so a newly selected description always starts at its beginning.
-        txtDescription.setCaretPosition(0);
-    }
-
-    /**
-     * Converts a {@link DefaultListModel} containing {@link CampaignPreset} objects to a {@link DefaultComboBoxModel}.
-     *
-     * @param listModel the {@link DefaultListModel} of {@link CampaignPreset}
-     *
-     * @return a {@link DefaultComboBoxModel} containing the same elements
-     */
-    private DefaultComboBoxModel<CampaignPreset> convertPresetListModelToComboBoxModel(
-          DefaultListModel<CampaignPreset> listModel) {
-        DefaultComboBoxModel<CampaignPreset> comboBoxModel = new DefaultComboBoxModel<>();
-
-        for (int i = 0; i < listModel.size(); i++) {
-            comboBoxModel.addElement(listModel.get(i));
-        }
-
-        return comboBoxModel;
+    private static String text(String key) {
+        return getTextAt(RESOURCE_BUNDLE, KEY + key);
     }
 }

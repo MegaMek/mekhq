@@ -89,7 +89,7 @@ import mekhq.gui.commandGeneration.contents.ForceGeneratorTab;
  */
 public final class ForcePage {
     private static final MMLogger LOGGER = MMLogger.create(ForcePage.class);
-    private static final int RAIL_WIDTH = 300;
+    private static final int RAIL_WIDTH = 330;
     private static final int READOUT_WIDTH = 400;
     // The readout's text column: its width less its padding and scroll bar.
     private static final int WRAP_WIDTH = READOUT_WIDTH - 70;
@@ -191,9 +191,10 @@ public final class ForcePage {
 
     private JComponent buildRail() {
         // No faction or command pickers: the command is always generated for the campaign's own faction.
-        HudChoice<Object> formation = picker(Picker.FORMATION, 5);
+        HudChoice<Object> formation = picker(Picker.FORMATION, Integer.MAX_VALUE);
+        formation.setSingleColumnAllowed(true);
         HudChoice<Object> rating = picker(Picker.RATING, 6);
-        HudChoice<Object> experience = picker(Picker.EXPERIENCE, 5);
+        HudChoice<Object> experience = picker(Picker.EXPERIENCE, 7);
         // Experience's Random entry is a label rather than a blank value, so it is marked to stand on its own row.
         experience.setFirstIsRandom(true);
         HudChoice<Object> unitType = picker(Picker.UNIT_TYPE, 6);
@@ -264,8 +265,9 @@ public final class ForcePage {
                     pickerRows.get(Picker.UNIT_TYPE), pickerRows.get(Picker.WEIGHT_CLASS),
                     pickerRows.get(Picker.INFANTRY_CLASS), pickerRows.get(Picker.FLAGS)),
               section(text("Designer.force.section.size"), null, pickerRows.get(Picker.FORMATION),
-                    // The rail's width less its padding and the note's own.
-                    note(text("Designer.force.formation.recommended"), ACCENT, RAIL_WIDTH - 100),
+                    // Well inside the rail: Swing's HTML lays the text out wider than the width it is given, and
+                    // anything past the rail's edge is cut off.
+                    note(text("Designer.force.formation.recommended"), ACCENT, RAIL_WIDTH - 130),
                     commandLance, detachments),
               section(text("Designer.force.section.quality"), null,
                     pickerRows.get(Picker.RATING), pickerRows.get(Picker.EXPERIENCE)),
