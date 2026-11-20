@@ -88,6 +88,7 @@ import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
 import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.logging.MMLogger;
+import megamek.release.ReleaseChannel;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
@@ -2224,6 +2225,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Assuming there is no upgrade path, we set version and continue parsing the campaign.
         campaign.setVersion(version);
+        campaign.setVersionChannel(ReleaseChannel.fromKey(campaignEle.getAttribute("channel")));
 
         // Indicates whether new units were written to disk while
         // loading the Campaign file. If so, we need to kick back off loading
