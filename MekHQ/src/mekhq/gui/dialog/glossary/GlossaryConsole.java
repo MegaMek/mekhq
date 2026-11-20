@@ -952,7 +952,7 @@ public class GlossaryConsole extends JDialog {
 
     private void fillDocumentRows() {
         List<DocumentationEntry> documents = new ArrayList<>(List.of(DocumentationEntry.values()));
-        documents.removeIf(document -> !passesFilter(GlossaryChange.of(document.getVersionAddedOrLastUpdated()),
+        documents.removeIf(document -> !passesFilter(GlossaryChange.of(document.getVersionLastUpdated()),
               true));
         String query = String.join(" ", terms);
         if (!terms.isEmpty()) {
@@ -966,12 +966,12 @@ public class GlossaryConsole extends JDialog {
         Comparator<DocumentationEntry> byTitle = Comparator.comparing(DocumentationEntry::getTitle,
               String.CASE_INSENSITIVE_ORDER);
         documents.sort(sort == Sort.NEWEST
-                             ? Comparator.comparing(DocumentationEntry::getVersionAddedOrLastUpdated,
+                             ? Comparator.comparing(DocumentationEntry::getVersionLastUpdated,
               Comparator.reverseOrder()).thenComparing(byTitle)
                              : byTitle);
         for (DocumentationEntry document : documents) {
             listModel.addElement(new DocumentRow(document,
-                  GlossaryChange.of(document.getVersionAddedOrLastUpdated())));
+                  GlossaryChange.of(document.getVersionLastUpdated())));
         }
         if (documents.isEmpty()) {
             listModel.addElement(new Heading(getTextAt(RESOURCE_BUNDLE,
@@ -1043,7 +1043,7 @@ public class GlossaryConsole extends JDialog {
         int thisBuild = 0;
         int sinceCore = 0;
         for (DocumentationEntry document : DocumentationEntry.values()) {
-            GlossaryChange change = GlossaryChange.of(document.getVersionAddedOrLastUpdated());
+            GlossaryChange change = GlossaryChange.of(document.getVersionLastUpdated());
             if (change == GlossaryChange.THIS_BUILD) {
                 thisBuild++;
             }
@@ -1339,8 +1339,8 @@ public class GlossaryConsole extends JDialog {
 
     private void showDocumentCard(DocumentationEntry document) {
         currentDocument = document;
-        GlossaryChange change = GlossaryChange.of(document.getVersionAddedOrLastUpdated());
-        readerEyebrow.setText(versionLine(document.getVersionAddedOrLastUpdated(), change).toUpperCase(Locale.ROOT));
+        GlossaryChange change = GlossaryChange.of(document.getVersionLastUpdated());
+        readerEyebrow.setText(versionLine(document.getVersionLastUpdated(), change).toUpperCase(Locale.ROOT));
         readerTitle.setText(document.getTitle().toUpperCase(Locale.ROOT));
         setReaderText(getFormattedTextAt(RESOURCE_BUNDLE, "GlossaryConsole.documentation.card",
               escape(document.getTitle())));
@@ -1352,7 +1352,9 @@ public class GlossaryConsole extends JDialog {
             addSideSection("GlossaryConsole.side.mentionedIn",
                   mentioning.stream().map(Item::entry).toList());
         }
-        setSideVisible(!mentioning.isEmpty());
+        addRecordSection(recordLines(document.getVersionAdded(), document.getVersionLastUpdated(), change,
+              document.getVersionLastVerified()));
+        setSideVisible(true);
         refreshNavigation(false);
     }
 
@@ -1525,13 +1527,21 @@ public class GlossaryConsole extends JDialog {
             sidePanel.add(Box.createVerticalStrut(scaleForGUI(12)));
         }
 
-        sidePanel.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "GlossaryConsole.side.record"))));
-        sidePanel.add(Box.createVerticalStrut(scaleForGUI(6)));
-        sidePanel.add(leftAligned(Hud.hint(versionLine(item.version(), item.change()))));
-        sidePanel.add(Box.createVerticalStrut(scaleForGUI(4)));
+        addRecordSection(recordLines(item.entry().getVersionAdded(), item.version(), item.change(),
+              item.entry().getVersionLastVerified()));
         sidePanel.add(leftAligned(Hud.hint(getFormattedTextAt(RESOURCE_BUNDLE, "GlossaryConsole.side.words",
               item.document().text().isBlank() ? 0 : item.document().text().split("\\s+").length))));
         setSideVisible(true);
+    }
+
+    /** Adds the Record heading and its lines: when the entry was added, last updated and last verified. */
+    private void addRecordSection(List<String> lines) {
+        sidePanel.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "GlossaryConsole.side.record"))));
+        sidePanel.add(Box.createVerticalStrut(scaleForGUI(6)));
+        for (String line : lines) {
+            sidePanel.add(leftAligned(Hud.hint(line)));
+            sidePanel.add(Box.createVerticalStrut(scaleForGUI(4)));
+        }
     }
 
     /** Empties the side panel and hides it, giving the reader its width. */
@@ -1629,7 +1639,8 @@ public class GlossaryConsole extends JDialog {
     private GlossaryPdfExporter.Entry pdfEntry(GlossaryEntry entry) {
         Item item = index.item(entry);
         List<String> referencedBy = index.referencedBy(entry).stream().map(GlossaryEntry::getTitle).toList();
-        String versionLine = item == null ? "" : versionLine(item.version(), item.change());
+        String versionLine = item == null ? "" : String.join(" · ", recordLines(entry.getVersionAdded(),
+              item.version(), item.change(), entry.getVersionLastVerified()));
         String title = item == null ? entry.getTitle() : item.title();
         return new GlossaryPdfExporter.Entry(entry.getLookUpName(), title, versionLine, entry.getDefinition(),
               referencedBy);
@@ -1669,6 +1680,24 @@ public class GlossaryConsole extends JDialog {
             case UNCHANGED -> "GlossaryConsole.version.unchanged";
         };
         return getFormattedTextAt(RESOURCE_BUNDLE, key, version.toString());
+    }
+
+    /**
+     * The lines of an entry's or document's record: when it was added, when it was last significantly updated (and
+     * how recent that is), and when it was last checked and found accurate.
+     *
+     * @param added        the release that first shipped it
+     * @param lastUpdated  the release that last significantly updated it
+     * @param change       how recent the last update is
+     * @param lastVerified the release in which it was last verified as accurate
+     *
+     * @return the record's lines, in that order
+     */
+    static List<String> recordLines(Version added, Version lastUpdated, GlossaryChange change,
+          Version lastVerified) {
+        return List.of(getFormattedTextAt(RESOURCE_BUNDLE, "GlossaryConsole.record.added", added.toString()),
+              versionLine(lastUpdated, change),
+              getFormattedTextAt(RESOURCE_BUNDLE, "GlossaryConsole.record.verified", lastVerified.toString()));
     }
 
     private static String text(String key) {
@@ -1752,7 +1781,7 @@ public class GlossaryConsole extends JDialog {
                 }
             } else if (row instanceof DocumentRow documentRow) {
                 html.append(highlight(documentRow.document().getTitle(), ACCENT_BRIGHT));
-                appendTag(html, documentRow.change(), documentRow.document().getVersionAddedOrLastUpdated());
+                appendTag(html, documentRow.change(), documentRow.document().getVersionLastUpdated());
             }
             label.setText(html.append("</div></html>").toString());
             return label;

@@ -61,6 +61,24 @@ import mekhq.campaign.universe.eras.Eras;
 public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerator {
     private static final MMLogger LOGGER = MMLogger.create(SingleSpecialAbilityGenerator.class);
 
+    /** Every specialization a randomly rolled Gunnery Specialist can be given. */
+    static final List<String> GUNNERY_SPECIALIST_CHOICES = List.of(Crew.SPECIAL_ENERGY,
+          Crew.SPECIAL_BALLISTIC,
+          Crew.SPECIAL_MISSILE);
+
+    /** Every specialization a randomly rolled Environmental Specialist can be given. */
+    static final List<String> ENVIRONMENT_SPECIALIST_CHOICES = List.of(Crew.ENVIRONMENT_SPECIALIST_FOG,
+          Crew.ENVIRONMENT_SPECIALIST_LIGHT,
+          Crew.ENVIRONMENT_SPECIALIST_RAIN,
+          Crew.ENVIRONMENT_SPECIALIST_SNOW,
+          Crew.ENVIRONMENT_SPECIALIST_WIND);
+
+    /** Every specialization a randomly rolled Human TRO can be given. */
+    static final List<String> HUMAN_TRO_CHOICES = List.of(Crew.HUMAN_TRO_MEK,
+          Crew.HUMAN_TRO_AERO,
+          Crew.HUMAN_TRO_VEE,
+          Crew.HUMAN_TRO_BA);
+
     @Override
     public boolean generateSpecialAbilities(final Campaign campaign, final Person person,
           final int expLvl) {
@@ -120,11 +138,7 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
         String displayName = SpecialAbility.getDisplayName(name);
         switch (name) {
             case OptionsConstants.GUNNERY_SPECIALIST: {
-                final String special = switch (Compute.randomInt(2)) {
-                    case 0 -> Crew.SPECIAL_ENERGY;
-                    case 1 -> Crew.SPECIAL_BALLISTIC;
-                    default -> Crew.SPECIAL_MISSILE;
-                };
+                final String special = ObjectUtility.getRandomItem(GUNNERY_SPECIALIST_CHOICES);
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
@@ -140,24 +154,13 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
                 break;
             }
             case OptionsConstants.MISC_ENV_SPECIALIST: {
-                final String special = switch (Compute.randomInt(4)) {
-                    case 0 -> Crew.ENVIRONMENT_SPECIALIST_FOG;
-                    case 1 -> Crew.ENVIRONMENT_SPECIALIST_LIGHT;
-                    case 2 -> Crew.ENVIRONMENT_SPECIALIST_RAIN;
-                    case 3 -> Crew.ENVIRONMENT_SPECIALIST_SNOW;
-                    default -> Crew.ENVIRONMENT_SPECIALIST_WIND;
-                };
+                final String special = ObjectUtility.getRandomItem(ENVIRONMENT_SPECIALIST_CHOICES);
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
             }
             case OptionsConstants.MISC_HUMAN_TRO: {
-                final String special = switch (Compute.randomInt(3)) {
-                    case 0 -> Crew.HUMAN_TRO_MEK;
-                    case 1 -> Crew.HUMAN_TRO_AERO;
-                    case 2 -> Crew.HUMAN_TRO_VEE;
-                    default -> Crew.HUMAN_TRO_BA;
-                };
+                final String special = ObjectUtility.getRandomItem(HUMAN_TRO_CHOICES);
                 person.getOptions().acquireAbility(PersonnelOptions.LVL3_ADVANTAGES, name, special);
                 displayName += " " + special;
                 break;
@@ -289,8 +292,8 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
     }
 
     /**
-     * Returns every registered {@link SpecialAbility} that passes the veterancy-award filter and has no currently
-     * active invalid-ability conflict for the given person.
+     * Returns every registered {@link SpecialAbility} that the given person does not already have, that passes the
+     * veterancy-award filter, and that has no currently active invalid-ability conflict for that person.
      *
      * <p>Extracted from {@link #getSpecialAbilities} to eliminate duplicated iteration logic and make the
      * {@code ignoreEligibility} path independently testable.</p>
@@ -302,11 +305,32 @@ public class SingleSpecialAbilityGenerator extends AbstractSpecialAbilityGenerat
      */
     private List<SpecialAbility> getValidAbilitiesIgnoringEligibility(Person person,
           boolean isVeterancyAward) {
+        return filterValidAbilities(person.getOptions(), SpecialAbility.getSpecialAbilities().values(),
+              isVeterancyAward);
+    }
 
-        final PersonnelOptions options = person.getOptions();
+    /**
+     * Filters {@code abilities} down to those the owner of {@code options} could be given without checking purchase
+     * eligibility.
+     *
+     * <p>An ability is dropped if the owner already has it, as rolling it again would either waste the roll or
+     * replace an existing specialization; if it is origin-only and this is a veterancy award; or if one of its
+     * invalid abilities is active.</p>
+     *
+     * @param options          the personnel options of the person receiving the ability
+     * @param abilities        the abilities to filter
+     * @param isVeterancyAward if {@code true}, abilities flagged as origin-only are skipped
+     *
+     * @return a mutable list of abilities that cleared all filters; never {@code null}
+     */
+    List<SpecialAbility> filterValidAbilities(PersonnelOptions options, Collection<SpecialAbility> abilities,
+          boolean isVeterancyAward) {
         final List<SpecialAbility> result = new ArrayList<>();
 
-        for (SpecialAbility ability : SpecialAbility.getSpecialAbilities().values()) {
+        for (SpecialAbility ability : abilities) {
+            if (options.booleanOption(ability.getName())) {
+                continue;
+            }
             if (isVeterancyAward && ability.getOriginOnly()) {
                 continue;
             }

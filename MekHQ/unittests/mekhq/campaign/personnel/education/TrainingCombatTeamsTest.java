@@ -245,4 +245,10 @@ class TrainingCombatTeamsTest {
         TrainingCombatTeams.getFinalXPProgress(marginOfSuccess, skill);
         verify(skill).changeXpProgress(xp);
     }
+
+    @ParameterizedTest
+    @CsvSource({ "4, 4, 0", "2, 4, 0", "1, 5, 0", "5, 4, 1", "7, 4, 3", "8, 5, 3", "6, 6, 0" })
+    void testClassSizeModifierOnlyPenalisesOversizedClasses(int formationSize, int standardClassSize, int expected) {
+        assertEquals(expected, TrainingCombatTeams.getClassSizeModifier(formationSize, standardClassSize));
+    }
 }
