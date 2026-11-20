@@ -712,8 +712,8 @@ public class GuideViewer extends JDialog {
     }
 
     private String versionLine() {
-        return GlossaryConsole.versionLine(entry.getVersionAddedOrLastUpdated(),
-              GlossaryChange.of(entry.getVersionAddedOrLastUpdated()));
+        return GlossaryConsole.versionLine(entry.getVersionLastUpdated(),
+              GlossaryChange.of(entry.getVersionLastUpdated()));
     }
 
     /** The zoom the fit asks for, at the canvas's present size; a zoom of the player's own is kept as it is. */

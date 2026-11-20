@@ -103,7 +103,7 @@ class GlossaryIndexTest {
     @Test
     void changedEntriesAreGroupedByVersionNewestFirst() {
         List<GlossaryEntry> entries = List.of(GlossaryEntry.values()).subList(0, 6);
-        Version newest = entries.stream().map(GlossaryEntry::getVersionAddedOrLastUpdated).max(Version::compareTo)
+        Version newest = entries.stream().map(GlossaryEntry::getVersionLastUpdated).max(Version::compareTo)
                                .orElseThrow();
         GlossaryIndex index = GlossaryIndex.build(entries,
               version -> version.equals(newest) ? GlossaryChange.THIS_BUILD : GlossaryChange.SINCE_LAST_CORE);
