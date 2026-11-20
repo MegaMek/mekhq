@@ -73,6 +73,7 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.ui.AppIcons;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
+import megamek.release.ReleaseChannel;
 import mekhq.CampaignPreset;
 import mekhq.MHQConstants;
 import mekhq.MHQStaticDirectoryManager;
@@ -132,6 +133,44 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
     private static final LocalDate DEFAULT_START_DATE = LocalDate.of(3151, 1, 1);
 
     // endregion Variable Declarations
+
+    /**
+     * Determines whether loading a campaign should prompt the player to upgrade it.
+     *
+     * <p>A campaign saved in an older release line (major, minor, and patch) always warrants the prompt. A newer
+     * build of the same line normally does not, because it is a point release.</p>
+     *
+     * <p>The exception is a Core build opening a campaign of its own line that a Core build did not save. Core and
+     * Experimental share one line's build numbers, and Experimental builds of a line are published before its first
+     * Core build, so such a campaign comes from Experimental (or a development build) and goes through the same
+     * upgrade as everyone else arriving in Core. Saves that predate release channels carry none, and no Core build
+     * predates them, so they are treated the same way.</p>
+     *
+     * @param campaignVersion the version the campaign was saved in
+     * @param campaignChannel the release channel of the build that saved the campaign, or {@code null} if none
+     * @param currentVersion  the version currently running
+     * @param currentChannel  the release channel of the running build, or {@code null} for a development build
+     *
+     * @return {@code true} if the upgrade prompt should be shown
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isUpgradePromptRequired(Version campaignVersion, @Nullable ReleaseChannel campaignChannel,
+          Version currentVersion, @Nullable ReleaseChannel currentChannel) {
+        Version campaignRelease = new Version(campaignVersion.getMajor(),
+              campaignVersion.getMinor(),
+              campaignVersion.getPatch());
+        Version currentRelease = new Version(currentVersion.getMajor(),
+              currentVersion.getMinor(),
+              currentVersion.getPatch());
+        if (campaignRelease.isLowerThan(currentRelease)) {
+            return true;
+        }
+        return (currentChannel == ReleaseChannel.CORE)
+              && (campaignRelease.compareTo(currentRelease) == 0)
+              && (campaignChannel != ReleaseChannel.CORE);
+    }
 
     // region Constructors
     public DataLoadingDialog(final JFrame frame, final MekHQ application, final @Nullable File campaignFile,
@@ -485,7 +524,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // Campaign upgrading
                 // This needs to be the final stage in Progress 7 as otherwise the display of any confirmation
                 // dialogs will get 'stuck' behind other dialogs
-                if (isUpgradePromptRequired(campaignVersion, MHQConstants.VERSION)) {
+                if (isUpgradePromptRequired(campaignVersion, campaign.getVersionChannel(), MHQConstants.VERSION,
+                      Version.getBuildChannel())) {
                     handleCampaignUpgrading(application, campaign, getCampaignFile());
                 }
                 // endregion Progress 7
@@ -598,30 +638,6 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
          */
         private static void handleCampaignUpgrading(MekHQ app, Campaign campaign, @Nullable File saveFile) {
             CampaignUpgradeDialog.campaignUpgradeDialog(app, campaign, saveFile);
-        }
-
-        /**
-         * Determines whether loading a campaign saved in an older version should prompt the player to upgrade.
-         *
-         * <p>Only a change in the major, minor, or patch component warrants the prompt. A newer revision of the same
-         * release (for example, 0.51.01 to 0.51.01.1) is a point release, so the prompt is skipped.</p>
-         *
-         * @param campaignVersion the version the campaign was saved in
-         * @param currentVersion  the version currently running
-         *
-         * @return {@code true} if the campaign predates the current release, ignoring revisions
-         *
-         * @author Illiani
-         * @since 0.51.01
-         */
-        private static boolean isUpgradePromptRequired(Version campaignVersion, Version currentVersion) {
-            Version campaignRelease = new Version(campaignVersion.getMajor(),
-                  campaignVersion.getMinor(),
-                  campaignVersion.getPatch());
-            Version currentRelease = new Version(currentVersion.getMajor(),
-                  currentVersion.getMinor(),
-                  currentVersion.getPatch());
-            return campaignRelease.isLowerThan(currentRelease);
         }
 
         /**

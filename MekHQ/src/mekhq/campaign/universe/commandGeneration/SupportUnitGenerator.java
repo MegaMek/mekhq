@@ -217,7 +217,13 @@ public final class SupportUnitGenerator {
         if (useTemporaryCrew && (crewRole != null)) {
             Person commander = humanResources.newPerson(campaign, crewRole);
             humanResources.recruitPerson(campaign, commander, true, true);
-            unit.addDriver(commander);
+            // A soldier holds both a driver and a gunner seat, and the gunner seats are what the crew screens count.
+            // Seated as a driver alone, the squad's sergeant is invisible there and the squad shows an empty seat.
+            if (unit.usesSoldiers()) {
+                unit.addPilotOrSoldier(commander);
+            } else {
+                unit.addDriver(commander);
+            }
             unit.resetPilotAndEntity();
             LOGGER.info("[CompanyGen][SupportUnits]     '{}' crewed with one named {} plus the temporary crew pool",
                   unit.getName(), crewRole);

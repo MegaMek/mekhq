@@ -34,6 +34,7 @@ package mekhq.campaign.utilities.glossary;
 
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.junit.jupiter.api.Assertions.fail;
@@ -110,5 +111,14 @@ class DocumentationEntryTest {
         } catch (IOException e) {
             fail("File '" + fileAddress + "' could not be opened as a PDF. Exception: " + e.getMessage());
         }
+    }
+
+    @ParameterizedTest
+    @EnumSource(DocumentationEntry.class)
+    void testVersionHistoryIsInOrder(DocumentationEntry entry) {
+        assertFalse(entry.getVersionLastUpdated().isLowerThan(entry.getVersionAdded()),
+              entry.name() + " was last updated before it was added");
+        assertFalse(entry.getVersionLastVerified().isLowerThan(entry.getVersionLastUpdated()),
+              entry.name() + " was last verified before it was last updated");
     }
 }

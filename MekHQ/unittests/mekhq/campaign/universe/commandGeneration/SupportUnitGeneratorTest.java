@@ -803,6 +803,30 @@ class SupportUnitGeneratorTest {
               "every seat is filled by an individual person");
     }
 
+    /**
+     * Issue #11103: the security detail's sergeant was seated as a driver only. Soldiers sit in both the driver and
+     * gunner lists, and the crew screens count the gunners, so the squad showed 0 soldiers aboard and one open seat
+     * beside its temp crew.
+     */
+    @Test
+    void aSecuritySergeantIsSeatedAsASoldier() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_INFANTRY, true);
+        Entity entity = MHQTestUtilities.getEntityForUnitTesting("Foot Platoon (DCMS) (Laser 2620+)", true);
+        assertNotNull(entity, "the test platoon must load");
+        Unit platoon = campaign.addNewUnit(entity, false, 0, PartQuality.QUALITY_D);
+
+        PersonnelRole pooledRole = SupportUnitGenerator.crewSupportUnit(campaign, platoon,
+              campaign.getPlayerForce().getFaction(), null);
+
+        assertEquals(PersonnelRole.SOLDIER, pooledRole, "the soldier role is reported as filled from the pool");
+        assertEquals(1, platoon.getDrivers().size(), "one named soldier is aboard");
+        Person sergeant = platoon.getDrivers().get(0);
+        assertTrue(platoon.getGunners().contains(sergeant),
+              "the named soldier also holds a gunner seat, which is what the crew screens count");
+        assertEquals(1, platoon.getActiveCrew().size(), "the named soldier is counted once");
+    }
+
     /** A multi-seat ground support vehicle, added to the campaign without a crew. */
     private static Unit supportVehicle(Campaign campaign) {
         Entity entity = MHQTestUtilities.getEntityForUnitTesting("Prime Mover", true);

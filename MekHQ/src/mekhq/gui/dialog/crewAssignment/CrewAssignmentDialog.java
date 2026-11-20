@@ -150,6 +150,14 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         state.role = value;
         refresh();
     });
+    private final HudFilterList<SkillGroup> skillFilter = new HudFilterList<>(value -> {
+        state.skill = value;
+        if (value != null) {
+            // Someone looking for a skill wants the best at it first; the sort chips can change that back
+            state.assignSort = AssignSort.SKILL;
+        }
+        refresh();
+    });
     private final HudFilterList<Condition> conditionFilter = new HudFilterList<>(value -> {
         state.condition = value;
         refresh();
@@ -232,7 +240,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         peoplePage = new CrewListPage<>(getTextAt(RESOURCE_BUNDLE, "personnel.search"), text -> {
             state.peopleQuery = text;
             refresh();
-        }, new CrewRowRenderers.PersonRow(plan, this::isSelected, this::isTechsPage),
+        }, new CrewRowRenderers.PersonRow(plan, this::isSelected, this::isTechsPage, () -> state.selectedUnit,
+                    () -> state.skill),
               PERSON_ROW_HEIGHT,
               this::onPersonRow);
         // A click on a Review row does nothing by itself; its links open the unit or person it names
@@ -407,6 +416,9 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         rail.add(Box.createVerticalStrut(scaleForGUI(12)));
         rail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.role"))));
         rail.add(leftAligned(roleFilter));
+        rail.add(Box.createVerticalStrut(scaleForGUI(12)));
+        rail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.skills"))));
+        rail.add(leftAligned(skillFilter));
         rail.add(Box.createVerticalStrut(scaleForGUI(12)));
         rail.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.condition"))));
         rail.add(leftAligned(conditionFilter));
@@ -591,6 +603,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         List<PersonEntry> shown = new ArrayList<>();
         Map<PersonnelRole, Integer> byRole = new TreeMap<>();
         Map<RoleGroup, Integer> byRoleGroup = new EnumMap<>(RoleGroup.class);
+        Map<SkillGroup, Integer> bySkill = new EnumMap<>(SkillGroup.class);
         int unassigned = 0;
         int listed = 0;
         int roleTotal = 0;
@@ -624,6 +637,11 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
                         byRoleGroup.merge(group, 1, Integer::sum);
                     }
                 }
+                for (SkillGroup group : SkillGroup.values()) {
+                    if (CrewAssignmentState.hasSkill(entry, group)) {
+                        bySkill.merge(group, 1, Integer::sum);
+                    }
+                }
                 for (Condition condition : Condition.values()) {
                     if (CrewAssignmentState.matches(entry, condition)) {
                         byCondition.merge(condition, 1, Integer::sum);
@@ -651,6 +669,11 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
                       plan.techMinutesAvailable(entry.person()) - plan.plannedTechMinutes(entry.person())).reversed());
                 case FEWEST_UNITS -> shown.sort(Comparator.comparingInt((PersonEntry entry) ->
                       plan.plannedTechUnits(entry.person()).size()));
+            }
+        } else {
+            Comparator<PersonEntry> order = state.assignOrder();
+            if (order != null) {
+                shown.sort(order);
             }
         }
         peoplePage.setRows(shown);
@@ -686,6 +709,15 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         byRole.forEach((role, count) -> roles.add(new Item<>(new SingleRole(role), role.getLabel(false), count)));
         roleFilter.setItems(roles);
         roleFilter.setSelected(state.role);
+        // Every group is always offered, so the player can see there is no one with a skill rather than wonder
+        List<Item<SkillGroup>> skills = new ArrayList<>();
+        skills.add(new Item<>(null, getTextAt(RESOURCE_BUNDLE, "rail.allSkills"), roleTotal));
+        for (SkillGroup group : SkillGroup.values()) {
+            skills.add(new Item<>(group, getTextAt(RESOURCE_BUNDLE, "SkillGroup." + group.name()),
+                  bySkill.getOrDefault(group, 0)));
+        }
+        skillFilter.setItems(skills);
+        skillFilter.setSelected(state.skill);
         List<Item<Condition>> conditions = new ArrayList<>();
         for (Condition condition : Condition.values()) {
             conditions.add(new Item<>(condition, getTextAt(RESOURCE_BUNDLE, "Condition." + condition.name()),
@@ -705,6 +737,28 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
                     refresh();
                 });
                 chip.setActive(state.techSort == sort);
+                chips.add(chip);
+            }
+        } else {
+            AssignSort current = state.effectiveAssignSort();
+            SkillGroup skillGroup = state.skill;
+            for (AssignSort sort : AssignSort.values()) {
+                String label;
+                if (sort != AssignSort.SKILL) {
+                    label = getTextAt(RESOURCE_BUNDLE, "AssignSort." + sort.name());
+                } else if (skillGroup != null) {
+                    label = getFormattedTextAt(RESOURCE_BUNDLE, "AssignSort.SKILL",
+                          getTextAt(RESOURCE_BUNDLE, "SkillGroup." + skillGroup.name()));
+                } else {
+                    // Ordering by a skill follows the Skills filter, so it is offered only while that is set
+                    continue;
+                }
+                HudChip chip = new HudChip(label, () -> {
+                    state.assignSort = sort;
+                    refresh();
+                });
+                chip.setActive(current == sort);
+                chip.setToolTipText(getTextAt(RESOURCE_BUNDLE, "AssignSort." + sort.name() + ".toolTipText"));
                 chips.add(chip);
             }
         }
@@ -1190,6 +1244,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         if (!state.shows(entry, data.plan())) {
             state.assignment = Assignment.EVERYONE;
             state.role = null;
+            state.skill = null;
             state.condition = Condition.ANY;
             state.familiarity = FamiliarityBand.ANY;
             state.peopleQuery = "";
@@ -1306,6 +1361,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         state.unitType = null;
         state.formation = null;
         state.role = null;
+        state.skill = null;
         state.condition = Condition.ANY;
         state.familiarity = FamiliarityBand.ANY;
         state.assignment = CrewAssignmentState.defaultAssignment(lastWorkPage);
@@ -1315,7 +1371,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         board.resetCards();
         // The row renderers hold the plan they draw from, so they are given the new one
         peoplePage.setRenderer(new CrewRowRenderers.PersonRow(data.plan(), this::isSelected,
-              this::isTechsPage));
+              this::isTechsPage, () -> state.selectedUnit, () -> state.skill));
         reviewPage.setRenderer(new CrewRowRenderers.ReviewRow(data.plan()));
         // Last, as clearing a search field refreshes the dialog, which must see the new plan
         board.setSearchText("");

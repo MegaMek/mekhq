@@ -73,9 +73,14 @@ import megamek.common.units.Crew;
 import megamek.common.units.Dropship;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.UnitType;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.enums.CampaignTransportType;
+import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.ChaosContract;
+import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
+import mekhq.campaign.mission.contract.contractData.ContractTermsData;
+import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
@@ -159,6 +164,43 @@ public class CampaignTest {
         // must be visible to code reading through the game, like TeamLoadOutGenerator
         campaign.getGameOptions().getOption(OptionsConstants.ALLOWED_YEAR).setValue(3019);
         assertEquals(3019, campaign.getGame().getOptions().intOption(OptionsConstants.ALLOWED_YEAR));
+    }
+
+    /**
+     * Regression test for issue #11104: contracts are read from a save (inside {@code <info>}) before
+     * {@code <campaignOptions>}, so they first bind to the campaign's default options. Replacing the campaign's options
+     * must repoint every contract - in the history and in the market - or their term getters keep applying the
+     * default per-term multipliers.
+     */
+    @Test
+    void testSetCampaignOptionsRepointsContracts() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        CampaignOptions staleOptions = campaign.getCampaignOptions();
+
+        AbstractContract historyContract = contractWithSalvage(staleOptions);
+        campaign.getContractHistoryAsMap().put(historyContract.getId(), historyContract);
+        AbstractContract marketOffer = contractWithSalvage(staleOptions);
+        campaign.getPlayerForce().getContractMarket().addContract(ContractSearchType.MERCENARY, marketOffer);
+
+        CampaignOptions loadedOptions = new CampaignOptions();
+        loadedOptions.set(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER, 0.5);
+        campaign.setCampaignOptions(loadedOptions);
+
+        // STEP_SIX grants 30% salvage; the campaign's 0.5 multiplier halves it
+        assertEquals(0.15, historyContract.getSalvageRightsMultiplier(), 1e-9);
+        assertEquals(0.15, marketOffer.getSalvageRightsMultiplier(), 1e-9);
+    }
+
+    private static AbstractContract contractWithSalvage(CampaignOptions campaignOptions) {
+        AbstractContract contract = new ChaosContract();
+        contract.setContractId(UUID.randomUUID());
+        contract.setCampaignOptions(campaignOptions);
+        contract.setContractTerms(new ContractTermsData(ChaosContractStepsTable.STEP_ONE,
+              ChaosContractStepsTable.STEP_ONE,
+              ChaosContractStepsTable.STEP_ONE,
+              ChaosContractStepsTable.STEP_SIX,
+              ChaosContractStepsTable.STEP_ONE));
+        return contract;
     }
 
     @Test

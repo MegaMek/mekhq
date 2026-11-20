@@ -32,19 +32,25 @@
  */
 package mekhq.gui.dialog.crewAssignment;
 
+import java.util.Comparator;
 import java.util.LinkedHashSet;
+import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.Set;
 
 import jakarta.annotation.Nullable;
 import megamek.common.units.Entity;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.ScoutingSkills;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.SeatEligibility;
 import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.SkillEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
 
 /**
@@ -95,6 +101,44 @@ final class CrewAssignmentState {
      */
     enum TechSort {
         BEST, TIME_FREE, FEWEST_UNITS
+    }
+
+    /**
+     * How the Assign page orders its people: the most experienced first; by the gunnery and piloting skills of the
+     * selected unit, or of each person's own combat role with no unit selected; or by the skill the Skills filter
+     * picks, which is only offered while that filter is set.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    enum AssignSort {
+        BEST, COMBAT, SKILL
+    }
+
+    /**
+     * The skills the people list's Skills filter offers: the ones the Personnel tab's Combat view shows beside each
+     * person's combat skills. Scouting covers every scouting skill, and a person's best one counts.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    enum SkillGroup {
+        SCOUTING(ScoutingSkills.SCOUTING_SKILLS),
+        ARTILLERY(List.of(SkillType.S_ARTILLERY)),
+        LEADERSHIP(List.of(SkillType.S_LEADER)),
+        TACTICS(List.of(SkillType.S_TACTICS)),
+        STRATEGY(List.of(SkillType.S_STRATEGY));
+
+        private final List<String> skillNames;
+
+        SkillGroup(List<String> skillNames) {
+            this.skillNames = List.copyOf(skillNames);
+        }
+
+        /** @return the names of the skills in this group, as {@link SkillType} names them */
+        List<String> getSkillNames() {
+            return skillNames;
+        }
     }
 
     /**
@@ -192,10 +236,14 @@ final class CrewAssignmentState {
     /** The Techs page's own status filter, in place of {@link #unitStatus}. */
     TechStatus techStatus = TechStatus.NEEDS_TECH;
     TechSort techSort = TechSort.BEST;
+    /** The Assign page's order; see {@link #effectiveAssignSort()} for the one in use. */
+    AssignSort assignSort = AssignSort.BEST;
 
     // People list
     Assignment assignment = Assignment.UNASSIGNED;
     @Nullable RoleFilter role;
+    /** The Skills filter: only people with a skill in this group, or {@code null} for everyone. */
+    @Nullable SkillGroup skill;
     Condition condition = Condition.ANY;
     /** Stays {@link FamiliarityBand#ANY} while chassis familiarity is off, as the filter is not offered then. */
     FamiliarityBand familiarity = FamiliarityBand.ANY;
@@ -426,6 +474,9 @@ final class CrewAssignmentState {
         if ((role != null) && !matches(person, role)) {
             return false;
         }
+        if (!hasSkill(entry, skill)) {
+            return false;
+        }
         if (!matches(entry, condition)) {
             return false;
         }
@@ -502,6 +553,9 @@ final class CrewAssignmentState {
                     active++;
                 }
                 if (role != null) {
+                    active++;
+                }
+                if (skill != null) {
                     active++;
                 }
                 if (condition != Condition.ANY) {
@@ -597,4 +651,135 @@ final class CrewAssignmentState {
     }
 
     // endregion Filters
+
+    // region Skills
+
+    /** Puts anyone with both gunnery and piloting ahead of anyone with one, whatever their levels. */
+    private static final int SKILL_HELD_WEIGHT = 1000;
+
+    /**
+     * @param skills a person's skills, by name
+     * @param group  a group of skills
+     *
+     * @return the person's best skill in the group, by level, or {@code null} if they have none of them
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable SkillEntry best(Map<String, SkillEntry> skills, SkillGroup group) {
+        SkillEntry best = null;
+        for (String name : group.getSkillNames()) {
+            SkillEntry skill = skills.get(name);
+            if ((skill != null) && ((best == null) || (skill.level() > best.level()))) {
+                best = skill;
+            }
+        }
+        return best;
+    }
+
+    /**
+     * @param entry a person
+     * @param group the Skills filter, or {@code null} for none
+     *
+     * @return {@code true} if the person matches the Skills filter: they have a skill in the group, or no group is set
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean hasSkill(PersonEntry entry, @Nullable SkillGroup group) {
+        return (group == null) || (best(entry.skills(), group) != null);
+    }
+
+    /**
+     * The gunnery and piloting skills a person is measured by: those the given unit uses, or with no unit, those of
+     * the person's combat role, primary first. These are the skills the Personnel tab's aggregate combat column shows.
+     *
+     * @param person a person
+     * @param unit   the unit to measure against, or {@code null} to use the person's own combat role
+     *
+     * @return the gunnery skill's name then the piloting skill's, or none for someone with no combat role and no unit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static List<String> combatSkills(Person person, @Nullable Unit unit) {
+        Entity entity = (unit == null) ? null : unit.getEntity();
+        if (entity != null) {
+            return List.of(SkillType.getGunnerySkillFor(entity), SkillType.getDrivingSkillFor(entity));
+        }
+        PersonnelRole role = person.getPrimaryRole().isCombat() ? person.getPrimaryRole() : person.getSecondaryRole();
+        return switch (role) {
+            case MEKWARRIOR, LAM_PILOT -> List.of(SkillType.S_GUN_MEK, SkillType.S_PILOT_MEK);
+            case AEROSPACE_PILOT -> List.of(SkillType.S_GUN_AERO, SkillType.S_PILOT_AERO);
+            case VEHICLE_CREW_GROUND -> List.of(SkillType.S_GUN_VEE, SkillType.S_PILOT_GVEE);
+            case VEHICLE_CREW_NAVAL -> List.of(SkillType.S_GUN_VEE, SkillType.S_PILOT_NVEE);
+            case VEHICLE_CREW_VTOL -> List.of(SkillType.S_GUN_VEE, SkillType.S_PILOT_VTOL);
+            case CONVENTIONAL_AIRCRAFT_PILOT -> List.of(SkillType.S_GUN_JET, SkillType.S_PILOT_JET);
+            case VESSEL_PILOT, VESSEL_GUNNER -> List.of(SkillType.S_GUN_SPACE, SkillType.S_PILOT_SPACE);
+            case PROTOMEK_PILOT -> List.of(SkillType.S_GUN_PROTO, SkillType.S_PILOT_PROTO);
+            case BATTLE_ARMOUR -> List.of(SkillType.S_GUN_BA, SkillType.S_ANTI_MEK);
+            case SOLDIER -> List.of(SkillType.S_SMALL_ARMS, SkillType.S_ANTI_MEK);
+            default -> List.of();
+        };
+    }
+
+    /**
+     * Scores a person by their gunnery and piloting, higher being better: anyone with both ahead of anyone with one,
+     * then by their total level.
+     *
+     * @param entry a person
+     * @param unit  the unit to measure against, or {@code null} to use the person's own combat role
+     *
+     * @return the score
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int combatScore(PersonEntry entry, @Nullable Unit unit) {
+        int held = 0;
+        int total = 0;
+        for (String name : combatSkills(entry.person(), unit)) {
+            SkillEntry skill = entry.skills().get(name);
+            if (skill != null) {
+                held++;
+                total += skill.level();
+            }
+        }
+        return (held * SKILL_HELD_WEIGHT) + total;
+    }
+
+    /**
+     * The Assign page's order in use: ordering by skill needs the Skills filter set, so without it the list is best
+     * first.
+     *
+     * @return the order to list people in
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    AssignSort effectiveAssignSort() {
+        return ((assignSort == AssignSort.SKILL) && (skill == null)) ? AssignSort.BEST : assignSort;
+    }
+
+    /**
+     * How to reorder the Assign page's people, which arrive best first; a sort keeps that order among equals.
+     *
+     * @return the order, or {@code null} to keep them best first
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Nullable Comparator<PersonEntry> assignOrder() {
+        SkillGroup group = skill;
+        return switch (effectiveAssignSort()) {
+            case BEST -> null;
+            case COMBAT -> Comparator.comparingInt((PersonEntry entry) -> combatScore(entry, selectedUnit)).reversed();
+            case SKILL -> Comparator.comparingInt((PersonEntry entry) -> {
+                SkillEntry best = (group == null) ? null : best(entry.skills(), group);
+                return (best == null) ? Integer.MIN_VALUE : best.level();
+            }).reversed();
+        };
+    }
+
+    // endregion Skills
 }
