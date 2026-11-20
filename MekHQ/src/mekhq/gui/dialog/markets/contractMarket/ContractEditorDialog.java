@@ -311,7 +311,7 @@ public class ContractEditorDialog extends JDialog {
      * The preview's content, refilled on every edit inside one long-lived scroll pane, so the preview keeps its scroll
      * position while the GM types.
      */
-    private final JPanel previewContent = MarketHud.column();
+    private final JPanel previewContent = Hud.column();
     private final List<Tracked> tracked = new ArrayList<>();
     private HudModeSelector<Section> sectionSelector;
     private Section buildingSection = Section.OFFER;
@@ -410,7 +410,7 @@ public class ContractEditorDialog extends JDialog {
         previewHolder.setPreferredSize(new Dimension(scaleForGUI(PREVIEW_WIDTH), 0));
         previewContent.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(14), scaleForGUI(16),
               scaleForGUI(14)));
-        previewHolder.add(MarketHud.scroll(previewContent, GROUND), BorderLayout.CENTER);
+        previewHolder.add(Hud.scroll(previewContent, GROUND), BorderLayout.CENTER);
         body.add(previewHolder, BorderLayout.EAST);
         content.add(body, BorderLayout.CENTER);
         content.add(buildFooter(), BorderLayout.SOUTH);
@@ -466,7 +466,7 @@ public class ContractEditorDialog extends JDialog {
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
               BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(14), scaleForGUI(10), scaleForGUI(14))));
 
-        JPanel identity = MarketHud.column();
+        JPanel identity = Hud.column();
         identity.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE,
               createMode ? "create.contractMarket.eyebrow" : "edit.contractMarket.eyebrow"))));
         identity.add(Box.createVerticalStrut(scaleForGUI(2)));
@@ -574,13 +574,13 @@ public class ContractEditorDialog extends JDialog {
     /** Builds a tab's page, scrolling on its own, and adds it to the tab pages under the tab's name. */
     private void addSection(Section section, Consumer<JPanel> builder) {
         buildingSection = section;
-        JPanel panel = MarketHud.column();
+        JPanel panel = Hud.column();
         panel.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(16), scaleForGUI(18), scaleForGUI(40),
               scaleForGUI(18)));
         panel.add(leftAligned(Hud.sectionHeading(section.label())));
         panel.add(Box.createVerticalStrut(scaleForGUI(4)));
         builder.accept(panel);
-        pageHolder.add(MarketHud.scroll(panel, SURFACE_DEEP), section.name());
+        pageHolder.add(Hud.scroll(panel, SURFACE_DEEP), section.name());
     }
 
     // endregion Layout
@@ -1243,7 +1243,7 @@ public class ContractEditorDialog extends JDialog {
         preview.add(leftAligned(previewCard()));
         preview.add(Box.createVerticalStrut(scaleForGUI(14)));
 
-        JPanel terms = MarketHud.section(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.terms"));
+        JPanel terms = Hud.section(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.terms"));
         previewTerm(terms, "edit.contractMarket.field.payRate", payRateTrack, TermEffect.PAY_RATE,
               payNonNegotiableCheck);
         previewTerm(terms, "edit.contractMarket.field.support", supportTrack, TermEffect.SUPPORT,
@@ -1257,7 +1257,7 @@ public class ContractEditorDialog extends JDialog {
         preview.add(leftAligned(terms));
         preview.add(Box.createVerticalStrut(scaleForGUI(12)));
 
-        JPanel intel = MarketHud.section(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.intel"));
+        JPanel intel = Hud.section(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.intel"));
         previewIntel(intel, "dossier.contractMarket.intel.alliedCommand",
               forcesText(employerSkillCombo, employerEquipmentPicker), obfuscateAlliedCommandCheckbox);
         previewIntel(intel, "dossier.contractMarket.intel.opposition", enemyLabel(), obfuscateOppositionCheckbox);
@@ -1270,7 +1270,7 @@ public class ContractEditorDialog extends JDialog {
         List<JComponent> badges = new ArrayList<>();
         characteristicCheckboxes.forEach((characteristic, chip) -> {
             if (chip.isSelected()) {
-                badges.add(MarketHud.badge(characteristic.getName(), polarityColor(characteristic),
+                badges.add(Hud.badge(characteristic.getName(), polarityColor(characteristic),
                       characteristic.getToolTipText()));
             }
         });
@@ -1314,12 +1314,12 @@ public class ContractEditorDialog extends JDialog {
         }
         parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "card.contractMarket.months", lengthValue()));
         StringBuilder html = new StringBuilder("<html><b style='color:").append(HudStyle.hex(TEXT)).append("'>")
-                                   .append(MarketHud.escape(nameField.getText().isBlank()
+                                   .append(Hud.escape(nameField.getText().isBlank()
                                                                   ? contract.getName()
                                                                   : nameField.getText().trim()))
                                    .append("</b><br><span style='color:")
                                    .append(HudStyle.hex(TEXT_MUTED)).append("'>")
-                                   .append(MarketHud.escape(String.join(separator, parts))).append("</span>");
+                                   .append(Hud.escape(String.join(separator, parts))).append("</span>");
         List<String> tags = previewTags();
         if (!tags.isEmpty()) {
             html.append("<br><span><b>").append(String.join(separator, tags))
@@ -1363,7 +1363,7 @@ public class ContractEditorDialog extends JDialog {
     }
 
     private static String tag(String text, Color color) {
-        return "<span style='color:" + HudStyle.hex(color) + "'>" + MarketHud.escape(text.toUpperCase(Locale.ROOT))
+        return "<span style='color:" + HudStyle.hex(color) + "'>" + Hud.escape(text.toUpperCase(Locale.ROOT))
                      + "</span>";
     }
 
@@ -1381,12 +1381,12 @@ public class ContractEditorDialog extends JDialog {
         if (lock.isSelected()) {
             value = getFormattedTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.locked", value);
         }
-        MarketHud.addRow(terms, getTextAt(RESOURCE_BUNDLE, labelKey), value, null, null, false);
+        Hud.addRow(terms, getTextAt(RESOURCE_BUNDLE, labelKey), value, null, null, false);
     }
 
     private void previewIntel(JPanel intel, String labelKey, String value, JCheckBox hidden) {
         boolean isHidden = hidden.isSelected();
-        MarketHud.addRow(intel, getTextAt(RESOURCE_BUNDLE, labelKey),
+        Hud.addRow(intel, getTextAt(RESOURCE_BUNDLE, labelKey),
               isHidden ? getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.intel.obfuscated") : value,
               isHidden ? AMBER : null, null, false);
     }
@@ -1431,7 +1431,7 @@ public class ContractEditorDialog extends JDialog {
 
     /** A tab's label, with how many of its rows have changed beside it once there are any. */
     private static String sectionLabel(Section section, int changes) {
-        String label = MarketHud.escape(section.label().toUpperCase(Locale.ROOT));
+        String label = Hud.escape(section.label().toUpperCase(Locale.ROOT));
         return changes == 0 ? "<html>" + label + "</html>"
                      : "<html>" + label + "&nbsp;&nbsp;<span style='color:" + hex(AMBER) + "'>" + changes
                              + "</span></html>";
@@ -2020,10 +2020,10 @@ public class ContractEditorDialog extends JDialog {
         JLabel effectLabel = new JLabel();
         effectLabel.setFont(hudFont(Font.BOLD, 0.9f, 0.0f));
         effectLabel.setForeground(TEXT);
-        Runnable showEffect = () -> effectLabel.setText("<html>" + MarketHud.escape(termEffectText(effect,
+        Runnable showEffect = () -> effectLabel.setText("<html>" + Hud.escape(termEffectText(effect,
               track.getSelected())) + "<br><span style='font-weight:normal; color:"
                                                               + HudStyle.hex(TEXT_FAINT) + "'>"
-                                                              + MarketHud.escape(getFormattedTextAt(RESOURCE_BUNDLE,
+                                                              + Hud.escape(getFormattedTextAt(RESOURCE_BUNDLE,
               "edit.contractMarket.stepLabel", track.getSelected().stepValue())) + "</span></html>");
         showEffect.run();
         // Sized only once its two lines are set: an empty label measures no height at all, which would clip them.
@@ -2744,7 +2744,7 @@ public class ContractEditorDialog extends JDialog {
 
     /** An NPC card: the portrait (and, in create mode, its pill) beside the fields. */
     private static JPanel personCard(JButton portrait, @Nullable JCheckBox portraitAutomatic, JComponent fields) {
-        JPanel portraitColumn = MarketHud.column();
+        JPanel portraitColumn = Hud.column();
         portrait.setAlignmentX(Component.LEFT_ALIGNMENT);
         portraitColumn.add(portrait);
         if (portraitAutomatic != null) {
@@ -2757,8 +2757,8 @@ public class ContractEditorDialog extends JDialog {
         card.setBackground(GROUND);
         card.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(BORDER, scaleForGUI(1)),
               BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(8), scaleForGUI(8), scaleForGUI(8))));
-        card.add(MarketHud.topAligned(portraitColumn), BorderLayout.WEST);
-        card.add(MarketHud.topAligned(fields), BorderLayout.CENTER);
+        card.add(Hud.topAligned(portraitColumn), BorderLayout.WEST);
+        card.add(Hud.topAligned(fields), BorderLayout.CENTER);
         return card;
     }
 

@@ -35,13 +35,13 @@ package mekhq.gui.dialog.markets.personnelMarket;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.personnel.RecruitmentCosts.SALARY_MONTHS;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.MALE_FEMALE_OTHER;
+import static mekhq.gui.baseComponents.hud.Hud.addRow;
+import static mekhq.gui.baseComponents.hud.Hud.addSpanning;
+import static mekhq.gui.baseComponents.hud.Hud.column;
+import static mekhq.gui.baseComponents.hud.Hud.escape;
+import static mekhq.gui.baseComponents.hud.Hud.section;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketDialog.RESOURCE_BUNDLE;
-import static mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketHud.addRow;
-import static mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketHud.addSpanning;
-import static mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketHud.column;
-import static mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketHud.escape;
-import static mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketHud.section;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -156,7 +156,7 @@ final class ApplicantDossier {
         detail.add(Box.createVerticalStrut(scaleForGUI(18)));
         detail.add(leftAligned(Hud.link(text("dossier.personnelMarket.fullRecord"),
               () -> market.showFullRecord(person))));
-        return PersonnelMarketHud.scroll(detail, GROUND);
+        return Hud.scroll(detail, GROUND);
     }
 
     /**
@@ -182,7 +182,7 @@ final class ApplicantDossier {
         body.setFont(hudFont(Font.PLAIN, 0.92f, 0.0f));
         text.add(leftAligned(body));
 
-        JPanel notice = PersonnelMarketHud.framedSurface(18);
+        JPanel notice = Hud.framedSurface(18);
         notice.add(text, BorderLayout.CENTER);
 
         JPanel holder = Hud.transparentPanel(new BorderLayout());
@@ -201,7 +201,7 @@ final class ApplicantDossier {
         ApplicantFacts facts = market.facts(person);
 
         JPanel header = Hud.transparentPanel(new BorderLayout(scaleForGUI(16), 0));
-        header.add(PersonnelMarketHud.topAligned(PersonnelMarketHud.portrait(person, scaleForGUI(PORTRAIT_SIZE))),
+        header.add(Hud.topAligned(PersonnelMarketHud.portrait(person, scaleForGUI(PORTRAIT_SIZE))),
               BorderLayout.WEST);
 
         JPanel text = column();
@@ -227,11 +227,11 @@ final class ApplicantDossier {
             factRow.add(PersonnelMarketHud.fact(origin.getFullName(today.getYear()), TEXT_MUTED));
         }
         if (person.isCivilian()) {
-            factRow.add(PersonnelMarketHud.badge(text("tag.personnelMarket.civilian"), TEXT_FAINT,
+            factRow.add(Hud.badge(text("tag.personnelMarket.civilian"), TEXT_FAINT,
                   text("tag.personnelMarket.civilian.tooltip")));
         }
         if (market.isRare(person)) {
-            factRow.add(PersonnelMarketHud.badge(text("tag.personnelMarket.rare"), AMBER,
+            factRow.add(Hud.badge(text("tag.personnelMarket.rare"), AMBER,
                   text("tag.personnelMarket.rare.tooltip")));
         }
         // The facts wrap beside the portrait; the row is offset by the layout's own gap so it lines up with the name.
@@ -338,7 +338,7 @@ final class ApplicantDossier {
         for (boolean flaws : new boolean[] { false, true }) {
             for (Ability ability : abilities) {
                 if (ability.isFlaw() == flaws) {
-                    badges.add(PersonnelMarketHud.badge(ability.name(), flaws ? DANGER : READY,
+                    badges.add(Hud.badge(ability.name(), flaws ? DANGER : READY,
                           ability.description()));
                 }
             }

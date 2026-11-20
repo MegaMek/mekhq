@@ -70,6 +70,7 @@ import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.factionHints.FactionHints;
+import mekhq.campaign.universe.factionStanding.FactionStandingLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
@@ -99,6 +100,10 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
     private static final int DEFAULT_UNIT_REPUTATION_RECRUITMENT_CUTOFF = -25;
     private static final int CHAOS_UNIT_REPUTATION_RECRUITMENT_CUTOFF = -3;
+    /** The largest system status multiplier: a Great hiring hall (3) on a major power's capital (+2) */
+    private static final int MAXIMUM_SYSTEM_STATUS_MULTIPLIER = 5;
+    /** Systems with fewer people than this give fewer recruitment rolls, in proportion to their population */
+    private static final int LOW_POPULATION_RECRUITMENT_DIVIDER = 7_500_000;
 
     /**
      * Constructs a personnel market using the MekHQ classic ruleset.
@@ -113,12 +118,6 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
 
         setAssociatedPersonnelMarketStyle(MEKHQ);
 
-        setLowPopulationRecruitmentDivider(7500000);
-
-        // The campaign reference isn't available yet at construction time, so we default the cutoff here and refine it
-        // in setCampaign(...) once the campaign has been attached.
-        setUnitReputationRecruitmentCutoff(DEFAULT_UNIT_REPUTATION_RECRUITMENT_CUTOFF);
-
         PersonnelMarketLibraries personnelMarketLibraries = new PersonnelMarketLibraries();
         setClanMarketEntries(personnelMarketLibraries.getClanMarketMekHQ());
         setInnerSphereMarketEntries(personnelMarketLibraries.getInnerSphereMarketMekHQ());
@@ -127,23 +126,59 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
     /**
      * {@inheritDoc}
      *
-     * <p>Once the campaign has been attached, the unit reputation recruitment cutoff is refined based on the
-     * {@link CampaignOption#USE_CHAOS_REPUTATION} campaign option. This can't be done in the constructor because the
-     * campaign reference isn't available at that point.</p>
+     * <p>The MekHQ rules multiply the daily rolls by the system's status (up to
+     * {@value #MAXIMUM_SYSTEM_STATUS_MULTIPLIER}), by two under Alternate Advanced Medical, and by the best Faction
+     * Standing modifier when standings affect recruitment, before adding Connections.</p>
      *
      * @author Illiani
      * @since 0.51.01
      */
     @Override
-    public void setCampaign(Campaign campaign) {
-        super.setCampaign(campaign);
-
+    public int getMaximumRecruitmentRolls() {
+        int rolls = MAXIMUM_DAYS_IN_MONTH * MAXIMUM_SYSTEM_STATUS_MULTIPLIER;
+        Campaign campaign = getCampaign();
         if (campaign != null) {
-            boolean isUseChaosReputation = campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
-            setUnitReputationRecruitmentCutoff(isUseChaosReputation ?
-                                                     CHAOS_UNIT_REPUTATION_RECRUITMENT_CUTOFF :
-                                                     DEFAULT_UNIT_REPUTATION_RECRUITMENT_CUTOFF);
+            CampaignOptions campaignOptions = campaign.getCampaignOptions();
+            if (campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
+                rolls *= ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER;
+            }
+            if (campaignOptions.isUseFactionStandingRecruitmentSafe()) {
+                double bestModifier = 0;
+                for (FactionStandingLevel level : FactionStandingLevel.values()) {
+                    bestModifier = Math.max(bestModifier, level.getRecruitmentRollsModifier());
+                }
+                rolls = (int) round(rolls * bestModifier);
+            }
         }
+        return applyApplicantMultiplier(rolls + getMaximumConnectionsRolls());
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * @return {@value #LOW_POPULATION_RECRUITMENT_DIVIDER}
+     */
+    @Override
+    public int getLowPopulationRecruitmentDivider() {
+        return LOW_POPULATION_RECRUITMENT_DIVIDER;
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>The cutoff depends on the {@link CampaignOption#USE_CHAOS_REPUTATION} campaign option, as Chaos reputation
+     * runs on a much smaller scale.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    public int getUnitReputationRecruitmentCutoff() {
+        Campaign campaign = getCampaign();
+        boolean isUseChaosReputation = campaign != null
+                                             && campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION);
+        return isUseChaosReputation ? CHAOS_UNIT_REPUTATION_RECRUITMENT_CUTOFF :
+                     DEFAULT_UNIT_REPUTATION_RECRUITMENT_CUTOFF;
     }
 
 

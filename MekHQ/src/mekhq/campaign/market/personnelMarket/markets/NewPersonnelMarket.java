@@ -79,6 +79,7 @@ import mekhq.campaign.market.personnelMarket.records.HiringCostBreakdown;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.RecruitmentCosts;
+import mekhq.campaign.personnel.RecruitmentCosts.RecruitmentCostBreakdown;
 import mekhq.campaign.personnel.enums.ConnectionsLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
@@ -105,11 +106,11 @@ public class NewPersonnelMarket {
 
     @SuppressWarnings(value = "FieldCanBeLocal")
     private static final int RARE_PROFESSION_WEIGHT = 20;
-    private static int lowPopulationRecruitmentDivider = 1;
-    private static int unitReputationRecruitmentCutoff = Integer.MIN_VALUE;
     @SuppressWarnings(value = "FieldCanBeLocal")
     private static final int PROFESSION_EXTINCTION_IGNORE_VALUE = -1;
     static final double MINIMUM_APPLICANT_MULTIPLIER = 0.1;
+    /** The most days a month can have, and so the most base recruitment rolls */
+    static final int MAXIMUM_DAYS_IN_MONTH = 31;
 
     private Campaign campaign;
     private PersonnelMarketStyle associatedPersonnelMarketStyle = PERSONNEL_MARKET_DISABLED;
@@ -410,51 +411,29 @@ public class NewPersonnelMarket {
     }
 
     /**
-     * Gets the recruitment divider value for low population systems.
+     * Gets the population below which a system gives fewer recruitment rolls. Each market style sets its own; this base
+     * market has no population limit.
      *
-     * @return recruitment divider integer
+     * @return the population threshold, as a recruitment divider
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public static int getLowPopulationRecruitmentDivider() {
-        return lowPopulationRecruitmentDivider;
+    public int getLowPopulationRecruitmentDivider() {
+        return 1;
     }
 
     /**
-     * Sets the recruitment divider for low population systems.
+     * Gets the reputation below which only mercenaries and pirates will join. Each market style sets its own; this base
+     * market has no reputation limit.
      *
-     * @param divider recruitment divider to set
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    public static void setLowPopulationRecruitmentDivider(int divider) {
-        lowPopulationRecruitmentDivider = divider;
-    }
-
-    /**
-     * Gets the unit reputation cutoff value for recruitment.
-     *
-     * @return reputation cutoff threshold
+     * @return the reputation cutoff
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public static int getUnitReputationRecruitmentCutoff() {
-        return unitReputationRecruitmentCutoff;
-    }
-
-    /**
-     * Sets the cutoff value for unit reputation in recruitment eligibility.
-     *
-     * @param cutoff reputation cutoff to set
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    public static void setUnitReputationRecruitmentCutoff(int cutoff) {
-        unitReputationRecruitmentCutoff = cutoff;
+    public int getUnitReputationRecruitmentCutoff() {
+        return Integer.MIN_VALUE;
     }
 
     /**
@@ -1266,6 +1245,31 @@ public class NewPersonnelMarket {
      * @author Illiani
      * @since 0.51.01
      */
+    /**
+     * Gets the most recruitment rolls this market could make in a month, for showing this month's rolls against. The
+     * base rules make one roll per day of the month, plus any rolls from the commander's Connections, multiplied by
+     * the Applicant Multiplier.
+     *
+     * @return the most recruitment rolls possible in a month
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getMaximumRecruitmentRolls() {
+        return applyApplicantMultiplier(MAXIMUM_DAYS_IN_MONTH + getMaximumConnectionsRolls());
+    }
+
+    /**
+     * @return the most extra recruitment rolls the commander's Connections can add, or {@code 0} if monthly Connections
+     *       checks are off
+     */
+    int getMaximumConnectionsRolls() {
+        if (campaign == null || !campaign.getCampaignOptions().get(CampaignOption.ALLOW_MONTHLY_CONNECTIONS)) {
+            return 0;
+        }
+        return ConnectionsLevel.CONNECTIONS_TEN.getRecruits();
+    }
+
     int applyApplicantMultiplier(int rolls) {
         if (campaign == null) {
             return rolls;
@@ -1422,9 +1426,8 @@ public class NewPersonnelMarket {
      * @param applicant the applicant
      * @param extra     an extra cost charged on top, such as a Golden Hello; zero for none
      *
-     * @return nothing but the extra if Pay for Recruitment is off; otherwise the applicant's training-based cost if
-     *       {@link RecruitmentCosts#isUsingTrainingBasedCost} applies, or {@link RecruitmentCosts#SALARY_MONTHS}
-     *       months' salary, plus the extra
+     * @return nothing but the extra if Pay for Recruitment is off; otherwise the applicant's
+     *       {@link RecruitmentCosts#getRecruitmentCostBreakdown recruitment cost} plus the extra
      *
      * @author Illiani
      * @since 0.51.01
@@ -1434,12 +1437,8 @@ public class NewPersonnelMarket {
             return new HiringCostBreakdown(Money.zero(), null, extra);
         }
 
-        if (RecruitmentCosts.isUsingTrainingBasedCost(campaign.getCampaignOptions())) {
-            return new HiringCostBreakdown(Money.zero(),
-                  RecruitmentCosts.getTrainingBasedCostBreakdown(campaign, applicant), extra);
-        }
-
-        return new HiringCostBreakdown(applicant.getSalary(campaign).multipliedBy(RecruitmentCosts.SALARY_MONTHS),
-              null, extra);
+        // Priced as any other recruit would be, so the market and Pay for Recruitment never quote different prices
+        RecruitmentCostBreakdown recruitmentCost = RecruitmentCosts.getRecruitmentCostBreakdown(campaign, applicant);
+        return new HiringCostBreakdown(recruitmentCost.salaryCost(), recruitmentCost.trainingCost(), extra);
     }
 }

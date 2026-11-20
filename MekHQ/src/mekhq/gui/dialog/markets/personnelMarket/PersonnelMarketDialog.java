@@ -38,8 +38,6 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.enums.DailyReportType.GENERAL;
 import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
-import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.PERSONNEL_MARKET_DISABLED;
-import static mekhq.campaign.market.personnelMarket.markets.PersonnelMarketMekHQ.ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.gui.dialog.markets.contractMarket.ContractMarketFormatting.compactMoney;
 import static mekhq.gui.enums.PersonnelFilter.ACTIVE;
@@ -68,7 +66,6 @@ import javax.swing.event.DocumentListener;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.preferences.JWindowPreference;
 import megamek.client.ui.preferences.PreferencesNode;
-import megamek.common.options.IOption;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
@@ -78,8 +75,6 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.personnel.PersonnelOptions;
-import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -121,8 +116,6 @@ public class PersonnelMarketDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(PersonnelMarketDialog.class);
     static final String RESOURCE_BUNDLE = "mekhq.resources.PersonnelMarket";
 
-    private static final int MAXIMUM_DAYS_IN_MONTH = 31;
-    private static final int MAXIMUM_NUMBER_OF_SYSTEM_ROLLS = 4;
     /** How many tips there are, numbered from zero, for the one shown in the footer. */
     private static final int TIP_COUNT = 11;
     private static final int RAIL_WIDTH = 220;
@@ -163,8 +156,8 @@ public class PersonnelMarketDialog extends JDialog {
 
     private final JTextField searchField = new JTextField();
     private final HudFilterList<PersonnelFilter> filterList = new HudFilterList<>(this::setFilter);
-    private final JPanel traitRows = PersonnelMarketHud.column();
-    private final JPanel experienceRows = PersonnelMarketHud.column();
+    private final JPanel traitRows = Hud.column();
+    private final JPanel experienceRows = Hud.column();
     private final HudCheckBox goldenHelloCheckbox = new HudCheckBox("");
     private final JPanel dossierHolder = new JPanel(new BorderLayout());
     private final JLabel selectionLabel = Hud.hint("");
@@ -177,6 +170,8 @@ public class PersonnelMarketDialog extends JDialog {
     private HudCheckBox autoOpenGuide;
     private @Nullable Person shownInDossier;
     private boolean isDossierShown;
+    /** {@code true} while the filters are being cleared, so clearing the search does not refresh the board early. */
+    private boolean isClearingFilters;
 
     /**
      * Builds the dialog and shows it modally; this returns once the dialog has closed.
@@ -282,7 +277,7 @@ public class PersonnelMarketDialog extends JDialog {
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
               BorderFactory.createEmptyBorder(scaleForGUI(14), scaleForGUI(16), scaleForGUI(12), scaleForGUI(16))));
 
-        JPanel identity = PersonnelMarketHud.column();
+        JPanel identity = Hud.column();
         JLabel eyebrow = new JLabel(getTitle().toUpperCase(Locale.ROOT));
         eyebrow.setForeground(TEXT_FAINT);
         eyebrow.setFont(hudFont(Font.BOLD, 0.72f, 0.18f));
@@ -299,10 +294,10 @@ public class PersonnelMarketDialog extends JDialog {
         identity.add(leftAligned(subtitle));
 
         applicantsTile = new HudStatTile(text("tile.personnelMarket.applicants"), "");
-        applicantsTile.setToolTipText(PersonnelMarketHud.wrapToolTip(text("tile.personnelMarket.applicants.tooltip")));
+        applicantsTile.setToolTipText(Hud.wrapToolTip(text("tile.personnelMarket.applicants.tooltip")));
         HudStatTile rollsTile = buildRollsTile();
         fundsTile = new HudStatTile(text("tile.personnelMarket.funds"), "");
-        fundsTile.setToolTipText(PersonnelMarketHud.wrapToolTip(text("tile.personnelMarket.funds.tooltip")));
+        fundsTile.setToolTipText(Hud.wrapToolTip(text("tile.personnelMarket.funds.tooltip")));
         JPanel tiles = Hud.tileRow(applicantsTile, rollsTile, fundsTile);
 
         JPanel topRow = Hud.transparentPanel(new BorderLayout(scaleForGUI(24), 0));
@@ -337,19 +332,14 @@ public class PersonnelMarketDialog extends JDialog {
      * it could have rolled here. It never changes while the market is open, so it is filled in once.
      */
     private HudStatTile buildRollsTile() {
-        int maximum = campaignOptions.get(CampaignOption.PERSONNEL_MARKET_STYLE) != PERSONNEL_MARKET_DISABLED
-                            ? MAXIMUM_DAYS_IN_MONTH * MAXIMUM_NUMBER_OF_SYSTEM_ROLLS
-                            : MAXIMUM_DAYS_IN_MONTH;
-        if (campaignOptions.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL)) {
-            maximum *= ALTERNATE_ADVANCED_MEDICAL_RECRUITMENT_MULTIPLIER;
-        }
+        int maximum = Math.max(1, market.getMaximumRecruitmentRolls());
         int rolls = market.getRecruitmentRolls();
 
         HudStatTile tile = new HudStatTile(text("tile.personnelMarket.rolls"),
               getFormattedTextAt(RESOURCE_BUNDLE, "tile.personnelMarket.rolls.sub", maximum));
         tile.setValue(Integer.toString(rolls), AMBER);
         tile.setMeter(min(rolls, maximum) / (double) maximum, AMBER, null);
-        tile.setToolTipText(PersonnelMarketHud.wrapToolTip(text("tile.personnelMarket.rolls.tooltip")));
+        tile.setToolTipText(Hud.wrapToolTip(text("tile.personnelMarket.rolls.tooltip")));
         return tile;
     }
 
@@ -366,14 +356,14 @@ public class PersonnelMarketDialog extends JDialog {
         String amberSpan = "<span style='color:" + hex(AMBER) + "'>";
         boolean isUseChaosReputation = campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION);
         if (campaign.getPlayerForce().getReputationRating(isUseChaosReputation)
-                  < NewPersonnelMarket.getUnitReputationRecruitmentCutoff()) {
+                  < market.getUnitReputationRecruitmentCutoff()) {
             return banner(AMBER, getFormattedTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.reputation", amberSpan,
                   "</span>"));
         }
 
         PlanetarySystem currentSystem = campaign.getCurrentSystem();
         if (currentSystem != null && currentSystem.getPopulation(campaign.getLocalDate())
-                                           < NewPersonnelMarket.getLowPopulationRecruitmentDivider()) {
+                                           < market.getLowPopulationRecruitmentDivider()) {
             return banner(AMBER, getFormattedTextAt(RESOURCE_BUNDLE, "hint.personnelMarket.population", amberSpan,
                   "</span>"));
         }
@@ -414,17 +404,17 @@ public class PersonnelMarketDialog extends JDialog {
         searchField.getDocument().addDocumentListener(new DocumentListener() {
             @Override
             public void insertUpdate(DocumentEvent event) {
-                refreshKeepingSelection();
+                searchChanged();
             }
 
             @Override
             public void removeUpdate(DocumentEvent event) {
-                refreshKeepingSelection();
+                searchChanged();
             }
 
             @Override
             public void changedUpdate(DocumentEvent event) {
-                refreshKeepingSelection();
+                searchChanged();
             }
         });
         // Enter or Down moves from the search to the board, so the player can search and pick without the mouse.
@@ -437,7 +427,7 @@ public class PersonnelMarketDialog extends JDialog {
             }
         });
 
-        JPanel head = PersonnelMarketHud.column();
+        JPanel head = Hud.column();
         head.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(12), scaleForGUI(8),
               scaleForGUI(12)));
         head.add(leftAligned(searchField));
@@ -447,7 +437,7 @@ public class PersonnelMarketDialog extends JDialog {
 
         // Below the roles, checkboxes narrow the board further: to applicants with abilities or flaws, and to chosen
         // experience levels.
-        JPanel rows = PersonnelMarketHud.column();
+        JPanel rows = Hud.column();
         rows.add(leftAligned(filterList));
         rows.add(Box.createVerticalStrut(scaleForGUI(14)));
         rows.add(leftAligned(railHeading(text("rail.personnelMarket.traits"))));
@@ -456,7 +446,7 @@ public class PersonnelMarketDialog extends JDialog {
         rows.add(leftAligned(railHeading(text("rail.personnelMarket.experience"))));
         rows.add(leftAligned(experienceRows));
         rows.add(Box.createVerticalStrut(scaleForGUI(10)));
-        JScrollPane scroll = PersonnelMarketHud.scroll(rows, SURFACE_DEEP);
+        JScrollPane scroll = Hud.scroll(rows, SURFACE_DEEP);
         rail.add(scroll, BorderLayout.CENTER);
 
         JPanel foot = Hud.transparentPanel(new BorderLayout());
@@ -506,7 +496,7 @@ public class PersonnelMarketDialog extends JDialog {
         if (market.getAssociatedPersonnelMarketStyle() == MEKHQ) {
             goldenHelloCheckbox.setText(text("checkbox.personnelMarket.goldenHello"));
             goldenHelloCheckbox.setSelected(market.isOfferingGoldenHello());
-            goldenHelloCheckbox.setToolTipText(PersonnelMarketHud.wrapToolTip(
+            goldenHelloCheckbox.setToolTipText(Hud.wrapToolTip(
                   text("checkbox.personnelMarket.goldenHello.tooltip")));
             JPanel options = Hud.transparentPanel(null);
             options.setLayout(new BoxLayout(options, BoxLayout.X_AXIS));
@@ -516,21 +506,21 @@ public class PersonnelMarketDialog extends JDialog {
             optionsRow.add(options, BorderLayout.WEST);
         }
         HudWrappingLabel tip = new HudWrappingLabel("<html><span style='color:" + hex(TEXT_FAINT) + "'>"
-                                                          + PersonnelMarketHud.escape(text("footer.personnelMarket.tip")
+                                                          + Hud.escape(text("footer.personnelMarket.tip")
                                                                                             .toUpperCase(Locale.ROOT))
                                                           + "</span>&nbsp;&nbsp;"
-                                                          + PersonnelMarketHud.escape(tipText()) + "</html>");
+                                                          + Hud.escape(tipText()) + "</html>");
         tip.setForeground(TEXT_MUTED);
         tip.setFont(hudFont(Font.PLAIN, 0.88f, 0.0f));
         optionsRow.add(tip, BorderLayout.CENTER);
 
         HudButton advanceDays = new HudButton(text("button.personnelMarket.advanceDays").toUpperCase(Locale.ROOT),
               false);
-        advanceDays.setToolTipText(PersonnelMarketHud.wrapToolTip(
+        advanceDays.setToolTipText(Hud.wrapToolTip(
               text("button.personnelMarket.advanceDays.tooltip")));
         advanceDays.addActionListener(event -> advanceDays());
         gmRecruitButton = new HudButton(text("button.personnelMarket.hire.gm").toUpperCase(Locale.ROOT), false);
-        gmRecruitButton.setToolTipText(PersonnelMarketHud.wrapToolTip(text(campaign.isGM()
+        gmRecruitButton.setToolTipText(Hud.wrapToolTip(text(campaign.isGM()
                                                                                  ? "button.personnelMarket.hire.gm.tooltip"
                                                                                  : "button.personnelMarket.gmOnly.tooltip")));
         gmRecruitButton.addActionListener(event -> {
@@ -588,12 +578,26 @@ public class PersonnelMarketDialog extends JDialog {
 
     /**
      * Brings every part of the window up to date: the filter rail and its counts, the board, the tiles and the footer.
+     * Used when the applicants or the filters' state change; see {@link #refreshBoard} for everything else.
      *
      * @param keep          the applicants to keep selected, if still shown
      * @param fallbackIndex the board position to select if none of {@code keep} is shown
      */
     private void refresh(Collection<Person> keep, int fallbackIndex) {
         refreshFilters();
+        refreshBoard(keep, fallbackIndex);
+    }
+
+    /**
+     * Brings the board, the tiles and the footer up to date after the player filters, searches or sorts. The rail's
+     * counts are of every applicant, so they cannot have changed; its controls are left in place, keeping the keyboard
+     * focus on the one the player just used.
+     *
+     * @param keep          the applicants to keep selected, if still shown
+     * @param fallbackIndex the board position to select if none of {@code keep} is shown
+     */
+    private void refreshBoard(Collection<Person> keep, int fallbackIndex) {
+        filterList.setSelected(filter);
 
         List<Person> shown = new ArrayList<>();
         for (Person applicant : currentApplicants) {
@@ -614,7 +618,7 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     private void refreshKeepingSelection() {
-        refresh(board.selected(), board.firstSelectedIndex());
+        refreshBoard(board.selected(), board.firstSelectedIndex());
     }
 
     /**
@@ -743,7 +747,7 @@ public class PersonnelMarketDialog extends JDialog {
         }
         recruitButton.setArmed(!selected.isEmpty());
         recruitButton.setToolTipText(isUnaffordable
-                                           ? PersonnelMarketHud.wrapToolTip(getFormattedTextAt(RESOURCE_BUNDLE,
+                                           ? Hud.wrapToolTip(getFormattedTextAt(RESOURCE_BUNDLE,
                                                  "button.personnelMarket.hire.unaffordable",
                                                  total.toAmountAndSymbolString(),
                                                  balance.toAmountAndSymbolString()))
@@ -807,41 +811,41 @@ public class PersonnelMarketDialog extends JDialog {
         refreshKeepingSelection();
     }
 
+    /** The search changed: refresh the board, unless the filters are being cleared and will refresh it once. */
+    private void searchChanged() {
+        if (!isClearingFilters) {
+            refreshKeepingSelection();
+        }
+    }
+
+    /** Clears every filter and the search, then rebuilds the rail so its checkboxes show as cleared. */
     private void clearFilters() {
+        resetFilters();
+        refresh(board.selected(), board.firstSelectedIndex());
+    }
+
+    /** Clears every filter and the search without refreshing anything; the caller refreshes once afterwards. */
+    private void resetFilters() {
         filter = ALL;
         isAbilitiesOnly = false;
         isFlawsOnly = false;
         experienceLevels.clear();
         market.setLastSelectedFilter(Math.max(filters.indexOf(ALL), 0));
-        // Clearing the search refreshes the board through its listener; refresh anyway in case it was already empty.
-        searchField.setText("");
-        refreshKeepingSelection();
+        isClearingFilters = true;
+        try {
+            searchField.setText("");
+        } finally {
+            isClearingFilters = false;
+        }
     }
 
     private ApplicantFacts workOutFacts(Person person) {
         int experienceLevel = person.getExperienceLevel(campaignOptions, campaign.getPlayerForce().isClanForce(),
               campaign.getLocalDate(), false, true);
-        int abilities = 0;
-        int flaws = 0;
-        for (Enumeration<IOption> options = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES);
-              options.hasMoreElements(); ) {
-            IOption option = options.nextElement();
-            if (!option.booleanValue()) {
-                continue;
-            }
-            SpecialAbility ability = null;
-            try {
-                ability = SpecialAbility.getAbility(option.getName());
-            } catch (Exception exception) {
-                LOGGER.debug("Unable to find {} in the campaign's SPAs; this is expected if it is turned off",
-                      option.getName());
-            }
-            if (ability != null && ability.getCost() < 0) {
-                flaws++;
-            } else {
-                abilities++;
-            }
-        }
+        // Counted from the dossier's list, so the card's counts always match the dossier's badges.
+        List<ApplicantDossier.Ability> traits = ApplicantDossier.abilities(person);
+        int flaws = (int) traits.stream().filter(ApplicantDossier.Ability::isFlaw).count();
+        int abilities = traits.size() - flaws;
         return new ApplicantFacts(experienceLevel, market.getHiringCost(person), abilities, flaws);
     }
 
@@ -1015,8 +1019,8 @@ public class PersonnelMarketDialog extends JDialog {
         facts.put(applicant, workOutFacts(applicant));
 
         if (!matchesFilters(applicant)) {
-            // Clearing the filters refreshes the board; the refresh below then selects the new applicant.
-            clearFilters();
+            // Clear the filters so the new applicant is in view; the refresh below then selects them.
+            resetFilters();
         }
         refresh(List.of(applicant), 0);
     }

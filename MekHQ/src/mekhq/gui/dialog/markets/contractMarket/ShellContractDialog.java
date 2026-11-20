@@ -203,7 +203,7 @@ public class ShellContractDialog extends JDialog {
         content.setOpaque(true);
         content.setBackground(GROUND);
         content.add(buildCommandBar(), BorderLayout.NORTH);
-        content.add(MarketHud.scroll(buildForm(), SURFACE_DEEP), BorderLayout.CENTER);
+        content.add(Hud.scroll(buildForm(), SURFACE_DEEP), BorderLayout.CENTER);
         content.add(buildFooter(), BorderLayout.SOUTH);
         setContentPane(content);
 
@@ -267,7 +267,7 @@ public class ShellContractDialog extends JDialog {
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
               BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(14), scaleForGUI(10), scaleForGUI(14))));
 
-        JPanel identity = MarketHud.column();
+        JPanel identity = Hud.column();
         identity.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE,
               contract == null ? "header.eyebrow.create" : "header.eyebrow.edit"))));
         identity.add(Box.createVerticalStrut(scaleForGUI(2)));
@@ -314,7 +314,7 @@ public class ShellContractDialog extends JDialog {
 
     /** The form: the contract's identity, then its belligerents, location, schedule and terms under sub-headings. */
     private JPanel buildForm() {
-        JPanel form = MarketHud.column();
+        JPanel form = Hud.column();
         form.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(16), scaleForGUI(18), scaleForGUI(24),
               scaleForGUI(18)));
         form.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "section.contract"))));

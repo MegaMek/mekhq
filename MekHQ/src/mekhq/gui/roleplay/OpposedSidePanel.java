@@ -33,8 +33,8 @@
 package mekhq.gui.roleplay;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.baseComponents.hud.Hud.column;
 import static mekhq.gui.baseComponents.hud.HudStyle.leftAligned;
-import static mekhq.gui.roleplay.AskPage.column;
 import static mekhq.gui.roleplay.OracleConsole.RESOURCE_BUNDLE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 

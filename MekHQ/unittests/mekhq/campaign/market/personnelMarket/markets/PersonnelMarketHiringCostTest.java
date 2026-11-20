@@ -34,6 +34,8 @@ package mekhq.campaign.market.personnelMarket.markets;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
@@ -68,11 +70,11 @@ class PersonnelMarketHiringCostTest {
         // Salary-based pricing: neither training cost option charges C-bills
         when(campaignOptions.get(CampaignOption.SKILL_IMPROVEMENTS_COST_C_BILLS)).thenReturn(false);
         when(campaignOptions.get(CampaignOption.USE_SPA_TRAINING_COSTS)).thenReturn(false);
-        // Read when the MekHQ market is attached to the campaign
-        when(campaignOptions.get(CampaignOption.USE_CHAOS_REPUTATION)).thenReturn(false);
 
         applicant = mock(Person.class);
+        // The market prices a Golden Hello from the first; RecruitmentCosts prices the recruit from the second
         when(applicant.getSalary(campaign)).thenReturn(MONTHLY_SALARY);
+        when(applicant.getSalary(any(CampaignOptions.class), anyBoolean(), any())).thenReturn(MONTHLY_SALARY);
     }
 
     private void setPayForRecruitment(boolean isPayForRecruitment) {

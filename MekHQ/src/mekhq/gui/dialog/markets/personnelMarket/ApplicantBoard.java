@@ -34,10 +34,10 @@ package mekhq.gui.dialog.markets.personnelMarket;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.personnel.enums.GenderDescriptors.MALE_FEMALE_OTHER;
+import static mekhq.gui.baseComponents.hud.Hud.escape;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.gui.dialog.markets.contractMarket.ContractMarketFormatting.compactMoney;
 import static mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketDialog.RESOURCE_BUNDLE;
-import static mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketHud.escape;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -170,7 +170,7 @@ final class ApplicantBoard {
         addApplicant.setArmed(market.isGM());
         String addToolTipKey = market.isGM() ? "button.personnelMarket.add.gm.tooltip"
                                      : "button.personnelMarket.gmOnly.tooltip";
-        addApplicant.setToolTipText(PersonnelMarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE, addToolTipKey)));
+        addApplicant.setToolTipText(Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE, addToolTipKey)));
         addApplicant.addActionListener(event -> {
             if (market.isGM()) {
                 market.addApplicant();
@@ -219,6 +219,7 @@ final class ApplicantBoard {
                   chipSort.toolTip()) : chipSort.toolTip());
         }
 
+        Person previousLead = lead();
         updatingList = true;
         try {
             listModel.clear();
@@ -234,6 +235,12 @@ final class ApplicantBoard {
                 indices.add(Math.clamp(fallbackIndex, 0, shown.size() - 1));
             }
             list.setSelectedIndices(indices.stream().mapToInt(Integer::intValue).toArray());
+            // Restoring the selection makes its last row the lead; give the lead back to the applicant the player last
+            // clicked, so the dossier keeps showing them. Re-adding a selected row only moves the lead.
+            int leadIndex = previousLead == null ? -1 : shown.indexOf(previousLead);
+            if (leadIndex >= 0 && indices.contains(leadIndex)) {
+                list.addSelectionInterval(leadIndex, leadIndex);
+            }
             if (!indices.isEmpty()) {
                 list.ensureIndexIsVisible(indices.getFirst());
             }
@@ -319,7 +326,7 @@ final class ApplicantBoard {
             JPanel figureHolder = Hud.transparentPanel(new BorderLayout());
             figureHolder.add(figureColumn, BorderLayout.NORTH);
 
-            add(PersonnelMarketHud.topAligned(portrait), BorderLayout.WEST);
+            add(Hud.topAligned(portrait), BorderLayout.WEST);
             add(text, BorderLayout.CENTER);
             add(figureHolder, BorderLayout.EAST);
         }
