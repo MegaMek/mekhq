@@ -48,6 +48,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -73,6 +74,8 @@ import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudLinkList;
 import mekhq.gui.baseComponents.hud.HudToolTip;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.SkillEntry;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SkillGroup;
 
 /**
  * The row renderers of the crew assignment lists, and the labels they share. Links in a row carry the {@link Unit} or
@@ -287,21 +290,37 @@ final class CrewRowRenderers {
         private final Predicate<Person> isSelected;
         /** {@code true} while the row is drawn on the Techs page, where it shows a tech's workload, not their seat. */
         private final BooleanSupplier isTechView;
+        /** The unit whose gunnery and piloting skills the row shows, or {@code null} for the person's own role's. */
+        private final Supplier<Unit> skillUnit;
+        /** The Skills filter's group, whose best skill the row shows, or {@code null} for none. */
+        private final Supplier<SkillGroup> skillGroup;
         private final JLabel where = label(LINE_FONT, TEXT_MUTED);
         /** Hits and fatigue, on the second line beside where the person serves. */
         private final JLabel condition = label(LINE_FONT, TEXT_MUTED);
+        /** The skill values that matter for the choice at hand, such as "3/4 · Scouting 5". */
+        private final JLabel skills = label(LINE_FONT, TEXT);
         private final JLabel abilities = badge();
         private final JLabel skill = label(SKILL_FONT, TEXT);
 
-        PersonRow(AssignmentPlan plan, Predicate<Person> isSelected, BooleanSupplier isTechView) {
+        /**
+         * @param skillUnit  the unit whose gunnery and piloting skills to show, or {@code null} for each person's own
+         *                   combat role's
+         * @param skillGroup the group of skills to show each person's best of, or {@code null} for none
+         */
+        PersonRow(AssignmentPlan plan, Predicate<Person> isSelected, BooleanSupplier isTechView,
+              Supplier<Unit> skillUnit, Supplier<SkillGroup> skillGroup) {
             // No tick box: one person is selected at a time, shown by the row's accent bar and lighter background
             super(false);
             this.plan = plan;
             this.isSelected = isSelected;
             this.isTechView = isTechView;
+            this.skillUnit = skillUnit;
+            this.skillGroup = skillGroup;
             secondLine.add(where);
             secondLine.add(Box.createHorizontalStrut(scaleForGUI(10)));
             secondLine.add(condition);
+            badges.add(skills);
+            badges.add(Box.createHorizontalStrut(scaleForGUI(10)));
             badges.add(abilities);
             badges.add(Box.createHorizontalStrut(scaleForGUI(10)));
             skill.setHorizontalAlignment(JLabel.RIGHT);
@@ -352,6 +371,8 @@ final class CrewRowRenderers {
                 setLink(list, index, where, text, planned);
             }
 
+            showSkills(entry);
+
             int count = entry.abilities().size();
             abilities.setVisible(count > 0);
             if (count > 0) {
@@ -367,6 +388,43 @@ final class CrewRowRenderers {
             skill.setText(entry.skillLevel().toString().toUpperCase(Locale.ROOT));
             skill.setForeground(skillColor(entry.skillLevel()));
             return this;
+        }
+
+        /**
+         * Shows the skills that matter for the choice at hand: gunnery/piloting, for the selected unit or the person's
+         * own combat role, as the Personnel tab's aggregate combat column writes them; then their best skill in the
+         * Skills filter's group. The tooltip names each skill. On the Techs page only the filtered skill is shown.
+         */
+        private void showSkills(PersonEntry entry) {
+            List<String> parts = new ArrayList<>();
+            List<String> named = new ArrayList<>();
+            if (!isTechView.getAsBoolean()) {
+                List<String> combat = CrewAssignmentState.combatSkills(entry.person(), skillUnit.get());
+                List<String> values = new ArrayList<>();
+                for (String name : combat) {
+                    SkillEntry held = entry.skills().get(name);
+                    values.add((held == null) ? "-" : String.valueOf(held.value()));
+                    if (held != null) {
+                        named.add(held.name() + ' ' + held.value());
+                    }
+                }
+                // Someone with none of the skills shows nothing, rather than a row of dashes
+                if (!named.isEmpty()) {
+                    parts.add(String.join("/", values));
+                }
+            }
+            SkillGroup group = skillGroup.get();
+            SkillEntry best = (group == null) ? null : CrewAssignmentState.best(entry.skills(), group);
+            if (best != null) {
+                parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "row.skillGroup",
+                      getTextAt(RESOURCE_BUNDLE, "SkillGroup." + group.name()), best.value()));
+                named.add(best.name() + ' ' + best.value());
+            }
+            skills.setVisible(!parts.isEmpty());
+            skills.setText(String.join("  ·  ", parts));
+            skills.setToolTipText(named.isEmpty() ? null :
+                                        HudToolTip.html(getTextAt(RESOURCE_BUNDLE, "row.skills.title"),
+                                              String.join(", ", named)));
         }
     }
 
