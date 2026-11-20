@@ -43,6 +43,7 @@ import static org.mockito.Mockito.when;
 import java.util.List;
 import java.util.Vector;
 
+import megamek.common.units.Crew;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import org.junit.jupiter.api.Test;
@@ -199,6 +200,86 @@ class SingleSpecialAbilityGeneratorTest {
 
         assertEquals(List.of(negative), result);
         assertTrue(result.stream().anyMatch(ability -> ability.getCost() < 0));
+    }
+
+    @Test
+    void gunnerySpecialistChoicesIncludeEverySpecialization() {
+        assertEquals(List.of(Crew.SPECIAL_ENERGY, Crew.SPECIAL_BALLISTIC, Crew.SPECIAL_MISSILE),
+              SingleSpecialAbilityGenerator.GUNNERY_SPECIALIST_CHOICES);
+    }
+
+    @Test
+    void environmentSpecialistChoicesIncludeEveryEnvironment() {
+        assertEquals(List.of(Crew.ENVIRONMENT_SPECIALIST_FOG,
+                    Crew.ENVIRONMENT_SPECIALIST_LIGHT,
+                    Crew.ENVIRONMENT_SPECIALIST_RAIN,
+                    Crew.ENVIRONMENT_SPECIALIST_SNOW,
+                    Crew.ENVIRONMENT_SPECIALIST_WIND),
+              SingleSpecialAbilityGenerator.ENVIRONMENT_SPECIALIST_CHOICES);
+    }
+
+    @Test
+    void humanTroChoicesIncludeEveryUnitType() {
+        assertEquals(List.of(Crew.HUMAN_TRO_MEK, Crew.HUMAN_TRO_AERO, Crew.HUMAN_TRO_VEE, Crew.HUMAN_TRO_BA),
+              SingleSpecialAbilityGenerator.HUMAN_TRO_CHOICES);
+    }
+
+    @Test
+    void filterValidAbilitiesSkipsAbilitiesThePersonAlreadyHas() {
+        PersonnelOptions options = mock(PersonnelOptions.class);
+        SpecialAbility held = mockAbility("held_ability", false);
+        SpecialAbility notHeld = mockAbility("new_ability", false);
+
+        when(options.booleanOption("held_ability")).thenReturn(true);
+        when(options.booleanOption("new_ability")).thenReturn(false);
+
+        List<SpecialAbility> result = service.filterValidAbilities(options, List.of(held, notHeld), true);
+
+        assertEquals(List.of(notHeld), result);
+    }
+
+    @Test
+    void filterValidAbilitiesSkipsOriginOnlyAbilitiesForVeterancyAwards() {
+        PersonnelOptions options = mock(PersonnelOptions.class);
+        SpecialAbility originOnly = mockAbility("origin_ability", true);
+        SpecialAbility normal = mockAbility("normal_ability", false);
+
+        List<SpecialAbility> result = service.filterValidAbilities(options, List.of(originOnly, normal), true);
+
+        assertEquals(List.of(normal), result);
+    }
+
+    @Test
+    void filterValidAbilitiesKeepsOriginOnlyAbilitiesOutsideVeterancyAwards() {
+        PersonnelOptions options = mock(PersonnelOptions.class);
+        SpecialAbility originOnly = mockAbility("origin_ability", true);
+
+        List<SpecialAbility> result = service.filterValidAbilities(options, List.of(originOnly), false);
+
+        assertEquals(List.of(originOnly), result);
+    }
+
+    @Test
+    void filterValidAbilitiesSkipsAbilitiesWithAnActiveInvalidAbility() {
+        PersonnelOptions options = mock(PersonnelOptions.class);
+        SpecialAbility conflicted = mockAbility("conflicted_ability", false);
+        Vector<String> invalidAbilities = new Vector<>();
+        invalidAbilities.add("blocking_ability");
+        when(conflicted.getInvalidAbilities()).thenReturn(invalidAbilities);
+
+        when(options.booleanOption("blocking_ability")).thenReturn(true);
+
+        List<SpecialAbility> result = service.filterValidAbilities(options, List.of(conflicted), true);
+
+        assertTrue(result.isEmpty());
+    }
+
+    private static SpecialAbility mockAbility(String name, boolean isOriginOnly) {
+        SpecialAbility ability = mock(SpecialAbility.class);
+        when(ability.getName()).thenReturn(name);
+        when(ability.getOriginOnly()).thenReturn(isOriginOnly);
+        when(ability.getInvalidAbilities()).thenReturn(new Vector<>());
+        return ability;
     }
 
     @Test

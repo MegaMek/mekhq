@@ -1751,9 +1751,18 @@ public class CampaignNewDayManager {
 
         // Coming of Age Events
         if (isBirthday && (person.getAge(today) == 16)) {
-            if (campaignOptions.get(CampaignOption.REWARD_COMING_OF_AGE_ABILITIES)) {
+            if (campaignOptions.get(CampaignOption.REWARD_COMING_OF_AGE_ABILITIES) &&
+                      campaignOptions.get(CampaignOption.USE_ABILITIES)) {
                 SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-                singleSpecialAbilityGenerator.rollSPA(campaign, person, true, true, false, false);
+                String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, person, true, true, false, false);
+                if (spaGained != null) {
+                    // We use warning as the ability can be a positive or negative one
+                    campaign.addReport(PERSONNEL, String.format(resources.getString("comingOfAgeAbility.text"),
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                          spaGained,
+                          CLOSING_SPAN_TAG));
+                }
             }
 
             if (campaignOptions.get(CampaignOption.REWARD_COMING_OF_AGE_RP_SKILLS)) {
