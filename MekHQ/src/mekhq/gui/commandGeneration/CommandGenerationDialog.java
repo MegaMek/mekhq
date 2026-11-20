@@ -67,7 +67,6 @@ import megamek.client.ui.enums.ValidationState;
 import megamek.client.ui.util.UIUtil;
 import megamek.common.enums.Gender;
 import megamek.logging.MMLogger;
-import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.RandomOriginOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;

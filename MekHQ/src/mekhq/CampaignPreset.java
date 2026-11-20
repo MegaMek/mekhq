@@ -362,7 +362,7 @@ public class CampaignPreset {
             for (int level = 0; level < size; level++) {
                 try {
                     SkillType.setCost(skillName, presetCosts[level], level);
-                } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException e) {
+                } catch (IllegalArgumentException | ArrayIndexOutOfBoundsException exception) {
                     LOGGER.info("Skipping outdated or missing skill level: {}", skillName);
                 }
             }

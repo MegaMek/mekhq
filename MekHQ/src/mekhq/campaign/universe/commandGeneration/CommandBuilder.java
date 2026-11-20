@@ -60,11 +60,11 @@ import mekhq.campaign.mission.contract.contractGeneration.ChaosContractMarketAva
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.autoAwards.AutoAwardsController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.reputation.camOpsReputation.ForceReputationController;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.ratgen.CommandGenerator;
 import mekhq.campaign.universe.commandGeneration.ratgen.RulesetEngineBootstrap;
-import mekhq.gui.campaignOptions.optionChangeDialogs.AdvancedScoutingCampaignOptionsChangedConfirmationDialog;
 
 /**
  * Turns a rolled command into a finished one: everything the Command Designer's Build does once the player has a
@@ -168,7 +168,7 @@ public final class CommandBuilder {
         // Support-vehicle generation (salvage, MASH, fatigue, StratCon convoy, security) is handled during generation
         // by SupportPersonnelToTOE and SupportUnitGenerator, so only the free scouting skills are granted here.
         if (campaignOptions.get(CampaignOption.USE_ADVANCED_SCOUTING) && campaignOptions.isUseStratCon()) {
-            AdvancedScoutingCampaignOptionsChangedConfirmationDialog.processFreeSkills(campaign, true);
+            ScoutingSkills.processFreeSkills(campaign, true);
         }
 
         AbstractLocation currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();

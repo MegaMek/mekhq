@@ -307,4 +307,3 @@ public class AutoAwardsDialog extends JDialog {
         });
     }
 }
-
