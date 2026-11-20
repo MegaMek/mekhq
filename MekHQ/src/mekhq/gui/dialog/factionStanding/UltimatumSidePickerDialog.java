@@ -38,14 +38,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Dimension;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
-import java.awt.Insets;
+import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
@@ -298,7 +291,8 @@ public class UltimatumSidePickerDialog extends JDialog {
      * @since 0.51.01
      */
     private JPanel buildDissentStrip() {
-        JPanel strip = new JPanel(new BorderLayout(scaleForGUI(14), 0));
+        JPanel strip = new WashPanel();
+        strip.setLayout(new BorderLayout(scaleForGUI(14), 0));
         strip.setBackground(DISSENT_WASH);
         strip.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(scaleForGUI(1), scaleForGUI(3), scaleForGUI(1), scaleForGUI(1),
@@ -369,7 +363,7 @@ public class UltimatumSidePickerDialog extends JDialog {
      * @since 0.51.01
      */
     private JPanel buildGameInformation() {
-        JPanel panel = new JPanel();
+        JPanel panel = new WashPanel();
         panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
         panel.setBackground(translucent(AMBER, 18));
         panel.setBorder(BorderFactory.createCompoundBorder(
@@ -621,8 +615,14 @@ public class UltimatumSidePickerDialog extends JDialog {
         Color codeColor = isRogue ? AMBER : ACCENT_BRIGHT;
         ImageIcon factionIcon = getTintedFactionIcon(choice.code(), gameYear, codeColor, size - (ICON_PADDING * 2));
 
-        JLabel codeBox = new JLabel(factionIcon, SwingConstants.CENTER);
-        codeBox.setOpaque(true);
+        JLabel codeBox = new JLabel(factionIcon, SwingConstants.CENTER) {
+            @Override
+            protected void paintComponent(Graphics graphics) {
+                paintWash(this, graphics);
+                super.paintComponent(graphics);
+            }
+        };
+        codeBox.setOpaque(false);
         codeBox.setBackground(isRogue ? ROGUE_CODE_BOX : SURFACE_HIGHLIGHT);
         codeBox.setBorder(BorderFactory.createLineBorder(isRogue ? ROGUE_BORDER : BORDER_CYAN, scaleForGUI(1)));
         Dimension boxSize = new Dimension(scaleForGUI(size), scaleForGUI(size));
@@ -682,5 +682,43 @@ public class UltimatumSidePickerDialog extends JDialog {
     private static <T extends JComponent> T leftAligned(T component) {
         component.setAlignmentX(LEFT_ALIGNMENT);
         return component;
+    }
+
+    /**
+     * Fills a non-opaque component with its (possibly translucent) background colour.
+     *
+     * <p>Swing assumes an opaque component paints every pixel, so it never clears behind one. An opaque component
+     * with a translucent background therefore blends each repaint over the last, leaving ghosts of old text. Keeping
+     * the component non-opaque makes Swing repaint the parent first, and this then lays the wash on top.</p>
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void paintWash(JComponent component, Graphics graphics) {
+        Graphics2D g2 = (Graphics2D) graphics.create();
+        try {
+            g2.setColor(component.getBackground());
+            g2.fillRect(0, 0, component.getWidth(), component.getHeight());
+        } finally {
+            g2.dispose();
+        }
+    }
+
+    /**
+     * A panel whose translucent background is painted by hand. See {@link #paintWash(JComponent, Graphics)}.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static class WashPanel extends JPanel {
+        WashPanel() {
+            setOpaque(false);
+        }
+
+        @Override
+        protected void paintComponent(Graphics graphics) {
+            paintWash(this, graphics);
+            super.paintComponent(graphics);
+        }
     }
 }

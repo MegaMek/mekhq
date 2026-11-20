@@ -355,14 +355,15 @@ class FactionStandingUltimatumsLibraryTest {
 
     /**
      * Lists the text keys the ultimatum needs, for the ways of going rogue it actually offers: a Pirate card needs
-     * {@code .rogue.pirate.pitch} and a Bandit Caste card needs {@code .rogue.banditCaste.pitch}.
+     * {@code .rogue.pirate.pitch} and a Bandit Caste card needs {@code .rogue.banditCaste.pitch}. A third party that
+     * introduces the ultimatum isn't a card, so it needs no pitch or news.
      *
      * @author Illiani
      * @since 0.51.01
      */
     private static List<String> getRequiredKeys(FactionStandingUltimatumData ultimatum) {
         List<String> sideIds = new ArrayList<>();
-        for (FactionStandingUltimatumSide side : ultimatum.sides()) {
+        for (FactionStandingUltimatumSide side : ultimatum.getChoosableSides()) {
             sideIds.add(side.id());
         }
         return FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), sideIds,
