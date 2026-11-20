@@ -1444,9 +1444,14 @@ public abstract class AbstractForce {
 
     /**
      * Detaches {@code u} from any C3 network it participates in (Naval C3, C3i, Nova CEWS, or a C3 master), refreshing
-     * the affected networks against the supplied {@link Game}.
+     * the affected networks against the supplied {@link Game}. A unit with a {@code null} entity has no network to
+     * leave, so nothing is changed.
      */
     public void detachUnitFromC3Networks(Unit u, Game game) {
+        Entity entity = u.getEntity();
+        if (entity == null) {
+            return;
+        }
         if (u.getEntity().hasNavalC3() && u.getEntity().calculateFreeC3Nodes() < 5) {
             Vector<Unit> removedUnits = new Vector<>();
             removedUnits.add(u);
@@ -1477,7 +1482,6 @@ public abstract class AbstractForce {
         }
         // A C3 slave leaving its formation must free its master's node, or the master keeps counting it. The stored
         // link is checked rather than hasC3S(), which is false for a damaged or shut-down slave computer.
-        Entity entity = u.getEntity();
         if (entity.getC3MasterIsUUIDAsString() != null) {
             entity.setC3MasterIsUUIDAsString(null);
             entity.setC3Master(null, true);

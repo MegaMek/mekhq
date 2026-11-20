@@ -317,6 +317,22 @@ class C3NetworkTest {
             verify(unlinked.getEntity(), never()).setC3Master(any(Entity.class), anyBoolean());
             verify(force, never()).refreshNetworks(any());
         }
+
+        @Test
+        @DisplayName("detachUnitFromC3Networks does nothing for a unit with no entity")
+        void testDetachIgnoresUnitWithoutEntity() {
+            // Arrange
+            Unit noEntity = mock(Unit.class);
+            when(noEntity.getEntity()).thenReturn(null);
+            units.add(noEntity);
+
+            // Act
+            force.detachUnitFromC3Networks(noEntity, null);
+
+            // Assert
+            verify(force, never()).refreshNetworks(any());
+            verify(force, never()).removeUnitsFromC3Master(any(), any());
+        }
     }
 
     @Nested
