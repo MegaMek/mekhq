@@ -3933,6 +3933,11 @@ public class Campaign implements ITechManager {
         campaignOptions = options;
         // Keep the player force's ForceOptions pass-through pointed at the current campaign options.
         playerForce.getForceOptions().setCampaignOptions(options);
+        // Contracts hold their own reference to the options so their term getters can apply the per-term multipliers.
+        // Repoint them all, or they keep reading the replaced object: on load the contracts are read (inside <info>)
+        // before <campaignOptions>, so without this they would apply the default multipliers (issue #11104).
+        contractHistory.contractHistory().values().forEach(contract -> contract.setCampaignOptions(options));
+        playerForce.getContractMarket().setCampaignOptions(options);
 
         // If blob crew was disabled for a specific role, clear only that role's blob crew
         if (infantryWasEnabled && !options.get(CampaignOption.USE_BLOB_INFANTRY)) {
