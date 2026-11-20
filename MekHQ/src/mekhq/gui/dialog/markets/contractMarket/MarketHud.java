@@ -33,6 +33,7 @@
 package mekhq.gui.dialog.markets.contractMarket;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT_BRIGHT;
 import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
 import static mekhq.gui.baseComponents.hud.HudStyle.DIVIDER;
 import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE;
@@ -43,6 +44,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 import static mekhq.gui.baseComponents.hud.HudStyle.translucent;
 
 import java.awt.*;
+import java.awt.image.BufferedImage;
 import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
@@ -267,7 +269,8 @@ final class MarketHud {
     }
 
     /**
-     * A square portrait of a person, or a blank square of the same size when there is no one to show.
+     * A square portrait of a person, or a blank square of the same size when there is no one to show. A person without
+     * a portrait of their own shows their origin faction's logo instead, tinted to the HUD's highlight colour.
      *
      * @param person the person, or {@code null}
      * @param size   the scaled edge length
@@ -282,10 +285,55 @@ final class MarketHud {
         if (person != null) {
             ImageIcon icon = person.getPortraitImageIconWithFallback(true);
             if (icon != null) {
-                portrait.setIcon(new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH)));
+                ImageIcon scaled = new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
+                portrait.setIcon(person.hasDefaultPortrait() ? tinted(scaled, ACCENT_BRIGHT) : scaled);
             }
         }
         return portrait;
+    }
+
+    /**
+     * Recolours an image in one hue, keeping its shading: each pixel takes the tint scaled by its brightness relative
+     * to the image's brightest opaque pixel, so the lightest parts land exactly on the tint, and its alpha is kept.
+     *
+     * @param icon the (loaded) image to recolour
+     * @param tint the colour the brightest parts take
+     */
+    static ImageIcon tinted(ImageIcon icon, Color tint) {
+        int width = icon.getIconWidth();
+        int height = icon.getIconHeight();
+        if (width <= 0 || height <= 0) {
+            return icon;
+        }
+        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
+        Graphics2D graphics = image.createGraphics();
+        graphics.drawImage(icon.getImage(), 0, 0, null);
+        graphics.dispose();
+
+        int[] pixels = image.getRGB(0, 0, width, height, null, 0, width);
+        double brightest = 0;
+        for (int pixel : pixels) {
+            if ((pixel >>> 24) > 0) {
+                brightest = Math.max(brightest, luminance(pixel));
+            }
+        }
+        if (brightest <= 0) {
+            brightest = 255;
+        }
+        for (int i = 0; i < pixels.length; i++) {
+            int alpha = pixels[i] >>> 24;
+            double level = Math.min(1.0, luminance(pixels[i]) / brightest);
+            pixels[i] = (alpha << 24)
+                              | ((int) Math.round(tint.getRed() * level) << 16)
+                              | ((int) Math.round(tint.getGreen() * level) << 8)
+                              | (int) Math.round(tint.getBlue() * level);
+        }
+        image.setRGB(0, 0, width, height, pixels, 0, width);
+        return new ImageIcon(image);
+    }
+
+    private static double luminance(int argb) {
+        return 0.2126 * ((argb >> 16) & 0xFF) + 0.7152 * ((argb >> 8) & 0xFF) + 0.0722 * (argb & 0xFF);
     }
 
     /** @return the tooltip wrapped to a comfortable reading width */
