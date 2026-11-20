@@ -246,7 +246,7 @@ public class MissionViewPanel extends JScrollablePanel {
         }
 
         final boolean useStratCon = campaign.getCampaignOptions().isUseStratCon();
-        if (useStratCon) {
+        if (isStratConPointsShown(useStratCon, mission)) {
             // Victory points gauge, or a text fallback when there is no positive target.
             int currentScore = ContractScore.getContractScore(campaign.getCampaignOptions().isUseStratConMaplessMode(),
                   mission);
@@ -428,6 +428,20 @@ public class MissionViewPanel extends JScrollablePanel {
      */
     static boolean isBattleRecordShown(LocalDate today, AbstractContract contract) {
         return !(contract instanceof ShellContract) && contract.isActiveOn(today) && !contract.isPeaceful();
+    }
+
+    /**
+     * Whether the briefing room shows the contract's victory point and support point gauges. Both figures live in the
+     * StratCon campaign state, which is discarded when a contract concludes; without it they would be recomputed from
+     * fallbacks that do not reflect what happened during the contract, so they are only shown while the state exists.
+     *
+     * @param useStratCon whether the campaign uses StratCon
+     * @param contract    the contract on show
+     *
+     * @return {@code true} if the victory point and support point gauges should be shown
+     */
+    static boolean isStratConPointsShown(boolean useStratCon, AbstractContract contract) {
+        return useStratCon && (contract.getStratConCampaignState() != null);
     }
 
     /**
