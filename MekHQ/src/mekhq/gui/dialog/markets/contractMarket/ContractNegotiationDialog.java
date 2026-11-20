@@ -2019,7 +2019,8 @@ public class ContractNegotiationDialog extends JDialog {
 
     private String valueOf(Clause clause, ChaosContractStepsTable step) {
         // Show the effective term value: the step multiplier scaled by the campaign's configured per-term multiplier,
-        // so the negotiation screen matches the pay/salvage the contract will actually deliver.
+        // so the negotiation screen matches the pay/salvage the contract will actually deliver. Salvage also carries the
+        // contract's Scale taper, as AbstractContract#getSalvageRightsMultiplier applies it.
         return switch (clause) {
             case COMMAND -> step.getContractCommandRights().toString();
             case PAY -> percent(step.getBasePayMultiplier() * termOption(CampaignOption.CONTRACT_BASE_PAY_MULTIPLIER));
@@ -2033,7 +2034,8 @@ public class ContractNegotiationDialog extends JDialog {
             case SALVAGE -> step.isExchangeSalvage()
                                   ? getTextAt(RESOURCE_BUNDLE, "value.contractMarket.salvage.exchange")
                                   : percent(step.getSalvageMultiplier()
-                                                  * termOption(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER));
+                                                  * termOption(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER)
+                                                  * contract.getSalvageTaperMultiplier());
         };
     }
 

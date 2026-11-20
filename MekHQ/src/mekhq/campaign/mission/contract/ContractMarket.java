@@ -41,6 +41,7 @@ import java.util.function.Function;
 import megamek.Version;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.campaign.mission.contract.io.ContractXmlCodec;
@@ -141,6 +142,18 @@ public class ContractMarket {
      */
     public void removeContract(final ContractSearchType searchType, final AbstractContract contract) {
         getContracts(searchType).remove(contract.getId());
+    }
+
+    /**
+     * Points every offer in every search type at the given campaign options, so their term getters apply the
+     * campaign's current per-term multipliers.
+     *
+     * @param campaignOptions the campaign options the offers should read from
+     */
+    public void setCampaignOptions(final CampaignOptions campaignOptions) {
+        for (Function<ContractMarket, Map<UUID, AbstractContract>> accessor : SECTION_ACCESSORS.values()) {
+            accessor.apply(this).values().forEach(contract -> contract.setCampaignOptions(campaignOptions));
+        }
     }
 
     /**

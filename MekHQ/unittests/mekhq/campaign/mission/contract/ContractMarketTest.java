@@ -49,7 +49,11 @@ import java.util.UUID;
 import megamek.Version;
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
+import mekhq.campaign.mission.contract.contractData.ContractTermsData;
 import mekhq.campaign.mission.contract.contractGeneration.ContractSearchType;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeAll;
@@ -121,6 +125,26 @@ class ContractMarketTest {
             case GOVERNMENT -> market.getGovernmentOrders();
             case TOURNAMENT -> market.getTournament();
         }, market.getContracts(searchType), "the named accessor and the switch must reach the same map");
+    }
+
+    @ParameterizedTest
+    @EnumSource(ContractSearchType.class)
+    void settingCampaignOptionsRepointsOffersInEveryBucket(ContractSearchType searchType) {
+        AbstractContract contract = offer("Offer");
+        contract.setContractTerms(new ContractTermsData(ChaosContractStepsTable.STEP_ONE,
+              ChaosContractStepsTable.STEP_ONE,
+              ChaosContractStepsTable.STEP_ONE,
+              ChaosContractStepsTable.STEP_SIX,
+              ChaosContractStepsTable.STEP_ONE));
+        contract.setCampaignOptions(new CampaignOptions());
+        market.addContract(searchType, contract);
+
+        CampaignOptions campaignOptions = new CampaignOptions();
+        campaignOptions.set(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER, 0.5);
+        market.setCampaignOptions(campaignOptions);
+
+        // STEP_SIX grants 30% salvage; the 0.5 multiplier halves it
+        assertEquals(0.15, contract.getSalvageRightsMultiplier(), 1e-9);
     }
 
     @Test
