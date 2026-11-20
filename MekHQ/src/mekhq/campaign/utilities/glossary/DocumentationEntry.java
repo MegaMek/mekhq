@@ -79,7 +79,6 @@ public enum DocumentationEntry {
     RANDOM_PERSONALITIES("RANDOM_PERSONALITIES",
           "GlossaryDocs/Personnel Modules/Random Personalities",
           "0.50.07", "0.50.07", "0.50.07"),
-    RECRUITMENT("RECRUITMENT", "GlossaryDocs/Personnel Modules/Recruitment", "0.50.07", "0.50.07", "0.50.07"),
     RESUPPLY_AND_CONVOYS("RESUPPLY_AND_CONVOYS", "GlossaryDocs/Resupply & Convoys", "0.50.07", "0.50.07", "0.50.07"),
     STARTING_ATTRIBUTE_SCORES("STARTING_ATTRIBUTE_SCORES",
           "GlossaryDocs/Personnel Modules/Starting Attribute Scores",

@@ -78,6 +78,7 @@ import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.records.HiringCostBreakdown;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.RecruitmentCosts;
 import mekhq.campaign.personnel.enums.ConnectionsLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
@@ -1382,12 +1383,23 @@ public class NewPersonnelMarket {
         logger.info("Load Rare Personnel Nodes Complete!");
     }
 
+    /**
+     * Gets the cost of hiring an applicant from this market.
+     *
+     * @param applicant the applicant
+     *
+     * @return the hiring cost; the total of {@link #getHiringCostBreakdown(Person)}
+     */
     public Money getHiringCost(Person applicant) {
-        return Money.zero();
+        return getHiringCostBreakdown(applicant).total();
     }
 
     /**
      * Gets the cost of hiring an applicant, split by part, so the hiring hall can show how it is made up.
+     *
+     * <p>Every market charges what Pay for Recruitment would: nothing if it is off, otherwise the recruitment cost
+     * from {@link RecruitmentCosts}. A market may add its own extras on top, as the MekHQ market adds a Golden
+     * Hello.</p>
      *
      * @param applicant the applicant
      *
@@ -1397,6 +1409,37 @@ public class NewPersonnelMarket {
      * @since 0.51.01
      */
     public HiringCostBreakdown getHiringCostBreakdown(Person applicant) {
-        return HiringCostBreakdown.free();
+        return getRecruitmentCostBreakdown(applicant, Money.zero());
+    }
+
+    /**
+     * Gets the recruitment cost of an applicant under the campaign's Pay for Recruitment rules, plus an extra charged
+     * whatever those rules are.
+     *
+     * <p>The market charges this itself when an applicant is hired, so recruiting them afterwards does not charge Pay
+     * for Recruitment a second time.</p>
+     *
+     * @param applicant the applicant
+     * @param extra     an extra cost charged on top, such as a Golden Hello; zero for none
+     *
+     * @return nothing but the extra if Pay for Recruitment is off; otherwise the applicant's training-based cost if
+     *       {@link RecruitmentCosts#isUsingTrainingBasedCost} applies, or {@link RecruitmentCosts#SALARY_MONTHS}
+     *       months' salary, plus the extra
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    HiringCostBreakdown getRecruitmentCostBreakdown(Person applicant, Money extra) {
+        if (campaign == null || !campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_RECRUITMENT)) {
+            return new HiringCostBreakdown(Money.zero(), null, extra);
+        }
+
+        if (RecruitmentCosts.isUsingTrainingBasedCost(campaign.getCampaignOptions())) {
+            return new HiringCostBreakdown(Money.zero(),
+                  RecruitmentCosts.getTrainingBasedCostBreakdown(campaign, applicant), extra);
+        }
+
+        return new HiringCostBreakdown(applicant.getSalary(campaign).multipliedBy(RecruitmentCosts.SALARY_MONTHS),
+              null, extra);
     }
 }

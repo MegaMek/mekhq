@@ -496,26 +496,26 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
         return rolls;
     }
 
-    @Override
-    public Money getHiringCost(Person applicant) {
-        return getHiringCostBreakdown(applicant).total();
-    }
-
+    /**
+     * Gets the cost of hiring an applicant: the recruitment cost Pay for Recruitment charges (see
+     * {@link NewPersonnelMarket#getHiringCostBreakdown(Person)}), plus a Golden Hello if one was on offer when the
+     * applicant arrived.
+     *
+     * <p>Personnel are hired without a rank, meaning they have a 0.5 salary multiplier. As a Golden Hello is 12
+     * months' salary, it is charged as {@link #GOLDEN_HELLO_SALARY_MONTHS} months of the applicant's salary, less the
+     * {@link RecruitmentCosts#SALARY_MONTHS} months a recruit normally costs. The player chose to offer it, so it is
+     * charged even when Pay for Recruitment is off.</p>
+     *
+     * @param applicant the applicant
+     *
+     * @return the hiring cost, by part
+     */
     @Override
     public HiringCostBreakdown getHiringCostBreakdown(Person applicant) {
-        // Personnel are hired without a rank, meaning they have a 0.5 salary multiplier. As a Golden Hello is
-        // 12 months' salary, we double the multiplier from 12 to 24. And a normal hiring cost is one month's salary
-        // we increase 1 to 2.
-        int hiringCostMultiplier = isWasOfferingGoldenHello() ? GOLDEN_HELLO_SALARY_MONTHS : SALARY_MONTHS;
-        Money salary = applicant.getSalary(getCampaign());
-        Money goldenHelloExtra = salary.multipliedBy(hiringCostMultiplier - SALARY_MONTHS);
-        if (!RecruitmentCosts.isUsingTrainingBasedCost(getCampaign().getCampaignOptions())) {
-            return new HiringCostBreakdown(salary.multipliedBy(SALARY_MONTHS), null, goldenHelloExtra);
-        }
-
-        // Training-based pricing replaces the normal hiring cost; a Golden Hello still adds its extra salary on top
-        return new HiringCostBreakdown(Money.zero(),
-              RecruitmentCosts.getTrainingBasedCostBreakdown(getCampaign(), applicant),
-              goldenHelloExtra);
+        Money goldenHelloExtra = isWasOfferingGoldenHello()
+                                       ? applicant.getSalary(getCampaign())
+                                               .multipliedBy(GOLDEN_HELLO_SALARY_MONTHS - SALARY_MONTHS)
+                                       : Money.zero();
+        return getRecruitmentCostBreakdown(applicant, goldenHelloExtra);
     }
 }

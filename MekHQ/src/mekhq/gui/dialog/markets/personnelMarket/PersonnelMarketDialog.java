@@ -83,7 +83,7 @@ import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
-import mekhq.campaign.utilities.glossary.DocumentationEntry;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
@@ -96,7 +96,7 @@ import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
 import mekhq.gui.baseComponents.hud.HudStatTile;
 import mekhq.gui.baseComponents.hud.HudWrappingLabel;
 import mekhq.gui.dialog.AdvanceDaysDialog;
-import mekhq.gui.dialog.glossary.GuideViewer;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.view.PersonViewPanel;
 
@@ -315,7 +315,7 @@ public class PersonnelMarketDialog extends JDialog {
         HudButton documentation = new HudButton(text("button.personnelMarket.documentation").toUpperCase(Locale.ROOT),
               false, true);
         documentation.setToolTipText(text("button.personnelMarket.documentation.tooltip"));
-        documentation.addActionListener(event -> GuideViewer.showGuide(this, DocumentationEntry.RECRUITMENT));
+        documentation.addActionListener(event -> GlossaryConsole.showEntry(this, GlossaryEntry.PERSONNEL_MARKET));
         JPanel helpButtons = Hud.transparentPanel(null);
         helpButtons.setLayout(new BoxLayout(helpButtons, BoxLayout.X_AXIS));
         helpButtons.add(documentation);

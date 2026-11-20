@@ -39,8 +39,10 @@ import mekhq.campaign.personnel.RecruitmentCosts.TrainingCostBreakdown;
 /**
  * The cost of hiring an applicant from the personnel market, split by part.
  *
- * @param salaryCost       the salary-based hiring cost, zero if the applicant is priced by their training
+ * @param salaryCost       the salary-based hiring cost; zero if the applicant is priced by their training, or if the
+ *                         campaign does not pay for recruitment
  * @param trainingCost     the training-based hiring cost, or {@code null} if the applicant is priced by their salary
+ *                         or the campaign does not pay for recruitment
  * @param goldenHelloExtra the extra cost of a Golden Hello, zero if none is offered
  *
  * @author Illiani
@@ -48,13 +50,6 @@ import mekhq.campaign.personnel.RecruitmentCosts.TrainingCostBreakdown;
  */
 public record HiringCostBreakdown(Money salaryCost, @Nullable TrainingCostBreakdown trainingCost,
       Money goldenHelloExtra) {
-    /**
-     * @return a breakdown for an applicant who costs nothing to hire
-     */
-    public static HiringCostBreakdown free() {
-        return new HiringCostBreakdown(Money.zero(), null, Money.zero());
-    }
-
     /**
      * @return the combined cost of every part
      */
