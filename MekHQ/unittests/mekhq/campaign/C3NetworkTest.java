@@ -57,7 +57,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests for C3 master/slave, C3i, NC3, and Nova CEWS network functionality in Campaign. These tests verify fixes for
- * issue #8648, issue #6611, and Nova CEWS support.
+ * issue #8648, issue #6611, issue #11106, and Nova CEWS support.
  */
 class C3NetworkTest {
 
@@ -255,6 +255,67 @@ class C3NetworkTest {
             verify(slave.getEntity()).setC3MasterIsUUIDAsString(null);
             verify(lanceMaster.getEntity(), never()).setC3MasterIsUUIDAsString(any());
             verify(lanceMaster.getEntity(), never()).setC3Master(any(Entity.class), anyBoolean());
+        }
+    }
+
+    @Nested
+    @DisplayName("C3 Slave Detach Tests - Issue #11106 Fix")
+    class C3SlaveDetachTests {
+
+        @BeforeEach
+        void setUpDetach() {
+            doCallRealMethod().when(force).detachUnitFromC3Networks(any(), any());
+        }
+
+        @Test
+        @DisplayName("detachUnitFromC3Networks frees a slave's node on its master")
+        void testDetachClearsSlaveLink() {
+            // Arrange
+            Unit master = createMockC3Unit("master", null);
+            Unit slave = createMockC3Unit("slave", "master");
+            when(slave.getEntity().hasC3S()).thenReturn(true);
+            units.addAll(List.of(master, slave));
+
+            // Act
+            force.detachUnitFromC3Networks(slave, null);
+
+            // Assert
+            verify(slave.getEntity()).setC3MasterIsUUIDAsString(null);
+            verify(slave.getEntity()).setC3Master(null, true);
+            verify(force).refreshNetworks(null);
+        }
+
+        @Test
+        @DisplayName("detachUnitFromC3Networks frees the node even when the slave computer is damaged")
+        void testDetachClearsLinkOfDamagedSlave() {
+            // Arrange - an inoperable slave computer makes hasC3S() false, but the stored link remains
+            Unit master = createMockC3Unit("master", null);
+            Unit slave = createMockC3Unit("slave", "master");
+            when(slave.getEntity().hasC3S()).thenReturn(false);
+            units.addAll(List.of(master, slave));
+
+            // Act
+            force.detachUnitFromC3Networks(slave, null);
+
+            // Assert
+            verify(slave.getEntity()).setC3MasterIsUUIDAsString(null);
+            verify(slave.getEntity()).setC3Master(null, true);
+        }
+
+        @Test
+        @DisplayName("detachUnitFromC3Networks leaves an unlinked unit alone")
+        void testDetachLeavesUnlinkedUnitAlone() {
+            // Arrange
+            Unit unlinked = createMockC3Unit("unlinked", null);
+            units.add(unlinked);
+
+            // Act
+            force.detachUnitFromC3Networks(unlinked, null);
+
+            // Assert
+            verify(unlinked.getEntity(), never()).setC3MasterIsUUIDAsString(any());
+            verify(unlinked.getEntity(), never()).setC3Master(any(Entity.class), anyBoolean());
+            verify(force, never()).refreshNetworks(any());
         }
     }
 

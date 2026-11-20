@@ -1475,6 +1475,14 @@ public abstract class AbstractForce {
             u.getEntity().setC3MasterIsUUIDAsString(null);
             u.getEntity().setC3Master(null, true);
         }
+        // A C3 slave leaving its formation must free its master's node, or the master keeps counting it. The stored
+        // link is checked rather than hasC3S(), which is false for a damaged or shut-down slave computer.
+        Entity entity = u.getEntity();
+        if (entity.getC3MasterIsUUIDAsString() != null) {
+            entity.setC3MasterIsUUIDAsString(null);
+            entity.setC3Master(null, true);
+            refreshNetworks(game);
+        }
     }
 
 }
