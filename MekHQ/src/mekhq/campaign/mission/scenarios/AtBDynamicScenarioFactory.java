@@ -732,7 +732,7 @@ public class AtBDynamicScenarioFactory {
 
                 // We only want the difficulty multipliers applying to enemy forces
                 double difficultyMultiplier = getOpForDifficultyMultiplier(scenario, campaign);
-                effectiveBV = (int) round(effectiveBV * difficultyMultiplier);
+                effectiveBV = applyOpposingBVMultiplier(scenario, (int) round(effectiveBV * difficultyMultiplier));
                 effectiveUnitCount = (int) round(effectiveUnitCount * difficultyMultiplier);
 
                 if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
@@ -1405,7 +1405,8 @@ public class AtBDynamicScenarioFactory {
                 int playerUnitValue = calculateEffectiveUnitCount(scenario, campaign, true);
 
                 double difficultyMultiplier = getOpForDifficultyMultiplier(scenario, campaign);
-                forceBVBudget = (int) (playerBattleValue * forceMultiplier * difficultyMultiplier);
+                forceBVBudget = applyOpposingBVMultiplier(scenario,
+                      (int) (playerBattleValue * forceMultiplier * difficultyMultiplier));
 
                 LOGGER.info("Base bidding budget is {} BV2. This is seed force multiplied by scenario force " +
                                   "multiplier", forceBVBudget);
@@ -3868,6 +3869,23 @@ public class AtBDynamicScenarioFactory {
      * @author Illiani
      * @since 0.51.01
      */
+    /**
+     * Applies the scenario's BV budget multiplier, set by scenario modifiers such as an enemy Space Port, to a budget
+     * for opposing forces.
+     *
+     * @param scenario the scenario being generated
+     * @param bvBudget the opposing force's budget before the multiplier
+     *
+     * @return the budget scaled by the multiplier, or unchanged when no modifier has set one
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int applyOpposingBVMultiplier(AtBDynamicScenario scenario, int bvBudget) {
+        double bvMultiplier = scenario.getEffectivePlayerBVMultiplier();
+        return (bvMultiplier > 0) ? (int) round(bvBudget * bvMultiplier) : bvBudget;
+    }
+
     public static int calculateEffectiveBV(AtBDynamicScenario scenario, Campaign campaign,
           boolean forceStandardBattleValue, boolean includeAlliedBotForces) {
         if (scenario.getStratConScenarioType().isResupply()) {
@@ -3896,10 +3914,8 @@ public class AtBDynamicScenarioFactory {
             LOGGER.info("Total Seed Force {}: {}", generationMethod, bvBudget);
         }
 
-        double bvMultiplier = scenario.getEffectivePlayerBVMultiplier();
-        if (bvMultiplier > 0) {
-            bvBudget = (int) round(bvBudget * scenario.getEffectivePlayerBVMultiplier());
-        }
+        // The scenario's BV budget multiplier is applied to opposing forces only (see applyOpposingBVMultiplier), so
+        // a modifier that strengthens the enemy does not strengthen allied forces scaled from the same budget.
 
         if (!includeAlliedBotForces) {
             LOGGER.info("Total Base {} Budget (player only): {}", generationMethod, bvBudget);
