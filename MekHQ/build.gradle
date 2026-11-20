@@ -618,7 +618,6 @@ tasks.register(suiteVersion != null ? 'copySuiteFiles' : 'stageFiles', Copy) {
     }
 
     from projectDir
-    include "campaigns/The Learning Ropes.cpnx.gz"
     include "data/**"
     include "docs/**"
     include "mmconf/**"

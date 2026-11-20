@@ -95,6 +95,7 @@ import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudConfirmButton;
 import mekhq.gui.baseComponents.hud.HudStyle;
 import mekhq.gui.baseComponents.hud.HudVerdictBanner;
+import mekhq.gui.baseComponents.hud.HudWrappingLabel;
 
 /**
  * The contract negotiation table, drawn as a heads-up display in the style of the contract market. Lets the player
@@ -1684,8 +1685,8 @@ public class ContractNegotiationDialog extends JDialog {
         private final Clause clause;
         private final JPanel panel = new JPanel(new GridBagLayout());
         private final Track track;
-        private final JLabel value = new MarketHud.WrappingLabel();
-        private final JLabel why = new MarketHud.WrappingLabel();
+        private final JLabel value = new HudWrappingLabel();
+        private final JLabel why = new HudWrappingLabel();
         private final HudButton lowerButton;
         private final HudButton raiseButton;
         private final JLabel lockBadge = new JLabel();

@@ -35,10 +35,12 @@ package mekhq.gui.baseComponents.hud;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Cursor;
 import java.awt.Dimension;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -53,12 +55,15 @@ import java.awt.event.KeyAdapter;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.util.List;
 import java.util.Locale;
 import javax.swing.*;
 import javax.swing.table.DefaultTableCellRenderer;
 import javax.swing.table.JTableHeader;
 
+import megamek.client.ui.WrapLayout;
 import mekhq.gui.baseComponents.ImmersiveScrollBarStyle;
+import org.apache.commons.text.StringEscapeUtils;
 
 /**
  * Static helpers for building heads-up-display dialogs in the style of the interstellar-map tab, the StratCon
@@ -287,6 +292,195 @@ public final class Hud {
         JPanel panel = new JPanel(layout);
         panel.setOpaque(false);
         return panel;
+    }
+
+    /**
+     * Plain text that wraps to the width it is given, for lines such as a window's subtitle that must never be cut off
+     * when the window is narrow or the font is large.
+     *
+     * @param text  the text; it is shown as written, never read as HTML
+     * @param color the text colour
+     * @param font  the font
+     *
+     * @return the text component
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static JLabel wrappingText(String text, Color color, Font font) {
+        return wrappingHtml(StringEscapeUtils.escapeHtml4(text), color, font);
+    }
+
+    /**
+     * HTML text that wraps to the width it is given and grows tall enough for every line. See
+     * {@link HudWrappingLabel}.
+     *
+     * @param html  the body of the text, without the surrounding {@code <html>} tags
+     * @param color the text colour
+     * @param font  the font
+     *
+     * @return the text component
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static JLabel wrappingHtml(String html, Color color, Font font) {
+        JLabel label = new HudWrappingLabel("<html>" + html + "</html>");
+        label.setForeground(color);
+        label.setFont(font);
+        label.setAlignmentX(Component.LEFT_ALIGNMENT);
+        return label;
+    }
+
+    /**
+     * A row of small boxed labels, tinted with one colour, that wraps to the width of its container. Used for short
+     * lists such as the option groups a campaign preset replaces.
+     *
+     * @param labels the labels
+     * @param tone   the tint of the boxes and their outlines
+     *
+     * @return the row
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static JPanel chipRow(List<String> labels, Color tone) {
+        JPanel row = transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(6), scaleForGUI(6)));
+        // WrapLayout pads the outside of the row by its gaps; pull the row back so the first chip lines up
+        row.setBorder(BorderFactory.createEmptyBorder(-scaleForGUI(6), -scaleForGUI(6), 0, 0));
+        for (String label : labels) {
+            JLabel chip = new JLabel(label);
+            chip.setOpaque(true);
+            chip.setBackground(translucent(tone, 18));
+            chip.setForeground(TEXT);
+            chip.setFont(hudFont(Font.PLAIN, 0.85f, 0.0f));
+            chip.setBorder(BorderFactory.createCompoundBorder(
+                  BorderFactory.createLineBorder(translucent(tone, 140), scaleForGUI(1)),
+                  BorderFactory.createEmptyBorder(scaleForGUI(3), scaleForGUI(8), scaleForGUI(3), scaleForGUI(8))));
+            row.add(chip);
+        }
+        return row;
+    }
+
+    /**
+     * The bar across the top of a HUD window: the ground colour, a divider beneath, and the standard padding.
+     *
+     * @param layout the bar's layout
+     *
+     * @return the bar; add the window's identity and controls to it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static JPanel commandBar(LayoutManager layout) {
+        JPanel bar = new JPanel(layout);
+        bar.setOpaque(true);
+        bar.setBackground(GROUND);
+        bar.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
+              BorderFactory.createEmptyBorder(scaleForGUI(14), scaleForGUI(16), scaleForGUI(12), scaleForGUI(16))));
+        return bar;
+    }
+
+    /**
+     * A window's identity for its command bar: a small tracked eyebrow, a large title, and a subtitle that wraps.
+     *
+     * @param eyebrow  the line above the title
+     * @param title    the title
+     * @param subtitle the line beneath the title, as plain text
+     *
+     * @return the identity block
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static JPanel identity(String eyebrow, String title, String subtitle) {
+        JPanel identity = transparentPanel(null);
+        identity.setLayout(new BoxLayout(identity, BoxLayout.Y_AXIS));
+        JLabel eyebrowLabel = new JLabel(eyebrow.toUpperCase(Locale.ROOT));
+        eyebrowLabel.setForeground(TEXT_FAINT);
+        eyebrowLabel.setFont(hudFont(Font.BOLD, 0.72f, 0.18f));
+        JLabel titleLabel = new JLabel(title.toUpperCase(Locale.ROOT));
+        titleLabel.setForeground(ACCENT_BRIGHT);
+        titleLabel.setFont(hudFont(Font.BOLD, 1.35f, 0.16f));
+        identity.add(leftAligned(eyebrowLabel));
+        identity.add(Box.createVerticalStrut(scaleForGUI(3)));
+        identity.add(leftAligned(titleLabel));
+        identity.add(Box.createVerticalStrut(scaleForGUI(4)));
+        identity.add(wrappingText(subtitle, TEXT_MUTED, hudFont(Font.PLAIN, 0.92f, 0.0f)));
+        return identity;
+    }
+
+    /**
+     * The main area of a HUD window, between its command bar and footer: the ground colour with the standard padding.
+     *
+     * @param layout the body's layout
+     *
+     * @return the body
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static JPanel windowBody(LayoutManager layout) {
+        JPanel body = new JPanel(layout);
+        body.setOpaque(true);
+        body.setBackground(GROUND);
+        body.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(16), scaleForGUI(16),
+              scaleForGUI(16)));
+        return body;
+    }
+
+    /**
+     * The bar along the bottom of a HUD window: a summary line on the left and the window's buttons on the right.
+     *
+     * @param summary the summary line, styled here
+     * @param actions the buttons, left to right
+     *
+     * @return the footer
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static JPanel footer(JLabel summary, JComponent... actions) {
+        JPanel footer = new JPanel(new BorderLayout(scaleForGUI(16), 0));
+        footer.setOpaque(true);
+        footer.setBackground(SURFACE_DEEP);
+        footer.setBorder(BorderFactory.createCompoundBorder(
+              BorderFactory.createMatteBorder(scaleForGUI(1), 0, 0, 0, BORDER),
+              BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(18), scaleForGUI(10), scaleForGUI(18))));
+
+        summary.setForeground(TEXT_MUTED);
+        summary.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
+
+        JPanel actionRow = transparentPanel(null);
+        actionRow.setLayout(new BoxLayout(actionRow, BoxLayout.X_AXIS));
+        for (int index = 0; index < actions.length; index++) {
+            if (index > 0) {
+                actionRow.add(Box.createHorizontalStrut(scaleForGUI(8)));
+            }
+            actionRow.add(actions[index]);
+        }
+
+        footer.add(summary, BorderLayout.CENTER);
+        footer.add(actionRow, BorderLayout.EAST);
+        return footer;
+    }
+
+    /**
+     * Holds a component at the top of the space it is given, at its own height, such as a button beside a taller
+     * block.
+     *
+     * @param component the component
+     *
+     * @return the holder
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static JPanel topAligned(JComponent component) {
+        JPanel holder = transparentPanel(new BorderLayout());
+        holder.add(component, BorderLayout.NORTH);
+        return holder;
     }
 
     // endregion Containers

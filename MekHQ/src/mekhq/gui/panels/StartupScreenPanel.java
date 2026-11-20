@@ -32,7 +32,6 @@
  */
 package mekhq.gui.panels;
 
-import static mekhq.MHQConstants.LAUNCHER_NEW_PLAYER_QUICKSTART_PATH;
 
 import java.awt.BorderLayout;
 import java.awt.Dimension;
@@ -70,6 +69,8 @@ import megamek.logging.MMLogger;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.Utilities;
+import mekhq.campaign.Campaign;
+import mekhq.campaign.NewPlayerQuickstart;
 import mekhq.campaign.storyArc.StoryArc;
 import mekhq.campaign.storyArc.StoryArcStub;
 import mekhq.gui.FileDialogs;
@@ -85,7 +86,6 @@ public class StartupScreenPanel extends AbstractMHQPanel {
     // region Variable Declarations
     private final MekHQ app;
     private @Nullable File lastSaveFile;
-    private final File newPlayerQuickstartFile;
     private BufferedImage backgroundIcon;
 
     // Save file filtering needs to avoid loading some special files
@@ -105,7 +105,6 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
         AppIcons.apply(getFrame(), "mekhq");
         this.app = app;
-        newPlayerQuickstartFile = new File(LAUNCHER_NEW_PLAYER_QUICKSTART_PATH);
 
         initialize();
     }
@@ -192,12 +191,11 @@ public class StartupScreenPanel extends AbstractMHQPanel {
         MegaMekButton btnNewPlayerQuickstart = new MegaMekButton(resources.getString("btnNewPlayerQuickstart.text"),
               UIComponents.MainMenuButton.getComp(),
               true);
-        btnNewPlayerQuickstart.setEnabled(newPlayerQuickstartFile != null);
         btnNewPlayerQuickstart.addActionListener(evt -> {
             btnNewPlayerQuickstart.setEnabled(false);
 
             if (!new NewPlayerQuickstartDialog(getFrame()).wasCanceled()) {
-                startCampaign(newPlayerQuickstartFile);
+                startNewPlayerQuickstart();
             } else {
                 btnNewPlayerQuickstart.setEnabled(true);
             }
@@ -358,20 +356,43 @@ public class StartupScreenPanel extends AbstractMHQPanel {
 
     private void startCampaign(final @Nullable File file, @Nullable StoryArcStub storyArcStub) {
         getFrame().setVisible(false); // hide StartupScreen
-        new DataLoadingDialog(getFrame(), app, file, false, campaign -> {
+        new DataLoadingDialog(getFrame(), app, file, false,
+              campaign -> onCampaignLoaded(campaign, storyArcStub)).setVisible(true);
+    }
+
+    /**
+     * Builds a fresh New Player Quickstart campaign, rather than loading one from a file, and welcomes the player to
+     * it once it is open.
+     */
+    private void startNewPlayerQuickstart() {
+        getFrame().setVisible(false); // hide StartupScreen
+        DataLoadingDialog.newPlayerQuickstart(getFrame(), app, campaign -> {
+            onCampaignLoaded(campaign, null);
             if (campaign != null) {
-                app.activateCampaign(campaign);
-                if (storyArcStub != null) {
-                    StoryArc storyArc = storyArcStub.loadStoryArc(campaign);
-                    if (storyArc != null) {
-                        campaign.useStoryArc(storyArc, true);
-                    }
-                }
-                getFrame().dispose();
-            } else {
-                getFrame().setVisible(true); // return back to StartupScreen
+                NewPlayerQuickstart.welcome(campaign);
             }
         }).setVisible(true);
+    }
+
+    /**
+     * Opens a campaign once it has loaded, or returns to the startup screen if it did not.
+     *
+     * @param campaign     the loaded campaign, or {@code null} if loading failed or was canceled
+     * @param storyArcStub the story arc to start once the campaign is open, or {@code null} for none
+     */
+    private void onCampaignLoaded(final @Nullable Campaign campaign, final @Nullable StoryArcStub storyArcStub) {
+        if (campaign != null) {
+            app.activateCampaign(campaign);
+            if (storyArcStub != null) {
+                StoryArc storyArc = storyArcStub.loadStoryArc(campaign);
+                if (storyArc != null) {
+                    campaign.useStoryArc(storyArc, true);
+                }
+            }
+            getFrame().dispose();
+        } else {
+            getFrame().setVisible(true); // return back to StartupScreen
+        }
     }
 
     private @Nullable File selectCampaignFile() {

@@ -80,6 +80,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsFreebieTracker;
+import mekhq.campaign.campaignOptions.CampaignOptionsSystemChanges;
+import mekhq.campaign.campaignOptions.CampaignOptionsSystemChanges.SystemChange;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRoleSubType;
@@ -962,144 +964,120 @@ public class CampaignOptionsPane extends JPanel {
     public static void triggerUpgradeFreebies(@Nonnull Campaign campaign, CampaignOptionsFreebieTracker oldOptions,
           CampaignOptionsFreebieTracker newOptions,
           boolean isStartUp) {
-        // Store old values for use if we want to trigger certain dialogs
-        boolean oldAwardVeterancySPAs = oldOptions.awardVeterancySPAs();
-        boolean oldIsTrackFactionStanding = oldOptions.trackFactionStanding();
-        boolean oldIsTrackPrisoners = oldOptions.trackPrisoners();
-        boolean oldIsUseMASHTheatres = oldOptions.useMASHTheatres();
-        boolean oldIsUseFatigue = oldOptions.useFatigue();
-        boolean oldIsUseAdvancedSalvage = oldOptions.useAdvancedSalvage();
-        boolean oldIsUseStratCon = oldOptions.useStratCon();
-        boolean oldIsUseMapless = oldOptions.useMapless();
-        boolean oldIsUseAdvancedScouting = oldOptions.useAdvancedScouting() && oldIsUseStratCon;
-        boolean oldIsUseAltAdvancedMedical = oldOptions.useAltAdvancedMedical();
-        boolean oldIsUseDiseases = oldIsUseAltAdvancedMedical && oldOptions.useDiseases();
-        boolean oldUseNormalizedContractPayModel = oldOptions.useNormalizedContractPayModel();
-        boolean oldIsDiminishReturnsContractPay = oldOptions.useDiminishingContractPay();
-        boolean oldIsUseChaosReputation = oldOptions.useChaosReputation();
-        boolean oldRequireMekWarriorKitToDeploy = oldOptions.requireMekWarriorKitToDeploy();
+        if (isStartUp) {
+            return;
+        }
 
-        boolean newIsTrackFactionStandings = newOptions.trackFactionStanding();
-        if (!isStartUp && (newIsTrackFactionStandings != oldIsTrackFactionStanding)) { // Has tracking changed?
-            FactionStandingCampaignOptionsChangedConfirmationDialog dialog = new FactionStandingCampaignOptionsChangedConfirmationDialog(
-                  campaign.getCampaignFactionIcon(),
-                  campaign.getPlayerForce().getFaction(),
-                  campaign.getLocalDate(),
-                  campaign.getPlayerForce().getFactionStandings(),
-                  campaign.getContractHistoryAsMap().values(),
-                  newIsTrackFactionStandings,
-                  campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER));
-
-            List<String> reports = dialog.getReports();
-            for (String report : reports) {
-                if (report != null && !report.isBlank()) {
-                    campaign.addReport(POLITICS, report);
+        // The same list the campaign upgrade console shows, so its follow-up warnings always match what runs here
+        for (SystemChange change : CampaignOptionsSystemChanges.between(oldOptions, newOptions)) {
+            boolean isNowOn = change.isNowOn();
+            switch (change.system()) {
+                case FACTION_STANDING -> reportFactionStandingChange(campaign, isNowOn);
+                case VETERANCY_AWARDS -> {
+                    if (isNowOn) {
+                        new VeterancyAwardsCampaignOptionsChangedConfirmationDialog(campaign);
+                    }
+                }
+                case SUPPORT_TEAMS -> {
+                    if (isNowOn && SupportCarrierReconciler.hasStaffToOrganize(campaign)) {
+                        new SupportTeamsCampaignOptionsChangedConfirmationDialog(campaign, false);
+                    }
+                }
+                case MASH_THEATRES -> grantSupportCapability(campaign, isNowOn, SupportCapability.MEDICAL);
+                case PRISONERS -> grantSupportCapability(campaign, isNowOn, SupportCapability.SECURITY);
+                case FATIGUE -> grantSupportCapability(campaign, isNowOn, SupportCapability.COMMISSARY);
+                case SALVAGE_OPERATIONS -> grantSupportCapability(campaign, isNowOn, SupportCapability.SALVAGE);
+                case STRATCON -> grantSupportCapability(campaign, isNowOn, SupportCapability.LOGISTICS);
+                case STRATCON_MAPLESS -> {
+                    if (isNowOn) {
+                        new StratConMaplessCampaignOptionsChangedConfirmationDialog(campaign);
+                    }
+                }
+                case ADVANCED_SCOUTING -> {
+                    if (isNowOn) {
+                        new AdvancedScoutingCampaignOptionsChangedConfirmationDialog(campaign);
+                    }
+                }
+                case ALTERNATIVE_ADVANCED_MEDICAL -> {
+                    if (isNowOn) {
+                        recordDerivedImplantProsthetics(campaign);
+                        new AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog(campaign);
+                    }
+                }
+                case DISEASES -> {
+                    if (isNowOn) {
+                        Inoculations.inoculateAllForNewlyEnabledDiseases(campaign);
+                    }
+                }
+                case LEGACY_CONTRACT_PAY -> {
+                    // Tracked so the player sees it change; nothing needs adjusting
+                }
+                case NORMALIZED_CONTRACT_PAY -> {
+                    if (isNowOn) {
+                        new NormalizedContractPayCampaignOptionsChangedConfirmationDialog(campaign);
+                    }
+                }
+                case DIMINISHING_CONTRACT_PAY -> {
+                    if (isNowOn) {
+                        new DiminishingReturnsCampaignOptionsChangedConfirmationDialog(campaign);
+                    }
+                }
+                case CHAOS_REPUTATION -> {
+                    if (isNowOn) {
+                        new ChaosReputationCampaignOptionsChangedConfirmationDialog(campaign);
+                        // Recalculate immediately so the reputation is current, rather than stale until the next
+                        // monthly update.
+                        ChaosReputation.processChaosCampaignReputationChanges(campaign.getCampaignOptions(),
+                              campaign.getPlayerForce(),
+                              campaign.getLocalDate());
+                        MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+                    }
+                }
+                case MEKWARRIOR_KITS -> {
+                    if (isNowOn) {
+                        new MekWarriorKitCampaignOptionsChangedConfirmationDialog(campaign);
+                    }
+                }
+                case AEROSPACE_KITS -> {
+                    if (isNowOn) {
+                        new AerospaceKitCampaignOptionsChangedConfirmationDialog(campaign);
+                    }
+                }
+                case SPECIALIST_TECH_SKILLS -> {
+                    if (isNowOn) {
+                        new SpecialistTechSkillsCampaignOptionsChangedConfirmationDialog(campaign);
+                    }
+                }
+                case TECH_TOOL_KITS -> {
+                    if (isNowOn) {
+                        new TechsNeedToolKitCampaignOptionsChangedConfirmationDialog(campaign);
+                    }
                 }
             }
         }
+    }
 
-        boolean newIsAwardVeterancySPAs = newOptions.awardVeterancySPAs();
-        if (!isStartUp && newIsAwardVeterancySPAs && !oldAwardVeterancySPAs) { // Has tracking changed?
-            new VeterancyAwardsCampaignOptionsChangedConfirmationDialog(campaign);
+    private static void reportFactionStandingChange(Campaign campaign, boolean isNowTracked) {
+        FactionStandingCampaignOptionsChangedConfirmationDialog dialog =
+              new FactionStandingCampaignOptionsChangedConfirmationDialog(
+              campaign.getCampaignFactionIcon(),
+              campaign.getPlayerForce().getFaction(),
+              campaign.getLocalDate(),
+              campaign.getPlayerForce().getFactionStandings(),
+              campaign.getContractHistoryAsMap().values(),
+              isNowTracked,
+              campaign.getCampaignOptions().get(CampaignOption.REGARD_MULTIPLIER));
+
+        for (String report : dialog.getReports()) {
+            if (report != null && !report.isBlank()) {
+                campaign.addReport(POLITICS, report);
+            }
         }
+    }
 
-        boolean newIsUseSupportTeams = newOptions.useSupportTeams();
-        if (!isStartUp && newIsUseSupportTeams && !oldOptions.useSupportTeams()
-                  && SupportCarrierReconciler.hasStaffToOrganize(campaign)) { // Has tracking changed?
-            new SupportTeamsCampaignOptionsChangedConfirmationDialog(campaign, false);
-        }
-
-        boolean newIsUseMASHTheatres = newOptions.useMASHTheatres();
-        if (!isStartUp && newIsUseMASHTheatres && !oldIsUseMASHTheatres) { // Has tracking changed?
-            new SupportCapabilityGrantDialog(campaign, SupportCapability.MEDICAL);
-        }
-
-        boolean newIsTrackPrisoners = newOptions.trackPrisoners();
-        if (!isStartUp && newIsTrackPrisoners && !oldIsTrackPrisoners) { // Has tracking changed?
-            new SupportCapabilityGrantDialog(campaign, SupportCapability.SECURITY);
-        }
-
-        boolean newIsUseFatigue = newOptions.useFatigue();
-        if (!isStartUp && newIsUseFatigue && !oldIsUseFatigue) { // Has tracking changed?
-            new SupportCapabilityGrantDialog(campaign, SupportCapability.COMMISSARY);
-        }
-
-        boolean newIsUseAdvancedSalvage = newOptions.useAdvancedSalvage();
-        if (!isStartUp && newIsUseAdvancedSalvage && !oldIsUseAdvancedSalvage) { // Has tracking changed?
-            new SupportCapabilityGrantDialog(campaign, SupportCapability.SALVAGE);
-        }
-
-        boolean newIsUseStratCon = newOptions.useStratCon();
-        if (!isStartUp && newIsUseStratCon && !oldIsUseStratCon) { // Has tracking changed?
-            new SupportCapabilityGrantDialog(campaign, SupportCapability.LOGISTICS);
-        }
-
-        boolean newIsUseMapless = newOptions.useMapless();
-        if (!isStartUp && newIsUseMapless && !oldIsUseMapless) { // Has tracking changed?
-            new StratConMaplessCampaignOptionsChangedConfirmationDialog(campaign);
-        }
-
-        boolean newIsUseAdvancedScouting = newOptions.useAdvancedScouting() && newIsUseStratCon;
-        if (!isStartUp && newIsUseAdvancedScouting && !oldIsUseAdvancedScouting) { // Has tracking changed?
-            new AdvancedScoutingCampaignOptionsChangedConfirmationDialog(campaign);
-        }
-
-        boolean newIsUseAltAdvancedMedical = newOptions.useAltAdvancedMedical();
-        if (!isStartUp && newIsUseAltAdvancedMedical && !oldIsUseAltAdvancedMedical) { // Has tracking changed?
-            recordDerivedImplantProsthetics(campaign);
-            new AltAdvancedMedicalCampaignOptionsChangedConfirmationDialog(campaign);
-        }
-
-        boolean newIsUseDiseases = newIsUseAltAdvancedMedical && newOptions.useDiseases();
-        if (!isStartUp && newIsUseDiseases && !oldIsUseDiseases) { // Has tracking changed?
-            Inoculations.inoculateAllForNewlyEnabledDiseases(campaign);
-        }
-
-        boolean newUseNormalizedContractPayModel = newOptions.useNormalizedContractPayModel() &&
-                                                         newOptions.useLegacyContractOptions();
-        if (!isStartUp && newUseNormalizedContractPayModel && !oldUseNormalizedContractPayModel) {
-            new NormalizedContractPayCampaignOptionsChangedConfirmationDialog(campaign);
-        }
-
-        boolean newIsDiminishReturnsContractPay = newOptions.useDiminishingContractPay() &&
-                                                        newOptions.useLegacyContractOptions();
-        if (!isStartUp && newIsDiminishReturnsContractPay && !oldIsDiminishReturnsContractPay) {
-            new DiminishingReturnsCampaignOptionsChangedConfirmationDialog(campaign);
-        }
-
-        boolean newIsUseChaosReputation = newOptions.useChaosReputation();
-        if (!isStartUp && newIsUseChaosReputation && !oldIsUseChaosReputation) { // Has tracking changed?
-            new ChaosReputationCampaignOptionsChangedConfirmationDialog(campaign);
-            // Recalculate immediately so the reputation is current, rather than stale until the next monthly update.
-            ChaosReputation.processChaosCampaignReputationChanges(campaign.getCampaignOptions(),
-                  campaign.getPlayerForce(),
-                  campaign.getLocalDate());
-            MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
-        }
-
-        boolean newRequireMekWarriorKitToDeploy = newOptions.requireMekWarriorKitToDeploy();
-        if (!isStartUp &&
-                  newRequireMekWarriorKitToDeploy &&
-                  !oldRequireMekWarriorKitToDeploy) { // Has tracking changed?
-            new MekWarriorKitCampaignOptionsChangedConfirmationDialog(campaign);
-        }
-
-        if (!isStartUp
-                  && newOptions.requireAerospaceKitToDeploy()
-                  && !oldOptions.requireAerospaceKitToDeploy()) { // Has tracking changed?
-            new AerospaceKitCampaignOptionsChangedConfirmationDialog(campaign);
-        }
-
-        boolean newSpecialistTechSkillsEnabled = newOptions.specialistTechSkillsEnabled();
-        if (!isStartUp
-                  && newSpecialistTechSkillsEnabled
-                  && !oldOptions.specialistTechSkillsEnabled()) { // Specialist tech skills newly enabled?
-            new SpecialistTechSkillsCampaignOptionsChangedConfirmationDialog(campaign);
-        }
-
-        boolean newTechsNeedToolKit = newOptions.techsNeedToolKit();
-        if (!isStartUp && newTechsNeedToolKit && !oldOptions.techsNeedToolKit()) { // Has tracking changed?
-            new TechsNeedToolKitCampaignOptionsChangedConfirmationDialog(campaign);
+    private static void grantSupportCapability(Campaign campaign, boolean isNowOn, SupportCapability capability) {
+        if (isNowOn) {
+            new SupportCapabilityGrantDialog(campaign, capability);
         }
     }
 

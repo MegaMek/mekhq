@@ -69,6 +69,72 @@ public class AutoAwardsController {
 
     private static final MMLogger logger = MMLogger.create(AutoAwardsController.class);
 
+    /** Set while {@link #issueEligibleAwards} runs: awards are issued straight away rather than at a ceremony. */
+    private boolean isCeremonySkipped;
+
+    /**
+     * Issues every award the campaign's personnel are eligible for, exactly as accepting the award ceremony unchanged
+     * would, without showing it. Shows nothing, so it is safe to call before the campaign window exists.
+     *
+     * @param campaign the campaign to be processed
+     */
+    public void issueEligibleAwards(Campaign campaign) {
+        isCeremonySkipped = true;
+        try {
+            ManualController(campaign, false);
+        } finally {
+            isCeremonySkipped = false;
+        }
+    }
+
+    /**
+     * Gives a person an award and logs it. A promotion award replaces any promotion award they already hold.
+     *
+     * @param campaign the campaign the person belongs to
+     * @param person   the person receiving the award
+     * @param award    the award
+     */
+    public static void issueAward(Campaign campaign, Person person, Award award) {
+        if (award.canBeAwarded(person)
+                  && award.getItem().equalsIgnoreCase("rank")
+                  && award.getRange().equalsIgnoreCase("Promotion")) {
+            List<Award> awardsForRemoval = new ArrayList<>();
+            for (Award existingAward : person.getAwardController().getAwards()) {
+                if (existingAward.getItem().equalsIgnoreCase("rank")
+                          && existingAward.getRange().equalsIgnoreCase("promotion")) {
+                    awardsForRemoval.add(existingAward);
+                }
+            }
+            for (Award awardPendingRemoval : awardsForRemoval) {
+                person.getAwardController().removeAwardSilent(awardPendingRemoval.getSet(),
+                      awardPendingRemoval.getName(), null);
+            }
+        }
+
+        person.getAwardController().addAndLogAward(campaign, award.getSet(), award.getName(),
+              campaign.getLocalDate());
+    }
+
+    /**
+     * Issues every award in the ceremony's pages that is ticked, as the ceremony's Issue Awards button does when the
+     * player leaves every page as it is.
+     *
+     * @param allAwardData the ceremony's pages: rows of the person's id, the award, and whether it is ticked
+     */
+    private void issueAllAwards(Map<Integer, Map<Integer, List<Object>>> allAwardData) {
+        for (Map<Integer, List<Object>> page : allAwardData.values()) {
+            for (List<Object> row : page.values()) {
+                if (!Boolean.TRUE.equals(row.get(2))) {
+                    continue;
+                }
+                Person person = campaign.getPlayerForce().getHumanResources().getPerson((UUID) row.getFirst());
+                if (person != null) {
+                    issueAward(campaign, person, (Award) row.get(1));
+                }
+            }
+        }
+    }
+
     /**
      * The controller for the manual-automatic processing of Awards
      *
@@ -787,7 +853,9 @@ public class AutoAwardsController {
             }
         }
 
-        if (!allAwardData.isEmpty()) {
+        if (!allAwardData.isEmpty() && isCeremonySkipped) {
+            issueAllAwards(allAwardData);
+        } else if (!allAwardData.isEmpty()) {
             AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allAwardData, 0);
             autoAwardsDialog.setModalityType(ModalityType.APPLICATION_MODAL);
             autoAwardsDialog.setLocation(autoAwardsDialog.getLocation().x, 0);
