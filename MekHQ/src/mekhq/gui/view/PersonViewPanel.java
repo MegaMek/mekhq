@@ -109,6 +109,7 @@ import javax.swing.table.TableColumn;
 import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.enums.SkillLevel;
 import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.EnhancedTabbedPane;
@@ -2028,6 +2029,35 @@ public class PersonViewPanel extends JScrollablePanel {
 
     }
 
+    /**
+     * Builds the role description with each profession prefixed by the person's experience level in it, for example
+     * {@code Veteran MekTech (Myomer), Green MekWarrior}. The tech specialization suffix stays beside the technician
+     * profession it describes. Injury effects are excluded, matching the personnel table.
+     *
+     * @param specializationSuffix the specialization, already formatted with its brackets and leading space, or an
+     *                             empty string if there is none
+     *
+     * @return the role description with experience levels
+     */
+    private String getRoleDescWithExperienceLevels(String specializationSuffix) {
+        String role = prefixWithExperienceLevel(person.getPrimaryRoleDesc(), false);
+        if (person.getPrimaryRole().isTech()) {
+            role += specializationSuffix;
+        }
+        if (!person.getSecondaryRole().isNone()) {
+            role += ", " + prefixWithExperienceLevel(person.getSecondaryRoleDesc(), true);
+            if (!person.getPrimaryRole().isTech() && person.getSecondaryRole().isTech()) {
+                role += specializationSuffix;
+            }
+        }
+        return role;
+    }
+
+    private String prefixWithExperienceLevel(String roleDesc, boolean secondary) {
+        SkillLevel skillLevel = person.getSkillLevel(campaign, secondary, true);
+        return skillLevel.isNone() ? roleDesc : skillLevel + " " + roleDesc;
+    }
+
     private JPanel fillInfo() {
         JPanel pnlInfo = new JPanel(new GridBagLayout());
         pnlInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(person.getFullTitle()));
@@ -2103,7 +2133,8 @@ public class PersonViewPanel extends JScrollablePanel {
         // A senior post sits beside the role because it is a different fact about the person: the role
         // is the job they do, the post is the position they hold within the command.
         String appointmentTitles = person.getSeniorAppointmentTitles();
-        String roleWithSpecialization = person.getRoleDesc(TechSpecialization.describeAsRoleSuffix(person, campaign));
+        String roleWithSpecialization = getRoleDescWithExperienceLevels(TechSpecialization.describeAsRoleSuffix(person,
+              campaign));
         String roleAndAppointment = appointmentTitles.isEmpty()
               ? roleWithSpecialization
               : roleWithSpecialization + " - " + appointmentTitles;
