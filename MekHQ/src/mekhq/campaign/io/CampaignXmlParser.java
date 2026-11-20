@@ -88,6 +88,7 @@ import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
 import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.logging.MMLogger;
+import megamek.release.ReleaseChannel;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
@@ -2177,6 +2178,17 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /**
+     * Reads the release channel of the build that wrote a save from its root {@code campaign} element.
+     *
+     * @param campaignElement the save's root element
+     *
+     * @return the channel, or {@code null} for a save written by a development build or before channels were saved
+     */
+    public static @Nullable ReleaseChannel parseVersionChannel(Element campaignElement) {
+        return ReleaseChannel.fromKey(campaignElement.getAttribute("channel"));
+    }
+
+    /**
      * Designed to create a campaign object from an input stream containing an XML structure.
      *
      * @return The created Campaign object, or null if there was a problem.
@@ -2224,6 +2236,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Assuming there is no upgrade path, we set version and continue parsing the campaign.
         campaign.setVersion(version);
+        campaign.setVersionChannel(parseVersionChannel(campaignEle));
 
         // Indicates whether new units were written to disk while
         // loading the Campaign file. If so, we need to kick back off loading

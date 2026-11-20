@@ -124,6 +124,7 @@ import megamek.common.units.Mek;
 import megamek.common.units.UnitNameTracker;
 import megamek.common.util.BuildingBlock;
 import megamek.logging.MMLogger;
+import megamek.release.ReleaseChannel;
 import mekhq.MHQConstants;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
@@ -274,6 +275,8 @@ public class Campaign implements ITechManager {
 
     private UUID id;
     private Version version; // this is dynamically populated on load and doesn't need to be saved
+    // The release channel of the build that last saved this campaign; populated on load like version
+    private ReleaseChannel versionChannel;
     private final List<Version> pastVersions = new ArrayList<>();
 
     // we have three things to track: (1) teams, (2) units, (3) repair tasks
@@ -576,6 +579,18 @@ public class Campaign implements ITechManager {
 
     public @Nullable Version getVersion() {
         return version;
+    }
+
+    /**
+     * @return the release channel of the build that last saved this campaign, or {@code null} when it was saved by a
+     *       development build or by a build that predates release channels
+     */
+    public @Nullable ReleaseChannel getVersionChannel() {
+        return versionChannel;
+    }
+
+    public void setVersionChannel(@Nullable ReleaseChannel versionChannel) {
+        this.versionChannel = versionChannel;
     }
 
     public List<Version> getPastVersions() {
@@ -4022,14 +4037,29 @@ public class Campaign implements ITechManager {
         this.lifePathLibrary = lifePathLibrary;
     }
 
+    /**
+     * Builds the opening {@code campaign} tag of a save, recording the version and release channel that wrote it.
+     *
+     * @param version the version writing the save
+     * @param channel the release channel of the build writing the save, or {@code null} for a development build, in
+     *                which case the {@code channel} attribute is left out
+     *
+     * @return the tag, ending in a newline
+     */
+    static String campaignOpenTag(Version version, @Nullable ReleaseChannel channel) {
+        return "<campaign version=\"" + MHQXMLUtility.escape(version.toString()) + '"'
+              + ((channel == null) ? "" : " channel=\"" + channel.getKey() + '"') + ">\n";
+    }
+
     public void writeToXML(final PrintWriter writer, boolean isBugReportPrep) {
         int indent = 0;
 
         // File header
         writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-        // Start the XML root.
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "campaign", "version", MHQConstants.VERSION);
+        // Start the XML root. The release channel cannot be derived from the version, so it is saved alongside it.
+        writer.print(campaignOpenTag(MHQConstants.VERSION, Version.getBuildChannel()));
+        indent++;
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "pastVersions");
         for (final Version pastVersion : pastVersions) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "pastVersion", pastVersion.toString());
