@@ -810,6 +810,22 @@ public class NewPersonnelMarket {
      * @author Illiani
      * @since 0.50.06
      */
+    /**
+     * Stops treating an applicant as rare, such as once they have been hired. If they were rare, one listing of their
+     * profession is dropped from the rare professions too, so the profession is only flagged while a rare applicant
+     * for it remains.
+     *
+     * @param applicant the applicant
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void removeRarePerson(Person applicant) {
+        if (applicant != null && rarePersonnel.remove(applicant.getId())) {
+            rareProfessions.remove(applicant.getPrimaryRole());
+        }
+    }
+
     public List<PersonnelRole> getRareProfessions() {
         return rareProfessions;
     }

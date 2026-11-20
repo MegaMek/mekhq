@@ -94,10 +94,10 @@ public class PersonnelMarketLibraries {
                                                                      CAMPAIGN_OPERATIONS_REVISED.getFileNameInnerSphere()));
 
         // Campaign Operations Strict
-        clanMarketCamOpsRevised.putAll(readEntriesAsMap(PERSONNEL_MARKET_DIRECTORY_PATH +
-                                                              CAMPAIGN_OPERATIONS_STRICT.getFileNameClan()));
-        innerSphereMarketCamOpsRevised.putAll(readEntriesAsMap(PERSONNEL_MARKET_DIRECTORY_PATH +
-                                                                     CAMPAIGN_OPERATIONS_STRICT.getFileNameInnerSphere()));
+        clanMarketCamOpsStrict.putAll(readEntriesAsMap(PERSONNEL_MARKET_DIRECTORY_PATH +
+                                                             CAMPAIGN_OPERATIONS_STRICT.getFileNameClan()));
+        innerSphereMarketCamOpsStrict.putAll(readEntriesAsMap(PERSONNEL_MARKET_DIRECTORY_PATH +
+                                                                    CAMPAIGN_OPERATIONS_STRICT.getFileNameInnerSphere()));
     }
 
     /**

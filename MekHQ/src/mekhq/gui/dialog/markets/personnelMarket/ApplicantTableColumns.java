@@ -46,7 +46,8 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
  * <p>Each column corresponds to a visible property for an applicant (e.g., full name, profession). Provides
  * localization for column headers.</p>
  *
- * <p>Each constant is associated with a column index for use in table models.</p>
+ * <p>The order of the constants is the order of the table's columns. A column's position in the table depends on
+ * which columns are shown, so use the index of a column in {@link #getVisibleColumns(CampaignOptions)}.</p>
  *
  * <p>The localized label for each column is retrieved from a resource bundle.</p>
  *
@@ -57,60 +58,46 @@ public enum ApplicantTableColumns {
     /**
      * The applicant's full name
      */
-    FULL_NAME(0),
+    FULL_NAME,
     /**
      * The applicant's primary role
      */
-    PROFESSION(1),
+    PROFESSION,
     /**
      * The applicant's experience level
      */
-    EXPERIENCE(2),
+    EXPERIENCE,
     /**
      * The applicant's adjusted Chaos Campaign reputation. Only shown when Chaos Reputation is enabled and it is not
      * tracked at the campaign level.
      */
-    REPUTATION(3),
+    REPUTATION,
     /**
      * The applicant's age
      */
-    AGE(3),
+    AGE,
     /**
      * The applicant's gender
      */
-    GENDER(4),
+    GENDER,
     /**
      * How many positive SPAs the character has
      */
-    POSITIVE_ABILITIES(5),
+    POSITIVE_ABILITIES,
     /**
      * How many negative SPAs (Flaws) the character has
      */
-    NEGATIVE_ABILITIES(6),
+    NEGATIVE_ABILITIES,
     /**
      * How highly the character scored on their performance exam (a measure of how high their Talent score it)
      */
-    PERFORMANCE_EXAM(6),
+    PERFORMANCE_EXAM,
     /**
      * The cost to hire the applicant
      */
-    HIRING_COST(7);
+    HIRING_COST;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ApplicantTableColumns";
-
-    public final int columnIndex;
-
-    /**
-     * Constructs a new ApplicantTableColumns value with the supplied column index.
-     *
-     * @param columnIndex the integer index for the column
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    ApplicantTableColumns(int columnIndex) {
-        this.columnIndex = columnIndex;
-    }
 
     /**
      * Returns the localized display label for this column using the resource bundle.

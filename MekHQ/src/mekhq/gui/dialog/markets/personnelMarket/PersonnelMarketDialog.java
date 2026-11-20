@@ -73,6 +73,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
@@ -105,8 +106,8 @@ import mekhq.gui.view.PersonViewPanel;
  *
  * <p>Usage:</p>
  * <ol>
- *     <li>Instantiate with the relevant market model, campaign, and parent frame.</li>
- *     <li>Call {@code initializeComponents()} before use to construct and arrange UI elements.</li>
+ *     <li>Construct it with the market to show. The constructor builds the dialog and shows it modally, so it
+ *     returns only once the dialog has closed.</li>
  *     <li>Handles user actions for hiring or inspecting applicants directly in the GUI.</li>
  * </ol>
  *
@@ -144,7 +145,7 @@ public class PersonnelMarketDialog extends JDialog {
     private PersonViewPanel personViewPanel;
 
     /**
-     * Constructs a new PersonnelMarketDialog.
+     * Builds the dialog and shows it modally; this returns once the dialog has closed.
      *
      * @param market the personnel market logic backing this dialog
      *
@@ -162,14 +163,12 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     /**
-     * Initializes and arranges all GUI components for the dialog.
-     *
-     * <p>Should be called before displaying the dialog.</p>
+     * Initializes and arranges all GUI components for the dialog, then shows it. Called once, by the constructor.
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public void initializeComponents() {
+    private void initializeComponents() {
         setDialogTitle();
         addWindowListener(new WindowAdapter() {
             @Override
@@ -194,10 +193,15 @@ public class PersonnelMarketDialog extends JDialog {
         JPanel pnlTips = initializeTipPanel();
         pnlLeft.add(pnlTips, BorderLayout.SOUTH);
 
-        AtomicReference<Person> selectedPerson = new AtomicReference<>();
-        if (!currentApplicants.isEmpty()) {
-            selectedPerson.set(tablePanel.getSelectedApplicants().getFirst());
+        // Start on the first applicant the filter shows, selected in the table, so Recruit only ever acts on
+        // applicants the player can see highlighted.
+        JTable personnelTable = tablePanel.getTable();
+        if (personnelTable.getRowCount() > 0) {
+            personnelTable.setRowSelectionInterval(0, 0);
         }
+        List<Person> initiallySelected = tablePanel.getSelectedApplicants();
+        AtomicReference<Person> selectedPerson = new AtomicReference<>(initiallySelected.isEmpty() ? null :
+                                                                             initiallySelected.getFirst());
 
         // This handles the initializing and display of the applicant panel
         JSplitPane splitPane = initializePersonView(selectedPerson, mainPanel);
@@ -452,9 +456,17 @@ public class PersonnelMarketDialog extends JDialog {
         personnelTable.getSelectionModel().addListSelectionListener(e -> {
             if (!e.getValueIsAdjusting()) {
                 SwingUtilities.invokeLater(() -> {
+                    // The first row is selected while the dialog is still being built, before the view exists
+                    if (personViewPanel == null) {
+                        return;
+                    }
                     List<Person> selected = tablePanel.getSelectedApplicants();
                     Person selectedPerson = selected.isEmpty() ? null : selected.getFirst();
                     personViewPanel.setPerson(selectedPerson);
+                    // The view starts hidden when the filter shows no one, so reveal it once someone is picked
+                    if (selectedPerson != null) {
+                        personViewPanel.setVisible(true);
+                    }
                 });
             }
         });
@@ -538,25 +550,51 @@ public class PersonnelMarketDialog extends JDialog {
      * @since 0.50.06
      */
     private void hireActionListener(boolean isGMHire) {
-        List<Person> recruitedPersons = new ArrayList<>(tablePanel.getSelectedApplicants());
+        List<Person> selectedApplicants = new ArrayList<>(tablePanel.getSelectedApplicants());
+        if (selectedApplicants.isEmpty()) {
+            return;
+        }
 
-        // Process recruitment and golden hello logic for all selected applicants
-        for (Person applicant : recruitedPersons) {
+        Finances finances = campaign.getPlayerForce().getFinances();
+        if (!isGMHire) {
+            // Hire everyone selected or no one, so the player is never left with part of a group they chose
+            Money totalCost = Money.zero();
+            for (Person applicant : selectedApplicants) {
+                totalCost = totalCost.plus(market.getHiringCost(applicant));
+            }
+
+            Money balance = finances.getBalance();
+            if (balance.isLessThan(totalCost)) {
+                JOptionPane.showMessageDialog(this,
+                      getFormattedTextAt(RESOURCE_BUNDLE, "hire.personnelMarket.insufficientFunds.text",
+                            totalCost.toAmountAndSymbolString(), balance.toAmountAndSymbolString()),
+                      getTextAt(RESOURCE_BUNDLE, "hire.personnelMarket.insufficientFunds.title"),
+                      JOptionPane.WARNING_MESSAGE);
+                return;
+            }
+        }
+
+        List<Person> recruitedPersons = new ArrayList<>();
+        for (Person applicant : selectedApplicants) {
             if (!isGMHire) {
-                // Personnel are hired without rank, meaning they have a 0.5 salary multiplier. As a Golden Hello is
-                // 12 months' salary, we double the multiplier from 12 to 24.
                 Money cost = market.getHiringCost(applicant);
+                boolean isPaid = finances.debit(RECRUITMENT,
+                      campaign.getLocalDate(),
+                      cost,
+                      getFormattedTextAt(RESOURCE_BUNDLE, "finances.personnelMarket.hire", applicant.getFullTitle()));
 
-                campaign.getPlayerForce().getFinances()
-                      .debit(RECRUITMENT,
-                            campaign.getLocalDate(),
-                            cost,
-                            getFormattedTextAt(RESOURCE_BUNDLE,
-                                  "finances.personnelMarket.hire",
-                                  applicant.getFullTitle()));
+                // The balance was checked above, so this only happens if something else spent the money. Never
+                // recruit someone whose hiring cost wasn't paid.
+                if (!isPaid) {
+                    LOGGER.warn("Could not pay the hiring cost of {} for {}; stopping recruitment",
+                          cost.toAmountAndSymbolString(), applicant.getFullTitle());
+                    break;
+                }
             }
             // The market has already charged its hiring cost, so recruitment isn't charged again
             campaign.getPlayerForce().getHumanResources().recruitPrepaidPerson(campaign, applicant, isGMHire);
+            market.removeRarePerson(applicant);
+            recruitedPersons.add(applicant);
         }
 
         // Remove all recruited persons from the applicant list

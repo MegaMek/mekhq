@@ -166,7 +166,8 @@ class PersonnelTablePanelTest {
             JTable table = panel.getTable();
             PersonTableModel model = (PersonTableModel) table.getModel();
             List<RowSorter.SortKey> sortKeys = List.of(
-                  new RowSorter.SortKey(ApplicantTableColumns.PROFESSION.columnIndex, SortOrder.ASCENDING),
+                  new RowSorter.SortKey(ApplicantTableColumns.getVisibleColumns(campaignOptions)
+                                              .indexOf(ApplicantTableColumns.PROFESSION), SortOrder.ASCENDING),
                   new RowSorter.SortKey(hiringCostColumn(), order));
             table.getRowSorter().setSortKeys(sortKeys);
 
