@@ -28,5 +28,11 @@
   } ],
   "dissenterPreference" : "DC",
   "isViolentTransition" : false,
-  "divisiveness" : -2
+  "divisiveness" : -2,
+  "isIntroducedByThirdParty" : false,
+  "hasNoDissent" : false,
+  "offersMercenary" : true,
+  "offersPirate" : true,
+  "offersBanditCaste" : false,
+  "hasSharedResult" : false
 }
