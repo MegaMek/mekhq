@@ -54,6 +54,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -110,7 +112,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     static final String RESOURCE_BUNDLE = "mekhq.resources.ChaosContractMarketDialog";
 
     private static final Dimension MINIMUM_SIZE = scaleForGUI(1040, 600);
-    private static final Dimension DEFAULT_SIZE = scaleForGUI(1180, 700);
+    /** The opening size, until the player resizes it; held to the screen's usable area on smaller screens. */
+    private static final Dimension DEFAULT_SIZE = scaleForGUI(1360, 870);
     private static final int GENERATED_OFFERS_PER_BATCH = 1;
     private static final int SHORTCUT_OFFERS = 9;
 
@@ -245,7 +248,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
         setMinimumSize(MINIMUM_SIZE);
         pack();
-        setSize(DEFAULT_SIZE); // Default opening size; saved preferences (below) override it on later opens
+        setSize(openingSize()); // Default opening size; saved preferences (below) override it on later opens
         setLocationRelativeTo(parent);
         setPreferences(); // Must be before setVisible
 
@@ -1126,6 +1129,12 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek. Besides the
      * window bounds, it remembers the mothball and travel on-departure checkboxes between opens.
      */
+    /** @return the default size, made no larger than the screen's usable area (the space outside any taskbar) */
+    private static Dimension openingSize() {
+        Rectangle usable = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        return new Dimension(Math.min(DEFAULT_SIZE.width, usable.width), Math.min(DEFAULT_SIZE.height, usable.height));
+    }
+
     private void setPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChaosContractMarketDialog.class);
