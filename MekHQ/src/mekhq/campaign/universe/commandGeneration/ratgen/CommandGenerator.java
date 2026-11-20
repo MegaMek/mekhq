@@ -60,6 +60,8 @@ import megamek.common.enums.NeuralInterfaceMode;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
 import megamek.common.units.Entity;
+import megamek.common.units.EntityWeightClass;
+import megamek.common.units.UnitType;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
@@ -179,6 +181,27 @@ public final class CommandGenerator {
     }
 
     /**
+     * The weight class a roll asks the rulesets for. Aerospace fighters have no assault class, so the fighter rules
+     * have no Assault option, and an Assault Squadron built no Flights and came out as a single fighter
+     * (MegaMek/megamek#9646). MegaMek's Target Weight no longer offers Assault for them, but a preset saved before
+     * that still carries it; it is read as Random.
+     *
+     * @param snapshot the roll inputs
+     *
+     * @return the weight class to request, or {@code null} for Random
+     */
+    static @Nullable Integer requestedWeightClass(ForceDescriptorSnapshot snapshot) {
+        Integer weightClass = snapshot.getWeightClass();
+        Integer unitType = snapshot.getUnitType();
+        boolean isAerospaceFighter = (unitType != null) && (unitType == UnitType.AEROSPACE_FIGHTER);
+        if (isAerospaceFighter && (weightClass != null) && (weightClass == EntityWeightClass.WEIGHT_ASSAULT)) {
+            LOGGER.info("[CompanyGen][Pipeline] aerospace fighters have no Assault class; rolling a Random weight");
+            return null;
+        }
+        return weightClass;
+    }
+
+    /**
      * Rolls a command from the given snapshot without touching any campaign: bootstraps the engine
      * for the snapshot's year, builds the root {@link ForceDescriptor}, and rolls the force via
      * {@link Ruleset#processRoot}. Each leaf of the returned tree carries a fully crewed
@@ -237,8 +260,9 @@ public final class CommandGenerator {
         if (snapshot.getExperience() != null) {
             forceDescriptor.setExperience(snapshot.getExperience());
         }
-        if (snapshot.getWeightClass() != null) {
-            forceDescriptor.setWeightClass(snapshot.getWeightClass());
+        Integer weightClass = requestedWeightClass(snapshot);
+        if (weightClass != null) {
+            forceDescriptor.setWeightClass(weightClass);
         }
         forceDescriptor.setInfantryClass(snapshot.getInfantryClass());
         forceDescriptor.setAugmented(snapshot.isAugmented());
