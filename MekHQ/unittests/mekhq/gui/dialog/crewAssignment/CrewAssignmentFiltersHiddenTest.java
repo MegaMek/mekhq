@@ -41,10 +41,12 @@ import java.nio.file.Path;
 
 import megamek.client.ui.preferences.SuitePreferences;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.AssignSort;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Assignment;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.Condition;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.FamiliarityBand;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SingleRole;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SkillGroup;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -96,13 +98,16 @@ class CrewAssignmentFiltersHiddenTest {
         state.formation = "D-1";
         state.assignment = Assignment.EVERYONE;
         state.role = new SingleRole(PersonnelRole.MEKWARRIOR);
+        state.skill = SkillGroup.SCOUTING;
         state.condition = Condition.FIT;
         state.familiarity = FamiliarityBand.AT_LEAST_100;
         // The search box is above the list, not on the rail, so it stays in sight and is not counted
         state.peopleQuery = "Smith";
+        // Nor is the order, which the chips above the list choose
+        state.assignSort = AssignSort.COMBAT;
 
-        // Two unit filters and four people filters, all on the Assign page's one rail
-        assertEquals(6, state.activeRailFilters(CrewAssignmentPage.ASSIGN));
+        // Two unit filters and five people filters, all on the Assign page's one rail
+        assertEquals(7, state.activeRailFilters(CrewAssignmentPage.ASSIGN));
         assertEquals(0, state.activeRailFilters(CrewAssignmentPage.REVIEW));
     }
 }

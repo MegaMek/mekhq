@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog.crewAssignment;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -60,20 +62,24 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AutoFill;
 import mekhq.campaign.unit.crewAssignment.CrewSeatLayout;
 import mekhq.campaign.unit.crewAssignment.SeatEligibility;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SkillGroup;
 import mekhq.gui.model.LocationFilterItem;
 
 /**
  * Everything the {@link CrewAssignmentDialog} shows for one location, read once when the dialog opens: the units that
  * can be crewed there, the people who could crew them, and the staged plan.
  *
- * <p>Each person's experience level, special abilities and search text are worked out here once, so filtering and
- * sorting thousands of people as the player types never asks the campaign again.</p>
+ * <p>Each person's experience level, special abilities, skills and search text are worked out here once, so filtering
+ * and sorting thousands of people as the player types never asks the campaign again.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -92,13 +98,26 @@ final class CrewAssignmentData {
     record AbilityEntry(String name, String description) {}
 
     /**
+     * One of a person's skills, as the dialog shows and sorts it.
+     *
+     * @param name  the skill's name, as {@link SkillType} names it
+     * @param value the skill's final value, as the Personnel tab's skill columns show it
+     * @param level the skill's total level, higher being better whichever way the skill counts, for sorting
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    record SkillEntry(String name, int value, int level) {}
+
+    /**
      * A person and what the dialog shows about them.
      *
+     * @param skills  the person's skills, by name
      * @param hits    the person's hits, counting advanced medical injuries
      * @param fatigue the person's effective fatigue, or {@code null} when the campaign does not use fatigue
      */
-    record PersonEntry(Person person, SkillLevel skillLevel, List<AbilityEntry> abilities, int hits,
-          @Nullable Integer fatigue, String searchText) {}
+    record PersonEntry(Person person, SkillLevel skillLevel, List<AbilityEntry> abilities,
+          Map<String, SkillEntry> skills, int hits, @Nullable Integer fatigue, String searchText) {}
 
     private final Map<UUID, UnitEntry> units = new LinkedHashMap<>();
     private final Map<UUID, PersonEntry> people = new LinkedHashMap<>();
@@ -203,15 +222,46 @@ final class CrewAssignmentData {
                 abilities.add(new AbilityEntry(Utilities.getOptionDisplayName(option), option.getDescription()));
             }
         }
+        Map<String, SkillEntry> skills = describeSkills(campaign, person);
         StringBuilder search = new StringBuilder(person.getFullTitle()).append(' ')
                                      .append(person.getPrimaryRole().getLabel(false)).append(' ')
                                      .append(person.getSecondaryRole().getLabel(false));
         for (AbilityEntry ability : abilities) {
             search.append(' ').append(ability.name());
         }
+        // Skills by name, such as Sensor Operations, and by the group the Skills filter offers, such as Scouting
+        for (String skill : skills.keySet()) {
+            search.append(' ').append(skill);
+        }
+        for (SkillGroup group : SkillGroup.values()) {
+            if (CrewAssignmentState.best(skills, group) != null) {
+                search.append(' ')
+                      .append(getTextAt(CrewAssignmentDialog.RESOURCE_BUNDLE, "SkillGroup." + group.name()));
+            }
+        }
         Integer fatigue = useFatigue ? Fatigue.getEffectiveFatigue(person, campaign) : null;
-        return new PersonEntry(person, level, List.copyOf(abilities), person.getTotalInjurySeverity(), fatigue,
-              search.toString().toLowerCase(Locale.ROOT));
+        return new PersonEntry(person, level, List.copyOf(abilities), skills, person.getTotalInjurySeverity(),
+              fatigue, search.toString().toLowerCase(Locale.ROOT));
+    }
+
+    /**
+     * Reads a person's skills with the modifiers the Personnel tab's skill columns use, so the values the dialog shows
+     * match those columns.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static Map<String, SkillEntry> describeSkills(Campaign campaign, Person person) {
+        SkillModifierData modifiers = person.getSkillModifierData(
+              campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
+              campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(), true);
+        Map<String, SkillEntry> skills = new LinkedHashMap<>();
+        for (Skill skill : person.getSkills().getSkills()) {
+            String name = skill.getType().getName();
+            skills.put(name, new SkillEntry(name, skill.getFinalSkillValue(modifiers),
+                  skill.getTotalSkillLevel(modifiers)));
+        }
+        return Map.copyOf(skills);
     }
 
     private static UnitEntry describe(Campaign campaign, Unit unit) {

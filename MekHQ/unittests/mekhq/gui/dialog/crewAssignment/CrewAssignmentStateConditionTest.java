@@ -38,6 +38,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
 import java.util.List;
+import java.util.Map;
 
 import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.Person;
@@ -55,7 +56,7 @@ class CrewAssignmentStateConditionTest {
     private static PersonEntry entry(int hits, boolean isPregnant) {
         Person person = mock(Person.class);
         when(person.isPregnant()).thenReturn(isPregnant);
-        return new PersonEntry(person, SkillLevel.REGULAR, List.of(), hits, null, "");
+        return new PersonEntry(person, SkillLevel.REGULAR, List.of(), Map.of(), hits, null, "");
     }
 
     @Test
