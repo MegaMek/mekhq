@@ -83,14 +83,17 @@ public final class ContractDiscordFormatter {
     public static String format(ContractReadout readout) {
         String header = "**" + escapeMarkdown(readout.title().toUpperCase(Locale.ROOT)) + "**\n"
                               + "-# " + escapeMarkdown(readout.employerLine()) + '\n';
+        // The war the offer is part of heads the briefing, as in the dossier.
+        String war = readout.warLine() == null ? ""
+                           : "**" + escapeMarkdown(readout.warLine().toUpperCase(Locale.ROOT)) + "**\n";
         String speaker = readout.speaker() == null ? "" : "**" + escapeMarkdown(readout.speaker()) + "**\n";
         String block = codeBlock(readout);
 
-        // The briefing gets whatever room the header and stat block leave.
+        // The briefing gets whatever room the header, war and stat block leave.
         String briefing = quote(readout.briefing(),
-              MAX_LENGTH - header.length() - speaker.length() - block.length());
+              MAX_LENGTH - header.length() - war.length() - speaker.length() - block.length());
 
-        String message = header + (briefing.isEmpty() ? "" : speaker + briefing) + block;
+        String message = header + war + (briefing.isEmpty() ? "" : speaker + briefing) + block;
         // A stat block alone over the limit cannot happen with the dossier's handful of rows, but never hand Discord
         // a message it will refuse.
         return message.length() <= MAX_LENGTH ? message

@@ -329,6 +329,15 @@ public class ContractDossierPanel extends JPanel {
         top.add(Hud.topAligned(buildRoute()));
 
         JPanel overview = Hud.column();
+        String warName = warName(contract);
+        if (warName != null) {
+            JLabel war = HudWrappingTextLabel.copyOf(Hud.eyebrow(warLine(contract)));
+            war.setForeground(DANGER);
+            war.setToolTipText(Hud.wrapToolTip(
+                  getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.war.tooltip", warName)));
+            overview.add(leftAligned(war));
+            overview.add(Box.createVerticalStrut(scaleForGUI(8)));
+        }
         overview.add(leftAligned(top));
         overview.add(Box.createVerticalStrut(scaleForGUI(14)));
         overview.add(leftAligned(columns));

@@ -47,9 +47,6 @@ import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 public class ContractEmergencyExtension {
@@ -62,17 +59,7 @@ public class ContractEmergencyExtension {
             return false;
         }
 
-        Factions factions = Factions.getInstance();
-        // We use anchor faction to allow for the breadth of faction political interactions
-        Faction employerFaction = factions.getFaction(contract.getEmployerData().anchorFactionCode());
-        // An enemy fielded by a covert sponsor fights that sponsor's war, so check against the sponsor when there is
-        // one; otherwise against the enemy itself.
-        Faction enemySponsor = contract.getEnemySponsorFaction();
-        Faction enemyFaction = enemySponsor == null ? contract.getEnemyFaction() : enemySponsor;
-        LocalDate localDate = campaign.getLocalDate();
-        final String warName = RandomFactionGenerator.getInstance()
-                                     .getFactionHints()
-                                     .getCurrentWar(employerFaction, enemyFaction, localDate);
+        final String warName = ContractWar.getCurrentWar(contract, campaign.getLocalDate());
         if (warName == null) {
             return false;
         }

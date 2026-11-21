@@ -65,7 +65,9 @@ import org.commonmark.renderer.text.TextContentRenderer;
  * @param statusLine   the objective, destination, term and transit, as one line
  * @param assessment   the assessment's word and score, such as "Even Fight 5/10"
  * @param badges       the offer's badges (batchall, proving ground, covert, special rules)
- * @param speaker      who is making the pitch, or {@code null} when the offer has its own description instead
+ * @param warLine      the named war the offer is part of, as the line above the dossier's briefing gives it, or
+ *                     {@code null} when it is part of none (or the dossier keeps the war back)
+ * @param speaker     who is making the pitch, or {@code null} when the offer has its own description instead
  * @param briefing     the pitch, or the offer's own description as plain text
  * @param sections     the Terms, Intel and Money sections, in that order
  * @param caveat       the note that the money is an estimate
@@ -74,7 +76,7 @@ import org.commonmark.renderer.text.TextContentRenderer;
  * @since 0.51.01
  */
 public record ContractReadout(String employerLine, String title, String statusLine, String assessment,
-      List<String> badges, @Nullable String speaker, String briefing, List<Section> sections, String caveat) {
+      List<String> badges, @Nullable String warLine, @Nullable String speaker, String briefing, List<Section> sections, String caveat) {
     private static final String RESOURCE_BUNDLE = ChaosContractMarketDialog.RESOURCE_BUNDLE;
 
     /**
@@ -128,6 +130,8 @@ public record ContractReadout(String employerLine, String title, String statusLi
               assessmentDifficulty(contract));
 
         List<String> badges = ContractMarketFormatting.badges(contract).stream().map(MarketBadge::text).toList();
+        // Qualified: unqualified, the name resolves to this record's own warLine() accessor.
+        String warLine = ContractMarketFormatting.warLine(contract);
 
         String speaker = null;
         String briefing;
@@ -144,6 +148,7 @@ public record ContractReadout(String employerLine, String title, String statusLi
               String.join(separator(), status),
               assessment,
               badges,
+              warLine,
               speaker,
               briefing,
               List.of(terms(contract, estimate),

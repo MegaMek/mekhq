@@ -95,6 +95,8 @@ public final class ContractPdfExporter {
     private static final Color ACCENT = new Color(0x0E, 0x6E, 0x80);
     private static final Color RULE = new Color(0xC8, 0xD0, 0xD6);
     private static final Color HIGHLIGHT = new Color(0x8A, 0x5A, 0x00);
+    /** The war line's red, dark enough to read on white paper. */
+    private static final Color WAR = new Color(0xA3, 0x2A, 0x2A);
 
     private final PDDocument document;
     private final PDFont regular;
@@ -188,6 +190,12 @@ public final class ContractPdfExporter {
         markers.addAll(offer.badges());
         wrapped(String.join(ContractReadout.separator(), markers), bold, BODY_SIZE, HIGHLIGHT, MARGIN, contentWidth());
         y -= 6;
+
+        // The war the offer is part of heads the briefing, as in the dossier.
+        if (offer.warLine() != null) {
+            wrapped(offer.warLine().toUpperCase(Locale.ROOT), bold, SMALL_SIZE, WAR, MARGIN, contentWidth());
+            y -= 4;
+        }
 
         if (!offer.briefing().isBlank()) {
             if (offer.speaker() != null) {

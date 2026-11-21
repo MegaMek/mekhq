@@ -50,12 +50,14 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
+import jakarta.annotation.Nullable;
 import megamek.SuiteOptions;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
 import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
+import mekhq.campaign.mission.contract.utilities.ContractWar;
 import mekhq.campaign.universe.Faction;
 
 /**
@@ -115,6 +117,41 @@ public final class ContractMarketFormatting {
             badges.add(new MarketBadge(specialRule.getName(), specialRule.getToolTipText(), AMBER));
         }
         return badges;
+    }
+
+    /**
+     * The named war the offer's two sides are fighting on its start date, shown above the dossier's briefing. Left off
+     * when it would give away hidden intel: with the opposition hidden, the war narrows down who the enemy is, and on a
+     * covert operation it narrows down the withheld employer.
+     *
+     * @return the war's name, or {@code null} when there is none to show
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable String warName(AbstractContract contract) {
+        LocalDate startDate = contract.getStartDate();
+        if ((startDate == null) || contract.isCovert() || contract.isIntelObfuscated(ObfuscatableIntel.OPPOSITION)) {
+            return null;
+        }
+        String warName = ContractWar.getCurrentWar(contract, startDate);
+        return ((warName == null) || warName.isBlank()) ? null : warName;
+    }
+
+    /**
+     * The line naming the offer's war, such as "Ongoing War · Fourth Succession War", as the dossier shows it above the
+     * briefing and the exports repeat it.
+     *
+     * @return the line, or {@code null} when {@link #warName(AbstractContract)} gives no war
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static @Nullable String warLine(AbstractContract contract) {
+        String warName = warName(contract);
+        return (warName == null) ? null
+                     : getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.war")
+                             + getTextAt(RESOURCE_BUNDLE, "value.contractMarket.separator") + warName;
     }
 
     /**
