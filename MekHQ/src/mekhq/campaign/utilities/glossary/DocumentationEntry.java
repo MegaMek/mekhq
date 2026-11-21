@@ -61,8 +61,7 @@ public enum DocumentationEntry {
     EDUCATION_MODULE("EDUCATION_MODULE",
           "GlossaryDocs/Personnel Modules/Education Module",
           "0.50.07", "0.50.10", "0.50.10"),
-    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "GlossaryDocs/0_MHQ New Player Guide", "0.50.07", "0.50.11", "0.50.11"),
-    UNIT_MARKETS("UNIT_MARKETS", "GlossaryDocs/Unit Markets", "0.50.07", "0.50.07", "0.50.07");
+    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "GlossaryDocs/0_MHQ New Player Guide", "0.50.07", "0.50.11", "0.50.11");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";
 
