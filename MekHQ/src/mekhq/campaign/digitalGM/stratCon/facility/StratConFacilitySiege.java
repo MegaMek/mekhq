@@ -168,10 +168,10 @@ public final class StratConFacilitySiege {
     }
 
     /**
-     * Rolls whether the enemy brings a counterattack forward as a relief force against a new siege, on a
-     * counterattack's daily chance (see {@link StratConEnemyFacilityActivity#isReliefSent}). Unlike a counterattack, a
-     * relief force is never guaranteed by a long quiet spell. A relief force counts as the enemy's latest
-     * counterattack. A cut-off facility cannot be relieved.
+     * Rolls whether the enemy sends a relief force against a new siege (see
+     * {@link StratConEnemyFacilityActivity#isReliefSent}). A relief force is fought today, as a Crisis, and is not a
+     * counterattack: losing it breaks the siege rather than costing a facility. A cut-off facility cannot be
+     * relieved.
      *
      * @param campaign    the current campaign
      * @param contract    the contract whose map holds the sector
