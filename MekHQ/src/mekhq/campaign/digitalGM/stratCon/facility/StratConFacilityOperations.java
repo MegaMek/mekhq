@@ -370,6 +370,11 @@ public final class StratConFacilityOperations {
             if (facility.getOwner() != ForceAlignment.Player) {
                 return "reason.employerHeld";
             }
+            // The fight's forces were settled when it began, so building up now would change only what the enemy
+            // takes if it wins.
+            if (track.getScenario(coords) != null) {
+                return "reason.scenarioUnderway";
+            }
             // Building up a facility, or bringing in fresh troops, needs the supplies a cut-off one can't get.
             if (StratConFacilitySupply.isCutOff(track, coords)) {
                 return "reason.cutOff";

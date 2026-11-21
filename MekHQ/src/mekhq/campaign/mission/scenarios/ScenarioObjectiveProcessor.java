@@ -514,6 +514,7 @@ public class ScenarioObjectiveProcessor {
                         }
                     }
                 }
+                break;
             case FacilityRemains:
                 if ((tracker.getMission() != null) && (tracker.getScenario() instanceof AtBScenario)) {
                     if (dryRun) {

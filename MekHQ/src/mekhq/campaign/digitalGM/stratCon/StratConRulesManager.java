@@ -1707,7 +1707,7 @@ public class StratConRulesManager {
         if (objectiveModifier != null) {
             backingScenario.addScenarioModifier(objectiveModifier);
             backingScenario.setName(String.format("%s - %s - %s",
-                  facility.getFacilityType(),
+                  facility.getDisplayableName(),
                   alliedFacility ? "Allied" : "Hostile",
                   objectiveModifier.getModifierName()));
         }

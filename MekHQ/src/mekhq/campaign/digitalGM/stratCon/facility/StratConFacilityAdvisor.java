@@ -192,6 +192,15 @@ public final class StratConFacilityAdvisor {
     public static List<String> getHints(Campaign campaign, AbstractContract contract, StratConTrackState track,
           StratConCoords coords) {
         List<String> hints = new ArrayList<>();
+
+        // The enemy attacks your side's facilities with or without Facility Operations, so the warning always shows.
+        StratConScenario counterattack = getCounterattack(track, coords);
+        if (counterattack != null) {
+            hints.add((counterattack.getCurrentState() == ScenarioState.UNRESOLVED) ?
+                            getFormattedTextAt(RESOURCE_BUNDLE, "hint.counterattack", formatDate(getDeadline(counterattack))) :
+                            getTextAt(RESOURCE_BUNDLE, "hint.counterattack.committed"));
+        }
+
         if (!StratConFacilityOperations.isEnabled(campaign)) {
             return hints;
         }
@@ -199,13 +208,6 @@ public final class StratConFacilityAdvisor {
         // An enemy facility the player hasn't found gets no hints, so they can't give it away.
         StratConFacility facility = StratConFacilityOperations.getKnownFacility(track, coords);
         LocalDate today = campaign.getLocalDate();
-
-        StratConScenario counterattack = getCounterattack(track, coords);
-        if (counterattack != null) {
-            hints.add((counterattack.getCurrentState() == ScenarioState.UNRESOLVED) ?
-                            getFormattedTextAt(RESOURCE_BUNDLE, "hint.counterattack", formatDate(getDeadline(counterattack))) :
-                            getTextAt(RESOURCE_BUNDLE, "hint.counterattack.committed"));
-        }
 
         for (StratConFacilityOrder order : track.getFacilityOrders()) {
             if (!order.getTargetCoords().equals(coords) || (order.getOperation() == FacilityOperation.SIEGE)) {

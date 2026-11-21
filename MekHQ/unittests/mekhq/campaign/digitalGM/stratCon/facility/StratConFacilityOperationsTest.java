@@ -730,6 +730,23 @@ class StratConFacilityOperationsTest {
         }
 
         @Test
+        void yourOwnFacilityCannotBeBuiltUpWhileAFightIsUnderWayThere() {
+            StratConFacility facility = placeFacility(ForceAlignment.Player, FacilityType.MekBase);
+            facility.setGarrison(0);
+            StratConScenario scenario = new StratConScenario();
+            scenario.setCoords(FACILITY_COORDS);
+            track.getScenarios().put(FACILITY_COORDS, scenario);
+
+            for (FacilityOperation operation : List.of(FacilityOperation.FORTIFY, FacilityOperation.REINFORCE)) {
+                assertEquals("reason.scenarioUnderway", StratConFacilityOperations.getUnavailableReasonKey(campaign,
+                      contract,
+                      track,
+                      FACILITY_COORDS,
+                      operation), operation.name());
+            }
+        }
+
+        @Test
         void ordersForYourOwnFacilitiesCannotBeGivenOnTheEnemys() {
             placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
 

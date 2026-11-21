@@ -236,11 +236,26 @@ class StratConFacilityAdvisorTest {
     @Nested
     class Hints {
         @Test
-        void noHintsWhenFacilityOperationsAreOff() {
+        void noOrderHintsWhenFacilityOperationsAreOff() {
             placeFacility(ForceAlignment.Opposing);
             when(campaign.getCampaignOptions().get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(false);
 
             assertTrue(hints().isEmpty());
+        }
+
+        @Test
+        void aCounterattackIsStillWarnedOfWhenFacilityOperationsAreOff() {
+            placeFacility(ForceAlignment.Player);
+            when(campaign.getCampaignOptions().get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(false);
+            StratConScenario counterattack = new StratConScenario();
+            counterattack.setCoords(FACILITY_COORDS);
+            counterattack.setCounterattack(true);
+            counterattack.setDeploymentDate(TODAY.plusDays(3));
+            track.getScenarios().put(FACILITY_COORDS, counterattack);
+
+            assertEquals(List.of(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "hint.counterattack",
+                  StratConFacilityAdvisor.formatDate(TODAY.plusDays(3)))), hints());
         }
 
         @Test
