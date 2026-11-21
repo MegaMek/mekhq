@@ -64,6 +64,7 @@ class ContractPdfExporterTest {
               "Objective Raid \u00B7 Galatea \u00B7 6-month term \u00B7 12 days transit",
               "Even Fight 5/10",
               List.of("Proving Ground"),
+              null,
               "Leutnant Katrina Steiner",
               briefing,
               List.of(new Section("Terms", rows, List.of("Characteristics: Career Maker")),
