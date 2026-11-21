@@ -122,7 +122,7 @@ public class QuickTrain {
         boolean isLevelOtherCommandSkills = options.isLevelOtherCommandSkills();
 
         // Do XP costs need to be adjusted?
-        boolean isUseReasoningMultiplier = campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
+        boolean isUseReasoningMultiplier = campaignOptions.isUseTalentXpCostMultiplier();
         double xpCostMultiplier = campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER);
 
         // Are we logging skill gain in the personnel logs?

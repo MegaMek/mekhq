@@ -354,7 +354,7 @@ class QuickTrainTest {
         lenient().when(campaignOptions.get(CampaignOption.USE_AGE_EFFECTS)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.PERSONNEL_LOG_SKILL_GAIN)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER)).thenReturn(0.0);
-        lenient().when(campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER)).thenReturn(false);
+        lenient().when(campaignOptions.isUseTalentXpCostMultiplier()).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.USE_FUNCTIONAL_APPRAISAL)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.USE_SMALL_ARMS_ONLY)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);

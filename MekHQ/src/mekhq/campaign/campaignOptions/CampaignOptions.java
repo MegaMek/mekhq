@@ -311,6 +311,19 @@ public class CampaignOptions {
         return get(CampaignOption.USE_ADVANCED_MEDICAL) || get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL);
     }
 
+    /**
+     * Checks whether a character's Talent should change their XP costs.
+     *
+     * <p>Talent only affects XP costs when both <b>Assign Random Talent</b> and <b>Talent Influences XP Costs</b>
+     * are enabled. Without Random Talent, Talent scores are hidden, so they should not quietly change what players
+     * pay.</p>
+     *
+     * @return {@code true} if Talent-based XP cost multipliers should be applied, {@code false} otherwise
+     */
+    public boolean isUseTalentXpCostMultiplier() {
+        return get(CampaignOption.USE_RANDOM_TALENT) && get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
+    }
+
     // endregion Medical
 
     // region Prisoners

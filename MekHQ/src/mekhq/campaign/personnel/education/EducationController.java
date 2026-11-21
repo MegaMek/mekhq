@@ -95,7 +95,6 @@ import mekhq.campaign.personnel.enums.education.EducationStage;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.ReportingUtilities;
@@ -106,6 +105,9 @@ import mekhq.utilities.ReportingUtilities;
  */
 public class EducationController {
     private static final MMLogger LOGGER = MMLogger.create(EducationController.class);
+
+    /** The percentage chance a newly generated adult passes each step of their starting education. */
+    static final int INITIAL_EDUCATION_BASE_PASS_RATE = 60;
 
     private static final String BUNDLE_NAME = "mekhq.resources.Education";
 
@@ -2513,14 +2515,12 @@ public class EducationController {
         final boolean isCombatRole = person.getPrimaryRole().isCombat();
         final boolean isDoctor = person.isDoctor();
 
-        // We base passRate on US averages
-        int passRate = 60 - (Reasoning.values().length / 2);
-        final int reasoningModifier = campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT) ?
-                                            person.getReasoning().getReasoningScore() :
-                                            Reasoning.values().length / 2;
-        passRate += reasoningModifier;
+        final int passRate = getInitialEducationPassRate(
+              campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT),
+              person.getReasoning().getReasoningScore());
 
-        final boolean flunked = randomInt(100) <= passRate;
+        // passRate is the percentage chance to pass
+        final boolean flunked = randomInt(100) >= passRate;
 
         EducationLevel educationLevel;
         if (isCombatRole) {
@@ -2540,6 +2540,25 @@ public class EducationController {
         if (educationLevel.isDoctorate()) {
             person.setPreNominal("Dr");
         }
+    }
+
+    /**
+     * Calculates the percentage chance a newly generated adult passes each step of their starting education.
+     *
+     * <p>The base rate is based on US averages. If Random Talent is enabled, the character's Talent score is added to
+     * it. Talent scores are centred on 0, so a character of average Talent keeps the base rate.</p>
+     *
+     * @param isUseRandomTalent whether the Assign Random Talent campaign option is enabled
+     * @param talentScore       the character's Talent score, from {@code Reasoning.getReasoningScore()}
+     *
+     * @return the pass rate, as a percentage
+     */
+    static int getInitialEducationPassRate(final boolean isUseRandomTalent, final int talentScore) {
+        int passRate = INITIAL_EDUCATION_BASE_PASS_RATE;
+        if (isUseRandomTalent) {
+            passRate += talentScore;
+        }
+        return passRate;
     }
 
     /**
@@ -2567,7 +2586,7 @@ public class EducationController {
         if (experienceLevel < EXP_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {
-                flunked = randomInt(100) < passRate;
+                flunked = randomInt(100) >= passRate;
             }
 
             return flunked ? EducationLevel.EARLY_CHILDHOOD : EducationLevel.HIGH_SCHOOL;
@@ -2606,7 +2625,7 @@ public class EducationController {
         if (experienceLevel < EXP_REGULAR) {
             // Second-chance roll for High School
             if (flunked) {
-                flunked = randomInt(100) < passRate;
+                flunked = randomInt(100) >= passRate;
             }
 
             return flunked ? EducationLevel.EARLY_CHILDHOOD : EducationLevel.HIGH_SCHOOL;

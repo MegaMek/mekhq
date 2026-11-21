@@ -77,6 +77,8 @@ import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
 
 /**
@@ -899,5 +901,20 @@ class EducationControllerTest {
             assertEquals(PersonnelStatus.ACTIVE, spouse.getStatus());
             assertEquals(PersonnelStatus.ACTIVE, child.getStatus());
         }
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+          // isUseRandomTalent, talentScore, expected pass rate
+          "false, 0, 60",
+          "false, 12, 60",
+          "false, -12, 60",
+          "true, 0, 60",
+          "true, 12, 72",
+          "true, -12, 48"
+    })
+    void testGetInitialEducationPassRate_averageTalentKeepsBaseRate(boolean isUseRandomTalent, int talentScore,
+          int expected) {
+        assertEquals(expected, EducationController.getInitialEducationPassRate(isUseRandomTalent, talentScore));
     }
 }
