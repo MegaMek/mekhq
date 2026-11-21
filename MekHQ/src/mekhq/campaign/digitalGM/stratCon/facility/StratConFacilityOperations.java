@@ -34,6 +34,8 @@ package mekhq.campaign.digitalGM.stratCon.facility;
 
 import static megamek.common.compute.Compute.d6;
 import static mekhq.campaign.enums.DailyReportType.BATTLE;
+import static mekhq.campaign.mission.resupplyAndCaches.PerformResupply.performResupply;
+import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -66,6 +68,7 @@ import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
+import mekhq.campaign.mission.resupplyAndCaches.Resupply;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -119,8 +122,9 @@ public final class StratConFacilityOperations {
     /** The 2d6 roll a sabotage must meet. */
     static final int SABOTAGE_TARGET_NUMBER = 8;
 
-    static final String ASSAULT_MODIFIER = "FacilityHostileCapture.json";
-    static final String RAID_MODIFIER = "FacilityHostileExtract.json";
+    /** The size of the Resupply a won raid carries off. */
+    static final int RAID_LOOT_SIZE = 1;
+
     static final String RECON_MODIFIER = "FacilityHostileRecon.json";
     static final String SABOTAGE_MODIFIER = "FacilityHostileEngage.json";
     /** The extra enemy force caught saboteurs face. */
@@ -234,19 +238,79 @@ public final class StratConFacilityOperations {
     /**
      * @param operation an order that can lead to a fight on a facility
      *
-     * @return the ID of the scenario modifier holding that fight's objective; an assault's for an order that never
-     *       fights
+     * @return the ID of the scenario modifier holding that fight's objective, or {@code null} if the fight has none
+     *       of its own: an assault or raid is settled by the scenario's result alone (see
+     *       {@code StratConRulesManager.processFacilityAftermath})
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static String getObjectiveModifierId(FacilityOperation operation) {
+    public static @Nullable String getObjectiveModifierId(FacilityOperation operation) {
         return switch (operation) {
-            case RAID -> RAID_MODIFIER;
             case RECON -> RECON_MODIFIER;
             case SABOTAGE -> SABOTAGE_MODIFIER;
-            default -> ASSAULT_MODIFIER;
+            default -> null;
         };
+    }
+
+    /**
+     * @param facility  the facility fought over
+     * @param operation the order that started the fight, or {@code null} for none
+     *
+     * @return the fight's scenario name: the facility, then the order, or "Defense" for a fight on one of the player's
+     *       side's facilities that no order started
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static String getFightName(StratConFacility facility, @Nullable FacilityOperation operation) {
+        String fightName = (operation == null) ?
+                                 getTextAt(RESOURCE_BUNDLE, "fightName.defense") :
+                                 getTextAt(RESOURCE_BUNDLE, "operation." + operation.name());
+        return getFormattedTextAt(RESOURCE_BUNDLE, "fightName", facility.getDisplayableName(), fightName);
+    }
+
+    /**
+     * Says, in one line for the briefing, what a fight on a facility decides. With Facility Operations, a fight's
+     * result alone settles what becomes of the facility, so this is all the player needs to follow.
+     *
+     * @param facility        the facility fought over
+     * @param operation       the order that started the fight, or {@code null} for none
+     * @param isCounterattack {@code true} if the enemy is attacking a facility of the player's side
+     *
+     * @return the line, ready to show
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static String getStakesText(StratConFacility facility, @Nullable FacilityOperation operation,
+          boolean isCounterattack) {
+        String key;
+        if (isCounterattack) {
+            key = "stakes.counterattack";
+        } else if (facility.isOwnerAlliedToPlayer()) {
+            key = "stakes.defend";
+        } else if ((operation == FacilityOperation.RECON) || (operation == FacilityOperation.SABOTAGE)) {
+            key = "stakes.escape";
+        } else if (operation == FacilityOperation.RAID) {
+            key = "stakes.raid";
+        } else {
+            key = "stakes.assault";
+        }
+        return getFormattedTextAt(RESOURCE_BUNDLE, key, facility.getDisplayableName());
+    }
+
+    /**
+     * Pays out a won raid's loot: a size {@value #RAID_LOOT_SIZE} Resupply of captured supplies.
+     *
+     * @param campaign the current campaign
+     * @param contract the contract the raid was fought under
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void resolveRaidSupplies(Campaign campaign, AbstractContract contract) {
+        performResupply(new Resupply(campaign, contract, RESUPPLY_LOOT), contract, RAID_LOOT_SIZE);
     }
 
     /**

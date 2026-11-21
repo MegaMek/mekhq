@@ -435,6 +435,11 @@ There is no direct sure-fire way to go about disabling turrets. You have two cho
 
 ### Base/objective attacks and capture
 
+**With Facility Operations enabled (0.51.01 and later), none of the below applies:** a fight over a facility is decided
+by the scenario's result alone, and its briefing says what winning and losing mean. Win an Assault and the facility is
+yours, after which you choose whether to hold it, raze it or hand it over. The rest of this section describes play with
+Facility Operations disabled.
+
 That one's a bit tricky.
 
 - To capture the base you need to leave 75% of the turrets intact with 75% of op for destroyed. As explained above, your
