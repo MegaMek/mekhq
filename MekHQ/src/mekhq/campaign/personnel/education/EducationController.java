@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.education;
 
 import static java.lang.Math.max;
+import static java.lang.Math.min;
 import static java.lang.Math.round;
 import static megamek.common.compute.Compute.d6;
 import static megamek.common.compute.Compute.randomInt;
@@ -108,6 +109,8 @@ public class EducationController {
 
     /** The percentage chance a newly generated adult passes each step of their starting education. */
     static final int INITIAL_EDUCATION_BASE_PASS_RATE = 60;
+    /** The highest graduation roll in-unit education allows, which is just short of honors. */
+    static final int HOME_SCHOOL_GRADUATION_ROLL_CAP = 89;
 
     private static final String BUNDLE_NAME = "mekhq.resources.Education";
 
@@ -1557,24 +1560,12 @@ public class EducationController {
      * @return true if the person completed their education, false otherwise
      */
     private static boolean graduateAdult(Campaign campaign, Person person, Academy academy, ResourceBundle resources) {
-        int graduationRoll = randomInt(100);
+        int reasoningModifier = campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT) ?
+                                      person.getReasoning().getReasoningScore() :
+                                      0;
+        int graduationRoll = getAdultGraduationRoll(randomInt(100), randomInt(100), academy.isHomeSchool(),
+              reasoningModifier);
         int roll;
-
-        if (academy.isHomeSchool()) {
-            int secondRoll = randomInt(100);
-
-            if (secondRoll < graduationRoll) {
-                graduationRoll = secondRoll;
-            }
-
-            if (graduationRoll >= 90) {
-                graduationRoll = 89;
-            }
-        }
-
-        if (campaign.getCampaignOptions().get(CampaignOption.USE_RANDOM_TALENT)) {
-            graduationRoll += person.getReasoning().getReasoningScore();
-        }
 
         // qualification failed
         if (graduationRoll < 5) {
@@ -1671,7 +1662,7 @@ public class EducationController {
                   person.getEduAcademyName(),
                   academy.getQualifications().get(person.getEduCourseIndex()));
 
-            processGraduation(campaign, person, academy, 2, resources);
+            processGraduation(campaign, person, academy, 2, true, resources);
 
             person.setEduEducationStage(EducationStage.GRADUATING);
 
@@ -1729,7 +1720,7 @@ public class EducationController {
                   person.getEduAcademyName(),
                   academy.getQualifications().get(person.getEduCourseIndex()));
 
-            processGraduation(campaign, person, academy, 1, resources);
+            processGraduation(campaign, person, academy, 1, true, resources);
 
             person.setEduEducationStage(EducationStage.GRADUATING);
 
@@ -1780,7 +1771,7 @@ public class EducationController {
               person.getEduAcademyName(),
               academy.getQualifications().get(person.getEduCourseIndex()));
 
-        processGraduation(campaign, person, academy, 0, resources);
+        processGraduation(campaign, person, academy, 0, true, resources);
 
         person.setEduEducationStage(EducationStage.GRADUATING);
 
@@ -1877,7 +1868,10 @@ public class EducationController {
             graduationRoll = 30;
         }
 
-        if (graduationRoll < 30) {
+        // A child who only barely graduates learns one level less, as an adult who fails to graduate does
+        boolean isFullGraduation = graduationRoll >= 30;
+
+        if (!isFullGraduation) {
             String reportMessage;
             if (academy.isHomeSchool()) {
                 reportMessage = String.format(resources.getString("graduatedBarelyHomeSchooled.text"),
@@ -1916,7 +1910,7 @@ public class EducationController {
               person.getEduAcademyName(),
               academy.getQualifications().get(person.getEduCourseIndex()));
 
-        processGraduation(campaign, person, academy, 0, resources);
+        processGraduation(campaign, person, academy, 0, isFullGraduation, resources);
     }
 
     /**
@@ -1941,12 +1935,13 @@ public class EducationController {
      * @param campaign   the campaign associated with the person's education
      * @param person     the person who is graduating with a bonus
      * @param academy    the academy from which the person is graduating
-     * @param bonusCount the number of bonuses to be added
-     * @param resources  the resource bundle for retrieving localized messages
+     * @param bonusCount       the number of bonuses to be added
+     * @param isFullGraduation {@code false} if the person only barely graduated, so learns one level less
+     * @param resources        the resource bundle for retrieving localized messages
      */
     private static void processGraduation(Campaign campaign, Person person, Academy academy, Integer bonusCount,
-          ResourceBundle resources) {
-        improveSkills(campaign, person, academy, true);
+          boolean isFullGraduation, ResourceBundle resources) {
+        improveSkills(campaign, person, academy, isFullGraduation);
 
         addFacultyXp(campaign, person, academy, bonusCount);
 
@@ -2092,7 +2087,8 @@ public class EducationController {
             }
 
             if (skill.equalsIgnoreCase("xp")) {
-                person.awardXP(campaign, curriculumXpRate);
+                // The course tooltip promises the Base XP Rate for each level taught, so award the same
+                person.awardXP(campaign, getCurriculumXp(curriculumXpRate, educationLevel));
             } else {
                 updateSkill(person, educationLevel, skill);
 
@@ -2171,7 +2167,7 @@ public class EducationController {
         double bonusPercentage = (double) bonusCount / 5;
 
         if (person.getEduHighestEducation().getLevel() < academy.getEducationLevel(person)) {
-            int xpRate = max(1, (12 - academy.getFacultySkill()) * (academyDuration / 600));
+            int xpRate = getFacultyXp(academy.getFacultySkill(), academyDuration);
 
             xpRate = (int) round(xpRate * campaign.getCampaignOptions().get(CampaignOption.FACULTY_XP_RATE));
 
@@ -2228,6 +2224,56 @@ public class EducationController {
                 }
             }
         }
+    }
+
+    /**
+     * Works out the curriculum XP a course awards: the Base XP Rate for each level it teaches.
+     *
+     * @param curriculumXpRate the Base XP Rate campaign option
+     * @param educationLevel   the level the course teaches, after any reduction for failing to graduate
+     *
+     * @return the XP to award, never negative
+     *
+     * @since 0.51.01
+     */
+    static int getCurriculumXp(int curriculumXpRate, int educationLevel) {
+        return curriculumXpRate * max(0, educationLevel);
+    }
+
+    /**
+     * Works out the XP a student gains from their teachers: {@code (12 - Faculty Skill) x (days / 600)}, rounded to the
+     * nearest whole number, at least 1. Days that don't make up a whole 600-day block still count.
+     *
+     * @param facultySkill the academy's Faculty Skill
+     * @param daysAttended the number of days the student attended
+     *
+     * @return the faculty XP, before the Faculty XP Multiplier
+     *
+     * @since 0.51.01
+     */
+    static int getFacultyXp(int facultySkill, int daysAttended) {
+        return max(1, (int) round((12 - facultySkill) * (daysAttended / 600.0)));
+    }
+
+    /**
+     * Works out an adult's graduation roll. In-unit education rolls twice and keeps the lower roll, and can never award
+     * honors, so its roll is capped at 89 after Reasoning is added.
+     *
+     * @param firstRoll         the first d100 roll, from 0 to 99
+     * @param secondRoll        the second d100 roll, only used for in-unit education
+     * @param isHomeSchool      whether the education is in-unit
+     * @param reasoningModifier the student's Reasoning score, or 0 if Random Personalities are not used
+     *
+     * @return the modified graduation roll
+     *
+     * @since 0.51.01
+     */
+    static int getAdultGraduationRoll(int firstRoll, int secondRoll, boolean isHomeSchool, int reasoningModifier) {
+        if (!isHomeSchool) {
+            return firstRoll + reasoningModifier;
+        }
+
+        return min(min(firstRoll, secondRoll) + reasoningModifier, HOME_SCHOOL_GRADUATION_ROLL_CAP);
     }
 
     /**
