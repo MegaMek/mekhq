@@ -376,8 +376,6 @@ public class HangarReport extends AbstractReport {
         int countGE = 0;
 
         //region JumpShips, WarShips, DropShips, and SmallCraft
-        int countSpace = 0;
-
         int countSmallCraft = 0;
 
         int countDropships = 0;
@@ -969,13 +967,11 @@ public class HangarReport extends AbstractReport {
         top.add(ge);
 
         // Space
-        final DefaultMutableTreeNode space = new DefaultMutableTreeNode();
+        final DefaultMutableTreeNode smallCraft = new DefaultMutableTreeNode();
+        top.add(smallCraft);
 
-        DefaultMutableTreeNode smallCraft = new DefaultMutableTreeNode();
-        space.add(smallCraft);
-
-        DefaultMutableTreeNode dropShip = new DefaultMutableTreeNode();
-        space.add(dropShip);
+        final DefaultMutableTreeNode dropShip = new DefaultMutableTreeNode();
+        top.add(dropShip);
         DefaultMutableTreeNode largeDropShips = new DefaultMutableTreeNode();
         dropShip.add(largeDropShips);
         DefaultMutableTreeNode mediumDropShips = new DefaultMutableTreeNode();
@@ -983,17 +979,15 @@ public class HangarReport extends AbstractReport {
         DefaultMutableTreeNode smallDropShips = new DefaultMutableTreeNode();
         dropShip.add(smallDropShips);
 
-        DefaultMutableTreeNode jumpShips = new DefaultMutableTreeNode();
-        space.add(jumpShips);
+        final DefaultMutableTreeNode jumpShips = new DefaultMutableTreeNode();
+        top.add(jumpShips);
 
-        DefaultMutableTreeNode warShips = new DefaultMutableTreeNode();
-        space.add(warShips);
+        final DefaultMutableTreeNode warShips = new DefaultMutableTreeNode();
+        top.add(warShips);
         DefaultMutableTreeNode largeWarShips = new DefaultMutableTreeNode();
         warShips.add(largeWarShips);
         DefaultMutableTreeNode smallWarShips = new DefaultMutableTreeNode();
         warShips.add(smallWarShips);
-
-        top.add(space);
 
         // Space Stations
         final DefaultMutableTreeNode spaceStation = new DefaultMutableTreeNode();
@@ -1530,7 +1524,6 @@ public class HangarReport extends AbstractReport {
                 countSpaceStations++;
                 spaceStation.add(new DefaultMutableTreeNode(createNodeName(u)));
             } else if (e instanceof Warship) {
-                countSpace++;
                 countWarShips++;
                 switch (e.getWeightClass()) {
                     case EntityWeightClass.WEIGHT_LARGE_WAR:
@@ -1543,11 +1536,9 @@ public class HangarReport extends AbstractReport {
                         break;
                 }
             } else if (e instanceof Jumpship) {
-                countSpace++;
                 countJumpShips++;
                 jumpShips.add(new DefaultMutableTreeNode(createNodeName(u)));
             } else if (e instanceof Dropship) {
-                countSpace++;
                 countDropships++;
                 switch (e.getWeightClass()) {
                     case EntityWeightClass.WEIGHT_LARGE_DROP:
@@ -1564,7 +1555,6 @@ public class HangarReport extends AbstractReport {
                         break;
                 }
             } else if (e instanceof SmallCraft) {
-                countSpace++;
                 countSmallCraft++;
                 smallCraft.add(new DefaultMutableTreeNode(createNodeName(u)));
             } else if (e instanceof Aero) {
@@ -2419,8 +2409,6 @@ public class HangarReport extends AbstractReport {
         ge.setUserObject(resources.getString("HangarReport.GunEmplacements") + " " + countGE);
 
         // Space
-        space.setUserObject(resources.getString("HangarReport.Spacecraft") + " " + countSpace);
-
         smallCraft.setUserObject(resources.getString("HangarReport.SmallCraft") + " " + countSmallCraft);
 
         dropShip.setUserObject(resources.getString("HangarReport.DropShips") + " " + countDropships);
