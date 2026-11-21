@@ -472,6 +472,8 @@ final class PlanetarySystemSystemEventsPanel extends JPanel {
             } else {
                 event.zenithCharge = wrapped;
             }
+            // Re-put the event so the system discards its cached current-event state
+            system.putEvent(event);
             notifyChange();
             int row = events.indexOf(event);
             if (row >= 0) {

@@ -48,6 +48,7 @@ import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
 import java.util.TreeMap;
+import java.util.function.Function;
 
 import com.fasterxml.jackson.annotation.JsonGetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -225,6 +226,12 @@ public class PlanetarySystem {
      * Package-private so that Planets can access it
      */
     TreeMap<LocalDate, PlanetarySystemEvent> events;
+
+    /**
+     * This is a cache of the current event data based on the latest date given.
+     */
+    private final CurrentEvents<PlanetarySystemEvent> currentEvents = new CurrentEvents<>(() -> events,
+          PlanetarySystemEvent::new, PlanetarySystemEvent::copyDataFrom);
 
     // For import only; lists are easier than maps in YAML.
     private List<PlanetarySystemEvent> eventList;
@@ -850,18 +857,8 @@ public class PlanetarySystem {
         return events.get(when);
     }
 
-    protected <T> T getEventData(LocalDate when, T defaultValue, EventGetter<T> getter) {
-        if ((null == when) || (null == events) || (null == getter)) {
-            return defaultValue;
-        }
-        T result = defaultValue;
-        for (LocalDate date : events.navigableKeySet()) {
-            if (date.isAfter(when)) {
-                break;
-            }
-            result = ObjectUtility.nonNull(getter.get(events.get(date)), result);
-        }
-        return result;
+    protected <T> T getEventData(LocalDate when, T defaultValue, Function<PlanetarySystemEvent, T> getter) {
+        return currentEvents.getEventData(when, defaultValue, getter);
     }
 
     public List<PlanetarySystemEvent> getEvents() {
@@ -906,6 +903,7 @@ public class PlanetarySystem {
             events = new TreeMap<>();
         }
         events.put(event.date, event);
+        currentEvents.invalidate();
     }
 
     /**
@@ -919,7 +917,11 @@ public class PlanetarySystem {
         if ((when == null) || (events == null)) {
             return false;
         }
-        return events.remove(when) != null;
+        boolean removed = events.remove(when) != null;
+        if (removed) {
+            currentEvents.invalidate();
+        }
+        return removed;
     }
 
     /**
@@ -940,10 +942,7 @@ public class PlanetarySystem {
         if (events.isEmpty()) {
             events = null;
         }
-    }
-
-    protected interface EventGetter<T> {
-        T get(PlanetarySystemEvent e);
+        currentEvents.invalidate();
     }
 
     /** A class representing some event, possibly changing planetary information */
@@ -957,6 +956,12 @@ public class PlanetarySystem {
         public SourceableValue<Boolean> zenithCharge;
         // Events marked as "custom" are saved to scenario files and loaded from there
         public transient boolean custom = false;
+
+        public void copyDataFrom(PlanetarySystemEvent other) {
+            nadirCharge = ObjectUtility.nonNull(other.nadirCharge, nadirCharge);
+            zenithCharge = ObjectUtility.nonNull(other.zenithCharge, zenithCharge);
+            custom = (other.custom || custom);
+        }
 
         /**
          * @return <code>true</code> if the event doesn't contain any change
@@ -1061,6 +1066,7 @@ public class PlanetarySystem {
                 planetarySystem.eventList.clear();
             }
             planetarySystem.eventList = null;
+            planetarySystem.currentEvents.invalidate();
 
             return planetarySystem;
         }
