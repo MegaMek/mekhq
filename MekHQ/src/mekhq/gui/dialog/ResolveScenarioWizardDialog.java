@@ -95,7 +95,6 @@ import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.ScenarioObjectiveProcessor;
 import mekhq.campaign.mission.scenarios.ScenarioStatus;
 import mekhq.campaign.personnel.Person;
-import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.campaign.unit.TestUnit;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.baseComponents.DefaultMHQScrollablePanel;
@@ -904,18 +903,10 @@ public class ResolveScenarioWizardDialog extends JDialog {
             gridBagConstraints.gridx = gridx;
             pnlPrisonerStatus.add(btnViewPrisoner, gridBagConstraints);
 
-            // if the person is dead, set the checkbox and skip all this captured stuff
-            PrisonerCaptureStyle prisonerCaptureStyle = campaign.getCampaignOptions().get(CampaignOption.PRISONER_CAPTURE_STYLE);
+            // if the person is dead, set the checkbox. Whether they were captured has already been rolled by the
+            // tracker, and the captured checkbox reflects that; rolling again here would make capture harder.
             if ((status.getHits() > 5) || status.isDead()) {
                 kiaCheck.setSelected(true);
-            } else if (status.isCaptured() && !prisonerCaptureStyle.isNone()) {
-                boolean wasCaptured;
-                if (status.wasPickedUp()) {
-                    wasCaptured = true;
-                } else {
-                    wasCaptured = tracker.getCapturePrisoners().attemptCaptureOfNPC(false);
-                }
-                prisonerCapturedCheck.setSelected(wasCaptured);
             }
 
             // When generating NPC personnel, we use placeholder characters and then later

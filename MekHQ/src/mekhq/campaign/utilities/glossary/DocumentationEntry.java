@@ -62,9 +62,6 @@ public enum DocumentationEntry {
           "GlossaryDocs/Personnel Modules/Education Module",
           "0.50.07", "0.50.10", "0.50.10"),
     NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "GlossaryDocs/0_MHQ New Player Guide", "0.50.07", "0.50.11", "0.50.11"),
-    PRISONERS_OF_WAR("PRISONERS_OF_WAR",
-          "GlossaryDocs/Prisoners of War & Abstracted Search and Rescue",
-          "0.50.07", "0.50.07", "0.50.07"),
     RESUPPLY_AND_CONVOYS("RESUPPLY_AND_CONVOYS", "GlossaryDocs/Resupply & Convoys", "0.50.07", "0.50.07", "0.50.07"),
     UNIT_MARKETS("UNIT_MARKETS", "GlossaryDocs/Unit Markets", "0.50.07", "0.50.07", "0.50.07");
 

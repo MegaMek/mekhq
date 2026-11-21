@@ -41,9 +41,18 @@ import static mekhq.campaign.personnel.skills.SkillType.S_GUN_MEK;
 import static mekhq.campaign.personnel.skills.SkillType.S_PILOT_MEK;
 import static mekhq.campaign.personnel.skills.SkillType.S_SMALL_ARMS;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerEventManager.MAX_CRIME_PENALTY;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent.EndOfContractResponse.ACCEPT_RANSOM;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent.EndOfContractResponse.ACKNOWLEDGE;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent.EndOfContractResponse.DECLINE_RANSOM;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent.EndOfContractResponse.EXECUTE;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent.EndOfContractResponse.RELEASE;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent.GOOD_EVENT_CHANCE;
+import static mekhq.campaign.randomEvents.prisoners.PrisonerMissionEndEvent.getEndOfContractResponses;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
 import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
@@ -68,8 +77,10 @@ import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.contractData.ContractScheduleData;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
 
@@ -120,7 +131,8 @@ class PrisonerMissionEndEventTest {
 
     @Test
     void testDetermineGoodEventChance_SomeCrime() {
-        final int CRIME_RATING = 5;
+        // Crime ratings are never positive: crimes push them below zero
+        final int CRIME_RATING = -5;
 
         // Setup
         Campaign mockCampaign = mockCampaign();
@@ -139,7 +151,7 @@ class PrisonerMissionEndEventTest {
         PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contract);
 
         int actualValue = endEvent.determineGoodEventChance(true);
-        int expectedValue = GOOD_EVENT_CHANCE - CRIME_RATING;
+        int expectedValue = GOOD_EVENT_CHANCE + CRIME_RATING;
 
         // Assert
         assertEquals(expectedValue, actualValue);
@@ -147,7 +159,7 @@ class PrisonerMissionEndEventTest {
 
     @Test
     void testDetermineGoodEventChance_AllTheCrime() {
-        final int CRIME_RATING = GOOD_EVENT_CHANCE * 2;
+        final int CRIME_RATING = -(GOOD_EVENT_CHANCE * 2);
 
         // Setup
         Campaign mockCampaign = mockCampaign();
@@ -387,5 +399,99 @@ class PrisonerMissionEndEventTest {
 
         // Assert
         verify(mockCampaign.getPlayerForce(), never()).changeCrimeRating(anyInt());
+    }
+
+    @Test
+    void testGetEndOfContractResponses_MatchButtonOrder() {
+        // Your people, failed contract, good event: a ransom offer
+        assertEquals(List.of(DECLINE_RANSOM, ACCEPT_RANSOM), getEndOfContractResponses(true, false, true));
+        // Your people, otherwise: nothing to decide
+        assertEquals(List.of(ACKNOWLEDGE), getEndOfContractResponses(true, true, true));
+        assertEquals(List.of(ACKNOWLEDGE), getEndOfContractResponses(true, false, false));
+        // Enemy prisoners, good event: a ransom offer as well as releasing or executing
+        assertEquals(List.of(ACCEPT_RANSOM, RELEASE, EXECUTE), getEndOfContractResponses(false, true, true));
+        // Enemy prisoners, bad event: only releasing or executing
+        assertEquals(List.of(RELEASE, EXECUTE), getEndOfContractResponses(false, true, false));
+    }
+
+    @Test
+    void testProcessPlayerResponse_AlliedRansomAccepted_PaysAndReturnsThem() {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+        PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contractStartingOn(null));
+        Person pow = mock(Person.class);
+        Money ransom = Money.of(1000);
+
+        // Act
+        endEvent.processPlayerResponse(true, false, true, ransom, ACCEPT_RANSOM, List.of(pow));
+
+        // Assert
+        verify(mockCampaign.getPlayerForce().getFinances())
+              .debit(eq(TransactionType.RANSOM), eq(today), eq(ransom), anyString());
+        verify(pow).changeStatus(mockCampaign, today, PersonnelStatus.ACTIVE);
+        verify(mockCampaign.getPlayerForce().getHumanResources(), never()).removePerson(any(), any());
+    }
+
+    @Test
+    void testProcessPlayerResponse_AlliedRansomDeclined_DoesNotPay() {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+        PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contractStartingOn(null));
+        Person pow = mock(Person.class);
+
+        // Act
+        endEvent.processPlayerResponse(true, false, true, Money.of(1000), DECLINE_RANSOM, List.of(pow));
+
+        // Assert
+        verify(mockCampaign.getPlayerForce().getFinances(), never()).debit(any(), any(), any(), anyString());
+        verify(pow).changeStatus(mockCampaign, today, PersonnelStatus.LEFT);
+    }
+
+    @Test
+    void testProcessPlayerResponse_EnemyExecutedAfterBadEvent_Executes() {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        CampaignOptions campaignOptions = new CampaignOptions();
+        campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
+        campaignOptions.set(CampaignOption.TRACK_FACTION_STANDING, true);
+        when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+        when(mockCampaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 1));
+        FactionStandings factionStandings = mock(FactionStandings.class);
+        when(factionStandings.executePrisonersOfWar(any(), anyList(), anyInt(), anyDouble())).thenReturn(List.of());
+        when(mockCampaign.getPlayerForce().getFactionStandings()).thenReturn(factionStandings);
+        PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contractStartingOn(null));
+        Person prisoner = mock(Person.class);
+
+        // Act
+        try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+            compute.when(() -> Compute.randomInt(100)).thenReturn(99);
+
+            endEvent.processPlayerResponse(false, true, false, Money.zero(), EXECUTE, List.of(prisoner));
+        }
+
+        // Assert
+        verify(factionStandings).executePrisonersOfWar(any(), eq(List.of(prisoner)), anyInt(), anyDouble());
+        verify(mockCampaign.getPlayerForce().getHumanResources()).removePerson(mockCampaign, prisoner);
+    }
+
+    @Test
+    void testProcessPlayerResponse_EnemyReleased_IsNotAnExecution() {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+        FactionStandings factionStandings = mock(FactionStandings.class);
+        when(mockCampaign.getPlayerForce().getFactionStandings()).thenReturn(factionStandings);
+        PrisonerMissionEndEvent endEvent = new PrisonerMissionEndEvent(mockCampaign, contractStartingOn(null));
+        Person prisoner = mock(Person.class);
+
+        // Act
+        endEvent.processPlayerResponse(false, true, false, Money.zero(), RELEASE, List.of(prisoner));
+
+        // Assert
+        verify(factionStandings, never()).executePrisonersOfWar(any(), anyList(), anyInt(), anyDouble());
+        verify(mockCampaign.getPlayerForce().getHumanResources()).removePerson(mockCampaign, prisoner);
     }
 }
