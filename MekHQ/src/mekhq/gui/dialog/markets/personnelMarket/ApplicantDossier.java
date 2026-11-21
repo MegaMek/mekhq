@@ -127,8 +127,15 @@ final class ApplicantDossier {
 
         List<Skill> skills = new ArrayList<>(person.getSkills().getSkills());
         skills.sort(Comparator.comparing(skill -> skill.getType().getName(), String.CASE_INSENSITIVE_ORDER));
-        List<Skill> trainedSkills = skills.stream().filter(skill -> !skill.getType().isRoleplaySkill()).toList();
-        List<Skill> roleplaySkills = skills.stream().filter(skill -> skill.getType().isRoleplaySkill()).toList();
+        List<Skill> trainedSkills = new ArrayList<>();
+        List<Skill> roleplaySkills = new ArrayList<>();
+        for (Skill skill : skills) {
+            if (skill.getType().isRoleplaySkill()) {
+                roleplaySkills.add(skill);
+            } else {
+                trainedSkills.add(skill);
+            }
+        }
         detail.add(Box.createVerticalStrut(scaleForGUI(18)));
         detail.add(leftAligned(buildSkillSection(person, text("dossier.personnelMarket.skills"), trainedSkills)));
         if (!roleplaySkills.isEmpty()) {
@@ -286,6 +293,10 @@ final class ApplicantDossier {
             }
         }
 
+        Campaign campaign = market.campaign();
+        Money monthlySalary = person.getSalary(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate());
         Money total = market.facts(person).hiringCost();
         boolean isUnaffordable = market.balance().isLessThan(total);
         addRow(section, text("dossier.personnelMarket.cost.total"),
@@ -293,7 +304,7 @@ final class ApplicantDossier {
               isUnaffordable ? DANGER : ACCENT_BRIGHT, null, true);
         addRow(section, text("dossier.personnelMarket.cost.monthly"),
               getFormattedTextAt(RESOURCE_BUNDLE, "dossier.personnelMarket.cost.monthly.value",
-                    person.getSalary(market.campaign()).toAmountAndSymbolString()), TEXT_MUTED,
+                    monthlySalary.toAmountAndSymbolString()), TEXT_MUTED,
               text("dossier.personnelMarket.cost.monthly.tooltip"), false);
         if (isUnaffordable) {
             HudWrappingLabel warning = new HudWrappingLabel("<html>" + escape(getFormattedTextAt(RESOURCE_BUNDLE,

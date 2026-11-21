@@ -72,8 +72,6 @@ class PersonnelMarketHiringCostTest {
         when(campaignOptions.get(CampaignOption.USE_SPA_TRAINING_COSTS)).thenReturn(false);
 
         applicant = mock(Person.class);
-        // The market prices a Golden Hello from the first; RecruitmentCosts prices the recruit from the second
-        when(applicant.getSalary(campaign)).thenReturn(MONTHLY_SALARY);
         when(applicant.getSalary(any(CampaignOptions.class), anyBoolean(), any())).thenReturn(MONTHLY_SALARY);
     }
 

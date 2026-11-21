@@ -783,14 +783,6 @@ public class NewPersonnelMarket {
     }
 
     /**
-     * Returns a list of rare professions currently stored.
-     *
-     * @return a list of {@link PersonnelRole} representing rare professions
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    /**
      * Stops treating an applicant as rare, such as once they have been hired. If they were rare, one listing of their
      * profession is dropped from the rare professions too, so the profession is only flagged while a rare applicant
      * for it remains.
@@ -806,6 +798,14 @@ public class NewPersonnelMarket {
         }
     }
 
+    /**
+     * Returns a list of rare professions currently stored.
+     *
+     * @return a list of {@link PersonnelRole} representing rare professions
+     *
+     * @author Illiani
+     * @since 0.50.06
+     */
     public List<PersonnelRole> getRareProfessions() {
         return rareProfessions;
     }
@@ -1234,18 +1234,6 @@ public class NewPersonnelMarket {
     }
 
     /**
-     * Scales the supplied number of recruitment rolls by {@link CampaignOption#PERSONNEL_MARKET_APPLICANT_MULTIPLIER}.
-     *
-     * <p>The multiplier is treated as being at least {@link #MINIMUM_APPLICANT_MULTIPLIER}.</p>
-     *
-     * @param rolls the unmodified number of recruitment rolls
-     *
-     * @return the modified number of recruitment rolls, rounded to the nearest whole number, to a minimum of {@code 0}
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    /**
      * Gets the most recruitment rolls this market could make in a month, for showing this month's rolls against. The
      * base rules make one roll per day of the month, plus any rolls from the commander's Connections, multiplied by
      * the Applicant Multiplier.
@@ -1270,6 +1258,18 @@ public class NewPersonnelMarket {
         return ConnectionsLevel.CONNECTIONS_TEN.getRecruits();
     }
 
+    /**
+     * Scales the supplied number of recruitment rolls by {@link CampaignOption#PERSONNEL_MARKET_APPLICANT_MULTIPLIER}.
+     *
+     * <p>The multiplier is treated as being at least {@link #MINIMUM_APPLICANT_MULTIPLIER}.</p>
+     *
+     * @param rolls the unmodified number of recruitment rolls
+     *
+     * @return the modified number of recruitment rolls, rounded to the nearest whole number, to a minimum of {@code 0}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
     int applyApplicantMultiplier(int rolls) {
         if (campaign == null) {
             return rolls;

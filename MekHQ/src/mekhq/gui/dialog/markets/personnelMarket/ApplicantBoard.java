@@ -214,7 +214,9 @@ final class ApplicantBoard {
             boolean isActive = chipSort == sort;
             chip.setActive(isActive);
             // The active chip shows which way the order runs; clicking it again reverses the order.
-            chip.setText(isActive ? chipSort.label() + (isReversed ? " ↑" : " ↓") : chipSort.label());
+            chip.setText(isActive ? getFormattedTextAt(RESOURCE_BUNDLE,
+                  isReversed ? "sort.personnelMarket.active.reversed" : "sort.personnelMarket.active.label",
+                  chipSort.label()) : chipSort.label());
             chip.setToolTipText(isActive ? getFormattedTextAt(RESOURCE_BUNDLE, "sort.personnelMarket.active.tooltip",
                   chipSort.toolTip()) : chipSort.toolTip());
         }
@@ -342,7 +344,7 @@ final class ApplicantBoard {
             StringBuilder html = new StringBuilder("<html><b style='color:").append(hex(TEXT)).append("'>")
                                        .append(escape(person.getFullName())).append("</b>");
             if (market.isRare(person)) {
-                html.append(" <span style='color:").append(hex(AMBER)).append("'>★</span>");
+                html.append(" <span style='color:").append(hex(AMBER)).append("'>&#9733;</span>");
             }
             List<String> sub = List.of(ApplicantDossier.roles(person),
                   getFormattedTextAt(RESOURCE_BUNDLE, "board.personnelMarket.age",

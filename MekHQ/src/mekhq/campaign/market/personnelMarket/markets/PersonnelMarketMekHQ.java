@@ -547,8 +547,11 @@ public class PersonnelMarketMekHQ extends NewPersonnelMarket {
      */
     @Override
     public HiringCostBreakdown getHiringCostBreakdown(Person applicant) {
+        Campaign campaign = getCampaign();
         Money goldenHelloExtra = isWasOfferingGoldenHello()
-                                       ? applicant.getSalary(getCampaign())
+                                       ? applicant.getSalary(campaign.getCampaignOptions(),
+                                                     campaign.getPlayerForce().isClanForce(),
+                                                     campaign.getLocalDate())
                                                .multipliedBy(GOLDEN_HELLO_SALARY_MONTHS - SALARY_MONTHS)
                                        : Money.zero();
         return getRecruitmentCostBreakdown(applicant, goldenHelloExtra);

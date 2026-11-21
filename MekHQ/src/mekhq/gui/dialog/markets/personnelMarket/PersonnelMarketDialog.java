@@ -609,7 +609,12 @@ public class PersonnelMarketDialog extends JDialog {
 
         board.show(shown, currentApplicants.size(), keep, fallbackIndex, sort, isSortReversed, emptyBoardText());
 
-        int rare = (int) currentApplicants.stream().filter(this::isRare).count();
+        int rare = 0;
+        for (Person applicant : currentApplicants) {
+            if (isRare(applicant)) {
+                rare++;
+            }
+        }
         applicantsTile.setValue(Integer.toString(currentApplicants.size()), ACCENT_BRIGHT);
         applicantsTile.setSub(rare == 0 ? text("tile.personnelMarket.applicants.noneRare")
                                     : getFormattedTextAt(RESOURCE_BUNDLE, "tile.personnelMarket.applicants.sub", rare));
@@ -645,8 +650,17 @@ public class PersonnelMarketDialog extends JDialog {
     private void refreshFilters() {
         refreshRoleFilters();
 
-        int withAbilities = (int) currentApplicants.stream().filter(person -> facts(person).abilities() > 0).count();
-        int withFlaws = (int) currentApplicants.stream().filter(person -> facts(person).flaws() > 0).count();
+        int withAbilities = 0;
+        int withFlaws = 0;
+        for (Person applicant : currentApplicants) {
+            ApplicantFacts applicantFacts = facts(applicant);
+            if (applicantFacts.abilities() > 0) {
+                withAbilities++;
+            }
+            if (applicantFacts.flaws() > 0) {
+                withFlaws++;
+            }
+        }
         traitRows.removeAll();
         traitRows.add(leftAligned(railCheckBox(text("rail.personnelMarket.abilities"), withAbilities,
               isAbilitiesOnly, isSelected -> {
@@ -696,9 +710,12 @@ public class PersonnelMarketDialog extends JDialog {
             if (candidate == ALL) {
                 continue;
             }
-            int count = (int) currentApplicants.stream()
-                                    .filter(applicant -> candidate.getFilteredInformation(applicant, today))
-                                    .count();
+            int count = 0;
+            for (Person applicant : currentApplicants) {
+                if (candidate.getFilteredInformation(applicant, today)) {
+                    count++;
+                }
+            }
             // The chosen filter stays on the rail even when empty, so the player can see what is narrowing the board.
             if (count > 0 || candidate == filter) {
                 items.add(new HudFilterList.Item<>(candidate, candidate.toString(), count));
@@ -844,7 +861,12 @@ public class PersonnelMarketDialog extends JDialog {
               campaign.getLocalDate(), false, true);
         // Counted from the dossier's list, so the card's counts always match the dossier's badges.
         List<ApplicantDossier.Ability> traits = ApplicantDossier.abilities(person);
-        int flaws = (int) traits.stream().filter(ApplicantDossier.Ability::isFlaw).count();
+        int flaws = 0;
+        for (ApplicantDossier.Ability trait : traits) {
+            if (trait.isFlaw()) {
+                flaws++;
+            }
+        }
         int abilities = traits.size() - flaws;
         return new ApplicantFacts(experienceLevel, market.getHiringCost(person), abilities, flaws);
     }
@@ -967,8 +989,9 @@ public class PersonnelMarketDialog extends JDialog {
 
         List<Person> recruitedPersons = new ArrayList<>();
         for (Person applicant : selectedApplicants) {
-            if (!isGMHire) {
-                Money cost = market.getHiringCost(applicant);
+            Money cost = isGMHire ? Money.zero() : market.getHiringCost(applicant);
+            // A free hire (no Pay for Recruitment, no Golden Hello) leaves no 0 C-bill line in the ledger
+            if (!cost.isZero()) {
                 boolean isPaid = finances.debit(RECRUITMENT,
                       campaign.getLocalDate(),
                       cost,
