@@ -151,7 +151,12 @@ final class MarketHud {
      * @param size  a multiplier on the base label font size
      */
     static JTextArea wrappedText(String text, Color color, int style, float size) {
-        JTextArea area = new JTextArea(text);
+        JTextArea area = new JTextArea();
+        // Read-only text never needs its caret on screen, and a caret that follows the text would scroll the page. Set
+        // before the text: JTextArea(String) moves the caret as it fills in, and each move queues a scroll to the
+        // caret that runs once the area is on a scrolling page, leaving the dossier opened part-way down.
+        ((DefaultCaret) area.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+        area.setText(text);
         area.setEditable(false);
         area.setFocusable(false);
         area.setLineWrap(true);
@@ -160,8 +165,6 @@ final class MarketHud {
         area.setBorder(null);
         area.setForeground(color);
         area.setFont(hudFont(style, size, 0.0f));
-        // Read-only text never needs its caret on screen, and a caret that follows the text would scroll the page.
-        ((DefaultCaret) area.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         return area;
     }
 
