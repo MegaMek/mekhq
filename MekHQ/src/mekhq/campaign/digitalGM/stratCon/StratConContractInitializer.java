@@ -2796,7 +2796,7 @@ public class StratConContractInitializer {
 
             if (scenario != null) {
                 if (facility != null) {
-                    StratConRulesManager.setupFacilityScenario(scenario, facility, null);
+                    StratConRulesManager.setupFacilityScenario(campaign, scenario, facility, null);
                 }
 
                 // These appear over the contract's run on their scheduled day and are meant to be fought like any

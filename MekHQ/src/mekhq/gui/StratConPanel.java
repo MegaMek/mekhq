@@ -2220,8 +2220,8 @@ public class StratConPanel extends JPanel implements ActionListener {
      * @param coords   the facility's hex
      *
      * @return the second line of the facility's map label, under its name: as much of its tier, condition and garrison
-     *       as the player knows, then whether it is cut off from its supply lines or besieged; {@code null} if there is
-     *       nothing to show
+     *       as the player knows, then whether it is cut off from its supply lines, besieged, or under an enemy attack
+     *       that has not been fought yet; {@code null} if there is nothing to show
      *
      * @author Illiani
      * @since 0.51.01
@@ -2247,6 +2247,9 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
         if (StratConFacilitySiege.isBesieged(currentTrack, coords)) {
             attributes.add(getTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.besieged"));
+        }
+        if (StratConFacilityAdvisor.getCounterattack(currentTrack, coords) != null) {
+            attributes.add(getTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.underAttack"));
         }
         return attributes.isEmpty() ? null : String.join(", ", attributes);
     }

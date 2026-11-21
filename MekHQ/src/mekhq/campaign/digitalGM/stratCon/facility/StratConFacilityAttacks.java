@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.digitalGM.stratCon.facility;
 
-import static mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity.COUNTERATTACK_MAXIMUM_WARNING_DAYS;
-import static mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity.COUNTERATTACK_MINIMUM_WARNING_DAYS;
 
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -61,21 +59,18 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * The enemy's attacks on facilities held by the player or their employer.
  *
  * <p>{@value StratConSpawnRates#FACILITY_ATTACKS_PER_SCALE} come each month per point of the contract's Scale, each on
- * a random day of its month, scheduled when the contract is accepted. On its day, an attack is one of these, each as
- * likely as the others:</p>
+ * a random day of its month, scheduled when the contract is accepted. On its day, an attack is one of these, a
+ * counterattack {@value #COUNTERATTACK_WEIGHT} times as likely as a Supply Interdiction:</p>
  *
  * <ul>
  *     <li><b>A Supply Interdiction:</b> raiders sit across one of the player's supply routes (see
  *     {@link StratConSupplyInterdictionBehavior}). Only with supply lines in use, and only when there is a route to
  *     sit on.</li>
- *     <li><b>A counterattack:</b> a fight on a random facility of the player's side, with
- *     {@value StratConEnemyFacilityActivity#COUNTERATTACK_MINIMUM_WARNING_DAYS} to
- *     {@value StratConEnemyFacilityActivity#COUNTERATTACK_MAXIMUM_WARNING_DAYS} days' warning. One whose warning would
- *     run past the contract's end is an assault instead.</li>
- *     <li><b>An assault:</b> as a counterattack, in the same templates, but fought today.</li>
+ *     <li><b>A counterattack:</b> a fight on a random facility of the player's side, fought today like any other
+ *     scenario.</li>
  * </ul>
  *
- * <p>Counterattacks and assaults are never Crises or Turning Points, and never pay the combat bonus. Losing one hands
+ * <p>Counterattacks are never Crises or Turning Points, and never pay the combat bonus. Losing one hands
  * the facility to the enemy; ignoring one does too, except that one held by the employer is left to an off-screen roll
  * (see {@link StratConEnemyFacilityActivity#resolveIgnoredCounterattack}).</p>
  *
@@ -92,9 +87,11 @@ public final class StratConFacilityAttacks {
     /** The kinds of attack the enemy makes on a facility of the player's side. */
     enum FacilityAttackType {
         SUPPLY_INTERDICTION,
-        COUNTERATTACK,
-        ASSAULT
+        COUNTERATTACK
     }
+
+    /** How many times as likely a counterattack is as a Supply Interdiction. */
+    static final int COUNTERATTACK_WEIGHT = 2;
 
     private StratConFacilityAttacks() {}
 
@@ -190,41 +187,24 @@ public final class StratConFacilityAttacks {
         }
 
         CounterattackTarget target = targets.get(Compute.randomInt(targets.size()));
-
-        int warningDays = 0;
-        if (attackType == FacilityAttackType.COUNTERATTACK) {
-            warningDays = COUNTERATTACK_MINIMUM_WARNING_DAYS
-                                + Compute.randomInt(COUNTERATTACK_MAXIMUM_WARNING_DAYS
-                                                          - COUNTERATTACK_MINIMUM_WARNING_DAYS + 1);
-            // Like any scenario, a counterattack must fall before the contract ends; one that would not comes today.
-            LocalDate contractEnd = contract.getEndingDate();
-            if ((contractEnd != null) && !campaign.getLocalDate().plusDays(warningDays).isBefore(contractEnd)) {
-                attackType = FacilityAttackType.ASSAULT;
-                warningDays = 0;
-            }
-        }
-
-        boolean isAssault = attackType == FacilityAttackType.ASSAULT;
         StratConScenario scenario = StratConRulesManager.startCounterattackScenario(campaign,
               contract,
               target.track(),
-              target.coords(),
-              warningDays,
-              isAssault);
+              target.coords());
         if (scenario == null) {
-            LOGGER.warn("Could not generate a {} on {} in sector {}.",
-                  isAssault ? "facility assault" : "counterattack",
+            LOGGER.warn("Could not generate a counterattack on {} in sector {}.",
                   target.coords(),
                   target.track().getDisplayableName());
             return null;
         }
 
-        StratConEnemyFacilityActivity.announceCounterattack(campaign, target, scenario, isAssault);
-        return attackType;
+        StratConEnemyFacilityActivity.announceCounterattack(campaign, target, scenario);
+        return FacilityAttackType.COUNTERATTACK;
     }
 
     /**
-     * Picks the kind of attack the enemy makes, each of those possible as likely as the others.
+     * Picks the kind of attack the enemy makes from those possible, a counterattack {@value #COUNTERATTACK_WEIGHT}
+     * times as likely as a Supply Interdiction.
      *
      * @param isInterdictionPossible whether a Supply Interdiction can be made
      *
@@ -234,15 +214,21 @@ public final class StratConFacilityAttacks {
      * @since 0.51.01
      */
     static FacilityAttackType pickAttackType(boolean isInterdictionPossible) {
-        List<FacilityAttackType> attackTypes = getPossibleAttackTypes(isInterdictionPossible);
-        return attackTypes.get(Compute.randomInt(attackTypes.size()));
+        List<FacilityAttackType> weightedAttackTypes = new ArrayList<>();
+        for (FacilityAttackType attackType : getPossibleAttackTypes(isInterdictionPossible)) {
+            int weight = (attackType == FacilityAttackType.COUNTERATTACK) ? COUNTERATTACK_WEIGHT : 1;
+            for (int entry = 0; entry < weight; entry++) {
+                weightedAttackTypes.add(attackType);
+            }
+        }
+        return weightedAttackTypes.get(Compute.randomInt(weightedAttackTypes.size()));
     }
 
     /**
      * @param isInterdictionPossible whether a Supply Interdiction can be made
      *
      * @return the kinds of attack the enemy can make: a Supply Interdiction first, if one can be made, then a
-     *       counterattack and an assault
+     *       counterattack
      *
      * @author Illiani
      * @since 0.51.01
@@ -253,7 +239,6 @@ public final class StratConFacilityAttacks {
             attackTypes.add(FacilityAttackType.SUPPLY_INTERDICTION);
         }
         attackTypes.add(FacilityAttackType.COUNTERATTACK);
-        attackTypes.add(FacilityAttackType.ASSAULT);
         return attackTypes;
     }
 

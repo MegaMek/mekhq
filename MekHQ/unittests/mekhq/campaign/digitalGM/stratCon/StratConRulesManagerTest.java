@@ -65,6 +65,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityType;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffects.LocalModifiersEffect;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityFactory;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOperations;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityOrder;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
 import mekhq.campaign.force.CombatTeam;
@@ -76,6 +77,7 @@ import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
+import mekhq.campaign.mission.scenarios.ScenarioObjective;
 import mekhq.campaign.mission.scenarios.ScenarioTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioType;
 import mekhq.campaign.mission.utilities.CombatRole;
@@ -212,6 +214,76 @@ class StratConRulesManagerTest {
         assertTrue(track.getScenarios().isEmpty());
         assertTrue(track.getFacilities().isEmpty());
         assertTrue(track.getStrategicObjectives().isEmpty());
+    }
+
+    @Test
+    void setupFacilityScenario_withFacilityOperationsAnUnorderedFightIsAnAssaultDecidedByItsResult() {
+        Campaign campaign = MHQTestUtilities.mockCampaign();
+        CampaignOptions campaignOptions = mock(CampaignOptions.class);
+        when(campaignOptions.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(true);
+        when(campaignOptions.isUseStratConMaplessMode()).thenReturn(false);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+        StratConFacility facility = StratConTestData.facility(ForceAlignment.Opposing, FacilityType.MekBase);
+        StratConScenario scenario = new StratConScenario();
+        scenario.setBackingScenario(new AtBDynamicScenario());
+
+        StratConRulesManager.setupFacilityScenario(campaign, scenario, facility, null);
+
+        assertEquals(FacilityOperation.ASSAULT, scenario.getFacilityOperation());
+        AtBDynamicScenario backingScenario = scenario.getBackingScenario();
+        assertEquals(1, backingScenario.getScenarioModifiers().size(), "only the stakes line, no objectives");
+        assertEquals(StratConRulesManager.FACILITY_STAKES_MODIFIER_NAME,
+              backingScenario.getScenarioModifiers().get(0).getModifierName());
+        assertEquals(StratConFacilityOperations.getStakesText(facility, FacilityOperation.ASSAULT, false),
+              backingScenario.getScenarioModifiers().get(0).getAdditionalBriefingText());
+        assertEquals(StratConFacilityOperations.getFightName(facility, FacilityOperation.ASSAULT),
+              backingScenario.getName());
+    }
+
+    private static AtBDynamicScenario scenarioWithFacilityDefenses(ScenarioObjective... objectives) {
+        ScenarioTemplate template = new ScenarioTemplate();
+        ScenarioForceTemplate defenses = new ScenarioForceTemplate();
+        defenses.setForceName(StratConRulesManager.FACILITY_DEFENSES_FORCE_NAME);
+        defenses.setFixedUnitCount(8);
+        template.getScenarioForces().put(StratConRulesManager.FACILITY_DEFENSES_FORCE_NAME, defenses);
+        template.scenarioObjectives.addAll(List.of(objectives));
+        AtBDynamicScenario backingScenario = new AtBDynamicScenario();
+        backingScenario.setTemplate(template);
+        return backingScenario;
+    }
+
+    @Test
+    void scaleFacilityDefenses_fieldsTurretsForEachGarrisonStep() {
+        StratConFacility facility = StratConTestData.facility(ForceAlignment.Player, FacilityType.MekBase);
+        facility.setGarrison(1);
+        AtBDynamicScenario backingScenario = scenarioWithFacilityDefenses();
+
+        StratConRulesManager.scaleFacilityDefenses(backingScenario, facility);
+
+        assertEquals(StratConRulesManager.TURRETS_PER_GARRISON_STEP,
+              backingScenario.getTemplate()
+                    .getScenarioForces()
+                    .get(StratConRulesManager.FACILITY_DEFENSES_FORCE_NAME)
+                    .getFixedUnitCount());
+    }
+
+    @Test
+    void scaleFacilityDefenses_withNoGarrisonThereAreNoTurretsAndNoObjectivesAboutThem() {
+        StratConFacility facility = StratConTestData.facility(ForceAlignment.Player, FacilityType.MekBase);
+        facility.setGarrison(0);
+        ScenarioObjective turretsOnly = new ScenarioObjective();
+        turretsOnly.addForce(StratConRulesManager.FACILITY_DEFENSES_FORCE_NAME);
+        ScenarioObjective shared = new ScenarioObjective();
+        shared.addForce(StratConRulesManager.FACILITY_DEFENSES_FORCE_NAME);
+        shared.addForce("Player");
+        AtBDynamicScenario backingScenario = scenarioWithFacilityDefenses(turretsOnly, shared);
+
+        StratConRulesManager.scaleFacilityDefenses(backingScenario, facility);
+
+        ScenarioTemplate template = backingScenario.getTemplate();
+        assertFalse(template.getScenarioForces().containsKey(StratConRulesManager.FACILITY_DEFENSES_FORCE_NAME));
+        assertEquals(List.of(shared), template.scenarioObjectives);
+        assertEquals(Set.of("Player"), shared.getAssociatedForceNames());
     }
 
     @Test

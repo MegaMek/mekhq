@@ -47,8 +47,6 @@ import megamek.common.compute.Compute;
 import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
@@ -68,14 +66,14 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 /**
  * What the enemy does with facilities between the player's fights: monthly upkeep of its own facilities, the
- * counterattacks and assaults it makes on facilities the player or their employer holds, and enemy engineers building
- * new outposts.
+ * counterattacks it makes on facilities the player or their employer holds, and enemy engineers building new
+ * outposts.
  *
  * <ul>
- *     <li><b>Monthly upkeep.</b> At the start of each month, every enemy facility repairs and reinforces by the "Enemy
- *     Facility Activity" option's worth of steps, unless a fight is under way there, it is cut off from its supply
- *     lines, or it is under siege.</li>
- *     <li><b>Counterattacks and assaults.</b> Started by the contract's facility attacks (see
+ *     <li><b>Monthly upkeep.</b> With Facility Operations, at the start of each month, every enemy facility repairs
+ *     and reinforces {@value #ENEMY_UPKEEP_STEPS} step, unless a fight is under way there, it is cut off from its
+ *     supply lines, or it is under siege.</li>
+ *     <li><b>Counterattacks.</b> Started by the contract's facility attacks, and fought the day they come (see
  *     {@link StratConFacilityAttacks}). Losing one outright hands the facility to the enemy; ignoring one does too,
  *     except that one held by the employer is left to an off-screen roll.</li>
  *     <li><b>Enemy engineers.</b> {@value StratConSpawnRates#ENGINEERS_PER_SCALE} a month per point of the contract's
@@ -91,17 +89,11 @@ public final class StratConEnemyFacilityActivity {
 
     static final String RESOURCE_BUNDLE = "mekhq.resources.StratConEnemyFacilityActivity";
 
-    /** The highest value the Enemy Facility Activity option takes. */
-    static final double MAXIMUM_ACTIVITY = 3.0;
+    /** The condition and garrison steps each enemy facility restores every month. */
+    static final int ENEMY_UPKEEP_STEPS = 1;
 
-    /** The percentage chance, at an activity of 1, that the enemy sends a relief force against a new siege. */
+    /** The percentage chance that the enemy sends a relief force against a new siege. */
     static final int RELIEF_CHANCE_PERCENT = 25;
-
-    /** The fewest days a counterattack gives the player to deploy. */
-    static final int COUNTERATTACK_MINIMUM_WARNING_DAYS = 3;
-
-    /** The most days a counterattack gives the player to deploy. */
-    static final int COUNTERATTACK_MAXIMUM_WARNING_DAYS = 7;
 
     /** The 2d6 roll, after modifiers, an employer's garrison must meet to hold off an ignored counterattack. */
     static final int OFF_SCREEN_DEFENSE_TARGET = 9;
@@ -111,51 +103,11 @@ public final class StratConEnemyFacilityActivity {
     private StratConEnemyFacilityActivity() {}
 
     /**
-     * @param campaign the current campaign
-     *
-     * @return the "Enemy Facility Activity" option, kept between 0 and {@link #MAXIMUM_ACTIVITY}; 0 with Facility
-     *       Operations off, so turning that off restores play as it was before, and 0 in mapless play, where there are
-     *       no facilities
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    public static double getActivity(Campaign campaign) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        if (!StratConFacilityOperations.isEnabled(campaign)) {
-            return 0;
-        }
-
-        Double activity = campaignOptions.get(CampaignOption.ENEMY_FACILITY_ACTIVITY);
-        if (activity == null) {
-            return 1.0;
-        }
-        return Math.max(0, Math.min(MAXIMUM_ACTIVITY, activity));
-    }
-
-    /**
-     * Works out how many steps of upkeep an enemy facility gets this month. The whole part of the activity is always
-     * given; its fraction is the percentage chance of one more step.
-     *
-     * @param activity   the Enemy Facility Activity option
-     * @param percentile a roll from 0 to 99
-     *
-     * @return the number of steps
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    static int getUpkeepSteps(double activity, int percentile) {
-        int wholeSteps = (int) Math.floor(activity);
-        int fractionPercent = (int) Math.round((activity - wholeSteps) * 100);
-        return wholeSteps + ((percentile < fractionPercent) ? 1 : 0);
-    }
-
-    /**
-     * Gives every enemy facility in a sector its monthly upkeep: for each step (see {@link #getUpkeepSteps}), one
-     * condition step repaired and one garrison step reinforced. Your employer's facilities get one step each month,
-     * however active the enemy is, since only facilities you hold take your Fortify and Reinforce orders. A facility
-     * being fought over, cut off or besieged gets none. Each facility the player can see that changed is reported.
+     * Gives every enemy facility in a sector its monthly upkeep: with Facility Operations,
+     * {@value #ENEMY_UPKEEP_STEPS} condition step repaired and garrison step reinforced. Your employer's facilities get
+     * {@value #EMPLOYER_UPKEEP_STEPS} step each month either way, since only facilities you hold take your Fortify and
+     * Reinforce orders. A facility being fought over, cut off or besieged gets none. Each facility the player can see
+     * that changed is reported.
      *
      * @param track    the sector
      * @param campaign the current campaign
@@ -164,7 +116,7 @@ public final class StratConEnemyFacilityActivity {
      * @since 0.51.01
      */
     public static void applyMonthlyUpkeep(StratConTrackState track, Campaign campaign) {
-        double activity = getActivity(campaign);
+        boolean isEnemyUpkeepActive = StratConFacilityOperations.isEnabled(campaign);
 
         for (Map.Entry<StratConCoords, StratConFacility> entry : track.getFacilities().entrySet()) {
             StratConFacility facility = entry.getValue();
@@ -172,14 +124,14 @@ public final class StratConEnemyFacilityActivity {
             boolean isEnemyHeld = facility.getOwner() == ForceAlignment.Opposing;
             // A facility being fought over, cut off from its supply lines, or under siege cannot be repaired.
             if ((!isEmployerHeld && !isEnemyHeld)
-                      || (isEnemyHeld && (activity <= 0))
+                      || (isEnemyHeld && !isEnemyUpkeepActive)
                       || (track.getScenario(entry.getKey()) != null)
                       || StratConFacilitySupply.isCutOff(track, entry.getKey())
                       || StratConFacilitySiege.isBesieged(track, entry.getKey())) {
                 continue;
             }
 
-            int steps = isEmployerHeld ? EMPLOYER_UPKEEP_STEPS : getUpkeepSteps(activity, Compute.randomInt(100));
+            int steps = isEmployerHeld ? EMPLOYER_UPKEEP_STEPS : ENEMY_UPKEEP_STEPS;
             boolean isChanged = applyUpkeep(facility, steps);
             if (isChanged && facility.getVisible()) {
                 campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE,
@@ -213,10 +165,8 @@ public final class StratConEnemyFacilityActivity {
     }
 
     /**
-     * Rolls whether the enemy sends a relief force against a new siege: {@value #RELIEF_CHANCE_PERCENT}%, scaled by
-     * activity.
+     * Rolls whether the enemy sends a relief force against a new siege: {@value #RELIEF_CHANCE_PERCENT}% of the time.
      *
-     * @param activity   the "Enemy Facility Activity" option (see {@link #getActivity})
      * @param percentile a roll from 0 to 99
      *
      * @return {@code true} if a relief force comes
@@ -224,8 +174,8 @@ public final class StratConEnemyFacilityActivity {
      * @author Illiani
      * @since 0.51.01
      */
-    static boolean isReliefSent(double activity, int percentile) {
-        return (activity > 0) && (percentile < Math.round(RELIEF_CHANCE_PERCENT * activity));
+    static boolean isReliefSent(int percentile) {
+        return percentile < RELIEF_CHANCE_PERCENT;
     }
 
     /**
@@ -264,24 +214,21 @@ public final class StratConEnemyFacilityActivity {
      * Tells the player the enemy is attacking one of their side's facilities: in the daily report, and with a warning
      * when there is a GUI.
      *
-     * @param campaign   the current campaign
-     * @param target     the facility under attack
-     * @param scenario   the attack's scenario
-     * @param isAssault  {@code true} for an assault, fought today; {@code false} for a counterattack, with warning
+     * @param campaign the current campaign
+     * @param target   the facility under attack
+     * @param scenario the attack's scenario
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static void announceCounterattack(Campaign campaign, CounterattackTarget target, StratConScenario scenario,
-          boolean isAssault) {
+    static void announceCounterattack(Campaign campaign, CounterattackTarget target, StratConScenario scenario) {
         StratConFacility facility = target.track().getFacility(target.coords());
         String facilityName = (facility == null) ? "" : facility.getDisplayableName();
         String deadline = StratConFacilityAdvisor.formatDate(scenario.getDeploymentDate());
         boolean isEmployerHeld = (facility != null) && (facility.getOwner() == ForceAlignment.Allied);
-        String keyPrefix = isAssault ? "assault." : "";
 
         campaign.addReport(BATTLE, getFormattedTextAt(RESOURCE_BUNDLE,
-              keyPrefix + "report.counterattack",
+              "report.counterattack",
               facilityName,
               target.track().getDisplayableName(),
               target.coords().toBTString(),
@@ -294,7 +241,7 @@ public final class StratConEnemyFacilityActivity {
         new ImmersiveDialogSimple(campaign,
               null,
               getFormattedTextAt(RESOURCE_BUNDLE,
-                    keyPrefix + (isEmployerHeld ? "warning.message.employer" : "warning.message.player"),
+                    isEmployerHeld ? "warning.message.employer" : "warning.message.player",
                     facilityName,
                     target.track().getDisplayableName(),
                     deadline),

@@ -37,7 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.CALLS_REAL_METHODS;
@@ -165,8 +164,8 @@ class StratConFacilityAttacksTest {
         try (MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class)) {
             assertNull(StratConFacilityAttacks.launchFacilityAttack(campaign, contract, campaignState));
 
-            rulesManager.verify(() -> StratConRulesManager.startCounterattackScenario(any(), any(), any(), any(),
-                  anyInt(), anyBoolean()), never());
+            rulesManager.verify(() -> StratConRulesManager.startCounterattackScenario(any(), any(), any(), any()),
+                  never());
         }
     }
 
@@ -180,8 +179,8 @@ class StratConFacilityAttacksTest {
         try (MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class)) {
             StratConFacilityAttacks.processFacilityAttacks(campaign, contract, campaignState);
 
-            rulesManager.verify(() -> StratConRulesManager.startCounterattackScenario(any(), any(), any(), any(),
-                  anyInt(), anyBoolean()), never());
+            rulesManager.verify(() -> StratConRulesManager.startCounterattackScenario(any(), any(), any(), any()),
+                  never());
         }
         assertTrue(campaignState.getFacilityAttackDates().isEmpty());
     }
@@ -189,89 +188,45 @@ class StratConFacilityAttacksTest {
     // Which kind of attack
 
     @Test
-    void anInterdictionCounterattackAndAssaultArePossibleWithASupplyRoute() {
-        assertEquals(List.of(FacilityAttackType.SUPPLY_INTERDICTION,
-                    FacilityAttackType.COUNTERATTACK,
-                    FacilityAttackType.ASSAULT),
+    void anInterdictionOrCounterattackIsPossibleWithASupplyRoute() {
+        assertEquals(List.of(FacilityAttackType.SUPPLY_INTERDICTION, FacilityAttackType.COUNTERATTACK),
               StratConFacilityAttacks.getPossibleAttackTypes(true));
     }
 
     @Test
-    void withoutASupplyRouteOnlyACounterattackOrAssaultIsPossible() {
-        assertEquals(List.of(FacilityAttackType.COUNTERATTACK, FacilityAttackType.ASSAULT),
-              StratConFacilityAttacks.getPossibleAttackTypes(false));
+    void withoutASupplyRouteOnlyACounterattackIsPossible() {
+        assertEquals(List.of(FacilityAttackType.COUNTERATTACK), StratConFacilityAttacks.getPossibleAttackTypes(false));
     }
 
     @Test
-    void eachPossibleKindIsPickedByAnEvenRoll() {
+    void aCounterattackIsTwiceAsLikelyAsAnInterdiction() {
         try (MockedStatic<Compute> dice = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
             dice.when(() -> Compute.randomInt(3)).thenReturn(0, 1, 2);
 
             assertEquals(FacilityAttackType.SUPPLY_INTERDICTION, StratConFacilityAttacks.pickAttackType(true));
             assertEquals(FacilityAttackType.COUNTERATTACK, StratConFacilityAttacks.pickAttackType(true));
-            assertEquals(FacilityAttackType.ASSAULT, StratConFacilityAttacks.pickAttackType(true));
+            assertEquals(FacilityAttackType.COUNTERATTACK, StratConFacilityAttacks.pickAttackType(true));
         }
     }
 
     @Test
-    void aCounterattackComesWithWarning() {
+    void aCounterattackIsFoughtTheDayItComes() {
         placeFacility(ForceAlignment.Player);
         StratConScenario scenario = mock(StratConScenario.class);
 
         try (MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class);
               MockedStatic<Compute> dice = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
-            // The lowest roll: a counterattack (supply lines are off), with the least warning
             dice.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
-            rulesManager.when(() -> StratConRulesManager.startCounterattackScenario(any(), any(), any(), any(),
-                  anyInt(), anyBoolean())).thenReturn(scenario);
+            rulesManager.when(() -> StratConRulesManager.startCounterattackScenario(any(), any(), any(), any()))
+                  .thenReturn(scenario);
 
             assertEquals(FacilityAttackType.COUNTERATTACK,
                   StratConFacilityAttacks.launchFacilityAttack(campaign, contract, campaignState));
 
-            rulesManager.verify(() -> StratConRulesManager.startCounterattackScenario(eq(campaign), eq(contract),
-                  eq(track), eq(FACILITY_COORDS), eq(StratConEnemyFacilityActivity.COUNTERATTACK_MINIMUM_WARNING_DAYS),
-                  eq(false)));
-        }
-    }
-
-    @Test
-    void anAssaultIsFoughtToday() {
-        placeFacility(ForceAlignment.Allied);
-        StratConScenario scenario = mock(StratConScenario.class);
-
-        try (MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class);
-              MockedStatic<Compute> dice = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
-            // Of the two kinds possible without supply lines, the second is an assault; everything else rolls lowest
-            dice.when(() -> Compute.randomInt(anyInt()))
-                  .thenAnswer(invocation -> (invocation.<Integer>getArgument(0) == 2) ? 1 : 0);
-            rulesManager.when(() -> StratConRulesManager.startCounterattackScenario(any(), any(), any(), any(),
-                  anyInt(), anyBoolean())).thenReturn(scenario);
-
-            assertEquals(FacilityAttackType.ASSAULT,
-                  StratConFacilityAttacks.launchFacilityAttack(campaign, contract, campaignState));
-
-            rulesManager.verify(() -> StratConRulesManager.startCounterattackScenario(eq(campaign), eq(contract),
-                  eq(track), eq(FACILITY_COORDS), eq(0), eq(true)));
-        }
-    }
-
-    @Test
-    void aCounterattackWhoseWarningWouldOutlastTheContractIsAnAssaultInstead() {
-        placeFacility(ForceAlignment.Player);
-        when(contract.getEndingDate()).thenReturn(TODAY.plusDays(2));
-        StratConScenario scenario = mock(StratConScenario.class);
-
-        try (MockedStatic<StratConRulesManager> rulesManager = mockStatic(StratConRulesManager.class);
-              MockedStatic<Compute> dice = mockStatic(Compute.class, CALLS_REAL_METHODS)) {
-            dice.when(() -> Compute.randomInt(anyInt())).thenReturn(0);
-            rulesManager.when(() -> StratConRulesManager.startCounterattackScenario(any(), any(), any(), any(),
-                  anyInt(), anyBoolean())).thenReturn(scenario);
-
-            assertEquals(FacilityAttackType.ASSAULT,
-                  StratConFacilityAttacks.launchFacilityAttack(campaign, contract, campaignState));
-
-            rulesManager.verify(() -> StratConRulesManager.startCounterattackScenario(eq(campaign), eq(contract),
-                  eq(track), eq(FACILITY_COORDS), eq(0), eq(true)));
+            rulesManager.verify(() -> StratConRulesManager.startCounterattackScenario(eq(campaign),
+                  eq(contract),
+                  eq(track),
+                  eq(FACILITY_COORDS)));
         }
     }
 }

@@ -416,7 +416,6 @@ class StratConFacilitySupplyTest {
 
         @Test
         void aCutOffEnemyFacilityGetsNoUpkeep() {
-            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(1.0);
             when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(true);
             StratConFacility facility = place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
             facility.setGarrison(0);

@@ -163,21 +163,22 @@ public final class StratConFacilitySiege {
         StratConFacilityOperations.report(campaign, "report.siege.started", facility.getDisplayableName());
 
         if (isFirstBesieger) {
-            tryRelief(campaign, contract, track, coords, formationId);
+            tryRelief(campaign, contract, track, coords, formationId, Compute.randomInt(100));
         }
     }
 
     /**
-     * Rolls whether the enemy brings a counterattack forward as a relief force against a new siege, on a
-     * counterattack's daily chance (see {@link StratConEnemyFacilityActivity#isReliefSent}). Unlike a counterattack, a
-     * relief force is never guaranteed by a long quiet spell. A relief force counts as the enemy's latest
-     * counterattack. A cut-off facility cannot be relieved.
+     * Rolls whether the enemy sends a relief force against a new siege (see
+     * {@link StratConEnemyFacilityActivity#isReliefSent}). A relief force is fought today, as a Crisis, and is not a
+     * counterattack: losing it breaks the siege rather than costing a facility. A cut-off facility cannot be
+     * relieved.
      *
      * @param campaign    the current campaign
      * @param contract    the contract whose map holds the sector
      * @param track       the sector
      * @param coords      the besieged facility's hex
      * @param formationId the ID of the besieging formation the relief force falls on
+     * @param reliefRoll  a roll from 0 to 99 (see {@link StratConEnemyFacilityActivity#isReliefSent})
      *
      * @return the relief force's scenario, or {@code null} if none came
      *
@@ -185,15 +186,13 @@ public final class StratConFacilitySiege {
      * @since 0.51.01
      */
     static @Nullable StratConScenario tryRelief(Campaign campaign, AbstractContract contract,
-          StratConTrackState track, StratConCoords coords, int formationId) {
+          StratConTrackState track, StratConCoords coords, int formationId, int reliefRoll) {
         StratConCampaignState campaignState = contract.getStratConCampaignState();
         if ((campaignState == null) || StratConFacilitySupply.isCutOff(track, coords)) {
             return null;
         }
 
-        boolean isRelieved = StratConEnemyFacilityActivity.isReliefSent(
-              StratConEnemyFacilityActivity.getActivity(campaign),
-              Compute.randomInt(100));
+        boolean isRelieved = StratConEnemyFacilityActivity.isReliefSent(reliefRoll);
         if (!isRelieved) {
             return null;
         }

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.facility;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
@@ -730,6 +731,23 @@ class StratConFacilityOperationsTest {
         }
 
         @Test
+        void yourOwnFacilityCannotBeBuiltUpWhileAFightIsUnderWayThere() {
+            StratConFacility facility = placeFacility(ForceAlignment.Player, FacilityType.MekBase);
+            facility.setGarrison(0);
+            StratConScenario scenario = new StratConScenario();
+            scenario.setCoords(FACILITY_COORDS);
+            track.getScenarios().put(FACILITY_COORDS, scenario);
+
+            for (FacilityOperation operation : List.of(FacilityOperation.FORTIFY, FacilityOperation.REINFORCE)) {
+                assertEquals("reason.scenarioUnderway", StratConFacilityOperations.getUnavailableReasonKey(campaign,
+                      contract,
+                      track,
+                      FACILITY_COORDS,
+                      operation), operation.name());
+            }
+        }
+
+        @Test
         void ordersForYourOwnFacilitiesCannotBeGivenOnTheEnemys() {
             placeFacility(ForceAlignment.Opposing, FacilityType.MekBase);
 
@@ -1194,6 +1212,53 @@ class StratConFacilityOperationsTest {
                                             .getValue();
 
             assertTrue(loaded.isPlayerBuilt());
+        }
+    }
+
+    @Nested
+    class FightStakes {
+        @Test
+        void anAssaultOrRaidHasNoObjectiveOfItsOwn() {
+            assertNull(StratConFacilityOperations.getObjectiveModifierId(FacilityOperation.ASSAULT));
+            assertNull(StratConFacilityOperations.getObjectiveModifierId(FacilityOperation.RAID));
+            assertNotNull(StratConFacilityOperations.getObjectiveModifierId(FacilityOperation.RECON));
+            assertNotNull(StratConFacilityOperations.getObjectiveModifierId(FacilityOperation.SABOTAGE));
+        }
+
+        @Test
+        void eachFightSaysWhatItDecides() {
+            StratConFacility enemyFacility = StratConTestData.facility(ForceAlignment.Opposing, FacilityType.MekBase);
+            StratConFacility ownFacility = StratConTestData.facility(ForceAlignment.Player, FacilityType.MekBase);
+
+            assertEquals(stakes("stakes.assault", enemyFacility),
+                  StratConFacilityOperations.getStakesText(enemyFacility, FacilityOperation.ASSAULT, false));
+            assertEquals(stakes("stakes.assault", enemyFacility),
+                  StratConFacilityOperations.getStakesText(enemyFacility, null, false),
+                  "an unordered fight on an enemy facility is an assault");
+            assertEquals(stakes("stakes.raid", enemyFacility),
+                  StratConFacilityOperations.getStakesText(enemyFacility, FacilityOperation.RAID, false));
+            assertEquals(stakes("stakes.escape", enemyFacility),
+                  StratConFacilityOperations.getStakesText(enemyFacility, FacilityOperation.RECON, false));
+            assertEquals(stakes("stakes.escape", enemyFacility),
+                  StratConFacilityOperations.getStakesText(enemyFacility, FacilityOperation.SABOTAGE, false));
+            assertEquals(stakes("stakes.defend", ownFacility),
+                  StratConFacilityOperations.getStakesText(ownFacility, null, false));
+            assertEquals(stakes("stakes.counterattack", ownFacility),
+                  StratConFacilityOperations.getStakesText(ownFacility, null, true));
+        }
+
+        @Test
+        void aFightIsNamedForItsFacilityAndOrder() {
+            StratConFacility facility = StratConTestData.facility(ForceAlignment.Opposing, FacilityType.MekBase);
+
+            assertEquals(facility.getDisplayableName() + " - Assault",
+                  StratConFacilityOperations.getFightName(facility, FacilityOperation.ASSAULT));
+            assertEquals(facility.getDisplayableName() + " - Defense",
+                  StratConFacilityOperations.getFightName(facility, null));
+        }
+
+        private String stakes(String key, StratConFacility facility) {
+            return getFormattedTextAt(StratConFacilityOperations.RESOURCE_BUNDLE, key, facility.getDisplayableName());
         }
     }
 }

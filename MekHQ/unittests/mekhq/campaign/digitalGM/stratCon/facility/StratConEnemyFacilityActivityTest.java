@@ -119,7 +119,6 @@ class StratConEnemyFacilityActivityTest {
 
         campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         options = mock(CampaignOptions.class);
-        when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(1.0);
         when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(true);
         when(options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
         when(options.isUseStratConMaplessMode()).thenReturn(false);
@@ -152,33 +151,17 @@ class StratConEnemyFacilityActivityTest {
     }
 
     @Nested
-    class Activity {
-        @Test
-        void theOptionIsKeptWithinItsRange() {
-            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(7.0);
-            assertEquals(StratConEnemyFacilityActivity.MAXIMUM_ACTIVITY,
-                  StratConEnemyFacilityActivity.getActivity(campaign));
-
-            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(-1.0);
-            assertEquals(0, StratConEnemyFacilityActivity.getActivity(campaign));
-        }
-
-        @Test
-        void maplessPlayHasNoActivity() {
-            when(options.isUseStratConMaplessMode()).thenReturn(true);
-
-            assertEquals(0, StratConEnemyFacilityActivity.getActivity(campaign));
-        }
-    }
-
-    @Nested
     class MonthlyUpkeep {
         @Test
-        void theWholeActivityIsAlwaysGivenAndItsFractionIsAChance() {
-            assertEquals(1, StratConEnemyFacilityActivity.getUpkeepSteps(1.0, 99));
-            assertEquals(0, StratConEnemyFacilityActivity.getUpkeepSteps(0.0, 0));
-            assertEquals(2, StratConEnemyFacilityActivity.getUpkeepSteps(1.5, 49));
-            assertEquals(1, StratConEnemyFacilityActivity.getUpkeepSteps(1.5, 50));
+        void anEnemyFacilityRecoversOneStepAMonth() {
+            StratConFacility enemy = placeFacility(ForceAlignment.Opposing);
+            enemy.setCondition(FacilityCondition.CRIPPLED);
+            enemy.setGarrison(0);
+
+            StratConEnemyFacilityActivity.applyMonthlyUpkeep(track, campaign);
+
+            assertEquals(FacilityCondition.DAMAGED, enemy.getCondition());
+            assertEquals(1, enemy.getGarrison());
         }
 
         @Test
@@ -222,8 +205,8 @@ class StratConEnemyFacilityActivityTest {
         }
 
         @Test
-        void yourEmployersFacilitiesRecoverOneStepAMonthWhateverTheEnemyDoes() {
-            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(0.0);
+        void yourEmployersFacilitiesRecoverOneStepAMonthEvenWithoutFacilityOperations() {
+            when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(false);
             StratConFacility employerHeld = placeFacility(ForceAlignment.Allied);
             employerHeld.setCondition(FacilityCondition.CRIPPLED);
             employerHeld.setGarrison(0);
@@ -240,8 +223,8 @@ class StratConEnemyFacilityActivityTest {
         }
 
         @Test
-        void noActivityMeansNoUpkeep() {
-            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(0.0);
+        void enemyFacilitiesGetNoUpkeepWithoutFacilityOperations() {
+            when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(false);
             StratConFacility enemy = placeFacility(ForceAlignment.Opposing);
             enemy.setGarrison(0);
 
@@ -513,9 +496,8 @@ class StratConEnemyFacilityActivityTest {
 
     @Test
     void aReliefForceIsNeverGuaranteed() {
-        // 25% at normal activity, however long the siege has gone unrelieved
-        assertTrue(StratConEnemyFacilityActivity.isReliefSent(1.0, 24));
-        assertFalse(StratConEnemyFacilityActivity.isReliefSent(1.0, 25));
-        assertFalse(StratConEnemyFacilityActivity.isReliefSent(0, 0));
+        // 25%, however long the siege has gone unrelieved
+        assertTrue(StratConEnemyFacilityActivity.isReliefSent(24));
+        assertFalse(StratConEnemyFacilityActivity.isReliefSent(25));
     }
 }
