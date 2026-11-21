@@ -609,12 +609,14 @@ final class MarketComparePage {
         private final Bar bar = new Bar();
         private final MarketHud.PipMeter pips = new MarketHud.PipMeter(0, ACCENT);
         private final JPanel south = Hud.transparentPanel(new BorderLayout());
+        private final Font plainFont = hudFont(Font.PLAIN, 0.9f, 0.0f);
+        private final Font boldFont = hudFont(Font.BOLD, 0.9f, 0.0f);
 
         private CellRenderer() {
             super(new BorderLayout());
             setBorder(BorderFactory.createEmptyBorder(scaleForGUI(3), scaleForGUI(12), scaleForGUI(4),
                   scaleForGUI(12)));
-            value.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
+            value.setFont(plainFont);
             best.setText(getTextAt(RESOURCE_BUNDLE, "compare.contractMarket.best"));
             best.setForeground(READY);
             best.setFont(hudFont(Font.BOLD, 0.66f, 0.12f));
@@ -642,9 +644,10 @@ final class MarketComparePage {
 
             Cell cell = (Cell) object;
             setBackground(isChosen ? SURFACE : tableRow.isKey() ? KEY_ROW : SURFACE_DEEP);
-            value.setText("<html>" + cell.text() + "</html>");
+            // Font and colour go on before the text: a label re-parses its HTML whenever either changes after it.
+            value.setFont(cell.isBest() || tableRow.isKey() ? boldFont : plainFont);
             value.setForeground(cell.color() == null ? TEXT : cell.color());
-            value.setFont(hudFont(cell.isBest() || tableRow.isKey() ? Font.BOLD : Font.PLAIN, 0.9f, 0.0f));
+            value.setText("<html>" + cell.text() + "</html>");
             best.setVisible(cell.isBest());
 
             south.removeAll();
