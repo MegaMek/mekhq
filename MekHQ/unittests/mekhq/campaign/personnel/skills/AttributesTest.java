@@ -45,6 +45,8 @@ import static mekhq.campaign.personnel.skills.enums.SkillAttribute.REFLEXES;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.STRENGTH;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.WILLPOWER;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
 
 import java.util.List;
 
@@ -52,6 +54,8 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 public class AttributesTest {
     @Test
@@ -293,5 +297,24 @@ public class AttributesTest {
         int actualScore = attributes.getAdjustedAttributeScore(SkillAttribute.BODY, List.of(), personnelOptions,
               21);
         assertEquals(MINIMUM_ATTRIBUTE_SCORE, actualScore);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+          // SPA taken, attribute checked, expected bonus to the cap
+          "exceptional_attribute_reflexes, REFLEXES, 1",
+          "exceptional_attribute_reflexes, DEXTERITY, 0",
+          "exceptional_attribute_dexterity, DEXTERITY, 1",
+          "exceptional_attribute_dexterity, REFLEXES, 0"
+    })
+    void testGetAttributeCap_exceptionalAttributeRaisesOnlyItsOwnAttribute(String spa, SkillAttribute attribute,
+          int expectedBonus) {
+        final Attributes attributes = new Attributes();
+        final Phenotype phenotype = Phenotype.GENERAL;
+        final PersonnelOptions options = mock(PersonnelOptions.class);
+        when(options.booleanOption(spa)).thenReturn(true);
+
+        assertEquals(phenotype.getAttributeCap(attribute) + expectedBonus,
+              attributes.getAttributeCap(phenotype, options, attribute));
     }
 }
