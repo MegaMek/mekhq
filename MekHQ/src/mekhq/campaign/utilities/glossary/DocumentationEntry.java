@@ -52,19 +52,19 @@ import mekhq.MHQConstants;
  * @since 0.50.07
  */
 public enum DocumentationEntry {
-    AWARDS_MODULE("AWARDS_MODULE", "GlossaryDocs/Personnel Modules/Awards Module", "0.50.07", "0.50.07", "0.50.07"),
+    AWARDS_MODULE("AWARDS_MODULE", "glossaryDocs/Awards Module", "0.50.07", "0.50.07", "0.50.07"),
     CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS",
-          "GlossaryDocs/MegaMek -MekHQ Chaos Campaign Guide",
+          "glossaryDocs/MegaMek -MekHQ Chaos Campaign Guide",
           "0.50.07", "0.50.07", "0.50.07"),
-    COOP_CAMPAIGNS("COOP_CAMPAIGNS", "GlossaryDocs/MekHQ Co-Op Campaign Guide v1", "0.50.07", "0.50.07", "0.50.07"),
+    COOP_CAMPAIGNS("COOP_CAMPAIGNS", "glossaryDocs/MekHQ Co-Op Campaign Guide v1", "0.50.07", "0.50.07", "0.50.07"),
     EDUCATION_MODULE("EDUCATION_MODULE",
-          "GlossaryDocs/Personnel Modules/Education Module",
+          "glossaryDocs/Education Module",
           "0.50.07", "0.50.10", "0.50.10"),
-    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "GlossaryDocs/0_MHQ New Player Guide", "0.50.07", "0.50.11", "0.50.11");
+    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "glossaryDocs/0_MHQ New Player Guide", "0.50.07", "0.50.11", "0.50.11");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";
 
-    private final String DIRECTORY = "docs/";
+    private final String DIRECTORY = "docs/mekhq/";
     private final String FILE_EXTENSION = ".pdf";
 
     private final String lookUpName;
