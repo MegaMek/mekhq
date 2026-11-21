@@ -44,6 +44,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
@@ -68,6 +69,9 @@ public class AutoAwardsController {
     final private List<Award> ignoredAwards = new ArrayList<>();
 
     private static final MMLogger logger = MMLogger.create(AutoAwardsController.class);
+
+    private static final List<String> FORMATION_KILL_AWARD_SIZES = List.of("lance", "company", "battalion", "regiment",
+          "brigade", "division", "corps", "army");
 
     /** Set while {@link #issueEligibleAwards} runs: awards are issued straight away rather than at a ceremony. */
     private boolean isCeremonySkipped;
@@ -305,6 +309,11 @@ public class AutoAwardsController {
      */
     public void PostGraduationController(Campaign campaign, List<UUID> personnel,
           HashMap<UUID, List<Object>> academyAttributes) {
+        // Graduation is reported whether or not autoAwards is enabled, so the check is made here
+        if (!campaign.getCampaignOptions().get(CampaignOption.ENABLE_AUTO_AWARDS)) {
+            return;
+        }
+
         logger.info("autoAwards (Education Conclusion) has started");
 
         this.campaign = campaign;
@@ -468,7 +477,7 @@ public class AutoAwardsController {
                         case "kill":
                             if ((!award.getRange().equalsIgnoreCase("scenario"))
                                       && (!award.getRange().equalsIgnoreCase("mission"))) {
-                                if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_FORMATION_KILL_AWARDS)) {
+                                if (isKillAwardTracked(campaign.getCampaignOptions(), award)) {
                                     killAwards.add(award);
                                 } else {
                                     ignoredAwards.add(award);
@@ -562,8 +571,7 @@ public class AutoAwardsController {
                         case "kill":
                             // Scenario Kill Awards are handled by the post-scenario controller
                             if (!award.getRange().equalsIgnoreCase("scenario")) {
-                                if ((campaign.getCampaignOptions().get(CampaignOption.ENABLE_INDIVIDUAL_KILL_AWARDS))
-                                          || (campaign.getCampaignOptions().get(CampaignOption.ENABLE_FORMATION_KILL_AWARDS))) {
+                                if (isKillAwardTracked(campaign.getCampaignOptions(), award)) {
                                     killAwards.add(award);
                                 } else {
                                     ignoredAwards.add(award);
@@ -723,6 +731,25 @@ public class AutoAwardsController {
             default:
                 throw new IllegalStateException("Unexpected awardListCase: " + awardListCase);
         }
+    }
+
+    /**
+     * Checks whether autoAwards tracks a kill award. Individual kill awards follow the individual kill option and
+     * formation kill awards follow the formation kill option.
+     *
+     * @param campaignOptions the campaign options
+     * @param award           the kill award
+     *
+     * @return {@code true} if the award's kind of kill award is enabled
+     */
+    static boolean isKillAwardTracked(CampaignOptions campaignOptions, Award award) {
+        String size = award.getSize();
+        // An award with no size, or one autoAwards doesn't recognise, is treated as an individual award
+        boolean isFormationAward = (size != null) && FORMATION_KILL_AWARD_SIZES.contains(size.toLowerCase());
+
+        return isFormationAward ?
+                     campaignOptions.get(CampaignOption.ENABLE_FORMATION_KILL_AWARDS) :
+                     campaignOptions.get(CampaignOption.ENABLE_INDIVIDUAL_KILL_AWARDS);
     }
 
     /**

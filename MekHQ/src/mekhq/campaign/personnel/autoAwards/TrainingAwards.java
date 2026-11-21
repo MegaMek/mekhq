@@ -111,7 +111,11 @@ public class TrainingAwards {
             }
 
             try {
-                requiredType = AcademyType.parseFromString(award.getSize());
+                // An award defined by education level or academy name has no academy type
+                String size = award.getSize();
+                requiredType = ((size == null) || size.isBlank()) ?
+                                     AcademyType.NONE :
+                                     AcademyType.parseFromString(size);
             } catch (Exception e) {
                 LOGGER.warn("Award {} from the {} set has an invalid size value {}",
                       award.getName(), award.getSet(), award.getSize());
@@ -127,7 +131,7 @@ public class TrainingAwards {
             }
 
             if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
-                if ((requiredEducationLevel != 0) && (requiredEducationLevel < academyEducationLevel)) {
+                if ((requiredEducationLevel != 0) && (requiredEducationLevel <= academyEducationLevel)) {
                     eligibleAwards.add(award);
                     continue;
                 }
@@ -137,7 +141,8 @@ public class TrainingAwards {
                     continue;
                 }
 
-                if (Objects.equals(requiredAcademyName, academyName)) {
+                if ((requiredAcademyName != null) && !requiredAcademyName.isBlank()
+                          && Objects.equals(requiredAcademyName, academyName)) {
                     eligibleAwards.add(award);
                 }
             }

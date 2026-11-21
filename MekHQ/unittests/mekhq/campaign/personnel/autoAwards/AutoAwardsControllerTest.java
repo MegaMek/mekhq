@@ -37,12 +37,16 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.only;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDate;
+import java.util.HashMap;
 import java.util.List;
+import java.util.UUID;
 
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -56,6 +60,8 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AwardBonus;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class AutoAwardsControllerTest {
     private static final LocalDate START = LocalDate.of(3051, 1, 1);
@@ -154,5 +160,33 @@ class AutoAwardsControllerTest {
     @Test
     void lastContractEndingDateIsNullWhenNoContractHasAnEndDate() {
         assertNull(AutoAwardsController.getLastContractEndingDate(List.of(contractEnding(null))));
+    }
+
+    @ParameterizedTest
+    @CsvSource({ "Individual, true, false, true", "Individual, false, true, false", "Lance, false, true, true",
+                 "Company, true, false, false", "'', true, false, true" })
+    void killAwardFollowsItsOwnTrackingOption(String size, boolean isIndividualTracked, boolean isFormationTracked,
+          boolean expected) {
+        CampaignOptions campaignOptions = new CampaignOptions();
+        campaignOptions.set(CampaignOption.ENABLE_INDIVIDUAL_KILL_AWARDS, isIndividualTracked);
+        campaignOptions.set(CampaignOption.ENABLE_FORMATION_KILL_AWARDS, isFormationTracked);
+
+        Award award = new Award("Kill Award", AWARD_SET, "", "", List.of(), List.of(), List.of(), 0, 0, false, 5,
+              "Kill", size, "Mission", 0);
+
+        assertEquals(expected, AutoAwardsController.isKillAwardTracked(campaignOptions, award));
+    }
+
+    @Test
+    void graduationAwardsWaitForAutoAwardsToBeEnabled() {
+        CampaignOptions campaignOptions = new CampaignOptions();
+        campaignOptions.set(CampaignOption.ENABLE_AUTO_AWARDS, false);
+
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+
+        new AutoAwardsController().PostGraduationController(campaign, List.of(UUID.randomUUID()), new HashMap<>());
+
+        verify(campaign, only()).getCampaignOptions();
     }
 }

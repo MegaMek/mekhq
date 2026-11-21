@@ -321,7 +321,7 @@ public class MiscAwards {
                 final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.AutoAwardsDialog",
                       MekHQ.getMHQOptions().getLocale());
 
-                campaign.addReport(PERSONNEL, String.format(resources.getString("supportPersonOfTheYear.tex"),
+                campaign.addReport(PERSONNEL, String.format(resources.getString("supportPersonOfTheYear.text"),
                       campaign.getPlayerForce().getHumanResources().getPerson(person).getHyperlinkedFullTitle(),
                       award.getName(),
                       award.getSet()));
