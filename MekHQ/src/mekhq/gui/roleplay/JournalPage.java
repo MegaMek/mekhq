@@ -33,11 +33,11 @@
 package mekhq.gui.roleplay;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.baseComponents.hud.Hud.column;
+import static mekhq.gui.baseComponents.hud.Hud.escape;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
-import static mekhq.gui.roleplay.AskPage.column;
 import static mekhq.gui.roleplay.AskPage.rightButtonRow;
 import static mekhq.gui.roleplay.OracleConsole.RESOURCE_BUNDLE;
-import static mekhq.gui.roleplay.OracleConsole.escape;
 import static mekhq.gui.roleplay.OracleConsole.formatDate;
 import static mekhq.gui.roleplay.ThreadsPage.onChange;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;

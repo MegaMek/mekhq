@@ -162,7 +162,7 @@ class ContractExportDialog extends JDialog {
     }
 
     private JComponent buildBody() {
-        JPanel body = MarketHud.column();
+        JPanel body = Hud.column();
         body.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(14), scaleForGUI(14), scaleForGUI(10),
               scaleForGUI(14)));
 
@@ -188,7 +188,7 @@ class ContractExportDialog extends JDialog {
         body.add(leftAligned(offersHeading));
         body.add(Box.createVerticalStrut(scaleForGUI(5)));
 
-        JPanel list = MarketHud.column();
+        JPanel list = Hud.column();
         list.setOpaque(true);
         list.setBackground(SURFACE_DEEP);
         list.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(6), scaleForGUI(8), scaleForGUI(6),
@@ -197,7 +197,7 @@ class ContractExportDialog extends JDialog {
             list.add(leftAligned(checkBox));
             list.add(Box.createVerticalStrut(scaleForGUI(3)));
         }
-        JScrollPane scroll = new JScrollPane(MarketHud.topAligned(list));
+        JScrollPane scroll = new JScrollPane(Hud.topAligned(list));
         Hud.styleScroll(scroll, SURFACE_DEEP, true);
         scroll.setHorizontalScrollBarPolicy(ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
 

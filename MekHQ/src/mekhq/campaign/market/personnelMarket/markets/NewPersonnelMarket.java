@@ -78,6 +78,8 @@ import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.records.HiringCostBreakdown;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.RecruitmentCosts;
+import mekhq.campaign.personnel.RecruitmentCosts.RecruitmentCostBreakdown;
 import mekhq.campaign.personnel.enums.ConnectionsLevel;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
@@ -104,11 +106,11 @@ public class NewPersonnelMarket {
 
     @SuppressWarnings(value = "FieldCanBeLocal")
     private static final int RARE_PROFESSION_WEIGHT = 20;
-    private static int lowPopulationRecruitmentDivider = 1;
-    private static int unitReputationRecruitmentCutoff = Integer.MIN_VALUE;
     @SuppressWarnings(value = "FieldCanBeLocal")
     private static final int PROFESSION_EXTINCTION_IGNORE_VALUE = -1;
     static final double MINIMUM_APPLICANT_MULTIPLIER = 0.1;
+    /** The most days a month can have, and so the most base recruitment rolls */
+    static final int MAXIMUM_DAYS_IN_MONTH = 31;
 
     private Campaign campaign;
     private PersonnelMarketStyle associatedPersonnelMarketStyle = PERSONNEL_MARKET_DISABLED;
@@ -409,51 +411,29 @@ public class NewPersonnelMarket {
     }
 
     /**
-     * Gets the recruitment divider value for low population systems.
+     * Gets the population below which a system gives fewer recruitment rolls. Each market style sets its own; this base
+     * market has no population limit.
      *
-     * @return recruitment divider integer
+     * @return the population threshold, as a recruitment divider
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public static int getLowPopulationRecruitmentDivider() {
-        return lowPopulationRecruitmentDivider;
+    public int getLowPopulationRecruitmentDivider() {
+        return 1;
     }
 
     /**
-     * Sets the recruitment divider for low population systems.
+     * Gets the reputation below which only mercenaries and pirates will join. Each market style sets its own; this base
+     * market has no reputation limit.
      *
-     * @param divider recruitment divider to set
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    public static void setLowPopulationRecruitmentDivider(int divider) {
-        lowPopulationRecruitmentDivider = divider;
-    }
-
-    /**
-     * Gets the unit reputation cutoff value for recruitment.
-     *
-     * @return reputation cutoff threshold
+     * @return the reputation cutoff
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public static int getUnitReputationRecruitmentCutoff() {
-        return unitReputationRecruitmentCutoff;
-    }
-
-    /**
-     * Sets the cutoff value for unit reputation in recruitment eligibility.
-     *
-     * @param cutoff reputation cutoff to set
-     *
-     * @author Illiani
-     * @since 0.50.06
-     */
-    public static void setUnitReputationRecruitmentCutoff(int cutoff) {
-        unitReputationRecruitmentCutoff = cutoff;
+    public int getUnitReputationRecruitmentCutoff() {
+        return Integer.MIN_VALUE;
     }
 
     /**
@@ -799,6 +779,22 @@ public class NewPersonnelMarket {
     public void addRarePerson(UUID personId) {
         if (personId != null) {
             rarePersonnel.add(personId);
+        }
+    }
+
+    /**
+     * Stops treating an applicant as rare, such as once they have been hired. If they were rare, one listing of their
+     * profession is dropped from the rare professions too, so the profession is only flagged while a rare applicant
+     * for it remains.
+     *
+     * @param applicant the applicant
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void removeRarePerson(Person applicant) {
+        if (applicant != null && rarePersonnel.remove(applicant.getId())) {
+            rareProfessions.remove(applicant.getPrimaryRole());
         }
     }
 
@@ -1238,6 +1234,31 @@ public class NewPersonnelMarket {
     }
 
     /**
+     * Gets the most recruitment rolls this market could make in a month, for showing this month's rolls against. The
+     * base rules make one roll per day of the month, plus any rolls from the commander's Connections, multiplied by
+     * the Applicant Multiplier.
+     *
+     * @return the most recruitment rolls possible in a month
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getMaximumRecruitmentRolls() {
+        return applyApplicantMultiplier(MAXIMUM_DAYS_IN_MONTH + getMaximumConnectionsRolls());
+    }
+
+    /**
+     * @return the most extra recruitment rolls the commander's Connections can add, or {@code 0} if monthly Connections
+     *       checks are off
+     */
+    int getMaximumConnectionsRolls() {
+        if (campaign == null || !campaign.getCampaignOptions().get(CampaignOption.ALLOW_MONTHLY_CONNECTIONS)) {
+            return 0;
+        }
+        return ConnectionsLevel.CONNECTIONS_TEN.getRecruits();
+    }
+
+    /**
      * Scales the supplied number of recruitment rolls by {@link CampaignOption#PERSONNEL_MARKET_APPLICANT_MULTIPLIER}.
      *
      * <p>The multiplier is treated as being at least {@link #MINIMUM_APPLICANT_MULTIPLIER}.</p>
@@ -1366,12 +1387,23 @@ public class NewPersonnelMarket {
         logger.info("Load Rare Personnel Nodes Complete!");
     }
 
+    /**
+     * Gets the cost of hiring an applicant from this market.
+     *
+     * @param applicant the applicant
+     *
+     * @return the hiring cost; the total of {@link #getHiringCostBreakdown(Person)}
+     */
     public Money getHiringCost(Person applicant) {
-        return Money.zero();
+        return getHiringCostBreakdown(applicant).total();
     }
 
     /**
      * Gets the cost of hiring an applicant, split by part, so the hiring hall can show how it is made up.
+     *
+     * <p>Every market charges what Pay for Recruitment would: nothing if it is off, otherwise the recruitment cost
+     * from {@link RecruitmentCosts}. A market may add its own extras on top, as the MekHQ market adds a Golden
+     * Hello.</p>
      *
      * @param applicant the applicant
      *
@@ -1381,6 +1413,32 @@ public class NewPersonnelMarket {
      * @since 0.51.01
      */
     public HiringCostBreakdown getHiringCostBreakdown(Person applicant) {
-        return HiringCostBreakdown.free();
+        return getRecruitmentCostBreakdown(applicant, Money.zero());
+    }
+
+    /**
+     * Gets the recruitment cost of an applicant under the campaign's Pay for Recruitment rules, plus an extra charged
+     * whatever those rules are.
+     *
+     * <p>The market charges this itself when an applicant is hired, so recruiting them afterwards does not charge Pay
+     * for Recruitment a second time.</p>
+     *
+     * @param applicant the applicant
+     * @param extra     an extra cost charged on top, such as a Golden Hello; zero for none
+     *
+     * @return nothing but the extra if Pay for Recruitment is off; otherwise the applicant's
+     *       {@link RecruitmentCosts#getRecruitmentCostBreakdown recruitment cost} plus the extra
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    HiringCostBreakdown getRecruitmentCostBreakdown(Person applicant, Money extra) {
+        if (campaign == null || !campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_RECRUITMENT)) {
+            return new HiringCostBreakdown(Money.zero(), null, extra);
+        }
+
+        // Priced as any other recruit would be, so the market and Pay for Recruitment never quote different prices
+        RecruitmentCostBreakdown recruitmentCost = RecruitmentCosts.getRecruitmentCostBreakdown(campaign, applicant);
+        return new HiringCostBreakdown(recruitmentCost.salaryCost(), recruitmentCost.trainingCost(), extra);
     }
 }

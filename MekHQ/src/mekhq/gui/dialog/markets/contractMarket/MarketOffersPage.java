@@ -191,11 +191,11 @@ final class MarketOffersPage {
         JPanel exchangeFoot = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(5), scaleForGUI(3)));
         exchangeFoot.add(exportButton);
         exchangeFoot.add(importButton);
-        JPanel feet = MarketHud.column();
+        JPanel feet = Hud.column();
         feet.add(HudStyle.leftAligned(boardFoot));
         feet.add(HudStyle.leftAligned(exchangeFoot));
 
-        JPanel boardTop = MarketHud.column();
+        JPanel boardTop = Hud.column();
         boardTop.add(HudStyle.leftAligned(searchStrip));
         boardTop.add(Box.createVerticalStrut(scaleForGUI(8)));
         boardTop.add(HudStyle.leftAligned(sortRow));
@@ -309,7 +309,7 @@ final class MarketOffersPage {
         String titleKey = marketDisabled ? "empty.contractMarket.disabled.title" : "empty.contractMarket.title";
         String bodyKey = marketDisabled ? "empty.contractMarket.disabled.body" : "empty.contractMarket.body";
 
-        JPanel text = MarketHud.column();
+        JPanel text = Hud.column();
         JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, titleKey).toUpperCase(Locale.ROOT));
         title.setForeground(ACCENT_BRIGHT);
         title.setFont(hudFont(Font.BOLD, 0.95f, 0.12f));
@@ -318,7 +318,7 @@ final class MarketOffersPage {
         text.add(HudStyle.leftAligned(MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE, bodyKey), TEXT_MUTED,
               Font.PLAIN, 0.92f)));
 
-        JPanel notice = MarketHud.framedSurface(18);
+        JPanel notice = Hud.framedSurface(18);
         notice.add(text, BorderLayout.CENTER);
 
         JPanel holder = Hud.transparentPanel(new BorderLayout());
@@ -390,14 +390,14 @@ final class MarketOffersPage {
                   contract.getLengthInMonths()));
 
             StringBuilder html = new StringBuilder("<html><b style='color:").append(hex(TEXT)).append("'>")
-                                       .append(MarketHud.escape(marketName(contract))).append("</b><br>")
+                                       .append(Hud.escape(marketName(contract))).append("</b><br>")
                                        .append("<span style='color:").append(hex(TEXT_MUTED))
-                                       .append("'>").append(MarketHud.escape(String.join(separator, parts)))
+                                       .append("'>").append(Hud.escape(String.join(separator, parts)))
                                        .append("</span>");
             List<String> badges = new ArrayList<>();
             for (MarketBadge badge : ContractMarketFormatting.badges(contract)) {
                 badges.add("<span style='color:" + hex(badge.color()) + "'>"
-                                 + MarketHud.escape(badge.text().toUpperCase(Locale.ROOT)) + "</span>");
+                                 + Hud.escape(badge.text().toUpperCase(Locale.ROOT)) + "</span>");
             }
             if (!badges.isEmpty()) {
                 html.append("<br><span><b>").append(String.join(separator, badges))

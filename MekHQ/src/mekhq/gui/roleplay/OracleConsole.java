@@ -33,6 +33,7 @@
 package mekhq.gui.roleplay;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.baseComponents.hud.Hud.escape;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -790,10 +791,6 @@ public class OracleConsole extends JDialog {
 
     static String formatDate(final LocalDate date) {
         return MekHQ.getMHQOptions().getDisplayFormattedDate(date);
-    }
-
-    static String escape(final String text) {
-        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     // endregion Shared helpers

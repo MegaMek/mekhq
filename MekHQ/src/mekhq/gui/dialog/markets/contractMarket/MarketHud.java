@@ -33,33 +33,32 @@
 package mekhq.gui.dialog.markets.contractMarket;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT_BRIGHT;
-import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
-import static mekhq.gui.baseComponents.hud.HudStyle.DIVIDER;
-import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE;
 import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE_HIGHLIGHT;
-import static mekhq.gui.baseComponents.hud.HudStyle.TEXT;
-import static mekhq.gui.baseComponents.hud.HudStyle.TEXT_FAINT;
 import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 import static mekhq.gui.baseComponents.hud.HudStyle.translucent;
 
 import java.awt.*;
-import java.awt.image.BufferedImage;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import javax.swing.*;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
 
-import jakarta.annotation.Nullable;
-import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudStyle;
 
 /**
  * Layout pieces shared by the contract market's board, dossier and comparison, built on the HUD kit in the style of the
- * Oracle Console: label-and-value rows, compact readouts, outlined badges, the difficulty pip meter and small painted
- * icons. Colours and fonts come from {@link HudStyle}.
+ * Oracle Console: compact readouts, wrapped text, the difficulty pip meter, small painted icons and the layouts that
+ * wrap columns to the window's width. The general pieces (columns, scroll panes, label-and-value sections, badges and
+ * portraits) are in {@link Hud}. Colours and fonts come from {@link HudStyle}.
  *
  * @author Illiani
  * @since 0.51.01
@@ -72,123 +71,8 @@ final class MarketHud {
 
     // region Containers
 
-    /** @return a transparent panel that stacks its children vertically */
-    static JPanel column() {
-        JPanel column = Hud.transparentPanel(null);
-        column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
-        return column;
-    }
-
     /**
-     * Wraps content in a HUD scroll pane that only scrolls vertically: the content is pinned to the top and always
-     * fits the pane's width, so wrapped text reflows instead of scrolling sideways.
-     *
-     * @param content    the content
-     * @param background the colour behind the content
-     */
-    static JScrollPane scroll(JComponent content, Color background) {
-        JPanel holder = new WidthTrackingPanel();
-        holder.setOpaque(true);
-        holder.setBackground(background);
-        holder.add(content, BorderLayout.NORTH);
-        JScrollPane scroll = new JScrollPane(holder);
-        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        Hud.styleScroll(scroll, background, false);
-        return scroll;
-    }
-
-    /**
-     * A label-and-value section: a section heading over rows added with {@link #addRow}.
-     *
-     * @param heading the section's heading
-     */
-    static JPanel section(String heading) {
-        JPanel section = Hud.transparentPanel(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 2;
-        constraints.weightx = 1.0;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(0, 0, scaleForGUI(4), 0);
-        section.add(Hud.sectionHeading(heading), constraints);
-        return section;
-    }
-
-    /**
-     * Adds one label-and-value row to a {@link #section}, with a hairline divider beneath it.
-     *
-     * @param section    the section
-     * @param label      the faint label on the left
-     * @param value      the value on the right
-     * @param valueColor the value's colour, or {@code null} for the standard text colour
-     * @param toolTip    a tooltip for the whole row, or {@code null}
-     * @param emphasize  {@code true} to draw the row in bold, for totals
-     */
-    static void addRow(JPanel section, String label, String value, @Nullable Color valueColor,
-          @Nullable String toolTip, boolean emphasize) {
-        int row = section.getComponentCount();
-        Color divider = DIVIDER;
-
-        JLabel labelComponent = new JLabel(label);
-        labelComponent.setForeground(emphasize ? TEXT : TEXT_FAINT);
-        labelComponent.setFont(hudFont(emphasize ? Font.BOLD : Font.PLAIN, 0.9f, 0.0f));
-        labelComponent.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, divider),
-              BorderFactory.createEmptyBorder(scaleForGUI(3), 0, scaleForGUI(3), scaleForGUI(10))));
-
-        JLabel valueComponent = new JLabel(value, SwingConstants.RIGHT);
-        valueComponent.setForeground(valueColor == null ? TEXT : valueColor);
-        valueComponent.setFont(hudFont(emphasize ? Font.BOLD : Font.PLAIN, emphasize ? 0.96f : 0.9f, 0.0f));
-        valueComponent.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, divider),
-              BorderFactory.createEmptyBorder(scaleForGUI(3), 0, scaleForGUI(3), 0)));
-        // Long values (an opposition's full name, say) are cut short in a narrow column rather than pushing it wider;
-        // a label's minimum width is otherwise its whole text. The tooltip keeps them readable.
-        valueComponent.setMinimumSize(new Dimension(scaleForGUI(24), valueComponent.getPreferredSize().height));
-        valueComponent.setToolTipText(toolTip == null ? value : toolTip);
-        if (toolTip != null) {
-            labelComponent.setToolTipText(toolTip);
-        }
-
-        GridBagConstraints labelConstraints = new GridBagConstraints();
-        labelConstraints.gridx = 0;
-        labelConstraints.gridy = row;
-        labelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        labelConstraints.anchor = GridBagConstraints.WEST;
-        section.add(labelComponent, labelConstraints);
-
-        GridBagConstraints valueConstraints = new GridBagConstraints();
-        valueConstraints.gridx = 1;
-        valueConstraints.gridy = row;
-        valueConstraints.weightx = 1.0;
-        valueConstraints.fill = GridBagConstraints.HORIZONTAL;
-        valueConstraints.anchor = GridBagConstraints.EAST;
-        section.add(valueComponent, valueConstraints);
-    }
-
-    /**
-     * Adds a full-width component, such as a cost bar or a wrapped caveat, beneath a {@link #section}'s rows.
-     *
-     * @param section the section
-     * @param content the component
-     * @param top     the gap above it, before scaling
-     */
-    static void addSpanning(JPanel section, JComponent content, int top) {
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = section.getComponentCount();
-        constraints.gridwidth = 2;
-        constraints.weightx = 1.0;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(scaleForGUI(top), 0, 0, 0);
-        section.add(content, constraints);
-    }
-
-    /**
-     * Pins a {@link #section} to the top of its cell, like {@link #topAligned}, and asks for enough width that no
+     * Pins a {@link Hud#section} to the top of its cell, like {@link Hud#topAligned}, and asks for enough width that no
      * row's label or value is ever cut short. {@link ColumnWrapLayout} honours that width. Use it for sections whose
      * values must always be read whole, such as figures; leave out sections with long names that can safely be cut
      * short.
@@ -196,13 +80,13 @@ final class MarketHud {
      * @param section the section
      */
     static JPanel topAlignedWhole(JPanel section) {
-        JPanel holder = topAligned(section);
+        JPanel holder = Hud.topAligned(section);
         holder.setMinimumSize(new Dimension(labelValueWidth(section), 0));
         return holder;
     }
 
     /**
-     * @return the width a {@link #section}'s label-and-value rows need to show every label and value in full: the
+     * @return the width a {@link Hud#section}'s label-and-value rows need to show every label and value in full: the
      *       widest label beside the widest value, as the section's two columns line up
      */
     private static int labelValueWidth(JPanel section) {
@@ -225,15 +109,6 @@ final class MarketHud {
             }
         }
         return labelWidth + valueWidth;
-    }
-
-    /**
-     * Pins a section to the top of a grid cell, so a short column does not stretch to match a tall neighbour.
-     */
-    static JPanel topAligned(JComponent content) {
-        JPanel holder = Hud.transparentPanel(new BorderLayout());
-        holder.add(content, BorderLayout.NORTH);
-        return holder;
     }
 
     // endregion Containers
@@ -268,25 +143,6 @@ final class MarketHud {
     }
 
     /**
-     * An outlined, tracked badge such as "Batchall" or "Proving Ground", explained on hover.
-     *
-     * @param text    the badge's text
-     * @param color   the text and outline colour
-     * @param toolTip what the badge means, or {@code null}
-     */
-    static JLabel badge(String text, Color color, @Nullable String toolTip) {
-        JLabel badge = new JLabel(text.toUpperCase(Locale.ROOT));
-        badge.setForeground(color);
-        badge.setFont(hudFont(Font.BOLD, 0.68f, 0.12f));
-        badge.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(color, scaleForGUI(1)),
-              BorderFactory.createEmptyBorder(scaleForGUI(2), scaleForGUI(7), scaleForGUI(2), scaleForGUI(7))));
-        if (toolTip != null) {
-            badge.setToolTipText(wrapToolTip(toolTip));
-        }
-        return badge;
-    }
-
-    /**
      * Read-only text that wraps to whatever width its container gives it.
      *
      * @param text  the text
@@ -307,86 +163,6 @@ final class MarketHud {
         // Read-only text never needs its caret on screen, and a caret that follows the text would scroll the page.
         ((DefaultCaret) area.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         return area;
-    }
-
-    /**
-     * A square portrait of a person, or a blank square of the same size when there is no one to show. A person without
-     * a portrait of their own shows their origin faction's logo instead, tinted to the HUD's highlight colour.
-     *
-     * @param person the person, or {@code null}
-     * @param size   the scaled edge length
-     */
-    static JLabel portrait(@Nullable Person person, int size) {
-        JLabel portrait = new JLabel();
-        portrait.setPreferredSize(new Dimension(size, size));
-        portrait.setMinimumSize(new Dimension(size, size));
-        portrait.setOpaque(true);
-        portrait.setBackground(SURFACE_HIGHLIGHT);
-        portrait.setBorder(BorderFactory.createLineBorder(HudStyle.BORDER_CYAN, scaleForGUI(1)));
-        if (person != null) {
-            ImageIcon icon = person.getPortraitImageIconWithFallback(true);
-            if (icon != null) {
-                ImageIcon scaled = new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
-                portrait.setIcon(person.hasDefaultPortrait() ? tinted(scaled, ACCENT_BRIGHT) : scaled);
-            }
-        }
-        return portrait;
-    }
-
-    /**
-     * Recolours an image in one hue, keeping its shading: each pixel takes the tint scaled by its brightness relative
-     * to the image's brightest opaque pixel, so the lightest parts land exactly on the tint, and its alpha is kept.
-     *
-     * @param icon the (loaded) image to recolour
-     * @param tint the colour the brightest parts take
-     */
-    static ImageIcon tinted(ImageIcon icon, Color tint) {
-        int width = icon.getIconWidth();
-        int height = icon.getIconHeight();
-        if (width <= 0 || height <= 0) {
-            return icon;
-        }
-        BufferedImage image = new BufferedImage(width, height, BufferedImage.TYPE_INT_ARGB);
-        Graphics2D graphics = image.createGraphics();
-        graphics.drawImage(icon.getImage(), 0, 0, null);
-        graphics.dispose();
-
-        int[] pixels = image.getRGB(0, 0, width, height, null, 0, width);
-        double brightest = 0;
-        for (int pixel : pixels) {
-            if ((pixel >>> 24) > 0) {
-                brightest = Math.max(brightest, luminance(pixel));
-            }
-        }
-        if (brightest <= 0) {
-            brightest = 255;
-        }
-        for (int i = 0; i < pixels.length; i++) {
-            int alpha = pixels[i] >>> 24;
-            double level = Math.min(1.0, luminance(pixels[i]) / brightest);
-            pixels[i] = (alpha << 24)
-                              | ((int) Math.round(tint.getRed() * level) << 16)
-                              | ((int) Math.round(tint.getGreen() * level) << 8)
-                              | (int) Math.round(tint.getBlue() * level);
-        }
-        image.setRGB(0, 0, width, height, pixels, 0, width);
-        return new ImageIcon(image);
-    }
-
-    private static double luminance(int argb) {
-        return 0.2126 * ((argb >> 16) & 0xFF) + 0.7152 * ((argb >> 8) & 0xFF) + 0.0722 * (argb & 0xFF);
-    }
-
-    /** @return the tooltip wrapped to a comfortable reading width */
-    static String wrapToolTip(String toolTip) {
-        return "<html><div style='width:" + scaleForGUI(280) + "px'>" + escape(toolTip) + "</div></html>";
-    }
-
-    static String escape(@Nullable String text) {
-        if (text == null) {
-            return "";
-        }
-        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     // endregion Pieces
@@ -519,7 +295,7 @@ final class MarketHud {
 
     /**
      * A layout whose arrangement follows the container's actual width, such as content that wraps into rows when it
-     * is too narrow to sit side by side. Use it where something above sets that width, such as a {@link #scroll}
+     * is too narrow to sit side by side. Use it where something above sets that width, such as a {@link Hud#scroll}
      * pane's content.
      *
      * <p>Swing measures a container's preferred height before it knows the width it will get, so after a resize the
@@ -626,7 +402,7 @@ final class MarketHud {
      * needs the layout's minimum column width, or more when its own minimum width has been set (as
      * {@link #topAlignedWhole} does). A full row shares its spare width equally; a column in a shorter, last row is as
      * wide as an even share of a full row, or its own need if that is wider. Each column is as tall as its row's
-     * tallest, so wrap columns in {@link #topAligned} to keep a short one pinned to the top.
+     * tallest, so wrap columns in {@link Hud#topAligned} to keep a short one pinned to the top.
      */
     static final class ColumnWrapLayout extends WidthDrivenLayout {
         private final int minimumColumnWidth;
@@ -732,7 +508,7 @@ final class MarketHud {
      * Lays out a main component with a fixed-width side component to its right while the main one keeps at least its
      * minimum width, and with the side component beneath it, at its own width, when it would not. The first component
      * is the main one, the second the side one. Side by side, both are as tall as the taller, so wrap the side
-     * component in {@link #topAligned} to keep it pinned to the top.
+     * component in {@link Hud#topAligned} to keep it pinned to the top.
      */
     static final class SidebarWrapLayout extends WidthDrivenLayout {
         private final int minimumMainWidth;
@@ -797,48 +573,5 @@ final class MarketHud {
             }
             return mainHeight + verticalGap + sideSize.height;
         }
-    }
-
-    /** A scroll pane's content that always fits the pane's width, so only vertical scrolling is ever needed. */
-    static final class WidthTrackingPanel extends JPanel implements Scrollable {
-        WidthTrackingPanel() {
-            super(new BorderLayout());
-        }
-
-        @Override
-        public Dimension getPreferredScrollableViewportSize() {
-            return getPreferredSize();
-        }
-
-        @Override
-        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return scaleForGUI(16);
-        }
-
-        @Override
-        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return visibleRect.height;
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportWidth() {
-            return true;
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportHeight() {
-            return false;
-        }
-    }
-
-    /** @return a hairline-bordered surface panel, for setting off one block such as an empty-state notice */
-    static JPanel framedSurface(int padding) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(true);
-        panel.setBackground(SURFACE);
-        int inset = scaleForGUI(padding);
-        panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(BORDER, scaleForGUI(1)),
-              BorderFactory.createEmptyBorder(inset, inset, inset, inset)));
-        return panel;
     }
 }

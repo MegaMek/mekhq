@@ -35,13 +35,13 @@ package mekhq.gui.roleplay;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static megamek.common.compute.Compute.randomInt;
+import static mekhq.gui.baseComponents.hud.Hud.column;
+import static mekhq.gui.baseComponents.hud.Hud.escape;
+import static mekhq.gui.baseComponents.hud.Hud.scroll;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
-import static mekhq.gui.roleplay.AskPage.column;
 import static mekhq.gui.roleplay.AskPage.heading;
 import static mekhq.gui.roleplay.AskPage.rightButtonRow;
-import static mekhq.gui.roleplay.AskPage.scroll;
 import static mekhq.gui.roleplay.OracleConsole.RESOURCE_BUNDLE;
-import static mekhq.gui.roleplay.OracleConsole.escape;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 

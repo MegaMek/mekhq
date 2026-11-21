@@ -275,7 +275,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         String locationName = currentSystem != null
                                     ? currentSystem.getName(currentDate)
                                     : getTextAt(RESOURCE_BUNDLE, "header.contractMarket.location.unknown");
-        JPanel identity = MarketHud.column();
+        JPanel identity = Hud.column();
         identity.add(HudStyle.leftAligned(Hud.eyebrow(getFormattedTextAt(RESOURCE_BUNDLE,
               "header.contractMarket.eyebrow",
               locationName,
@@ -295,7 +295,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         int reputation = campaign.getPlayerForce().getReputationRating(useChaosReputation);
         JPanel reputationReadout = MarketHud.readout(getTextAt(RESOURCE_BUNDLE, "readout.contractMarket.reputation"),
               Integer.toString(reputation), AMBER, SURFACE_DEEP);
-        reputationReadout.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+        reputationReadout.setToolTipText(Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
               "readout.contractMarket.reputation.tooltip")));
         Money balance = campaign.getPlayerForce().getFinances().getBalance();
         JPanel fundsReadout = MarketHud.readout(getTextAt(RESOURCE_BUNDLE, "readout.contractMarket.funds"),
@@ -372,7 +372,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
                                                       .toUpperCase(Locale.ROOT), false);
         // A GM tool, like creating an offer by hand: armed only in GM mode, with a tooltip saying why when it is not.
         shellContract.setArmed(isGM());
-        shellContract.setToolTipText(MarketHud.wrapToolTip(MarketOffersPage.gmToolTip(isGM(),
+        shellContract.setToolTipText(Hud.wrapToolTip(MarketOffersPage.gmToolTip(isGM(),
               "button.contractMarket.shellContract.tooltip")));
         shellContract.addActionListener(event -> createShellContract());
 
@@ -484,7 +484,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     private static String pageLabel(MarketPage marketPage, int count) {
-        return "<html>" + MarketHud.escape(marketPage.label().toUpperCase(Locale.ROOT))
+        return "<html>" + Hud.escape(marketPage.label().toUpperCase(Locale.ROOT))
                      + "&nbsp;&nbsp;<span style='color:" + hex(ACCENT_BRIGHT) + "'>" + count + "</span></html>";
     }
 
@@ -932,7 +932,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
                   .append("<ul>");
             for (ContractImportPlan.Placement placement : moved) {
                 summary.append("<li>")
-                      .append(MarketHud.escape(offerName(placement.contract().getName())))
+                      .append(Hud.escape(offerName(placement.contract().getName())))
                       .append(separator)
                       .append(getFormattedTextAt(RESOURCE_BUNDLE, "import.contractMarket.moved.entry",
                             searchTypeLabel(placement.listedBoard()), searchTypeLabel(placement.board())))
@@ -947,7 +947,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
                   .append("<ul>");
             for (ContractExchange.SkippedOffer skipped : plan.skipped()) {
                 summary.append("<li>")
-                      .append(MarketHud.escape(offerName(skipped.name())))
+                      .append(Hud.escape(offerName(skipped.name())))
                       .append(separator)
                       .append(getTextAt(RESOURCE_BUNDLE, "import.contractMarket.skipped." + skipped.reason().name()))
                       .append("</li>");

@@ -36,6 +36,7 @@ import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 
+import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -90,14 +91,31 @@ public final class RecruitmentCosts {
      * @since 0.51.01
      */
     public static Money getRecruitmentCost(Campaign campaign, Person person) {
+        return getRecruitmentCostBreakdown(campaign, person).total();
+    }
+
+    /**
+     * As {@link #getRecruitmentCost(Campaign, Person)}, split into its salary-based and training-based parts, so
+     * anything that shows the cost can show how it is made up.
+     *
+     * @param campaign the campaign
+     * @param person   the recruit
+     *
+     * @return the recruitment cost, by part
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static RecruitmentCostBreakdown getRecruitmentCostBreakdown(Campaign campaign, Person person) {
         if (isUsingTrainingBasedCost(campaign.getCampaignOptions())) {
-            return getTrainingBasedCost(campaign, person);
+            return new RecruitmentCostBreakdown(Money.zero(), getTrainingBasedCostBreakdown(campaign, person));
         }
 
-        return person.getSalary(campaign.getCampaignOptions(),
+        Money salaryCost = person.getSalary(campaign.getCampaignOptions(),
                     campaign.getPlayerForce().isClanForce(),
                     campaign.getLocalDate())
-                     .multipliedBy(SALARY_MONTHS);
+                                 .multipliedBy(SALARY_MONTHS);
+        return new RecruitmentCostBreakdown(salaryCost, null);
     }
 
     /**
@@ -152,6 +170,24 @@ public final class RecruitmentCosts {
         }
 
         return new TrainingCostBreakdown(skillCosts, spaCost);
+    }
+
+    /**
+     * A recruitment cost, split by part: either {@link #SALARY_MONTHS} months' salary, or a training-based cost.
+     *
+     * @param salaryCost   the salary-based cost; zero if the recruit is priced by their training
+     * @param trainingCost the training-based cost, or {@code null} if the recruit is priced by their salary
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public record RecruitmentCostBreakdown(Money salaryCost, @Nullable TrainingCostBreakdown trainingCost) {
+        /**
+         * @return the combined cost of every part
+         */
+        public Money total() {
+            return trainingCost == null ? salaryCost : salaryCost.plus(trainingCost.total());
+        }
     }
 
     /**
