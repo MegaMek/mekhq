@@ -128,7 +128,7 @@ public class SkillDeprecationTool {
             final String skillName = skillType.getName();
             if (skills.hasSkill(skillName)) {
                 int refundValue = getRefundValue(skills, skillType, skillName);
-                
+
                 // Reasoning cost changes should always take place before global changes
                 refundValue = (int) round(refundValue * reasoningXpMultiplier * xpCostMultiplier);
 
