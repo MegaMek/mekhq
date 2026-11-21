@@ -177,9 +177,6 @@ public class StratConRulesManager {
     private static final int AUTOMATIC_FACILITY_MODIFIER = 1;
     // a facility your employer holds answers a fight's draw for support only 1 time in this many
     public static final int EMPLOYER_LEND_DIE_SIZE = 2;
-    // what an enemy counterattack on a facility is fought in; see startCounterattackScenario
-    private static final List<String> COUNTERATTACK_SCENARIO_TEMPLATES = List.of("Base Defense.json",
-          "Hold Until Relief.json");
     // what an Interdict Supply order is fought in; see startInterdictionScenario
     private static final String INTERDICTION_SCENARIO_TEMPLATE = "Convoy Interdiction.json";
     // what an enemy relief force against besiegers is fought in; see startSiegeScenario
@@ -1897,10 +1894,11 @@ public class StratConRulesManager {
      *     <li>An <b>assault</b> is fought today.</li>
      * </ul>
      *
-     * <p>Both are fought in the Base Defense or Hold Until Relief template. Neither is ever a Crisis or a Turning Point,
-     * and neither ever pays the combat bonus, even on a facility that is a strategic objective. Formations already on
-     * the facility's hex are committed to it at once, as they would be to any scenario arising on their hex; otherwise
-     * the player has until the deployment deadline to send one. The facility's fate follows from the result (see
+     * <p>Both are fought in the Base Defense template, the mirror of the Hostile Facility template the player's own
+     * assaults on enemy facilities use. Neither is ever a Crisis or a Turning Point, and neither ever pays the combat
+     * bonus, even on a facility that is a strategic objective. Formations already on the facility's hex are committed
+     * to it at once, as they would be to any scenario arising on their hex; otherwise the player has until the
+     * deployment deadline to send one. The facility's fate follows from the result (see
      * {@code StratConFacilityOperations}), never from a facility-removing objective.</p>
      *
      * @param campaign    the current campaign
@@ -1923,13 +1921,9 @@ public class StratConRulesManager {
             return null;
         }
 
-        // An assault is fought in the same templates as a counterattack, only today: never with the allied facility
+        // An assault is fought in the same template as a counterattack, only today: never with the allied facility
         // objective, which would remove the facility when failed rather than hand it to the enemy.
-        ScenarioTemplate template = StratConScenarioFactory.getSpecificScenario(
-              getRandomItem(COUNTERATTACK_SCENARIO_TEMPLATES));
-        if (template == null) {
-            template = StratConScenarioFactory.getFacilityScenario(true);
-        }
+        ScenarioTemplate template = StratConScenarioFactory.getFacilityScenario(true);
         if (template == null) {
             return null;
         }
@@ -3280,7 +3274,8 @@ public class StratConRulesManager {
      *     <li>If no template is provided, a random template is chosen based on the unit type of the given force.</li>
      *     <li>The battle takes place {@code daysTilDeployment} days from today, or today if it is {@code null}.</li>
      *     <li>Global modifiers, facility modifiers, attached unit modifiers, and allied force modifiers
-     *         are applied as appropriate.</li>
+     *         are applied as appropriate. Random scenario modifiers are rolled only for a scenario that is not over a
+     *         facility.</li>
      *     <li>The scenario is marked as unresolved and is registered with the campaign and track.</li>
      * </ul>
      * This method also handles special conditions:
@@ -3393,8 +3388,14 @@ public class StratConRulesManager {
               restrictAlliedModifiers,
               restrictEnemyModifiers);
 
-        AtBDynamicScenarioFactory.setScenarioModifiers(campaign.getCampaignOptions(), scenario.getBackingScenario(),
-              restrictAlliedModifiers, restrictEnemyModifiers);
+        // A fight over a facility takes its forces from the facility and its supporters alone: a random modifier could
+        // otherwise put the wrong side's garrison on it, such as enemy turrets around the player's own base. The
+        // template is checked too, as a randomly rolled facility scenario has its facility placed only after this.
+        boolean isFacilityScenario = (facilityAtCoords != null) || template.isFacilityScenario();
+        if (!isFacilityScenario) {
+            AtBDynamicScenarioFactory.setScenarioModifiers(campaign.getCampaignOptions(), scenario.getBackingScenario(),
+                  restrictAlliedModifiers, restrictEnemyModifiers);
+        }
         scenario.setCurrentState(ScenarioState.UNRESOLVED);
 
         setScenarioDates((daysTilDeployment == null) ? 0 : daysTilDeployment, track, campaign, scenario);
