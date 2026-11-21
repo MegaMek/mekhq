@@ -63,6 +63,7 @@ import static mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation
 import static mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation.SpecificGroundTerrain;
 import static mekhq.campaign.personnel.PersonnelOptions.ADMIN_COORDINATOR;
 import static mekhq.campaign.personnel.PersonnelOptions.EDGE_RECON_FAIL;
+import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 import static mekhq.campaign.personnel.skills.SkillType.S_ADMIN;
 import static mekhq.campaign.personnel.skills.SkillType.S_TACTICS;
 import static mekhq.utilities.EntityUtilities.hasActiveProbe;
@@ -179,6 +180,12 @@ public class StratConRulesManager {
     // the facility templates' own turrets, and how many each garrison step fields; see scaleFacilityDefenses
     static final String FACILITY_DEFENSES_FORCE_NAME = "Base Defenses";
     static final int TURRETS_PER_GARRISON_STEP = 4;
+
+    /**
+     * The reinforcement target number modifier when there is no Admin, or the senior Admin lacks the Administration
+     * skill. This is one worse than an Ultra-Green Admin (+2).
+     */
+    public static final int NO_ADMINISTRATION_REINFORCEMENT_MODIFIER = 3;
 
     /**
      * What makes a particular lance eligible to be reinforcements for a scenario
@@ -2943,10 +2950,12 @@ public class StratConRulesManager {
         Skill skill = commandLiaison != null ? commandLiaison.getSkill(S_ADMIN) : null;
         int skillModifier;
         if (skill == null) {
-            skillModifier = 0;
+            // No Admin, or an Admin without the skill, is worse than an Ultra-Green one
+            skillModifier = NO_ADMINISTRATION_REINFORCEMENT_MODIFIER;
         } else {
+            // Both sides use the same experience-level scale, so a Regular Admin gives no modifier
             SkillModifierData skillModifierData = commandLiaison.getSkillModifierData();
-            skillModifier = REGULAR.getExperienceLevel() - skill.getExperienceLevel(skillModifierData);
+            skillModifier = EXP_REGULAR - skill.getExperienceLevel(skillModifierData);
         }
 
         // Admin Skill Modifier
