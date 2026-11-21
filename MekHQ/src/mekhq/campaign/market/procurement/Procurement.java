@@ -46,6 +46,7 @@ import megamek.common.enums.Era;
 import megamek.common.enums.SkillLevel;
 import megamek.common.enums.TechBase;
 import megamek.logging.MMLogger;
+import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.universe.Faction;
@@ -56,7 +57,7 @@ import mekhq.campaign.universe.Faction;
  * and scarcity of parts in a given time frame.
  */
 public class Procurement {
-    private final int negotiatorSkillRating;
+    private final SkillLevel negotiatorSkillLevel;
     private final int gameYear;
     private final Era techEra;
     private final Faction originFaction;
@@ -67,12 +68,13 @@ public class Procurement {
      * Procurement constructor. Initializes class instance with negotiator skill rating, game year, and originating
      * faction.
      *
-     * @param negotiatorSkillRating the skill rating of the negotiator.
-     * @param gameYear              the current year of the game.
-     * @param originFaction         the faction from where procurement is initiated.
+     * @param negotiatorSkillLevel the negotiator's Negotiation skill level, or {@link SkillLevel#NONE} if there is no
+     *                             negotiator.
+     * @param gameYear             the current year of the game.
+     * @param originFaction        the faction from where procurement is initiated.
      */
-    public Procurement(int negotiatorSkillRating, int gameYear, Faction originFaction) {
-        this.negotiatorSkillRating = negotiatorSkillRating;
+    public Procurement(SkillLevel negotiatorSkillLevel, int gameYear, Faction originFaction) {
+        this.negotiatorSkillLevel = negotiatorSkillLevel;
         this.gameYear = gameYear;
         this.originFaction = originFaction;
 
@@ -158,7 +160,7 @@ public class Procurement {
     private int getProcurementTargetNumber(Part part, boolean useHardExtinction, boolean isResupply) {
         // Get the base target number
         int targetNumber;
-        if (part instanceof AmmoBin) {
+        if (isConsumable(part)) {
             targetNumber = getConsumableBaseTargetNumber(part, useHardExtinction);
         } else {
             targetNumber = getBaseTargetNumber(part, useHardExtinction);
@@ -175,7 +177,7 @@ public class Procurement {
             }
         }
 
-        targetNumber += getNegotiatorModifier();
+        targetNumber += getNegotiatorModifier(negotiatorSkillLevel);
 
         if (isResupply) {
             targetNumber -= 2;
@@ -185,28 +187,33 @@ public class Procurement {
     }
 
     /**
-     * Returns negotiator modifier based on the negotiator's skill rating.
+     * Checks whether a part is ammunition, which uses the easier consumables target numbers. Ammunition to be bought
+     * arrives as {@link AmmoStorage}, the part ordered for an {@link AmmoBin}, so both count.
+     *
+     * @param part the part to check
+     *
+     * @return {@code true} if the part is ammunition
+     */
+    static boolean isConsumable(Part part) {
+        return part instanceof AmmoBin || part instanceof AmmoStorage;
+    }
+
+    /**
+     * Returns negotiator modifier based on the negotiator's skill level.
+     *
+     * @param negotiatorSkillLevel the negotiator's Negotiation skill level, or {@link SkillLevel#NONE} if there is no
+     *                             negotiator
      *
      * @return Modifier for the procurement process based on negotiator's skill level
      */
-    private int getNegotiatorModifier() {
-        if (negotiatorSkillRating == SkillLevel.NONE.ordinal()) {
-            return 4;
-        }
-
-        if (negotiatorSkillRating == SkillLevel.ULTRA_GREEN.ordinal()) {
-            return 3;
-        }
-
-        if (negotiatorSkillRating == SkillLevel.VETERAN.ordinal()) {
-            return -2;
-        }
-
-        if (negotiatorSkillRating >= SkillLevel.ELITE.ordinal()) {
-            return -3;
-        }
-
-        return 0;
+    static int getNegotiatorModifier(SkillLevel negotiatorSkillLevel) {
+        return switch (negotiatorSkillLevel) {
+            case NONE -> 4;
+            case ULTRA_GREEN -> 3;
+            case GREEN, REGULAR -> 0;
+            case VETERAN -> -2;
+            case ELITE, HEROIC, LEGENDARY -> -3;
+        };
     }
 
     /**
