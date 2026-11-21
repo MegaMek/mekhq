@@ -196,6 +196,7 @@ class CampaignXmlParserTest {
             forceDetachment = new Detachment();
             when(playerForce.getForceDetachment()).thenReturn(forceDetachment);
             when(playerForce.getPersonnel()).thenReturn(forceDetachment.getPersonnel());
+            when(playerForce.allPersonnel()).thenAnswer(invocation -> List.copyOf(forceDetachment.getPersonnel().values()));
 
             CampaignLocationManager locationManager = mock(CampaignLocationManager.class);
             when(campaign.getCampaignLocationManager()).thenReturn(locationManager);

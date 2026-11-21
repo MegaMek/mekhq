@@ -250,7 +250,7 @@ public enum Familiarity {
         }
 
         int familiarityCap = mode.getFamiliarityCap();
-        for (Unit unit : campaign.getPlayerForce().getHangar().getUnits()) {
+        for (Unit unit : campaign.getPlayerForce().allUnits()) {
             assignFamiliarity(campaign, unit, familiarityCap, familiaritySpeed, FamiliarityGainType.D6);
         }
     }

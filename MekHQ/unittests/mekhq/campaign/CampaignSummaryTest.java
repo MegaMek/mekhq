@@ -98,12 +98,10 @@ class CampaignSummaryTest {
 
     private static Campaign campaignWithEmptySummaryInputs() {
         Campaign campaign = mockCampaign();
-        LocalHangar hangar = mock(LocalHangar.class);
         CargoStatistics cargoStatistics = mock(CargoStatistics.class);
 
         when(campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)).thenReturn(List.of());
-        when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
-        when(hangar.getUnits()).thenReturn(List.of());
+        when(campaign.getPlayerForce().allUnits()).thenReturn(List.of());
         when(campaign.getActiveContracts()).thenReturn(List.of());
         when(campaign.getCargoStatistics()).thenReturn(cargoStatistics);
 

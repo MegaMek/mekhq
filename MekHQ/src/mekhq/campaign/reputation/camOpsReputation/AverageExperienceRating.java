@@ -44,9 +44,9 @@ import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.LocalHangar;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -122,8 +122,8 @@ public class AverageExperienceRating {
         int unitCount = 0;
         double totalExperience = 0;
 
-        LocalHangar hangar = campaign.getPlayerForce().getHangar();
-        List<CombatTeam> combatTeams = campaign.getPlayerForce().getCombatTeamsAsList(campaign);
+        PlayerForce playerForce = campaign.getPlayerForce();
+        List<CombatTeam> combatTeams = playerForce.getCombatTeamsAsList(campaign);
 
         if (combatTeams.isEmpty()) {
             return NO_CAMPAIGN_EXPERIENCE;
@@ -143,7 +143,7 @@ public class AverageExperienceRating {
                 continue;
             }
 
-            for (Unit unit : formation.getAllUnitsAsUnits(hangar, true)) {
+            for (Unit unit : formation.getAllForceUnitsAsUnits(playerForce, true)) {
                 // Support carriers are not combat units; their occupants are support personnel
                 if (unit.isCarrier()) {
                     continue;
