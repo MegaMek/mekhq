@@ -1087,8 +1087,6 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useEmployerLostPlanetReactions");
     public static final CampaignOption<Boolean> USE_FACILITY_OPERATIONS =
           of(Boolean.class, true, "useFacilityOperations");
-    public static final CampaignOption<Double> ENEMY_FACILITY_ACTIVITY =
-          of(Double.class, 1.0, "enemyFacilityActivity");
     public static final CampaignOption<Boolean> USE_SUPPLY_LINES =
           of(Boolean.class, true, "useSupplyLines");
     public static final CampaignOption<Double> FACILITY_DENSITY =

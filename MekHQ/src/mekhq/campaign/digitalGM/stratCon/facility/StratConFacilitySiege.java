@@ -163,7 +163,7 @@ public final class StratConFacilitySiege {
         StratConFacilityOperations.report(campaign, "report.siege.started", facility.getDisplayableName());
 
         if (isFirstBesieger) {
-            tryRelief(campaign, contract, track, coords, formationId);
+            tryRelief(campaign, contract, track, coords, formationId, Compute.randomInt(100));
         }
     }
 
@@ -178,6 +178,7 @@ public final class StratConFacilitySiege {
      * @param track       the sector
      * @param coords      the besieged facility's hex
      * @param formationId the ID of the besieging formation the relief force falls on
+     * @param reliefRoll  a roll from 0 to 99 (see {@link StratConEnemyFacilityActivity#isReliefSent})
      *
      * @return the relief force's scenario, or {@code null} if none came
      *
@@ -185,15 +186,13 @@ public final class StratConFacilitySiege {
      * @since 0.51.01
      */
     static @Nullable StratConScenario tryRelief(Campaign campaign, AbstractContract contract,
-          StratConTrackState track, StratConCoords coords, int formationId) {
+          StratConTrackState track, StratConCoords coords, int formationId, int reliefRoll) {
         StratConCampaignState campaignState = contract.getStratConCampaignState();
         if ((campaignState == null) || StratConFacilitySupply.isCutOff(track, coords)) {
             return null;
         }
 
-        boolean isRelieved = StratConEnemyFacilityActivity.isReliefSent(
-              StratConEnemyFacilityActivity.getActivity(campaign),
-              Compute.randomInt(100));
+        boolean isRelieved = StratConEnemyFacilityActivity.isReliefSent(reliefRoll);
         if (!isRelieved) {
             return null;
         }

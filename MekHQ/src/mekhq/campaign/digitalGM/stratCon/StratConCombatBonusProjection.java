@@ -54,8 +54,8 @@ import mekhq.campaign.mission.contract.AbstractContract;
  * Essential scenarios or Nav Points, so no combat bonus is paid.</p>
  *
  * <p>Other one-off bonuses, such as handing a captured facility over to the employer or the fights at a contract's
- * objective facilities, depend on how the contract is played and are not counted. Counterattacks and assaults on the
- * player's side's facilities never pay it.</p>
+ * objective facilities, depend on how the contract is played and are not counted. Counterattacks on the player's
+ * side's facilities never pay it.</p>
  *
  * @param bonusCount     how many times the bonus can be paid
  * @param isFromNavPoint {@code true} if the bonus comes from the contract's Nav Points rather than its Essential

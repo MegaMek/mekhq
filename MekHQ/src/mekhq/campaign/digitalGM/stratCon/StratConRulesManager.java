@@ -125,18 +125,10 @@ import mekhq.campaign.mission.contract.contractData.ContractCommandRights;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.mission.contract.utilities.MHQMorale;
-import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
-import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
-import mekhq.campaign.mission.scenarios.AtBScenario;
-import mekhq.campaign.mission.scenarios.BotForce;
-import mekhq.campaign.mission.scenarios.Scenario;
-import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
+import mekhq.campaign.mission.scenarios.*;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceGenerationMethod;
 import mekhq.campaign.mission.scenarios.ScenarioMapParameters.MapLocation;
-import mekhq.campaign.mission.scenarios.ScenarioStatus;
-import mekhq.campaign.mission.scenarios.ScenarioTemplate;
-import mekhq.campaign.mission.scenarios.ScenarioType;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier;
 import mekhq.campaign.mission.scenarios.atb.AtBScenarioModifier.EventTiming;
 import mekhq.campaign.mission.utilities.CombatRole;
@@ -184,6 +176,9 @@ public class StratConRulesManager {
     private static final String SIEGE_RELIEF_SCENARIO_TEMPLATE = "Hold Until Relief.json";
     // the name of the briefing line saying what a fight over a facility decides; see addStakesBriefing
     static final String FACILITY_STAKES_MODIFIER_NAME = "Facility Stakes";
+    // the facility templates' own turrets, and how many each garrison step fields; see scaleFacilityDefenses
+    static final String FACILITY_DEFENSES_FORCE_NAME = "Base Defenses";
+    static final int TURRETS_PER_GARRISON_STEP = 4;
 
     /**
      * What makes a particular lance eligible to be reinforcements for a scenario
@@ -1769,6 +1764,45 @@ public class StratConRulesManager {
 
         backingScenario.setName(StratConFacilityOperations.getFightName(facility, operation));
         addStakesBriefing(backingScenario, StratConFacilityOperations.getStakesText(facility, operation, false));
+        scaleFacilityDefenses(backingScenario, facility);
+    }
+
+    /**
+     * Sizes a facility template's own turrets to the facility's garrison: {@value #TURRETS_PER_GARRISON_STEP} for
+     * each garrison step, so a full Base fields the template's usual eight. With no garrison left there are none, and
+     * any objective about them alone goes too, so it can't be failed for want of turrets. Must be called before the
+     * scenario's forces are generated.
+     *
+     * @param backingScenario the scenario fought on the facility
+     * @param facility        the facility
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void scaleFacilityDefenses(AtBDynamicScenario backingScenario, StratConFacility facility) {
+        ScenarioTemplate template = backingScenario.getTemplate();
+        if (template == null) {
+            return;
+        }
+
+        ScenarioForceTemplate defenses = template.getScenarioForces().get(FACILITY_DEFENSES_FORCE_NAME);
+        if (defenses == null) {
+            return;
+        }
+
+        int garrison = facility.getGarrison();
+        if (garrison > 0) {
+            defenses.setFixedUnitCount(garrison * TURRETS_PER_GARRISON_STEP);
+            return;
+        }
+
+        template.getScenarioForces().remove(FACILITY_DEFENSES_FORCE_NAME);
+        for (ScenarioObjective objective : new ArrayList<>(template.scenarioObjectives)) {
+            objective.removeForce(FACILITY_DEFENSES_FORCE_NAME);
+            if (objective.getAssociatedForceNames().isEmpty() && objective.getAssociatedUnitIDs().isEmpty()) {
+                template.scenarioObjectives.remove(objective);
+            }
+        }
     }
 
     /**
@@ -1946,26 +1980,20 @@ public class StratConRulesManager {
     }
 
     /**
-     * Starts an enemy attack on a facility held by the player or their employer (see {@code StratConFacilityAttacks}):
+     * Starts an enemy counterattack on a facility held by the player or their employer (see
+     * {@code StratConFacilityAttacks}), fought today like any other scenario.
      *
-     * <ul>
-     *     <li>A <b>counterattack</b> comes with warning.</li>
-     *     <li>An <b>assault</b> is fought today.</li>
-     * </ul>
+     * <p>It is fought in the Base Defense template, the mirror of the Hostile Facility template the player's own
+     * assaults on enemy facilities use. It is never a Crisis or a Turning Point, and never pays the combat bonus, even
+     * on a facility that is a strategic objective. Formations already on the facility's hex are committed to it at
+     * once, as they would be to any scenario arising on their hex; otherwise the player has the day to send one. The
+     * facility's fate follows from the result (see {@code StratConFacilityOperations}), never from a facility-removing
+     * objective.</p>
      *
-     * <p>Both are fought in the Base Defense template, the mirror of the Hostile Facility template the player's own
-     * assaults on enemy facilities use. Neither is ever a Crisis or a Turning Point, and neither ever pays the combat
-     * bonus, even on a facility that is a strategic objective. Formations already on the facility's hex are committed
-     * to it at once, as they would be to any scenario arising on their hex; otherwise the player has until the
-     * deployment deadline to send one. The facility's fate follows from the result (see
-     * {@code StratConFacilityOperations}), never from a facility-removing objective.</p>
-     *
-     * @param campaign    the current campaign
-     * @param contract    the contract whose map holds the sector
-     * @param track       the sector
-     * @param coords      the facility's hex
-     * @param warningDays how many days the player has to deploy; 0 for an assault
-     * @param isAssault   {@code true} for an assault, {@code false} for a counterattack
+     * @param campaign the current campaign
+     * @param contract the contract whose map holds the sector
+     * @param track    the sector
+     * @param coords   the facility's hex
      *
      * @return the scenario, or {@code null} if there is no facility there, a scenario is already there, or none could
      *       be generated
@@ -1974,14 +2002,14 @@ public class StratConRulesManager {
      * @since 0.51.01
      */
     public static @Nullable StratConScenario startCounterattackScenario(Campaign campaign, AbstractContract contract,
-          StratConTrackState track, StratConCoords coords, int warningDays, boolean isAssault) {
+          StratConTrackState track, StratConCoords coords) {
         StratConFacility facility = track.getFacility(coords);
         if ((facility == null) || (track.getScenario(coords) != null)) {
             return null;
         }
 
-        // An assault is fought in the same template as a counterattack, only today: never with the allied facility
-        // objective, which would remove the facility when failed rather than hand it to the enemy.
+        // Never with the allied facility objective, which would remove the facility when failed rather than hand it to
+        // the enemy.
         ScenarioTemplate template = StratConScenarioFactory.getFacilityScenario(true);
         if (template == null) {
             return null;
@@ -1999,7 +2027,7 @@ public class StratConRulesManager {
               firstDefenderId,
               coords,
               template,
-              warningDays);
+              null);
         if (scenario == null) {
             return null;
         }
@@ -2017,10 +2045,9 @@ public class StratConRulesManager {
         // Not Essential, even on a strategic-objective facility, so winning it never pays the combat bonus
         scenario.setStrategicObjective(false);
         AtBDynamicScenario backingScenario = scenario.getBackingScenario();
-        backingScenario.setName(String.format("%s - %s",
-              facility.getDisplayableName(),
-              isAssault ? "Assault" : "Counterattack"));
+        backingScenario.setName(String.format("%s - Counterattack", facility.getDisplayableName()));
         addStakesBriefing(backingScenario, StratConFacilityOperations.getStakesText(facility, null, true));
+        scaleFacilityDefenses(backingScenario, facility);
 
         track.getRevealedCoords().add(coords);
         finalizeBackingScenario(campaign, contract, track, false, scenario);
@@ -5123,7 +5150,8 @@ public class StratConRulesManager {
      *     <li>Otherwise, if the side attacking the facility won, the facility is damaged one step and loses one
      *     garrison step. The player attacks a hostile facility and wins with an overall victory; the enemy attacks an
      *     allied one and wins when the player loses outright.</li>
-     *     <li>Otherwise the defender held, at the cost of one garrison step.</li>
+     *     <li>Otherwise the defender held. An enemy garrison holding off the player loses one garrison step; a
+     *     facility of the player's side loses one only on a draw, as a victory there costs it nothing.</li>
      * </ul>
      *
      * <p>Either way, the player now knows everything about the facility, having fought over it.</p>
@@ -5162,9 +5190,11 @@ public class StratConRulesManager {
             switchFacilityOwner(facility);
         } else if (!isEscapeFight) {
             boolean isAttackerVictory = facility.isOwnerAlliedToPlayer() ? (!victory && !isDraw) : victory;
+            // Your side's facility comes through a won defense unharmed.
+            boolean isDefenseWon = facility.isOwnerAlliedToPlayer() && victory;
             if (isAttackerVictory) {
                 facility.applyAttackerVictory();
-            } else {
+            } else if (!isDefenseWon) {
                 facility.applyDefenderHeld();
             }
         }
@@ -5629,7 +5659,7 @@ public class StratConRulesManager {
      *       <ul>
      *         <li>If no facility is associated with the scenario's coordinates, the objective tied to the scenario's
      *         location is marked as failed.</li>
-     *         <li>If the scenario is a counterattack or assault on a facility held by the player or their employer,
+     *         <li>If the scenario is a counterattack on a facility held by the player or their employer,
      *         the facility is lost, or for an employer's facility fought over off-screen (see
      *         {@link StratConEnemyFacilityActivity#resolveIgnoredCounterattack}).</li>
      *       </ul>
@@ -5653,8 +5683,8 @@ public class StratConRulesManager {
 
     /**
      * As {@link #processIgnoredStratConScenario(StratConScenario, StratConTrackState, StratConCampaignState)}, with
-     * the campaign to report to. Only the enemy's counterattacks and assaults (see {@code StratConFacilityAttacks})
-     * cost a facility when left unplayed.
+     * the campaign to report to. Only the enemy's counterattacks (see {@code StratConFacilityAttacks}) cost a
+     * facility when left unplayed.
      *
      * @param scenario      the ignored scenario
      * @param track         its sector

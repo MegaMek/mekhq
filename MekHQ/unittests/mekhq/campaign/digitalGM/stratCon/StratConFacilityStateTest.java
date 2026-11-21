@@ -406,13 +406,13 @@ class StratConFacilityStateTest {
         }
 
         @Test
-        void holdingAnAlliedFacilityOnlyCostsItsGarrison() {
+        void winningAtAnAlliedFacilityCostsItNothing() {
             StratConFacility facility = mekBase(ForceAlignment.Allied);
 
             StratConRulesManager.processFacilityAftermath(facility, true, false);
 
             assertEquals(FacilityCondition.INTACT, facility.getCondition());
-            assertEquals(1, facility.getGarrison());
+            assertEquals(2, facility.getGarrison());
         }
 
         @Test

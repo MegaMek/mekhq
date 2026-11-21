@@ -179,8 +179,6 @@ class StratConPage {
     private JCheckBox chkUseStratConAlternateSectorTerrain;
     private JLabel lblStratConSectorSizeMultiplier;
     private JSpinner spnStratConSectorSizeMultiplier;
-    private JLabel lblEnemyFacilityActivity;
-    private JSpinner spnEnemyFacilityActivity;
     private JLabel lblFacilityDensity;
     private JSpinner spnFacilityDensity;
     // end StratCon
@@ -352,11 +350,6 @@ class StratConPage {
               getMetadata(new Version(0, 51, 1)));
         spnStratConSectorSizeMultiplier = new CampaignOptionsSpinner("StratConSectorSizeMultiplier", 1.0, 0.25, 2.0,
               0.1);
-        lblEnemyFacilityActivity = new CampaignOptionsLabel("EnemyFacilityActivity",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
-        lblEnemyFacilityActivity.addMouseListener(createTipPanelUpdater("EnemyFacilityActivity"));
-        spnEnemyFacilityActivity = new CampaignOptionsSpinner("EnemyFacilityActivity", 1.0, 0.0, 3.0, 0.1);
-        spnEnemyFacilityActivity.addMouseListener(createTipPanelUpdater("EnemyFacilityActivity"));
         lblFacilityDensity = new CampaignOptionsLabel("FacilityDensity",
               getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
         lblFacilityDensity.addMouseListener(createTipPanelUpdater("FacilityDensity"));
@@ -550,7 +543,6 @@ class StratConPage {
               chkUseStratConAlternateSectorTerrain);
         panel.addRow(lblStratConSectorCountMethod, comboStratConSectorCountMethod);
         panel.addRow(lblStratConSectorSizeMultiplier, spnStratConSectorSizeMultiplier);
-        panel.addRow(lblEnemyFacilityActivity, spnEnemyFacilityActivity);
         panel.addRow(lblFacilityDensity, spnFacilityDensity);
 
         return panel;
@@ -702,7 +694,6 @@ class StratConPage {
         comboStratConSectorCountMethod.setSelectedItem(model.stratConSectorCountMethod);
         chkUseStratConAlternateSectorTerrain.setSelected(model.useStratConAlternateSectorTerrain);
         spnStratConSectorSizeMultiplier.setValue(model.stratConSectorSizeMultiplier);
-        spnEnemyFacilityActivity.setValue(model.enemyFacilityActivity);
         spnFacilityDensity.setValue(model.facilityDensity);
     }
 
@@ -766,7 +757,6 @@ class StratConPage {
         model.stratConSectorCountMethod = comboStratConSectorCountMethod.getSelectedItem();
         model.useStratConAlternateSectorTerrain = chkUseStratConAlternateSectorTerrain.isSelected();
         model.stratConSectorSizeMultiplier = (double) spnStratConSectorSizeMultiplier.getValue();
-        model.enemyFacilityActivity = (double) spnEnemyFacilityActivity.getValue();
         model.facilityDensity = (double) spnFacilityDensity.getValue();
     }
 }

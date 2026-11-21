@@ -164,6 +164,10 @@ public class CampaignOptionsUnmarshaller {
             case "multiplyTrackIntensityByScale", "minimumOneTrackPerRoll", "rollTracksWeekly",
                  "scenarioTempoMultiplier" -> {
             }
+            // Removed option: enemy facilities now always repair and reinforce one step a month, and the enemy sends
+            // a relief force against a quarter of sieges.
+            case "enemyFacilityActivity" -> {
+            }
             default -> LOGGER.warn("Potentially unexpected entry in campaign options: {}", nodeName);
         }
     }
