@@ -52,7 +52,6 @@ import mekhq.MHQConstants;
  * @since 0.50.07
  */
 public enum DocumentationEntry {
-    ACAR("ACAR", "GlossaryDocs/ACAR-Abstract Combat Auto-Resolve documentation", "0.50.07", "0.50.07", "0.50.07"),
     AWARDS_MODULE("AWARDS_MODULE", "GlossaryDocs/Personnel Modules/Awards Module", "0.50.07", "0.50.07", "0.50.07"),
     CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS",
           "GlossaryDocs/MegaMek -MekHQ Chaos Campaign Guide",
