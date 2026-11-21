@@ -70,9 +70,6 @@ public enum DocumentationEntry {
           "GlossaryDocs/Prisoners of War & Abstracted Search and Rescue",
           "0.50.07", "0.50.07", "0.50.07"),
     RESUPPLY_AND_CONVOYS("RESUPPLY_AND_CONVOYS", "GlossaryDocs/Resupply & Convoys", "0.50.07", "0.50.07", "0.50.07"),
-    TURNOVER_AND_RETENTION("TURNOVER_AND_RETENTION",
-          "GlossaryDocs/Personnel Modules/Turnover & Retention Module (feat. Fatigue)",
-          "0.50.07", "0.50.07", "0.50.07"),
     UNIT_MARKETS("UNIT_MARKETS", "GlossaryDocs/Unit Markets", "0.50.07", "0.50.07", "0.50.07");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";

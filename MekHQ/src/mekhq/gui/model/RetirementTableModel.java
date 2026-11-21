@@ -32,15 +32,12 @@
  */
 package mekhq.gui.model;
 
-import static mekhq.campaign.personnel.turnoverAndRetention.RetirementDefectionTracker.Payout.isBreakingContract;
-
 import java.awt.Component;
 import java.awt.Image;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 import javax.swing.JTable;
 import javax.swing.SwingConstants;
@@ -270,64 +267,14 @@ public class RetirementTableModel extends AbstractTableModel {
                 if (altPayout.containsKey(person.getId())) {
                     return altPayout.get(person.getId()).toAmountAndSymbolString();
                 }
-                Money payout = campaign.getPlayerForce()
-                                     .getHumanResources()
-                                     .getRetirementDefectionTracker()
-                                     .getPayout(person.getId())
-                                     .getPayoutAmount();
-                /*
-                 * If no unit is required as part of the payout, the unit is part or all of the
-                 * final payout. If using the share system and tracking the original unit,
-                 * the payout is also reduced by the value of the unit.
-                 */
-                if ((campaign.getPlayerForce()
-                           .getHumanResources()
-                           .getRetirementDefectionTracker()
-                           .getPayout(person.getId())
-                           .getWeightClass() == 0 &&
-                           null != unitAssignments.get(person.getId())) ||
-                          (campaign.getCampaignOptions().get(CampaignOption.USE_SHARE_SYSTEM) &&
-                                 campaign.getCampaignOptions().get(CampaignOption.TRACK_ORIGINAL_UNIT) &&
-                                 Objects.equals(person.getOriginalUnitId(), unitAssignments.get(person.getId())) &&
-                                 null != campaign.getUnit(unitAssignments.get(person.getId())))) {
-                    payout = payout.minus(campaign.getUnit(unitAssignments.get(person.getId())).getBuyCost());
-                }
-
-                if (isBreakingContract(person,
-                      campaign.getLocalDate(),
-                      campaign.getCampaignOptions().get(CampaignOption.SERVICE_CONTRACT_DURATION))) {
-                    // if the person requires a unit, check to ensure there isn't a shortfall
-                    if (null != unitAssignments.get(person.getId())) {
-                        payout = payout.plus(RetirementDefectionDialog.getShortfallAdjustment(campaign.getPlayerForce()
-                                                                                                    .getHumanResources()
-                                                                                                    .getRetirementDefectionTracker()
-                                                                                                    .getPayout(person.getId())
-                                                                                                    .getWeightClass(),
-                              RetirementDefectionDialog.weightClassIndex(campaign.getUnit(unitAssignments.get(person.getId())))));
-                    }
-
-                    // if the person requires a unit, but doesn't have one...
-                    if ((unitAssignments.get(person.getId()) == null) &&
-                              campaign.getPlayerForce()
-                                    .getHumanResources()
-                                    .getRetirementDefectionTracker()
-                                    .getPayout(person.getId())
-                                    .getWeightClass() >
-                                    0) {
-                        payout = payout.plus(mekhq.gui.dialog.RetirementDefectionDialog.getShortfallAdjustment(campaign.getPlayerForce()
-                                                                                                                     .getHumanResources()
-                                                                                                                     .getRetirementDefectionTracker()
-                                                                                                                     .getPayout(
-                                                                                                                           person.getId())
-                                                                                                                     .getWeightClass(),
-                              0));
-                    }
-                }
-
-                // If payout is negative then make it zero
-                if (payout.isNegative()) {
-                    payout = Money.zero();
-                }
+                // Use the same calculation as the dialog's total, so each row matches what is actually paid
+                Money payout = RetirementDefectionDialog.getIndividualPayout(campaign,
+                      person,
+                      campaign.getPlayerForce()
+                            .getHumanResources()
+                            .getRetirementDefectionTracker()
+                            .getPayout(person.getId()),
+                      unitAssignments.get(person.getId()));
                 return payout.toAmountAndSymbolString();
             case COL_UNIT:
                 if (null ==

@@ -786,25 +786,17 @@ public class Campaign implements ITechManager {
                                               .getPayout(pid).isWasSacked();
 
                     if ((!wasKilled) && (!wasSacked)) {
-                        if (!person.getPermanentInjuries().isEmpty()) {
-                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
-                        }
-                        if (isBreakingContract(person,
-                              getLocalDate(),
-                              getCampaignOptions().get(CampaignOption.SERVICE_CONTRACT_DURATION))) {
-                            if (!getActiveContracts().isEmpty()) {
-                                int roll = randomInt(20);
+                        PersonnelStatus departureStatus = RetirementDefectionTracker.getDepartureStatus(
+                              RetirementDefectionTracker.hasMedicalDischargeInjuries(person),
+                              isBreakingContract(person,
+                                    getLocalDate(),
+                                    getCampaignOptions().get(CampaignOption.SERVICE_CONTRACT_DURATION)),
+                              !getActiveContracts().isEmpty(),
+                              person.getAge(getLocalDate()) >= RetirementDefectionTracker.RETIREMENT_AGE,
+                              randomInt(20) == 0);
 
-                                if (roll == 0) {
-                                    person.changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
-                                }
-                            } else {
-                                person.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                            }
-                        } else if (person.getAge(getLocalDate()) >= 50) {
-                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
-                        } else {
-                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
+                        if (departureStatus != null) {
+                            person.changeStatus(this, getLocalDate(), departureStatus);
                         }
                     }
 
@@ -814,11 +806,16 @@ public class Campaign implements ITechManager {
                     }
 
                     if (wasSacked) {
-                        if (person.getPermanentInjuries().isEmpty()) {
+                        if (!RetirementDefectionTracker.hasMedicalDischargeInjuries(person)) {
                             person.changeStatus(this, getLocalDate(), PersonnelStatus.SACKED);
                         } else {
                             person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
                         }
+                    }
+
+                    // Characters who stayed (breaking contract mid-deployment without defecting) take nobody with them
+                    if (!person.getStatus().isDepartedUnit()) {
+                        continue;
                     }
 
                     // civilian spouses follow their partner in departing
@@ -836,7 +833,8 @@ public class Campaign implements ITechManager {
                     }
 
                     // non-civilian spouses may divorce the remaining partner
-                    if ((person.getAge(getLocalDate()) >= 50) && (!campaignOptions.get(CampaignOption.RANDOM_DIVORCE_METHOD).isNone())) {
+                    if (RetirementDefectionTracker.isDepartureDivorceCheckRequired(person.getStatus()) &&
+                              (!campaignOptions.get(CampaignOption.RANDOM_DIVORCE_METHOD).isNone())) {
                         if ((spouse != null) && (spouse.isDivorceable()) && (!spouse.getPrimaryRole().isCivilian())) {
                             if ((person.getStatus().isDefected()) || (randomInt(6) == 0)) {
                                 getPlayerForce().getHumanResources()

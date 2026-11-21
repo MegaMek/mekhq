@@ -65,6 +65,7 @@ import mekhq.campaign.personnel.Injury;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.Profession;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
@@ -107,22 +108,23 @@ public class RetirementDefectionTracker {
     final private transient Set<Integer> legacyRollRequired = new HashSet<>();
     final private transient Map<Integer, HashSet<UUID>> legacyUnresolvedPersonnel = new HashMap<>();
 
-    private static Person asfCommander;
-    private static Integer asfCommanderModifier;
-    private static Person vehicleCrewCommander;
-    private static Integer vehicleCrewCommanderModifier;
-    private static Person infantryCommander;
-    private static Integer infantryCommanderModifier;
-    private static Person navalCommander;
-    private static Integer navalCommanderModifier;
-    private static Person techCommander;
-    private static Integer techCommanderModifier;
-    private static Person medicalCommander;
-    private static Integer medicalCommanderModifier;
-    private static Person administrationCommander;
-    private static Integer administrationCommanderModifier;
-    private static Person mekWarriorCommander;
-    private static Integer mekWarriorCommanderModifier;
+    private transient Person asfCommander;
+    private transient Integer asfCommanderModifier;
+    private transient Person vehicleCrewCommander;
+    private transient Integer vehicleCrewCommanderModifier;
+    private transient Person infantryCommander;
+    private transient Integer infantryCommanderModifier;
+    private transient Person navalCommander;
+    private transient Integer navalCommanderModifier;
+    private transient Person techCommander;
+    private transient Integer techCommanderModifier;
+    private transient Person medicalCommander;
+    private transient Integer medicalCommanderModifier;
+    private transient Person administrationCommander;
+    private transient Integer administrationCommanderModifier;
+    private transient Person mekWarriorCommander;
+    private transient Integer mekWarriorCommanderModifier;
+    private transient LocalDate managementSkillRefreshDate;
 
     private final ResourceBundle resources = ResourceBundle.getBundle(RESOURCE_BUNDLE);
 
@@ -273,7 +275,7 @@ public class RetirementDefectionTracker {
      *
      * @return the management skill modifier
      */
-    private static int getManagementSkillModifier(Person person) {
+    private int getManagementSkillModifier(Person person) {
         if ((person.getPrimaryRole().isCivilian()) || (!person.getPrisonerStatus().isFree())) {
             return 0;
         }
@@ -293,7 +295,7 @@ public class RetirementDefectionTracker {
      *
      * @return the management skill modifier for the commander
      */
-    private static int getCommanderManagementSkill(PersonnelRole role) {
+    private int getCommanderManagementSkill(PersonnelRole role) {
         return switch (Profession.getProfessionFromPersonnelRole(role)) {
             case AEROSPACE -> asfCommanderModifier;
             case VEHICLE -> vehicleCrewCommanderModifier;
@@ -510,28 +512,12 @@ public class RetirementDefectionTracker {
                 targetNumber.addModifier(modifier, resources.getString("managementSkill.text"));
             }
 
-            // Shares Modifiers
+            // Shares Modifiers: a share-heavy contract gives the crew a larger stake, suppressing turnover. If this
+            // isn't an end of contract check, the active contract with the best share percentage is used.
             if (campaignOptions.get(CampaignOption.USE_SHARE_SYSTEM)) {
-                // If this retirement roll is not being made at the end of a contract (e.g. >12
-                // months since last roll),
-                // the share percentage should still apply.
-                // In the case of multiple active contracts, pick the one with the best
-                // percentage.
-                if (mission == null) {
-                    List<AbstractContract> atbContracts = campaign.getActiveContracts();
-
-                    if (!atbContracts.isEmpty()) {
-                        for (AbstractContract contract : atbContracts) {
-                            if ((contract == null) || (contract.getSharesPercent() > contract.getSharesPercent())) {
-                                mission = contract;
-                            }
-                        }
-                    }
-                }
-
-                if (mission != null) {
-                    targetNumber.addModifier(-max(0, ((mission.getSharesPercent() / 10) - 2)),
-                          resources.getString("shares.text"));
+                int sharesModifier = getSharesModifier(mission, campaign.getActiveContracts());
+                if (sharesModifier != 0) {
+                    targetNumber.addModifier(sharesModifier, resources.getString("shares.text"));
                 }
             }
 
@@ -556,14 +542,6 @@ public class RetirementDefectionTracker {
                     targetNumber.addModifier(1, resources.getString("missionFailure.text"));
                 } else if (mission.getStatus().isBreach()) {
                     targetNumber.addModifier(2, resources.getString("missionBreach.text"));
-                }
-            }
-
-            // Shares modifier: a share-heavy contract gives the crew a larger stake, suppressing turnover.
-            if ((mission != null) && campaignOptions.get(CampaignOption.USE_SHARE_SYSTEM)) {
-                int sharesModifier = max(0, (mission.getSharesPercent() / 10) - 2);
-                if (sharesModifier > 0) {
-                    targetNumber.addModifier(-sharesModifier, resources.getString("shares.text"));
                 }
             }
 
@@ -607,29 +585,7 @@ public class RetirementDefectionTracker {
 
             // Family Modifier
             if (campaignOptions.get(CampaignOption.USE_FAMILY_MODIFIERS)) {
-                Person spouse = person.getGenealogy().getSpouse();
-                List<Person> children = person.getGenealogy().getChildren();
-
-                int modifier = 0;
-
-                // if 'person' is married to a non-civilian, apply a -1 modifier
-                if ((spouse != null) &&
-                          (!spouse.getPrimaryRole().isCivilian()) &&
-                          (!spouse.getStatus().isDepartedUnit())) {
-                    modifier--;
-                }
-
-                // if 'person' has any non-civilian children in the unit, apply a -1 modifier
-                if ((!children.isEmpty()) && (spouse == null)) {
-                    if (children.stream()
-                              .filter(child -> !child.isChild(campaign.getLocalDate()))
-                              .anyMatch(child -> (!child.isChild(campaign.getLocalDate())) &&
-                                                       (!child.getPrimaryRole().isCivilian()) &&
-                                                       (!child.getStatus().isDepartedUnit()))) {
-                        modifier--;
-                    }
-                }
-
+                int modifier = getFamilyModifier(person, campaign.getLocalDate());
                 if (modifier != 0) {
                     targetNumber.addModifier(modifier, resources.getString("family.text"));
                 }
@@ -669,8 +625,8 @@ public class RetirementDefectionTracker {
     }
 
     public int getManagementSkillPenalty(Person person, Campaign campaign) {
-        if (asfCommanderModifier == null) {
-            // calculate the modifiers if they're not populated yet
+        if (!campaign.getLocalDate().equals(managementSkillRefreshDate)) {
+            // calculate the modifiers if they haven't been worked out today, so departed commanders aren't used
             refreshManagementSkillValues(campaign);
         }
         int modifier = campaign.getCampaignOptions().get(CampaignOption.MANAGEMENT_SKILL_PENALTY);
@@ -747,6 +703,17 @@ public class RetirementDefectionTracker {
      * @param campaign The Campaign object for which to calculate the management skill values.
      */
     private void refreshManagementSkillValues(Campaign campaign) {
+        // Start from scratch, so a commander who has left (or who belongs to another campaign) is never kept
+        asfCommander = null;
+        vehicleCrewCommander = null;
+        infantryCommander = null;
+        navalCommander = null;
+        techCommander = null;
+        medicalCommander = null;
+        administrationCommander = null;
+        mekWarriorCommander = null;
+        managementSkillRefreshDate = campaign.getLocalDate();
+
         for (Person person : campaign.getPlayerForce().getHumanResources().getActivePersonnel(false, false)) {
             if (person.getPrimaryRole().isCivilian()) {
                 continue;
@@ -1093,11 +1060,129 @@ public class RetirementDefectionTracker {
      *
      * @return count of permanent injuries excluding prosthetics and implants
      */
+    /**
+     * Calculates the shares modifier to a character's turnover target number.
+     *
+     * <p>The contract used is {@code mission} if one is given (an end of contract check). Otherwise it is the active
+     * contract with the highest share percentage. The modifier is minus (share percentage / 10, minus 2), to a
+     * minimum of 0.</p>
+     *
+     * @param mission         the contract that just ended, or {@code null} for a scheduled check
+     * @param activeContracts the campaign's active contracts
+     *
+     * @return the shares modifier, which is 0 or negative
+     */
+    static int getSharesModifier(final @Nullable AbstractContract mission,
+          final List<AbstractContract> activeContracts) {
+        AbstractContract sharesContract = mission;
+        if (sharesContract == null) {
+            for (AbstractContract contract : activeContracts) {
+                if ((contract != null) &&
+                          ((sharesContract == null) ||
+                                 (contract.getSharesPercent() > sharesContract.getSharesPercent()))) {
+                    sharesContract = contract;
+                }
+            }
+        }
+
+        if (sharesContract == null) {
+            return 0;
+        }
+
+        return -max(0, (sharesContract.getSharesPercent() / 10) - 2);
+    }
+
+    /**
+     * Calculates the family modifier to a character's turnover target number.
+     *
+     * <p>A character gets -1 if they are married to a non-civilian who is still with the campaign, and a further -1
+     * if they have at least one adult, non-civilian child who is still with the campaign. The two modifiers
+     * stack.</p>
+     *
+     * @param person the character being checked
+     * @param today  the current campaign date, used to decide whether a child is an adult
+     *
+     * @return the family modifier: 0, -1 or -2
+     */
+    static int getFamilyModifier(final Person person, final LocalDate today) {
+        int modifier = 0;
+
+        Person spouse = person.getGenealogy().getSpouse();
+        if ((spouse != null) && (!spouse.getPrimaryRole().isCivilian()) && (!spouse.getStatus().isDepartedUnit())) {
+            modifier--;
+        }
+
+        boolean hasAdultChildInCampaign = person.getGenealogy()
+                                                .getChildren()
+                                                .stream()
+                                                .anyMatch(child -> (!child.isChild(today)) &&
+                                                                         (!child.getPrimaryRole().isCivilian()) &&
+                                                                         (!child.getStatus().isDepartedUnit()));
+        if (hasAdultChildInCampaign) {
+            modifier--;
+        }
+
+        return modifier;
+    }
+
     static int getInjuryTurnoverModifier(final Person person) {
         return (int) person.getInjuries().stream()
                            .filter(i -> !i.getSubType().isPermanentModification())
                            .filter(Injury::isPermanent)
                            .count();
+    }
+
+    /**
+     * Works out how a character who failed their turnover roll leaves the campaign.
+     *
+     * <p>The checks are made in order, and the first that applies decides the outcome:</p>
+     * <ol>
+     *     <li>A character with a permanent injury (not counting prosthetics or implants) is medically discharged,
+     *     which counts as retiring.</li>
+     *     <li>A character still within their service contract resigns if no contract is active. If a contract is
+     *     active, they defect if {@code isDefectionRollSuccessful} is {@code true}, and otherwise stay.</li>
+     *     <li>A character of retirement age retires.</li>
+     *     <li>Everyone else resigns.</li>
+     * </ol>
+     *
+     * @param hasMedicalDischargeInjuries whether the character has injuries that qualify for medical discharge
+     * @param isBreakingContract          whether the character is still within their service contract
+     * @param hasActiveContract           whether the campaign has an active contract
+     * @param isRetirementAge             whether the character is at or above {@link #RETIREMENT_AGE}
+     * @param isDefectionRollSuccessful   whether the 1 in 20 defection roll succeeded; only used when breaking
+     *                                    contract during an active contract
+     *
+     * @return the character's new status, or {@code null} if they stay with the campaign
+     */
+    public static @Nullable PersonnelStatus getDepartureStatus(final boolean hasMedicalDischargeInjuries,
+          final boolean isBreakingContract, final boolean hasActiveContract, final boolean isRetirementAge,
+          final boolean isDefectionRollSuccessful) {
+        if (hasMedicalDischargeInjuries) {
+            return PersonnelStatus.RETIRED;
+        }
+
+        if (isBreakingContract) {
+            if (!hasActiveContract) {
+                return PersonnelStatus.RESIGNED;
+            }
+            return isDefectionRollSuccessful ? PersonnelStatus.DEFECTED : null;
+        }
+
+        return isRetirementAge ? PersonnelStatus.RETIRED : PersonnelStatus.RESIGNED;
+    }
+
+    /**
+     * Checks whether a departing character's marriage should be checked for divorce.
+     *
+     * <p>Retiring characters (including medical discharges) never divorce on departure. Characters who are still with
+     * the campaign aren't departing, and characters who died aren't divorcing anyone, so neither is checked.</p>
+     *
+     * @param status the departing character's status after turnover was applied
+     *
+     * @return {@code true} if the divorce check should be made
+     */
+    public static boolean isDepartureDivorceCheckRequired(final PersonnelStatus status) {
+        return status.isDepartedUnit() && !status.isRetired() && !status.isDead();
     }
 
     /**
@@ -1108,7 +1193,7 @@ public class RetirementDefectionTracker {
      *
      * @return {@code true} if the person has at least one permanent non-prosthetic injury
      */
-    static boolean hasMedicalDischargeInjuries(final Person person) {
+    public static boolean hasMedicalDischargeInjuries(final Person person) {
         return person.getInjuries().stream()
                      .filter(i -> !i.getSubType().isPermanentModification())
                      .anyMatch(Injury::isPermanent);
