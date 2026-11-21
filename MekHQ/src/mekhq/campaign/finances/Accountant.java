@@ -635,7 +635,8 @@ public record Accountant(Campaign campaign) {
      */
     private static double setFactionStandingBarrackCostMultiplier(FactionStandings factionStandings,
           PlanetarySystem currentSystem, List<AbstractContract> activeContracts, LocalDate today) {
-        double maxRegard = 0.0;
+        // Start below every possible Regard, so a poor Standing can raise costs as well as a good one lowering them
+        double maxRegard = Double.NEGATIVE_INFINITY;
         boolean foundContract = false;
 
         // Consider contracts in the current system
@@ -657,6 +658,11 @@ public record Accountant(Campaign campaign) {
                     maxRegard = currentRegard;
                 }
             }
+        }
+
+        // No contract and no local factions, so there is no one whose Standing could change the costs
+        if (maxRegard == Double.NEGATIVE_INFINITY) {
+            return 1.0;
         }
 
         return FactionStandingUtilities.getBarrackCostsMultiplier(maxRegard);

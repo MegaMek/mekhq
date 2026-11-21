@@ -90,6 +90,7 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudConfirmButton;
@@ -706,7 +707,7 @@ public class ContractNegotiationDialog extends JDialog {
             return block;
         }
         NegotiatorProfile.TableOdds odds = NegotiatorProfile.odds(campaign, playerNegotiator, employerNegotiator,
-              scale);
+              scale, FactionStandingUtilities.getNegotiationModifier(campaign, contract));
         block.add(leftAligned(oddsRow("negotiate.contractMarket.odds.haggle", odds.haggle())));
         block.add(Box.createVerticalStrut(scaleForGUI(2)));
         block.add(leftAligned(oddsRow("negotiate.contractMarket.odds.exception", odds.exception())));
@@ -1213,12 +1214,14 @@ public class ContractNegotiationDialog extends JDialog {
                                              .booleanOption(PersonnelOptions.EDGE_COMMANDER_NEGOTIATION);
         MarginOfSuccess playerMargin = reportedNegotiationCheck(playerNegotiator,
               "negotiate.contractMarket.renegotiate.roll.player",
-              playerUsesEdge);
+              playerUsesEdge,
+              FactionStandingUtilities.getNegotiationModifier(campaign, contract));
         Person employerNegotiator = contract.getEmployerNegotiator();
         MarginOfSuccess employerMargin = employerNegotiator != null ?
                                                reportedNegotiationCheck(employerNegotiator,
                                                      "negotiate.contractMarket.renegotiate.roll.employer",
-                                                     isUseEdge) :
+                                                     isUseEdge,
+                                                     0) :
                                                MarginOfSuccess.BARELY_MADE_IT;
         return ActiveNegotiationMath.netMargin(playerMargin, employerMargin)
                      + NegotiatorProfile.of(playerNegotiator, scale).generalModifier();
@@ -1226,10 +1229,12 @@ public class ContractNegotiationDialog extends JDialog {
 
     /**
      * Resolves a Negotiation check for the given person, posts the result to the daily report's skill-checks tab, and
-     * returns its margin of success.
+     * returns its margin of success. The player's negotiator gets the campaign's Faction Standing modifier with the
+     * employer; the employer's negotiator gets none.
      */
-    private MarginOfSuccess reportedNegotiationCheck(Person negotiator, String reasonKey, boolean useEdge) {
-        ActionCheckResult result = negotiator.checkSkill(SkillType.S_NEGOTIATION, campaign)
+    private MarginOfSuccess reportedNegotiationCheck(Person negotiator, String reasonKey, boolean useEdge,
+          int standingModifier) {
+        ActionCheckResult result = NegotiatorProfile.negotiationCheck(campaign, negotiator, standingModifier)
                                          .resolve(useEdge, getTextAt(RESOURCE_BUNDLE, reasonKey));
         campaign.addReport(DailyReportType.SKILL_CHECKS, result.getReport());
         return result.getReportMargin();

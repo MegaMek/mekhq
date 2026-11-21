@@ -78,6 +78,12 @@ class AccoladeEntryTest {
               arguments(7, FactionAccoladeLevel.PROPAGANDA_REEL, FactionStandingLevel.STANDING_LEVEL_8, true),
               arguments(5, FactionAccoladeLevel.PROPAGANDA_REEL, FactionStandingLevel.STANDING_LEVEL_7, false),
               arguments(6, FactionAccoladeLevel.PROPAGANDA_REEL, FactionStandingLevel.STANDING_LEVEL_5, false),
+              // The next accolade's requirement applies: Cash Bonus 2 needs Standing Level 7
+              arguments(7, FactionAccoladeLevel.ADOPTION_OR_MEKS, FactionStandingLevel.STANDING_LEVEL_6, false),
+              arguments(7, FactionAccoladeLevel.ADOPTION_OR_MEKS, FactionStandingLevel.STANDING_LEVEL_7, true),
+              // Appearing in Searches needs Standing Level 6
+              arguments(7, FactionAccoladeLevel.TAKING_NOTICE_1, FactionStandingLevel.STANDING_LEVEL_5, false),
+              arguments(7, FactionAccoladeLevel.TAKING_NOTICE_1, FactionStandingLevel.STANDING_LEVEL_6, true),
               arguments(7,
                     FactionAccoladeLevel.LETTER_FROM_HEAD_OF_STATE,
                     FactionStandingLevel.STANDING_LEVEL_8,

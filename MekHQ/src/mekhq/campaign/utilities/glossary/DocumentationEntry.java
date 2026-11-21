@@ -61,7 +61,6 @@ public enum DocumentationEntry {
     EDUCATION_MODULE("EDUCATION_MODULE",
           "GlossaryDocs/Personnel Modules/Education Module",
           "0.50.07", "0.50.10", "0.50.10"),
-    FACTION_STANDINGS("FACTION_STANDINGS", "GlossaryDocs/Faction Standings", "0.50.07", "0.50.11", "0.50.11"),
     NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "GlossaryDocs/0_MHQ New Player Guide", "0.50.07", "0.50.11", "0.50.11"),
     PRISONERS_OF_WAR("PRISONERS_OF_WAR",
           "GlossaryDocs/Prisoners of War & Abstracted Search and Rescue",

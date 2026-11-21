@@ -83,6 +83,7 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl;
@@ -185,8 +186,10 @@ public class ContractNegotiatorPickerDialog extends JDialog {
         this.activeNegotiators = campaign.getCampaignOptions().get(CampaignOption.USE_ACTIVE_NEGOTIATORS);
         this.useEdge = campaign.getCampaignOptions().get(CampaignOption.USE_EDGE);
         if (activeNegotiators) {
+            int standingModifier = FactionStandingUtilities.getNegotiationModifier(campaign, contract);
             for (Person candidate : candidates) {
-                odds.put(candidate, NegotiatorProfile.odds(campaign, candidate, employerNegotiator, scale));
+                odds.put(candidate, NegotiatorProfile.odds(campaign, candidate, employerNegotiator, scale,
+                      standingModifier));
             }
         }
 

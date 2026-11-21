@@ -44,7 +44,13 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Stream;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionHints.FactionHints;
@@ -208,5 +214,74 @@ class FactionStandingUtilitiesTest {
               "With Faction Standing Command Circuits disabled the estimate must match the journey: no circuit");
         assertTrue(FactionStandingUtilities.isUseCommandCircuit(true, true, false, factionStandings, "WOB"),
               "A GM override always grants the circuit");
+    }
+
+    private static Campaign campaignWithRegard(boolean negotiationEnabled, boolean contractPayEnabled,
+          double regard) {
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(options.isUseFactionStandingNegotiationSafe()).thenReturn(negotiationEnabled);
+        when(options.isUseFactionStandingContractPaySafe()).thenReturn(contractPayEnabled);
+        FactionStandings standings = mock(FactionStandings.class);
+        when(standings.getRegardForFaction("FS", true)).thenReturn(regard);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        when(playerForce.getFactionStandings()).thenReturn(standings);
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
+        return campaign;
+    }
+
+    private static AbstractContract contractForFederatedSuns() {
+        AbstractContract contract = mock(AbstractContract.class);
+        when(contract.getStandingEmployerFactionCode()).thenReturn("FS");
+        return contract;
+    }
+
+    @Test
+    @DisplayName("Standing modifies contract negotiations only when the option is enabled")
+    void testGetNegotiationModifierForContract() {
+        AbstractContract contract = contractForFederatedSuns();
+
+        assertEquals(4, FactionStandingUtilities.getNegotiationModifier(campaignWithRegard(true, false, 55.0),
+              contract), "Standing Level 8 gives +4");
+        assertEquals(-4, FactionStandingUtilities.getNegotiationModifier(campaignWithRegard(true, false, -55.0),
+              contract), "Standing Level 0 gives -4");
+        assertEquals(0, FactionStandingUtilities.getNegotiationModifier(campaignWithRegard(false, true, 55.0),
+              contract), "No modifier when Standing doesn't affect negotiations");
+    }
+
+    @Test
+    @DisplayName("Standing multiplies contract pay only when the option is enabled")
+    void testGetContractPayMultiplierForContract() {
+        AbstractContract contract = contractForFederatedSuns();
+
+        assertEquals(1.2, FactionStandingUtilities.getContractPayMultiplier(campaignWithRegard(false, true, 55.0),
+              contract), 0.0001, "Standing Level 8 pays x1.2");
+        assertEquals(0.6, FactionStandingUtilities.getContractPayMultiplier(campaignWithRegard(false, true, -55.0),
+              contract), 0.0001, "Standing Level 0 pays x0.6");
+        assertEquals(1.0, FactionStandingUtilities.getContractPayMultiplier(campaignWithRegard(true, false, 55.0),
+              contract), 0.0001, "No change when Standing doesn't affect contract pay");
+    }
+
+    private static Person employedAdult(PrisonerStatus prisonerStatus) {
+        Person person = mock(Person.class);
+        when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
+        when(person.isChild(TODAY_FOR_EXEMPTION)).thenReturn(false);
+        when(person.isEmployed()).thenReturn(true);
+        when(person.getPrisonerStatus()).thenReturn(prisonerStatus);
+        return person;
+    }
+
+    private static final LocalDate TODAY_FOR_EXEMPTION = LocalDate.of(3050, 1, 1);
+
+    @Test
+    @DisplayName("Free personnel and bondsmen are affected by mass loyalty changes; prisoners are exempt")
+    void testIsExemptOnlyExemptsPrisoners() {
+        assertFalse(FactionStandingUtilities.isExempt(employedAdult(PrisonerStatus.FREE), TODAY_FOR_EXEMPTION),
+              "Free personnel must not be exempt");
+        assertFalse(FactionStandingUtilities.isExempt(employedAdult(PrisonerStatus.BONDSMAN), TODAY_FOR_EXEMPTION),
+              "Bondsmen must not be exempt");
+        assertTrue(FactionStandingUtilities.isExempt(employedAdult(PrisonerStatus.PRISONER), TODAY_FOR_EXEMPTION),
+              "Prisoners must be exempt");
     }
 }

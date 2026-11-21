@@ -3447,10 +3447,9 @@ public class Campaign implements ITechManager {
      * Checks if a new mercenary organization is starting up in the current game year, and, if so, triggers a welcome
      * dialog introducing the organization's representative.
      *
-     * <p>This method examines a prioritized list of known mercenary-related factions for their respective founding
-     * (start) years matching the current year. The list is evaluated in the following order: Mercenary Review Board
-     * (MRB), Mercenary Review Bonding Commission (MRBC), Mercenary Bonding Authority (MBA), and Mercenary Guild (MG),
-     * with MG as the default fallback. If a matching faction is found (and is recognized as a mercenary organization),
+     * <p>This method looks for the mercenary organization founded in the current year, or, if
+     * {@code bypassStartYear} is set, the organization active this year ({@link Faction#getActiveMercenaryOrganization}),
+     * with the Mercenary Guild (MG) as the default fallback. If a matching faction is found (and is recognized as a mercenary organization),
      * it generates an appropriate speaker (as either a merchant or military liaison, depending on the faction) and
      * opens a welcome dialog for the player.</p>
      *
@@ -3466,20 +3465,15 @@ public class Campaign implements ITechManager {
     public void checkForNewMercenaryOrganizationStartUp(boolean bypassStartYear, boolean isStartUp) {
         Factions factions = Factions.getInstance();
         int currentYear = getGameYear();
-        Faction[] possibleFactions = new Faction[] {
-              factions.getFaction("MRB"),
-              factions.getFaction("MRBC"),
-              factions.getFaction("MBA"),
-              factions.getFaction("MG")
-        };
 
+        // Use the same organization that contracts update Regard with, so the two never disagree
         Faction chosenFaction = null;
-        for (Faction faction : possibleFactions) {
-            if (faction != null) {
-                boolean isValidInYear = bypassStartYear && faction.validIn(currentYear);
-                boolean isFoundedInYear = !bypassStartYear && faction.getStartYear() == currentYear;
-
-                if (isValidInYear || isFoundedInYear) {
+        if (bypassStartYear) {
+            chosenFaction = Faction.getActiveMercenaryOrganization(currentYear);
+        } else {
+            for (String code : Faction.MERCENARY_ORGANIZATION_CODES) {
+                Faction faction = factions.getFaction(code);
+                if ((faction != null) && (faction.getStartYear() == currentYear)) {
                     chosenFaction = faction;
                     break;
                 }

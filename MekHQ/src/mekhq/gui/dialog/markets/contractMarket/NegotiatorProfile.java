@@ -43,6 +43,7 @@ import mekhq.campaign.mission.contract.utilities.ActiveNegotiationMath.Odds;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillCheck;
 import mekhq.campaign.personnel.skills.SkillType;
 
 /**
@@ -142,6 +143,27 @@ record NegotiatorProfile(int raiseCap, int sacrificeTerms, int sacrificeSteps, i
     }
 
     /** Whether the player's negotiator spends Edge to reroll a failed re-negotiation check. */
+    /**
+     * A Negotiation check for the given person, with the campaign's Faction Standing modifier applied. A positive
+     * modifier makes the check easier.
+     *
+     * @param campaign         the current campaign
+     * @param person           the negotiator
+     * @param standingModifier the Faction Standing negotiation modifier; {@code 0} for the employer's negotiator
+     *
+     * @return the skill check, ready to resolve
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static SkillCheck negotiationCheck(Campaign campaign, Person person, int standingModifier) {
+        SkillCheck check = person.checkSkill(SkillType.S_NEGOTIATION, campaign);
+        if (standingModifier != 0) {
+            check.withMiscModifier(-standingModifier);
+        }
+        return check;
+    }
+
     static boolean playerUsesEdge(Person negotiator, Campaign campaign) {
         return campaign.getCampaignOptions().get(CampaignOption.USE_EDGE)
                      && negotiator.getOptions().booleanOption(PersonnelOptions.EDGE_COMMANDER_NEGOTIATION);
@@ -155,14 +177,17 @@ record NegotiatorProfile(int raiseCap, int sacrificeTerms, int sacrificeSteps, i
      * @param playerNegotiator   the player's negotiator
      * @param employerNegotiator the employer's negotiator, or {@code null} when the employer always barely makes it
      * @param scale              the contract's scale
+     * @param standingModifier   the Faction Standing negotiation modifier for the player's negotiator
      *
      * @return the odds of asking for a better offer and of asking for an exception
      */
-    static TableOdds odds(Campaign campaign, Person playerNegotiator, @Nullable Person employerNegotiator, int scale) {
-        double[] player = marginChances(campaign, playerNegotiator, playerUsesEdge(playerNegotiator, campaign));
+    static TableOdds odds(Campaign campaign, Person playerNegotiator, @Nullable Person employerNegotiator, int scale,
+          int standingModifier) {
+        double[] player = marginChances(campaign, playerNegotiator, playerUsesEdge(playerNegotiator, campaign),
+              standingModifier);
         double[] employer = employerNegotiator == null ? null
                                   : marginChances(campaign, employerNegotiator,
-                                        campaign.getCampaignOptions().get(CampaignOption.USE_EDGE));
+                                        campaign.getCampaignOptions().get(CampaignOption.USE_EDGE), 0);
         NegotiatorProfile profile = of(playerNegotiator, scale);
         return new TableOdds(
               ActiveNegotiationMath.opposedOdds(player, employer, profile.generalModifier + profile.haggleModifier),
@@ -171,8 +196,8 @@ record NegotiatorProfile(int raiseCap, int sacrificeTerms, int sacrificeSteps, i
     }
 
     /** The chance of each margin on a person's Negotiation check, as a re-negotiation rolls it. */
-    private static double[] marginChances(Campaign campaign, Person person, boolean useEdge) {
-        TargetRoll target = person.checkSkill(SkillType.S_NEGOTIATION, campaign).getTargetNumber();
+    private static double[] marginChances(Campaign campaign, Person person, boolean useEdge, int standingModifier) {
+        TargetRoll target = negotiationCheck(campaign, person, standingModifier).getTargetNumber();
         Skill skill = person.getSkill(SkillType.S_NEGOTIATION);
         return ActiveNegotiationMath.marginChances(target.getValue(), target.cannotSucceed(),
               SkillType.getType(SkillType.S_NEGOTIATION).isCountUp(), skill != null && skill.getHasNaturalAptitude(),
