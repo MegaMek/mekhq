@@ -64,6 +64,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.education.EducationController;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.unit.Maintenance;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -349,30 +350,32 @@ public record Accountant(Campaign campaign) {
         return total;
     }
 
-    public Money getWeeklyMaintenanceCosts() {
-        return getWeeklyMaintenanceTotal(getAllUnits())
-                     .multipliedBy(PlanetaryCostReductions.getMaintenanceMultiplier(campaign()));
-    }
-
     /**
-     * Static version of {@link #getWeeklyMaintenanceCosts()}.
+     * The maintenance the campaign will be charged in an average month if its situation doesn't change. This follows
+     * what {@link Maintenance#doMaintenance(Campaign, Unit)} charges each unit (see
+     * {@link Maintenance#getProjectedDailyMaintenanceCost}), including the planetary cost reductions where the force
+     * stands now.
      *
-     * <p>Units that do not require maintenance (e.g. mothballed, deployed, or self-maintained infantry) are skipped,
-     * as they are never charged.</p>
+     * @return the projected monthly maintenance, or zero if the campaign isn't charged maintenance
      *
-     * @param units the units to total weekly maintenance costs for
-     *
-     * @return the total {@link Money} weekly cost of maintenance
+     * @author Illiani
+     * @since 0.51.01
      */
-    public static Money getWeeklyMaintenanceTotal(Collection<Unit> units) {
-        Money total = Money.zero();
-        for (Unit unit : units) {
-            if (unit.requiresMaintenance()) {
-                total = total.plus(unit.getWeeklyMaintenanceCost());
-            }
+    public Money getProjectedMonthlyMaintenanceCosts() {
+        boolean isOnContract = !campaign().getActiveContracts().isEmpty();
+        boolean isOnCombatContract = Maintenance.isOnCombatContract(campaign());
+
+        Money dailyMaintenance = Money.zero();
+        for (Unit unit : getAllUnits()) {
+            dailyMaintenance = dailyMaintenance.plus(Maintenance.getProjectedDailyMaintenanceCost(campaign(),
+                  unit,
+                  isOnContract,
+                  isOnCombatContract,
+                  Maintenance.isUnitInTransit(unit)));
         }
 
-        return total;
+        return dailyMaintenance.multipliedBy(ContractExpenseProjection.DAYS_PER_MONTH)
+                     .multipliedBy(PlanetaryCostReductions.getMaintenanceMultiplier(campaign()));
     }
 
     public Money getPayRoll(boolean noInfantry) {

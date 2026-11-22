@@ -204,17 +204,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
     }
 
     @Override
-    public Money getValueNeeded() {
-        if ((getShotsPerTon() <= 0) || (shotsNeeded <= 0)) {
-            return Money.zero();
-        }
-
-        return adjustCostsForCampaignOptions(getPricePerTon().multipliedBy(getCapacity())
-                                                   .multipliedBy(shotsNeeded)
-                                                   .dividedBy(getShotsPerTon()));
-    }
-
-    @Override
     protected Money getPricePerTon() {
         // Since ammo swaps are handled by moving capacity from one bay to another, the
         // ammo type

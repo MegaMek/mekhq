@@ -229,7 +229,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     }
 
     private static int getShotsPerTon(AmmoType ammoType) {
-        if (ammoType.getKgPerShot() > 0) {
+        // Without a listed weight, getKgPerShot() is worked out from the shots, and dividing back out of it can lose a
+        // shot to rounding (15 shots a ton comes back as 14)
+        if (ammoType.hasCustomKgPerShot()) {
             return (int) Math.floor(1000.0 / ammoType.getKgPerShot());
         }
 
