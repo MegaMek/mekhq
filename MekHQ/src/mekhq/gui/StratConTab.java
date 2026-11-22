@@ -487,19 +487,14 @@ public class StratConTab extends CampaignGuiTab {
     }
 
     /**
-     * Shows a simple integer input dialog seeded with the current value.
+     * Asks the GM for a whole number, seeded with the current value.
      *
      * @param promptKey    the resource key for the prompt message
      * @param currentValue the value to seed the input with
      *
-     * @return the entered integer, or {@code null} if cancelled or not a valid integer
-     */
-    /**
-     * Asks the GM for a whole number, seeded with the current value.
-     *
-     * @return the number entered, or {@code null} if the GM cancelled. Unparseable input is reported rather than
-     *       silently discarded - typing a stray letter used to close the dialog and change nothing, with no way to tell
-     *       that from a deliberate cancel.
+     * @return the number entered, or {@code null} if the GM cancelled or the input is not a whole number. Unparseable
+     *       input is reported rather than silently discarded - typing a stray letter used to close the dialog and
+     *       change nothing, with no way to tell that from a deliberate cancel.
      */
     private Integer promptForInt(String promptKey, int currentValue) {
         String input = JOptionPane.showInputDialog(this, getTextAt(RESOURCE_BUNDLE, promptKey),

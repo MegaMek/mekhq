@@ -124,6 +124,13 @@ public class RecoverMIAPersonnel {
     }
 
     /**
+     * @return the target number for the daily rescue roll, with its modifiers
+     */
+    TargetRoll getSarTargetNumber() {
+        return sarTargetNumber;
+    }
+
+    /**
      * Attempts to rescue a player-character who is listed as missing in action (MIA).
      *
      * <p>The success of the SAR operation is determined by a die roll against a target number (TN).
@@ -135,13 +142,6 @@ public class RecoverMIAPersonnel {
      *
      * @param missingPerson The {@link Person} representing the character who is MIA.
      */
-    /**
-     * @return the target number for the daily rescue roll, with its modifiers
-     */
-    TargetRoll getSarTargetNumber() {
-        return sarTargetNumber;
-    }
-
     public void attemptRescueOfPlayerCharacter(Person missingPerson) {
         int targetNumber = sarTargetNumber.getValue();
         int roll = d6(2);

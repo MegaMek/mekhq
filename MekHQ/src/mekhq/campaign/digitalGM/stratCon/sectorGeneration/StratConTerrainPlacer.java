@@ -155,12 +155,6 @@ public class StratConTerrainPlacer {
     }
 
     /**
-     * Adds every ocean hex on the given track to its revealed-coordinates set, so open water is always visible.
-     *
-     * @param track the track whose ocean hexes should be revealed
-     */
-
-    /**
      * Draws a "stripe" of the given terrain type on the given track
      *
      * @param track           Track to stripe

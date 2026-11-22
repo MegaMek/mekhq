@@ -142,7 +142,6 @@ record NegotiatorProfile(int raiseCap, int sacrificeTerms, int sacrificeSteps, i
                      || trait.equals(PersonnelOptions.EDGE_COMMANDER_NEGOTIATION);
     }
 
-    /** Whether the player's negotiator spends Edge to reroll a failed re-negotiation check. */
     /**
      * A Negotiation check for the given person, with the campaign's Faction Standing modifier applied. A positive
      * modifier makes the check easier.
@@ -164,6 +163,7 @@ record NegotiatorProfile(int raiseCap, int sacrificeTerms, int sacrificeSteps, i
         return check;
     }
 
+    /** Whether the player's negotiator spends Edge to reroll a failed re-negotiation check. */
     static boolean playerUsesEdge(Person negotiator, Campaign campaign) {
         return campaign.getCampaignOptions().get(CampaignOption.USE_EDGE)
                      && negotiator.getOptions().booleanOption(PersonnelOptions.EDGE_COMMANDER_NEGOTIATION);

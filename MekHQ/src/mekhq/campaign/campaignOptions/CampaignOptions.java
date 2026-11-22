@@ -571,13 +571,6 @@ public class CampaignOptions {
     }
 
     /**
-     * Checks whether tracking faction standing is enabled and if the use of faction standing command circuits are
-     * active.
-     *
-     * @return {@code true} if both faction standing tracking and faction standing command circuit usage are enabled;
-     *       {@code false} otherwise.
-     */
-    /**
      * Hot Spots upkeep replaces unit maintenance, so maintenance is never charged alongside it, whatever its own option
      * says. The options dialog already prevents combining them; this also covers presets and hand-edited saves.
      *
@@ -660,6 +653,13 @@ public class CampaignOptions {
         return get(CampaignOption.PAY_FOR_PEACETIME_FUEL) && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
     }
 
+    /**
+     * Checks whether tracking faction standing is enabled and if the use of faction standing command circuits are
+     * active.
+     *
+     * @return {@code true} if both faction standing tracking and faction standing command circuit usage are enabled;
+     *       {@code false} otherwise.
+     */
     public boolean isUseFactionStandingCommandCircuitSafe() {
         return get(CampaignOption.TRACK_FACTION_STANDING) && get(CampaignOption.USE_FACTION_STANDING_COMMAND_CIRCUIT);
     }

@@ -1051,16 +1051,6 @@ public class RetirementDefectionTracker {
     }
 
     /**
-     * Returns the number of permanent, non-prosthetic injuries for turnover modifier calculation.
-     *
-     * <p>Prosthetics and implants are excluded because they are elective modifications,
-     * not debilitating injuries that would cause a person to leave a unit.</p>
-     *
-     * @param person the person to evaluate
-     *
-     * @return count of permanent injuries excluding prosthetics and implants
-     */
-    /**
      * Calculates the shares modifier to a character's turnover target number.
      *
      * <p>The contract used is {@code mission} if one is given (an end of contract check). Otherwise it is the active
@@ -1125,6 +1115,16 @@ public class RetirementDefectionTracker {
         return modifier;
     }
 
+    /**
+     * Returns the number of permanent, non-prosthetic injuries for turnover modifier calculation.
+     *
+     * <p>Prosthetics and implants are excluded because they are elective modifications,
+     * not debilitating injuries that would cause a person to leave a unit.</p>
+     *
+     * @param person the person to evaluate
+     *
+     * @return count of permanent injuries excluding prosthetics and implants
+     */
     static int getInjuryTurnoverModifier(final Person person) {
         return (int) person.getInjuries().stream()
                            .filter(i -> !i.getSubType().isPermanentModification())

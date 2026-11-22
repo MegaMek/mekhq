@@ -3513,19 +3513,6 @@ public class StratConRulesManager {
     }
 
     /**
-     * Whether a hex is unfit for an Official Challenge: something already takes it up (a scenario, a facility, or an
-     * occupying point of interest - see {@link StratConTrackState#isHexOccupied}), or a player formation is deployed
-     * there.
-     *
-     * @param track  the track the challenge would be placed on, or {@code null} if it has none
-     * @param coords the hex to test, or {@code null} if the scenario has no position
-     *
-     * @return {@code true} if the challenge must be placed elsewhere
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    /**
      * Picks the hex an Official Challenge is placed on: the rolled hex if it is free (see
      * {@link #isOccupiedForOfficialChallenge}), otherwise a free hex chosen by the active GM's OpFor deployment
      * strategy.
@@ -3548,6 +3535,19 @@ public class StratConRulesManager {
         return StratConGMs.opForDeployment(campaignOptions).getUnoccupiedCoords(track);
     }
 
+    /**
+     * Whether a hex is unfit for an Official Challenge: something already takes it up (a scenario, a facility, or an
+     * occupying point of interest - see {@link StratConTrackState#isHexOccupied}), or a player formation is deployed
+     * there.
+     *
+     * @param track  the track the challenge would be placed on, or {@code null} if it has none
+     * @param coords the hex to test, or {@code null} if the scenario has no position
+     *
+     * @return {@code true} if the challenge must be placed elsewhere
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
     static boolean isOccupiedForOfficialChallenge(@Nullable StratConTrackState track,
           @Nullable StratConCoords coords) {
         if ((track == null) || (coords == null)) {

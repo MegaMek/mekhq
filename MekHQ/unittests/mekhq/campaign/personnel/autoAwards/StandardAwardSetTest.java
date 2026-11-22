@@ -38,11 +38,11 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
 
+import megamek.MMConstants;
+import megamek.common.universe.Faction2;
+import megamek.common.universe.Factions2;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
-import mekhq.campaign.universe.Factions;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -53,21 +53,13 @@ class StandardAwardSetTest {
     private static final List<String> SUPER_FACTIONS = List.of("majorpowers", "innersphere", "clans", "periphery",
           "pirate", "mercenary", "independent", "deepperiphery", "comstar", "wob", "comstarorwob");
 
-    private static Factions originalFactions;
-
-    @BeforeAll
-    static void loadFactions() {
-        originalFactions = Factions.getInstance();
-        Factions.setInstance(Factions.loadDefault(true));
-    }
-
-    @AfterAll
-    static void restoreFactions() {
-        Factions.setInstance(originalFactions);
-    }
-
     @Test
     void testTheatreOfWarBelligerentsAreFactionCodes() {
+        // The shipped factions, as the test faction data holds only a handful. Loaded apart from the shared instance so
+        // other tests are unaffected.
+        Factions2 factions = new Factions2(MMConstants.FACTIONS_DIR);
+        assertFalse(factions.getFactions().isEmpty(), "No faction data found in " + MMConstants.FACTIONS_DIR);
+
         List<Award> theatreOfWarAwards = AwardsFactory.getInstance().getAllAwardsForSet("standard").stream()
                                                .filter(award -> award.getItem()
                                                                       .replaceAll("\\s", "")
@@ -83,7 +75,7 @@ class StandardAwardSetTest {
                     continue;
                 }
 
-                assertEquals(name, Factions.getInstance().getFaction(name).getShortName(),
+                assertEquals(name, factions.getFaction(name).map(Faction2::getKey).orElse(null),
                       award.getName() + " lists '" + name + "', which is not a faction code");
             }
 

@@ -2809,10 +2809,6 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Worker function that outputs html representing the status of a selected hex, containing info such as whether it's
-     * been revealed, assigned forces, scenarios, facilities, etc.
-     */
-    /**
      * A rough local temperature for a hex: the sector's average temperature shifted by the hex's terrain climate (see
      * {@link StratConBiomeManifest#terrainTemperatureOffset}). This is the same value a scenario spawned here uses for
      * its board temperature.
@@ -2826,6 +2822,10 @@ public class StratConPanel extends JPanel implements ActionListener {
                      StratConBiomeManifest.terrainTemperatureOffset(currentTrack.getTerrainTile(coords));
     }
 
+    /**
+     * Worker function that outputs html representing the status of a selected hex, containing info such as whether it's
+     * been revealed, assigned forces, scenarios, facilities, etc.
+     */
     private String buildSelectedHexInfo(Campaign campaign) {
         StringBuilder infoBuilder = new StringBuilder();
         // Bound the width so long content (e.g. long terrain/scenario names) wraps instead of overflowing the HUD.

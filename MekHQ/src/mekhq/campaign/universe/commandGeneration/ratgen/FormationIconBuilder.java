@@ -728,11 +728,6 @@ public final class FormationIconBuilder {
     }
 
     /**
-     * Returns the most common {@link UnitType} among the units in the formation's subtree, or
-     * {@link UnitType#MEK} when the formation has no units or all units' entities are null. Used
-     * by {@link #appendTypePieces} to pick the chassis silhouette.
-     */
-    /**
      * The icon for what a formation is <em>for</em>, when that is clear from the equipment its units carry.
      *
      * <p>Every unit has to agree, so a company of MASH trucks is a field hospital while a mixed formation that merely
@@ -878,6 +873,11 @@ public final class FormationIconBuilder {
         return null;
     }
 
+    /**
+     * Returns the most common {@link UnitType} among the units in the formation's subtree, or
+     * {@link UnitType#MEK} when the formation has no units or all units' entities are null. Used
+     * by {@link #appendTypePieces} to pick the chassis silhouette.
+     */
     private static int determineDominantUnitType(Formation formation, Function<UUID, Unit> unitLookup) {
         Map<Integer, Integer> counts = new java.util.HashMap<>();
         for (UUID unitId : formation.getAllUnits(false)) {

@@ -218,18 +218,6 @@ public class Bloodname {
     }
 
     /**
-     * Determines a likely Bloodname based on Clan, phenotype, and year.
-     *
-     * @param factionCode The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
-     * @param phenotype   The person's Phenotype
-     * @param year        The current campaign year
-     *
-     * @return An object representing the chosen Bloodname
-     *       <p>
-     *       Though based as much as possible on official sources, the method employed here involves a considerable
-     *       amount of speculation.
-     */
-    /**
      * Finds a Bloodname by name.
      *
      * <p>{@link Person} stores only the name it was given, so anything that
@@ -253,6 +241,18 @@ public class Bloodname {
         return null;
     }
 
+    /**
+     * Determines a likely Bloodname based on Clan, phenotype, and year.
+     *
+     * @param factionCode The faction code for the Clan; must exist in data/names/bloodnames/clans.xml
+     * @param phenotype   The person's Phenotype
+     * @param year        The current campaign year
+     *
+     * @return An object representing the chosen Bloodname
+     *       <p>
+     *       Though based as much as possible on official sources, the method employed here involves a considerable
+     *       amount of speculation.
+     */
     public static @Nullable Bloodname randomBloodname(String factionCode, Phenotype phenotype, int year) {
         // The Bandit Caste has no Bloodnames, so there is nothing to look up (and nothing to log as an error)
         if (Faction.BANDIT_CASTE_FACTION_CODE.equals(factionCode)) {

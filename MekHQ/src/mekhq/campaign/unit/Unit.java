@@ -1520,9 +1520,6 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
-     * Takes a part off this unit and out of the warehouse that keeps it, for a part the unit has no place for.
-     */
-    /**
      * @return {@code true} for a Mek built without a gyro, such as one with an Interface Cockpit, which has no gyro
      *       part to repair, replace or buy
      */
@@ -1534,6 +1531,9 @@ public class Unit implements ITechnology, ILocatable {
         return isBuiltWithoutGyro;
     }
 
+    /**
+     * Takes a part off this unit and out of the warehouse that keeps it, for a part the unit has no place for.
+     */
     private void discardPart(Part part) {
         removePart(part);
         // the warehouse that keeps the part, which need not be the unit's when an older version left it elsewhere

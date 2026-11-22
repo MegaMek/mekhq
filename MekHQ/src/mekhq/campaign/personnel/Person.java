@@ -763,9 +763,6 @@ public class Person implements ILocatable {
     }
 
     /**
-     * @return {@code true} if this person descends from a recorded Bloodname House
-     */
-    /**
      * @return how this warrior's legacy is used in the breeding program; never {@code null}
      */
     public GeneticLegacyRole getGeneticLegacyRole() {
@@ -780,6 +777,9 @@ public class Person implements ILocatable {
         this.geneticLegacyRole = (geneticLegacyRole == null) ? GeneticLegacyRole.NONE : geneticLegacyRole;
     }
 
+    /**
+     * @return {@code true} if this person descends from a recorded Bloodname House
+     */
     public boolean hasBloodhouse() {
         return (bloodhouse != null) && !bloodhouse.isBlank();
     }
@@ -6890,9 +6890,6 @@ public class Person implements ILocatable {
     }
 
     /**
-     * Returns a string of all the option "codes" for this pilot, for a given group, using sep as the separator
-     */
-    /**
      * Every implant this person carries, across the groups that hold them.
      *
      * <p>The Manei Domini implants and enhanced imaging sit in separate option groups but are one
@@ -6920,6 +6917,9 @@ public class Person implements ILocatable {
         return countOptions(PersonnelOptions.MD_ADVANTAGES) + countOptions(PilotOptions.EI_ADVANTAGES);
     }
 
+    /**
+     * Returns a string of all the option "codes" for this pilot, for a given group, using sep as the separator
+     */
     public String getOptionList(@Nullable String sep, final String groupKey) {
         final StringBuilder adv = new StringBuilder();
 

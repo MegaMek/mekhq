@@ -94,25 +94,6 @@ public class AddSupportUnitsToTOE {
     }
 
     /**
-     * Creates a new {@link Formation} populated with the given units.
-     *
-     * <p>The formation is assigned the provided {@code label} as its display name and configured with the given
-     * {@link FormationType}. Each unit's ID is then registered with the formation. The formation type is largely
-     * presentational for support formations and does not affect gameplay calculations.</p>
-     *
-     * @param campaign    the campaign context, used to register the units with the formation
-     * @param label       the display name for the new formation
-     * @param type        the {@link FormationType} to assign to the formation
-     * @param units       the list of {@link Unit} objects whose IDs will be added to the formation; must not be
-     *                    {@code null}, but may be empty
-     * @param hqFormation the HQ {@link Formation} to attach the new formation to; must not be {@code null}
-     *
-     * @return a fully populated, non-{@code null} {@link Formation} ready to be registered with the campaign
-     *
-     * @author Illiani
-     * @since 0.51.0
-     */
-    /**
      * Adds units to a formation nested one level deeper than {@link #addSupportUnitsToTOE}, so related
      * sub-commands can be grouped under a shared parent rather than sitting as siblings directly under
      * the HQ.
@@ -377,6 +358,23 @@ public class AddSupportUnitsToTOE {
         return created;
     }
 
+    /**
+     * Adds the given units to a sub-{@link Formation} of the HQ formation, creating it if it does not already exist.
+     *
+     * <p>A new formation is assigned the provided {@code label} as its display name and configured with the given
+     * {@link FormationType}. Each unit's ID is then registered with the formation. The formation type is largely
+     * presentational for support formations and does not affect gameplay calculations.</p>
+     *
+     * @param campaign    the campaign context, used to register the units with the formation
+     * @param label       the display name of the sub-formation
+     * @param type        the {@link FormationType} to assign to the formation, if it is created
+     * @param units       the list of {@link Unit} objects whose IDs will be added to the formation; must not be
+     *                    {@code null}, but may be empty
+     * @param hqFormation the HQ {@link Formation} the sub-formation sits under; must not be {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     private static void createSubFormation(Campaign campaign, String label, FormationType type,
           List<Unit> units, Formation hqFormation) {
         // Reuse an existing sub-formation of this label under the HQ, so a top-up generation (for
@@ -419,20 +417,6 @@ public class AddSupportUnitsToTOE {
         return null;
     }
 
-    /**
-     * Retrieves the campaign's HQ {@link Formation}, creating it if one does not already exist.
-     *
-     * <p>All existing formations are searched for a name that matches {@link SupportTOEFormationTypes#HQ_FORMATION}'s
-     * label (case-insensitive). If a match is found, it is returned immediately. Otherwise, a new HQ formation is
-     * created, attached to the campaign's origin formation ({@link Formation#FORMATION_ORIGIN}), and returned.</p>
-     *
-     * @param campaign the active {@link Campaign} whose formation list is searched and potentially modified
-     *
-     * @return the existing or newly created HQ {@link Formation}; never {@code null}
-     *
-     * @author Illiani
-     * @since 0.51.0
-     */
     /**
      * The formation a campaign already keeps its support under, if it has one.
      *
@@ -496,6 +480,20 @@ public class AddSupportUnitsToTOE {
                      || formation.isFormationType(FormationType.SECURITY);
     }
 
+    /**
+     * Retrieves the campaign's HQ {@link Formation}, creating it if one does not already exist.
+     *
+     * <p>All existing formations are searched for a name that matches {@link SupportTOEFormationTypes#HQ_FORMATION}'s
+     * label (case-insensitive). If a match is found, it is returned immediately. Otherwise, a new HQ formation is
+     * created, attached to the campaign's origin formation ({@link Formation#FORMATION_ORIGIN}), and returned.</p>
+     *
+     * @param campaign the active {@link Campaign} whose formation list is searched and potentially modified
+     *
+     * @return the existing or newly created HQ {@link Formation}; never {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     static @Nonnull Formation getHqFormation(Campaign campaign) {
         final Formation ORIGIN_FORMATION = campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN);
 

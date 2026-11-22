@@ -1137,19 +1137,6 @@ public final class SupportPersonnelToTOE {
     }
 
     /**
-     * The capability vehicles still to build for a section, less those the campaign already owns.
-     *
-     * <p>A freshly generated command owns none, so it gets the full count. A campaign converted to support teams
-     * may already field them - bought, or granted when the capability's option was switched on - and building the
-     * full count again would duplicate them.</p>
-     *
-     * @param campaign    the campaign whose hangar is counted
-     * @param unitName    the capability vehicle to build
-     * @param targetCount how many the command should field
-     *
-     * @return a single spec for the missing vehicles, or an empty list when none are missing
-     */
-    /**
      * The vehicles still needed to reach {@code targetCount} of a capability fielded under one name.
      *
      * @param campaign    the campaign whose hangar is counted
@@ -1168,6 +1155,20 @@ public final class SupportPersonnelToTOE {
         return List.of(new VehicleSpec(unitName, missing));
     }
 
+    /**
+     * The capability vehicles still to build for a section, less those the campaign already owns.
+     *
+     * <p>A freshly generated command owns none, so it gets the full count. A campaign converted to support teams
+     * may already field them - bought, or granted when the capability's option was switched on - and building the
+     * full count again would duplicate them.</p>
+     *
+     * @param campaign    the campaign whose hangar is counted
+     * @param capability  the capability to build vehicles for
+     * @param faction     the faction the vehicles are rolled for when the capability has no single named unit
+     * @param targetCount how many the command should field
+     *
+     * @return the specs for the missing vehicles, or an empty list when none are missing
+     */
     static List<VehicleSpec> vehiclesStillNeeded(Campaign campaign, SupportCapability capability,
           Faction faction, int targetCount) {
         // A named capability is infantry and is counted by name. A rolled one has no single name to count or to
