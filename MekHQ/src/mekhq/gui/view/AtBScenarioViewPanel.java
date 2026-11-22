@@ -67,6 +67,7 @@ import javax.swing.tree.TreeSelectionModel;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
+import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.common.interfaces.IStartingPositions;
 import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.PlanetaryConditions;
@@ -1109,7 +1110,33 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                           scenario.getBotForce(this.forceIndex).getFullEntityList(campaign).get(unitIndex));
                     editorDialog.setVisible(true);
                 }
+            } else if (command.equalsIgnoreCase("VIEW_TRO")) {
+                Entity entity = getSelectedEntity();
+                if (entity != null) {
+                    new EntityReadoutDialog(frame, entity).setVisible(true);
+                }
             }
+        }
+
+        /**
+         * @return the entity shown on the selected row of the tree, or {@code null} if no unit is selected or the
+         *       selected row doesn't represent a valid entity
+         */
+        private @Nullable Entity getSelectedEntity() {
+            // Row 0 is the bot force itself, its units follow in order
+            int unitIndex = tree.getMinSelectionRow() - 1;
+            List<Entity> entities = scenario.getBotForce(forceIndex).getFullEntityList(campaign);
+            return ((unitIndex >= 0) && (unitIndex < entities.size())) ? entities.get(unitIndex) : null;
+        }
+
+        /**
+         * @return {@code true} if the units in this bot force have their identities hidden from the player by blind
+         *       drop
+         */
+        private boolean isHiddenByBlindDrop() {
+            boolean isBlindDrop = campaign.getGameOptions().getOption(BASE_BLIND_DROP).booleanValue();
+            boolean isTrueBlindDrop = campaign.getGameOptions().getOption(BASE_REAL_BLIND_DROP).booleanValue();
+            return (isBlindDrop || isTrueBlindDrop) && (scenario.getBotForce(forceIndex).getTeam() != 1);
         }
 
         @Override
@@ -1131,7 +1158,17 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                     return;
                 }
 
+                // Right-clicking doesn't select the row by default, so without this the menu would act on whichever
+                // unit was previously selected, rather than the one that was clicked
+                tree.setSelectionPath(path);
+
                 JMenuItem menuItem;
+                if (!isHiddenByBlindDrop() && (getSelectedEntity() != null)) {
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "AtBScenarioViewPanel.menu.viewTRO"));
+                    menuItem.setActionCommand("VIEW_TRO");
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
                 if ((path.getPathCount() > 1) &&
                           (tree.getSelectionRows() != null) &&
                           (tree.getSelectionRows()[0] != 0) &&
