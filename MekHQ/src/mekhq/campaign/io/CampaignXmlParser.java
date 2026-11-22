@@ -727,6 +727,27 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
     }
 
+    /**
+     * Removes any dead prisoners still on the roster.
+     *
+     * <p>Prisoners are removed from the roster when they die, but earlier versions left them there, where the player
+     * could still free, execute, or ransom them.</p>
+     *
+     * @param campaign the campaign that has just been loaded
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void removeDeadPrisoners(Campaign campaign) {
+        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+        List<Person> deadPrisoners = humanResources.getPersonnel().stream().filter(Person::isDeadPrisoner).toList();
+
+        for (Person prisoner : deadPrisoners) {
+            LOGGER.info("Removing dead prisoner from the roster: {}", prisoner.getFullTitle());
+            humanResources.removePerson(campaign, prisoner);
+        }
+    }
+
     private static void cleanupGhostKills(Campaign retVal) {
         // check for kills with missing person references
         List<Kill> ghostKills = new ArrayList<>();
@@ -2876,6 +2897,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LegacyContractConverter.settlePendingLegacyContracts(campaign);
         // Free any forces stranded on the scenarios of contracts whose completion was interrupted in earlier versions.
         MissionCompletionManager.releaseCompletedContractDeployments(campaign);
+        // Has to come after everyone has been reconnected to their location, so nobody is reconnected after removal
+        removeDeadPrisoners(campaign);
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;

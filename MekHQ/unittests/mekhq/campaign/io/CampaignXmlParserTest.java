@@ -56,6 +56,7 @@ import megamek.common.options.OptionsConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsUnmarshaller;
@@ -65,7 +66,9 @@ import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.education.AcademyFactory;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationStage;
+import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeEach;
@@ -309,6 +312,56 @@ class CampaignXmlParserTest {
             CampaignXmlParser.migrateDerivedImplantProsthetics(campaign, new Version("0.51.01"));
 
             assertTrue(person.getProstheticInjuries().isEmpty());
+        }
+    }
+
+    /**
+     * Earlier versions left prisoners on the roster after they died, so saves may still hold them.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Nested
+    class DeadPrisonerRemoval {
+        Campaign campaign;
+        ForceHumanResources humanResources;
+
+        @BeforeEach
+        void setUp() {
+            campaign = MHQTestUtilities.getTestCampaign();
+            humanResources = campaign.getPlayerForce().getHumanResources();
+        }
+
+        private Person addPerson(PrisonerStatus prisonerStatus, PersonnelStatus status) {
+            Person person = new Person(campaign);
+            person.setPrisonerStatusDirect(prisonerStatus);
+            person.setStatus(status);
+            humanResources.importPerson(person);
+            return person;
+        }
+
+        @Test
+        void deadPrisoners_areRemoved() {
+            Person prisoner = addPerson(PrisonerStatus.PRISONER, PersonnelStatus.HOMICIDE);
+            Person defector = addPerson(PrisonerStatus.PRISONER_DEFECTOR, PersonnelStatus.MEDICAL_COMPLICATIONS);
+
+            CampaignXmlParser.removeDeadPrisoners(campaign);
+
+            assertNull(humanResources.getPerson(prisoner.getId()));
+            assertNull(humanResources.getPerson(defector.getId()));
+        }
+
+        @Test
+        void everyoneElse_isKept() {
+            Person livingPrisoner = addPerson(PrisonerStatus.PRISONER, PersonnelStatus.ACTIVE);
+            Person deadBondsman = addPerson(PrisonerStatus.BONDSMAN, PersonnelStatus.KIA);
+            Person deadMember = addPerson(PrisonerStatus.FREE, PersonnelStatus.KIA);
+
+            CampaignXmlParser.removeDeadPrisoners(campaign);
+
+            assertSame(livingPrisoner, humanResources.getPerson(livingPrisoner.getId()));
+            assertSame(deadBondsman, humanResources.getPerson(deadBondsman.getId()));
+            assertSame(deadMember, humanResources.getPerson(deadMember.getId()));
         }
     }
 }
