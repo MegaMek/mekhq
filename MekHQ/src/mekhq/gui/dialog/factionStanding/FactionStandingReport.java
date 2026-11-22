@@ -79,12 +79,12 @@ import mekhq.campaign.universe.factionHints.FactionHints;
 import mekhq.campaign.universe.factionStanding.FactionStandingLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
-import mekhq.campaign.utilities.glossary.DocumentationEntry;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
 import mekhq.gui.baseComponents.roundedComponents.RoundedLineBorder;
 import mekhq.gui.dialog.factionStanding.gmToolsDialog.GMTools;
 import mekhq.gui.dialog.factionStanding.manualMissionDialogs.SimulateMissionDialog;
-import mekhq.gui.dialog.glossary.GuideViewer;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 import mekhq.gui.utilities.WrapLayout;
 
 /**
@@ -425,17 +425,7 @@ public class FactionStandingReport extends JDialog {
         RoundedJButton btnDocumentation = new RoundedJButton(getTextAt(RESOURCE_BUNDLE,
               "factionStandingReport.button.documentation"));
         btnDocumentation.setName("btnDocumentation");
-        btnDocumentation.addActionListener(e -> {
-            DocumentationEntry documentationEntry = DocumentationEntry.getDocumentationEntryFromLookUpName(
-                  "FACTION_STANDINGS");
-
-            if (documentationEntry == null) {
-                LOGGER.warn("Glossary entry not found: {}", "FACTION_STANDINGS");
-                return;
-            }
-
-            GuideViewer.showGuide(this, documentationEntry);
-        });
+        btnDocumentation.addActionListener(e -> GlossaryConsole.showEntry(this, GlossaryEntry.FACTION_STANDING));
         btnDocumentation.setFocusable(false);
         pnlButtons.add(btnDocumentation);
 

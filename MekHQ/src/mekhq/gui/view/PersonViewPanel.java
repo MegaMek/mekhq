@@ -3144,7 +3144,7 @@ public class PersonViewPanel extends JScrollablePanel {
               "pnlInProgress.hide")));
         pnlProgressHide.setVisible(false);
 
-        boolean isUseReasoning = campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
+        boolean isUseReasoning = campaignOptions.isUseTalentXpCostMultiplier();
 
         // Each entry is a name and "progress/cost"
         List<String[]> entries = new ArrayList<>();

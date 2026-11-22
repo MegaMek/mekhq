@@ -89,7 +89,6 @@ public class KillAwards {
         List<Award> awardsDepth6 = new ArrayList<>();
         List<Award> awardsDepth7 = new ArrayList<>();
 
-        Award bestAward = new Award();
         List<Award> eligibleAwards = new ArrayList<>();
 
         for (Award award : awards) {
@@ -249,19 +248,19 @@ public class KillAwards {
                             }
                         }
                     }
+                }
 
-                    // now check whether any of the entries in killCount meet or beat the score
-                    // required for the award;
-                    for (Integer kill : killCount) {
-                        if (kill >= killsNeeded) {
-                            if (awardDepth.isNone()) {
-                                individualAwards.add(award);
-                            } else {
-                                groupAwards.add(award);
-                            }
-
-                            break;
+                // now check whether any of the entries in killCount meet or beat the score required for the award.
+                // This covers lifetime awards as well as mission awards.
+                for (Integer kill : killCount) {
+                    if (kill >= killsNeeded) {
+                        if (awardDepth.isNone()) {
+                            individualAwards.add(award);
+                        } else {
+                            groupAwards.add(award);
                         }
+
+                        break;
                     }
                 }
             }
@@ -269,19 +268,10 @@ public class KillAwards {
 
         // At the point, all Awards have been processed, and we just need to communicate
         // eligibility
-        int rollingQty = 0;
-
         if (!individualAwards.isEmpty()) {
             // if isIssueBestAwardOnly we need to do some filtering
             if (campaign.getCampaignOptions().get(CampaignOption.ISSUE_BEST_AWARD_ONLY)) {
-                for (Award a : individualAwards) {
-                    if (a.getQty() > rollingQty) {
-                        rollingQty = a.getQty();
-                        bestAward = a;
-                    }
-                }
-
-                eligibleAwards.add(bestAward);
+                eligibleAwards.add(getBestAward(individualAwards));
             } else {
                 eligibleAwards.addAll(individualAwards);
             }
@@ -320,15 +310,7 @@ public class KillAwards {
 
                 for (List<Award> awardGroup : allGroupAwards) {
                     if (!awardGroup.isEmpty()) {
-                        for (Award award : awardGroup) {
-                            rollingQty = 0;
-
-                            if (award.getQty() > rollingQty) {
-                                bestAward = award;
-                            }
-                        }
-
-                        eligibleAwards.add(bestAward);
+                        eligibleAwards.add(getBestAward(awardGroup));
                     }
                 }
             } else {
@@ -337,6 +319,25 @@ public class KillAwards {
         }
 
         return AutoAwardsController.prepareAwardData(person, eligibleAwards);
+    }
+
+    /**
+     * Picks the award with the highest requirement, which is the best award a person qualifies for.
+     *
+     * @param awards the awards a person qualifies for; must not be empty
+     *
+     * @return the award with the highest quantity, or the first of them if several share it
+     */
+    static Award getBestAward(List<Award> awards) {
+        Award bestAward = awards.getFirst();
+
+        for (Award award : awards) {
+            if (award.getQty() > bestAward.getQty()) {
+                bestAward = award;
+            }
+        }
+
+        return bestAward;
     }
 
     /**

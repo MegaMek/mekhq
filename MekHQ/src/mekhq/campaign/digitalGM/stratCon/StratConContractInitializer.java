@@ -2589,14 +2589,6 @@ public class StratConContractInitializer {
     }
 
     /**
-     * @return how many facilities a sector will accept, being a fraction of the hexes that can actually hold one.
-     *
-     *       <p>Two things make this narrower than it looks. Only dry land counts - {@link #getUnoccupiedCoords} never
-     *       returns an ocean hex - so a wet sector holds far fewer facilities than its width times its height would
-     *       suggest. And only part of that land is offered, because scenarios need somewhere to spawn for the life of
-     *       the contract; a sector paved with facilities has nowhere left to fight.</p>
-     */
-    /**
      * @param track a sector
      *
      * @return {@code true} if the sector has room for another facility under its cap (see
@@ -2622,6 +2614,14 @@ public class StratConContractInitializer {
         return facilityCapacity(track);
     }
 
+    /**
+     * @return how many facilities a sector will accept, being a fraction of the hexes that can actually hold one.
+     *
+     *       <p>Two things make this narrower than it looks. Only dry land counts - {@link #getUnoccupiedCoords} never
+     *       returns an ocean hex - so a wet sector holds far fewer facilities than its width times its height would
+     *       suggest. And only part of that land is offered, because scenarios need somewhere to spawn for the life of
+     *       the contract; a sector paved with facilities has nowhere left to fight.</p>
+     */
     private static int facilityCapacity(StratConTrackState trackState) {
         int placeable = 0;
         for (int x = 0; x < trackState.getWidth(); x++) {

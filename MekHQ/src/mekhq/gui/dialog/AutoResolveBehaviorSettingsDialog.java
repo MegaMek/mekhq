@@ -47,7 +47,8 @@ import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.gui.dialog.helpDialogs.AutoResolveBehaviorSettingsHelpDialog;
+import mekhq.campaign.utilities.glossary.GlossaryEntry;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 
 public class AutoResolveBehaviorSettingsDialog
       extends BotConfigDialog {
@@ -133,9 +134,8 @@ public class AutoResolveBehaviorSettingsDialog
     }
 
     private void showAutoResolveHelp() {
-        var autoResolveHelp = new AutoResolveBehaviorSettingsHelpDialog(getFrame());
-        autoResolveHelp.setVisible(true);
-        autoResolveHelp.setAlwaysOnTop(true);
+        // Owned by this dialog, so the glossary opens above it even though this dialog is always on top
+        GlossaryConsole.showEntry(this, GlossaryEntry.AUTO_RESOLVE);
     }
 
     @Override

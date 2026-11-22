@@ -52,45 +52,19 @@ import mekhq.MHQConstants;
  * @since 0.50.07
  */
 public enum DocumentationEntry {
-    ACAR("ACAR", "GlossaryDocs/ACAR-Abstract Combat Auto-Resolve documentation", "0.50.07", "0.50.07", "0.50.07"),
-    AGING_EFFECTS("AGING_EFFECTS", "GlossaryDocs/Personnel Modules/Aging Effects", "0.50.07", "0.50.07", "0.50.07"),
-    AWARDS_MODULE("AWARDS_MODULE", "GlossaryDocs/Personnel Modules/Awards Module", "0.50.07", "0.50.07", "0.50.07"),
+    AWARDS_MODULE("AWARDS_MODULE", "glossaryDocs/Awards Module", "0.50.07", "0.50.07", "0.50.07"),
     CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS",
-          "GlossaryDocs/MegaMek -MekHQ Chaos Campaign Guide",
+          "glossaryDocs/MegaMek -MekHQ Chaos Campaign Guide",
           "0.50.07", "0.50.07", "0.50.07"),
-    COMBAT_TEAMS("COMBAT_TEAMS",
-          "GlossaryDocs/Combat Teams, Roles & Reinforcements",
-          "0.50.07", "0.50.10", "0.50.10"),
-    COOP_CAMPAIGNS("COOP_CAMPAIGNS", "GlossaryDocs/MekHQ Co-Op Campaign Guide v1", "0.50.07", "0.50.07", "0.50.07"),
+    COOP_CAMPAIGNS("COOP_CAMPAIGNS", "glossaryDocs/MekHQ Co-Op Campaign Guide v1", "0.50.07", "0.50.07", "0.50.07"),
     EDUCATION_MODULE("EDUCATION_MODULE",
-          "GlossaryDocs/Personnel Modules/Education Module",
+          "glossaryDocs/Education Module",
           "0.50.07", "0.50.10", "0.50.10"),
-    FACTION_STANDINGS("FACTION_STANDINGS", "GlossaryDocs/Faction Standings", "0.50.07", "0.50.11", "0.50.11"),
-    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "GlossaryDocs/0_MHQ New Player Guide", "0.50.07", "0.50.11", "0.50.11"),
-    PRISONERS_OF_WAR("PRISONERS_OF_WAR",
-          "GlossaryDocs/Prisoners of War & Abstracted Search and Rescue",
-          "0.50.07", "0.50.07", "0.50.07"),
-    RANDOM_DEATH("RANDOM_DEATH",
-          "GlossaryDocs/Personnel Modules/Random Death in MekHQ",
-          "0.50.07", "0.50.07", "0.50.07"),
-    RANDOM_DEPENDENTS("RANDOM_DEPENDENTS",
-          "GlossaryDocs/Personnel Modules/Random Dependents",
-          "0.50.07", "0.50.07", "0.50.07"),
-    RANDOM_PERSONALITIES("RANDOM_PERSONALITIES",
-          "GlossaryDocs/Personnel Modules/Random Personalities",
-          "0.50.07", "0.50.07", "0.50.07"),
-    RESUPPLY_AND_CONVOYS("RESUPPLY_AND_CONVOYS", "GlossaryDocs/Resupply & Convoys", "0.50.07", "0.50.07", "0.50.07"),
-    STARTING_ATTRIBUTE_SCORES("STARTING_ATTRIBUTE_SCORES",
-          "GlossaryDocs/Personnel Modules/Starting Attribute Scores",
-          "0.50.07", "0.50.10", "0.50.10"),
-    TURNOVER_AND_RETENTION("TURNOVER_AND_RETENTION",
-          "GlossaryDocs/Personnel Modules/Turnover & Retention Module (feat. Fatigue)",
-          "0.50.07", "0.50.07", "0.50.07"),
-    UNIT_MARKETS("UNIT_MARKETS", "GlossaryDocs/Unit Markets", "0.50.07", "0.50.07", "0.50.07");
+    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "glossaryDocs/0_MHQ New Player Guide", "0.50.07", "0.50.11", "0.50.11");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";
 
-    private final String DIRECTORY = "docs/";
+    private final String DIRECTORY = "docs/mekhq/";
     private final String FILE_EXTENSION = ".pdf";
 
     private final String lookUpName;

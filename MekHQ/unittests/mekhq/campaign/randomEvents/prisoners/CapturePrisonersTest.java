@@ -58,10 +58,13 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * The {@link CapturePrisonersTest} class is a test suite for validating the functionality of the prisoner capture and
@@ -488,6 +491,42 @@ class CapturePrisonersTest {
         PrisonerStatus actualStatus = prisoner.getPrisonerStatus();
 
         assertSame(BECOMING_BONDSMAN, actualStatus);
+    }
+
+    @ParameterizedTest(name = "MekHQ capture style: {0}")
+    @CsvSource({ "true", "false" })
+    void testProcessPrisoner_ClanPrisonerTakenByInnerSphere_BondsrefOnlyUnderMekHQStyle(boolean isMekHQCaptureStyle) {
+        // Setup
+        Campaign mockCampaign = mockCampaign();
+
+        LocalDate today = LocalDate.of(3151, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        Faction captorFaction = factions.getFaction("FS");
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(captorFaction);
+
+        Person prisoner = new Person(mockCampaign);
+        prisoner.setOriginFaction(factions.getFaction("CJF"));
+        prisoner.setClanPersonnel(true);
+
+        CapturePrisoners capturePrisoners = new CapturePrisoners(mockCampaign,
+              captorFaction,
+              new Scenario(),
+              DragoonRating.DRAGOON_C.getRating()) {
+            @Override
+            protected int d6(int dice) {
+                return dice; // Every die rolls a 1, which is a Bondsref result
+            }
+        };
+
+        // Act
+        capturePrisoners.processPrisoner(prisoner, captorFaction, isMekHQCaptureStyle, true);
+
+        // Assert
+        assertEquals(isMekHQCaptureStyle, prisoner.getStatus() == PersonnelStatus.BONDSREF);
+        if (!isMekHQCaptureStyle) {
+            assertSame(PRISONER, prisoner.getPrisonerStatus());
+        }
     }
 
     @Test

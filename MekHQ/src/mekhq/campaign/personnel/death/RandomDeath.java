@@ -561,12 +561,12 @@ public class RandomDeath {
      *
      * @param person the person whose injuries are evaluated.
      *
-     * @return the injury-related health multiplier.
+     * @return the amount the injuries add to the health multiplier, which already starts at 1.
      */
     private double getInjuryModifier(Person person) {
         if (!campaignOptions.isUseAdvancedMedical()) {
             // Simplified injury multiplier without advanced medical care
-            return 1 + (MEDICAL_MULTIPLIER_INJURY_TRANSIENT * person.getHits());
+            return MEDICAL_MULTIPLIER_INJURY_TRANSIENT * person.getHits();
         }
 
         // Advanced medical care: calculate based on individual injuries
@@ -745,7 +745,7 @@ public class RandomDeath {
         }
 
         final Map<TenYearAgeRange, WeightedDoubleMap<PersonnelStatus>> genderedCauses = causes
-                                                                                              .get(person.getGender());
+                                                                                              .get(getCauseGender(person.getGender()));
         if (genderedCauses == null) {
             return getDefaultCause(ageGroup);
         }
@@ -757,6 +757,21 @@ public class RandomDeath {
 
         final PersonnelStatus cause = ageRangeCauses.randomItem();
         return (cause == null) ? getDefaultCause(ageGroup) : cause;
+    }
+
+    /**
+     * Returns the gender whose cause-of-death table is used for a character.
+     *
+     * <p>The causes file only has {@code MALE} and {@code FEMALE} tables, so other genders are mapped onto them the
+     * same way {@link #getBaseDeathChance(Person)} picks a column: female genders use {@code FEMALE}, everyone else
+     * uses {@code MALE}.</p>
+     *
+     * @param gender the character's gender
+     *
+     * @return {@link Gender#FEMALE} or {@link Gender#MALE}
+     */
+    static Gender getCauseGender(final Gender gender) {
+        return gender.isFemale() ? Gender.FEMALE : Gender.MALE;
     }
 
     /**

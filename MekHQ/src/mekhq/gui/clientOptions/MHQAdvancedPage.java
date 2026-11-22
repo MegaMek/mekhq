@@ -108,9 +108,9 @@ class MHQAdvancedPage extends MHQOptionsPage {
         // Material Symbols "help" glyph (https://fonts.google.com/icons).
         userDirHelp.setIcon(symbolIcon(0xE887, userDirHelp.getFont().getSize() + UIUtil.scaleForGUI(2),
               userDirHelp.getForeground()));
-        // MekHQ ships its own copy of the user-directory help under docs/Customization/MekHQ; MMConstants points at
+        // MekHQ ships its own copy of the user-directory help under docs/mekhq/customization; MMConstants points at
         // MegaMek's docs/Customization/UserDir path, which is absent from MekHQ's working directory.
-        String userDirHelpPath = "docs/Customization/MekHQ/UserDirHelp.html";
+        String userDirHelpPath = "docs/mekhq/customization/UserDirHelp.html";
         try {
             URL helpFile = new File(userDirHelpPath).toURI().toURL();
             userDirHelp.addActionListener(evt -> new HelpDialog(helpTitle, helpFile, frame).setVisible(true));

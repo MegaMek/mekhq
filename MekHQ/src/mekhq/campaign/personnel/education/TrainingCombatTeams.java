@@ -241,7 +241,7 @@ public class TrainingCombatTeams {
     private static void performTraining(Campaign campaign, Formation formation, Person commander,
           Map<String, Integer> educatorSkills, ActionCheckResult actionCheckResult) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean useReasoningXPChanges = campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
+        boolean useReasoningXPChanges = campaignOptions.isUseTalentXpCostMultiplier();
         boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
         int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
         double xpCostMultiplier = campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER);

@@ -100,8 +100,8 @@ class SkillCheckTest {
         SkillCheck check = person.checkSkill(SkillType.S_NEGOTIATION, true, true, today);
 
         assertNotNull(check);
-        assertEquals(2, Aging.getFameAgeModifier(age, true, false, 40)); // 2
-        assertEquals(4, check.getTargetNumber().getValue()); // == 10 - 4 - 2 (aging effect)
+        assertEquals(-2, Aging.getFameAgeModifier(age, true, false, 40));
+        assertEquals(8, check.getTargetNumber().getValue()); // == 10 - 4 + 2 (aging Fame penalty)
     }
 
     @ParameterizedTest

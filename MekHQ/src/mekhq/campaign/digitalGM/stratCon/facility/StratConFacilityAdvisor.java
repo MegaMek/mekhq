@@ -385,12 +385,6 @@ public final class StratConFacilityAdvisor {
     }
 
     /**
-     * @return the date the player must deploy against a scenario by; its battle date if it has no deployment date
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    /**
      * @param campaignState the contract's StratCon campaign state, or {@code null} for the base cost
      * @param operation     an order
      *
@@ -420,6 +414,12 @@ public final class StratConFacilityAdvisor {
                      MekHQ.getMHQOptions().getDisplayFormattedDate(date);
     }
 
+    /**
+     * @return the date the player must deploy against a scenario by; its battle date if it has no deployment date
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
     public static @Nullable LocalDate getDeadline(StratConScenario scenario) {
         return (scenario.getDeploymentDate() != null) ? scenario.getDeploymentDate() : scenario.getActionDate();
     }

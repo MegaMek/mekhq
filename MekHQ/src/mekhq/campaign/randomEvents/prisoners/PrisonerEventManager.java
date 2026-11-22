@@ -691,22 +691,24 @@ public class PrisonerEventManager {
      * @param executions The number of prisoners to be executed.
      * @param prisoners  The list of prisoners involved in the execution.
      */
-    private void processExecutions(int executions, List<Person> prisoners) {
+    void processExecutions(int executions, List<Person> prisoners) {
+        // Only the executed prisoners cost Regard, not everyone being held
+        List<Person> victims = new ArrayList<>(prisoners.subList(0, min(executions, prisoners.size())));
+
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         if (campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
             FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
             List<String> reports = factionStandings.executePrisonersOfWar(campaign.getPlayerForce()
                                                                                 .getFaction()
                                                                                 .getShortName(),
-                  prisoners, campaign.getGameYear(), campaignOptions.get(CampaignOption.REGARD_MULTIPLIER));
+                  victims, campaign.getGameYear(), campaignOptions.get(CampaignOption.REGARD_MULTIPLIER));
 
             for (String report : reports) {
                 campaign.addReport(POLITICS, report);
             }
         }
 
-        for (int i = 0; i < executions; i++) {
-            Person prisoner = prisoners.get(i);
+        for (Person prisoner : victims) {
             campaign.addReport(PERSONNEL,
                   getFormattedTextAt(RESOURCE_BUNDLE, "execute.report", prisoner.getFullName()));
             campaign.getPlayerForce().getHumanResources().removePerson(campaign, prisoner, false);

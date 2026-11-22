@@ -1128,18 +1128,6 @@ public final class CommandGenerator {
     }
 
     /**
-     * Stage 8: GM-stocks the warehouse with spare parts based on the campaign's auto-logistics
-     * percentages. Mirrors what the WarehouseTab does on a daily refresh: builds a
-     * {@link PartInUse} set for every part type the current force depends on, then asks
-     * {@link PartsInUseManager#stockUpPartsInUseGM} to add enough of each to meet the per-type
-     * target percentage. The percentages themselves come from {@code CampaignOptions.getAutoLogistics*}
-     * — the same values that drive ongoing auto-logistics restocking during play, written by the
-     * Spares tab's spinners.
-     *
-     * <p>Setting all percentages to 0 produces an empty warehouse with no shopping list churn -
-     * effectively disabling spare-part generation.</p>
-     */
-    /**
      * Stage 8b: provisions the cargo DropShips the command needs to haul its own warehouse, per the
      * Cargo Capacity percentage on the Force Generator tab.
      *
@@ -1281,6 +1269,18 @@ public final class CommandGenerator {
               undercrewed.size(), String.join(", ", undercrewed.subList(0, named)), tail);
     }
 
+    /**
+     * Stage 8: GM-stocks the warehouse with spare parts based on the campaign's auto-logistics
+     * percentages. Mirrors what the WarehouseTab does on a daily refresh: builds a
+     * {@link PartInUse} set for every part type the current force depends on, then asks
+     * {@link PartsInUseManager#stockUpPartsInUseGM} to add enough of each to meet the per-type
+     * target percentage. The percentages themselves come from {@code CampaignOptions.getAutoLogistics*}
+     * — the same values that drive ongoing auto-logistics restocking during play, written by the
+     * Spares tab's spinners.
+     *
+     * <p>Setting all percentages to 0 produces an empty warehouse with no shopping list churn -
+     * effectively disabling spare-part generation.</p>
+     */
     private static void stockSpareParts(Campaign campaign) {
         long start = System.nanoTime();
         PartsInUseManager partsInUseManager = new PartsInUseManager(campaign);

@@ -71,7 +71,7 @@ import org.w3c.dom.NodeList;
  *
  * <p>Data is loaded from the per-conflict YAML files in {@code data/universe/factionDiplomacy/} when that directory
  * exists, falling back to the legacy {@code data/universe/factionhints.xml} otherwise. The format is documented in
- * {@code docs/Faction Diplomacy Readme.md}.</p>
+ * {@code docs/mekhq/devTools/Faction Diplomacy Readme.md}.</p>
  *
  * @author Neoancient
  */
@@ -657,7 +657,8 @@ public class FactionHints {
                     [FactionDiplomacy] {} differs from the shipped faction diplomacy data. \
                     That XML file is NO LONGER LOADED when the {} directory is present, so any custom wars or \
                     alliances in it are not in effect. To keep them, recreate them as a YAML file in the \
-                    factionDiplomacy directory (the format is documented in docs/Faction Diplomacy Readme.md). \
+                    factionDiplomacy directory (the format is documented in \
+                    docs/mekhq/devTools/Faction Diplomacy Readme.md). \
                     If the XML file was not customized, it can simply be deleted.""",
               legacyXmlFile.getPath(), FACTION_DIPLOMACY_DIRECTORY_PATH);
         showCustomLegacyDataWarning(legacyXmlFile);

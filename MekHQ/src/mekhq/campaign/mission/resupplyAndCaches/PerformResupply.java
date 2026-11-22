@@ -212,7 +212,7 @@ public class PerformResupply {
 
         double totalTonnage = 0;
         for (Part part : resupply.getConvoyContents()) {
-            if (part instanceof AmmoBin) {
+            if (part instanceof AmmoBin || part instanceof AmmoStorage) {
                 totalTonnage += RESUPPLY_AMMO_TONNAGE;
             } else if (part instanceof Armor) {
                 totalTonnage += RESUPPLY_ARMOR_TONNAGE;
@@ -339,7 +339,7 @@ public class PerformResupply {
                 double tonnage = part.getTonnage();
                 tonnage = tonnage == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : tonnage;
 
-                if (part instanceof AmmoBin) {
+                if (part instanceof AmmoBin || part instanceof AmmoStorage) {
                     tonnage = RESUPPLY_AMMO_TONNAGE;
                 } else if (part instanceof Armor) {
                     tonnage = RESUPPLY_ARMOR_TONNAGE;

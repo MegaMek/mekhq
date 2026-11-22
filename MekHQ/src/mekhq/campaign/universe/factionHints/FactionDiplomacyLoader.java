@@ -53,7 +53,7 @@ import mekhq.campaign.universe.Factions;
  *
  * <p>Every {@code *.yml} file in the directory is read and merged; a file that fails to parse is logged and skipped
  * so a single bad file cannot take down the rest of the diplomacy data. The directory format is documented in
- * {@code docs/Faction Diplomacy Readme.md}.</p>
+ * {@code docs/mekhq/devTools/Faction Diplomacy Readme.md}.</p>
  */
 final class FactionDiplomacyLoader {
     private static final MMLogger LOGGER = MMLogger.create(FactionDiplomacyLoader.class);

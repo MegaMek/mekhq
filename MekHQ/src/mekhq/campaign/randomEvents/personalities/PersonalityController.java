@@ -107,7 +107,8 @@ public class PersonalityController {
                     person.setSocialDescriptionIndex(randomInt(Social.MAXIMUM_VARIATIONS));
                 }
                 case PERSONALITY_QUIRK -> {
-                    int traitRoll = randomInt(PersonalityQuirk.values().length) + 1;
+                    // Index 0 is NONE, so roll 1 to (length - 1) to land on a real quirk
+                    int traitRoll = randomInt(PersonalityQuirk.values().length - 1) + 1;
                     String traitIndex = String.valueOf(traitRoll);
                     person.setPersonalityQuirk(PersonalityQuirk.fromString(traitIndex));
                     person.setPersonalityQuirkDescriptionIndex(randomInt(PersonalityQuirk.MAXIMUM_VARIATIONS));
@@ -439,11 +440,11 @@ public class PersonalityController {
         } else if (roll < 162) {
             return OBTUSE;
         } else if (roll < 285) {
-            return BELOW_AVERAGE;
+            return LIMITED_INSIGHT;
         } else if (roll < 501) {
             return UNDER_PERFORMING;
         } else if (roll < 878) {
-            return LIMITED_INSIGHT;
+            return BELOW_AVERAGE;
         } else if (roll < 7028) {
             return AVERAGE;
         } else if (roll < 7594) {

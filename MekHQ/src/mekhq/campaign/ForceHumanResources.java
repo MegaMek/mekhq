@@ -2100,13 +2100,6 @@ public class ForceHumanResources {
     }
 
     /**
-     * If the person does not already have a bloodname, assigns a chance of having one based on skill and rank.
-     *
-     * @param campaign   the campaign
-     * @param person     the bloodname candidate
-     * @param ignoreDice if true, skips the random roll and assigns a bloodname automatically
-     */
-    /**
      * The hardest a Bloodname roll can get. 2d6 reaches 12, so a target above this could never be met
      * and a warrior on it still has one chance in thirty-six.
      */
@@ -2123,6 +2116,13 @@ public class ForceHumanResources {
      */
     private static final int LEGACY_IN_USE_DENOMINATOR = 4;
 
+    /**
+     * If the person does not already have a bloodname, assigns a chance of having one based on skill and rank.
+     *
+     * @param campaign   the campaign
+     * @param person     the bloodname candidate
+     * @param ignoreDice if true, skips the random roll and assigns a bloodname automatically
+     */
     public void checkBloodnameAdd(Campaign campaign, Person person, boolean ignoreDice) {
         checkBloodnameAdd(campaign, person, ignoreDice, 0);
     }

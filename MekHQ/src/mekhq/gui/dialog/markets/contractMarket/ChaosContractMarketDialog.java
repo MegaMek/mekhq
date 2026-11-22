@@ -1125,16 +1125,16 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
     // endregion Departure options
 
-    /**
-     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek. Besides the
-     * window bounds, it remembers the mothball and travel on-departure checkboxes between opens.
-     */
     /** @return the default size, made no larger than the screen's usable area (the space outside any taskbar) */
     private static Dimension openingSize() {
         Rectangle usable = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
         return new Dimension(Math.min(DEFAULT_SIZE.width, usable.width), Math.min(DEFAULT_SIZE.height, usable.height));
     }
 
+    /**
+     * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek. Besides the
+     * window bounds, it remembers the mothball and travel on-departure checkboxes between opens.
+     */
     private void setPreferences() {
         try {
             PreferencesNode preferences = MekHQ.getMHQPreferences().forClass(ChaosContractMarketDialog.class);

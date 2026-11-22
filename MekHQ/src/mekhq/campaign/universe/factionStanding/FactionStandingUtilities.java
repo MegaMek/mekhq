@@ -152,6 +152,30 @@ public class FactionStandingUtilities {
     }
 
     /**
+     * Returns the negotiation modifier the player's negotiator gets for a contract, from the campaign's Standing with
+     * the contract's employer (the real sponsor, for a false flag operation).
+     *
+     * <p>A positive modifier makes the negotiator's Negotiation check easier, a negative one harder.</p>
+     *
+     * @param campaign the current campaign
+     * @param contract the contract being negotiated
+     *
+     * @return the negotiation modifier, or {@code 0} if Standing does not affect negotiations
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getNegotiationModifier(final Campaign campaign, final AbstractContract contract) {
+        if (!campaign.getCampaignOptions().isUseFactionStandingNegotiationSafe()) {
+            return 0;
+        }
+
+        double regard = campaign.getPlayerForce().getFactionStandings()
+                              .getRegardForFaction(contract.getStandingEmployerFactionCode(), true);
+        return getNegotiationModifier(regard);
+    }
+
+    /**
      * Returns the resupply weight modifier for the specified regard value.
      *
      * @param regard the regard value to evaluate
@@ -302,6 +326,28 @@ public class FactionStandingUtilities {
         final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getContractPayMultiplier();
+    }
+
+    /**
+     * Returns the multiplier applied to a contract's monthly pay, from the campaign's Standing with the contract's
+     * employer (the real sponsor, for a false flag operation).
+     *
+     * @param campaign the current campaign
+     * @param contract the contract being paid
+     *
+     * @return the pay multiplier, or {@code 1.0} if Standing does not affect contract pay
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getContractPayMultiplier(final Campaign campaign, final AbstractContract contract) {
+        if (!campaign.getCampaignOptions().isUseFactionStandingContractPaySafe()) {
+            return 1.0;
+        }
+
+        double regard = campaign.getPlayerForce().getFactionStandings()
+                              .getRegardForFaction(contract.getStandingEmployerFactionCode(), true);
+        return getContractPayMultiplier(regard);
     }
 
     /**
@@ -638,7 +684,7 @@ public class FactionStandingUtilities {
             return true;
         }
 
-        return person.getPrisonerStatus().isFreeOrBondsman();
+        return !person.getPrisonerStatus().isFreeOrBondsman();
     }
 
     /**

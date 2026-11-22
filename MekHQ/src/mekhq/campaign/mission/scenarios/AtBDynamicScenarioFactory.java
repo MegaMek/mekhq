@@ -3852,6 +3852,23 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
+     * Applies the scenario's BV budget multiplier, set by scenario modifiers such as an enemy Space Port, to a budget
+     * for opposing forces.
+     *
+     * @param scenario the scenario being generated
+     * @param bvBudget the opposing force's budget before the multiplier
+     *
+     * @return the budget scaled by the multiplier, or unchanged when no modifier has set one
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int applyOpposingBVMultiplier(AtBDynamicScenario scenario, int bvBudget) {
+        double bvMultiplier = scenario.getEffectivePlayerBVMultiplier();
+        return (bvMultiplier > 0) ? (int) round(bvBudget * bvMultiplier) : bvBudget;
+    }
+
+    /**
      * Calculates from scratch the current effective player BV present in the given scenario, optionally including the
      * BV of already-generated allied bot forces.
      *
@@ -3869,23 +3886,6 @@ public class AtBDynamicScenarioFactory {
      * @author Illiani
      * @since 0.51.01
      */
-    /**
-     * Applies the scenario's BV budget multiplier, set by scenario modifiers such as an enemy Space Port, to a budget
-     * for opposing forces.
-     *
-     * @param scenario the scenario being generated
-     * @param bvBudget the opposing force's budget before the multiplier
-     *
-     * @return the budget scaled by the multiplier, or unchanged when no modifier has set one
-     *
-     * @author Illiani
-     * @since 0.51.01
-     */
-    static int applyOpposingBVMultiplier(AtBDynamicScenario scenario, int bvBudget) {
-        double bvMultiplier = scenario.getEffectivePlayerBVMultiplier();
-        return (bvMultiplier > 0) ? (int) round(bvBudget * bvMultiplier) : bvBudget;
-    }
-
     public static int calculateEffectiveBV(AtBDynamicScenario scenario, Campaign campaign,
           boolean forceStandardBattleValue, boolean includeAlliedBotForces) {
         if (scenario.getStratConScenarioType().isResupply()) {
@@ -4397,13 +4397,6 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Calculates the difficulty multiplier based on campaign options.
-     *
-     * @param campaign the campaign for which to calculate the difficulty multiplier
-     *
-     * @return the difficulty multiplier
-     */
-    /**
      * Returns the difficulty multiplier to apply to OpFor BV budgets in the given scenario.
      *
      * <p>Convoy interception scenarios spawned by the Resupply system are always sized at twice the convoy's BV, so
@@ -4422,6 +4415,13 @@ public class AtBDynamicScenarioFactory {
         return getDifficultyMultiplier(campaign);
     }
 
+    /**
+     * Calculates the difficulty multiplier based on campaign options.
+     *
+     * @param campaign the campaign for which to calculate the difficulty multiplier
+     *
+     * @return the difficulty multiplier
+     */
     private static double getDifficultyMultiplier(Campaign campaign) {
         return switch (campaign.getCampaignOptions().get(CampaignOption.SKILL_LEVEL)) {
             case NONE, ULTRA_GREEN -> 0.5;

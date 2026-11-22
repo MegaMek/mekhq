@@ -76,14 +76,30 @@ public class PrisonerMissionEndEvent {
 
     private final Campaign campaign;
     private final AbstractContract mission;
-    private boolean isSuccess;
-    private boolean isAllied;
 
     final static int GOOD_EVENT_CHANCE = 20;
 
-    private final int CHOICE_ACCEPTED = 0;
-    private final int CHOICE_RELEASE_THEM = 1;
-    private final int CHOICE_EXECUTE_THEM = 2;
+    /**
+     * The responses offered by the end-of-contract prisoner dialog. Each button is built from one of these, so the
+     * player's choice maps straight back to its meaning, whichever buttons a given outcome shows.
+     */
+    enum EndOfContractResponse {
+        DECLINE_RANSOM("decline.button"),
+        ACCEPT_RANSOM("accept.button"),
+        RELEASE("releaseThem.button"),
+        EXECUTE("executeThem.button"),
+        ACKNOWLEDGE("successful.button");
+
+        private final String buttonKey;
+
+        EndOfContractResponse(String buttonKey) {
+            this.buttonKey = buttonKey;
+        }
+
+        String getButtonLabel() {
+            return getFormattedTextAt(RESOURCE_BUNDLE, buttonKey);
+        }
+    }
 
     /**
      * Creates a new instance of `PrisonerMissionEndEvent` to handle mission-end prisoner events.
@@ -138,9 +154,6 @@ public class PrisonerMissionEndEvent {
      * @param isAllied  {@code true} if the prisoners are allied POWs, {@code false} if they belong to the enemy.
      */
     public void handlePrisoners(boolean isSuccess, boolean isAllied) {
-        this.isAllied = isAllied;
-        this.isSuccess = isSuccess;
-
         List<Person> prisoners;
         prisoners = isAllied ?
                           campaign.getPlayerForce().getHumanResources().getFriendlyPrisoners() :
@@ -167,6 +180,9 @@ public class PrisonerMissionEndEvent {
             outOfCharacterMessage = getFormattedTextAt(RESOURCE_BUNDLE, "prisoners.ransom.ooc");
         }
 
+        List<EndOfContractResponse> responses = getEndOfContractResponses(isAllied, isSuccess, isGoodEvent);
+        List<String> buttons = responses.stream().map(EndOfContractResponse::getButtonLabel).toList();
+
         ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaign,
               campaign.getPlayerForce().getHumanResources()
                     .getSeniorAdminPerson(campaign.getCampaignOptions(),
@@ -174,54 +190,56 @@ public class PrisonerMissionEndEvent {
                           campaign.getLocalDate()),
               null,
               inCharacterMessage,
-              getEndOfContractDialogButtons(isAllied, isSuccess, isGoodEvent),
+              buttons,
               outOfCharacterMessage,
               null,
               false);
 
-        processPlayerResponse(ransom, isGoodEvent, dialog.getDialogChoice(), prisoners, campaign);
+        int choiceIndex = dialog.getDialogChoice();
+        EndOfContractResponse response = (choiceIndex >= 0 && choiceIndex < responses.size()) ?
+                                               responses.get(choiceIndex) :
+                                               responses.getFirst();
+
+        processPlayerResponse(isAllied, isSuccess, isGoodEvent, ransom, response, prisoners);
     }
 
     /**
-     * Builds the list of buttons to be displayed in the dialog based on the parameters.
+     * Builds the responses offered by the dialog, in button order.
      *
-     * <p>
-     * The available buttons depend on the ownership (allied/enemy), mission outcome, and the type of event. Buttons may
-     * include options such as "Accept Ransom", "Decline Ransom", "Release Prisoners", and "Execute Prisoners".
-     * </p>
+     * <p>The available responses depend on the ownership (allied/enemy), mission outcome, and the type of event. A
+     * ransom is offered for enemy prisoners on a good event, and for allied prisoners on a good event after a failed
+     * mission. Enemy prisoners can always be released or executed.</p>
      *
      * @param isAllied    Indicates whether the prisoners are allied.
      * @param isSuccess   Indicates whether the mission was successful.
      * @param isGoodEvent Indicates whether the event is positive.
      *
-     * @return A list of buttons to be displayed on the dialog.
+     * @return the responses, one per button, in the order they are displayed
      */
-    private static List<String> getEndOfContractDialogButtons(boolean isAllied, boolean isSuccess,
+    static List<EndOfContractResponse> getEndOfContractResponses(boolean isAllied, boolean isSuccess,
           boolean isGoodEvent) {
-        List<String> buttons = new ArrayList<>();
+        List<EndOfContractResponse> responses = new ArrayList<>();
 
-        boolean isRansom = (!isAllied && isSuccess && isGoodEvent) ||
-                                 (!isAllied && !isSuccess && isGoodEvent) ||
-                                 (isAllied && !isSuccess && isGoodEvent);
+        boolean isRansom = isGoodEvent && (!isAllied || !isSuccess);
 
         if (isRansom) {
             if (isAllied) {
-                buttons.add(getFormattedTextAt(RESOURCE_BUNDLE, "decline.button"));
+                responses.add(EndOfContractResponse.DECLINE_RANSOM);
             }
 
-            buttons.add(getFormattedTextAt(RESOURCE_BUNDLE, "accept.button"));
+            responses.add(EndOfContractResponse.ACCEPT_RANSOM);
         }
 
         if (!isAllied) {
-            buttons.add(getFormattedTextAt(RESOURCE_BUNDLE, "releaseThem.button"));
-            buttons.add(getFormattedTextAt(RESOURCE_BUNDLE, "executeThem.button"));
+            responses.add(EndOfContractResponse.RELEASE);
+            responses.add(EndOfContractResponse.EXECUTE);
         }
 
         if (isAllied && !isRansom) {
-            buttons.add(getFormattedTextAt(RESOURCE_BUNDLE, "successful.button"));
+            responses.add(EndOfContractResponse.ACKNOWLEDGE);
         }
 
-        return buttons;
+        return responses;
     }
 
     /**
@@ -230,8 +248,8 @@ public class PrisonerMissionEndEvent {
      *
      * <p>If the prisoners are allied POWs, the method evaluates whether recent crimes have occurred after the start
      * of the current contract or mission. If such crimes exist, the chance of a "good event" is adjusted downward based
-     * on the crime rating. For non-allied prisoners or situations without recent crimes, a default chance value is
-     * used.</p>
+     * on the crime rating, which is never positive: each point of crime removes one side from the die. For non-allied
+     * prisoners or situations without recent crimes, a default chance value is used.</p>
      *
      * @param isAllied {@code true} if the prisoners are allied POWs, {@code false} otherwise.
      *
@@ -245,7 +263,8 @@ public class PrisonerMissionEndEvent {
             if ((startDate != null) && (lastCrime != null)) {
                 if (lastCrime.isAfter(startDate)) {
                     // Adjust the chance of a good event based on crime rating
-                    return max(1, GOOD_EVENT_CHANCE - campaign.getPlayerForce().getAdjustedCrimeRating());
+                    int crimeRating = min(0, campaign.getPlayerForce().getAdjustedCrimeRating());
+                    return max(1, GOOD_EVENT_CHANCE + crimeRating);
                 }
             }
         }
@@ -293,19 +312,21 @@ public class PrisonerMissionEndEvent {
      * releasing, executing, or ransoming prisoners. It also modifies prisoner status and manages any associated
      * financial transactions.</p>
      *
-     * @param ransom      The calculated ransom amount.
+     * @param isAllied    {@code true} if the prisoners are allied POWs, {@code false} if they belong to the enemy.
+     * @param isSuccess   {@code true} if the mission was a success, {@code false} otherwise.
      * @param isGoodEvent {@code true} if the event is classified as positive, {@code false} otherwise.
-     * @param choiceIndex The player's choice index from the dialog.
+     * @param ransom      The calculated ransom amount.
+     * @param response    The response the player chose.
      * @param prisoners   The list of prisoners involved in the event.
      */
-    private void processPlayerResponse(Money ransom, boolean isGoodEvent, int choiceIndex, List<Person> prisoners,
-          Campaign campaign) {
-        if (choiceIndex == CHOICE_RELEASE_THEM) {
+    void processPlayerResponse(boolean isAllied, boolean isSuccess, boolean isGoodEvent, Money ransom,
+          EndOfContractResponse response, List<Person> prisoners) {
+        if (response == EndOfContractResponse.RELEASE) {
             removeAllPrisoners(prisoners);
             return;
         }
 
-        if (choiceIndex == CHOICE_EXECUTE_THEM) {
+        if (response == EndOfContractResponse.EXECUTE) {
             if (campaign.getCampaignOptions().get(CampaignOption.TRACK_FACTION_STANDING)) {
                 FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
 
@@ -327,21 +348,19 @@ public class PrisonerMissionEndEvent {
 
         final LocalDate today = campaign.getLocalDate();
 
-        if (isAllied && isSuccess && isGoodEvent) {
-            changeStatusOfAllPrisoners(prisoners, today, ACTIVE);
-            return;
-        }
+        if (isAllied) {
+            if (!isGoodEvent) {
+                changeStatusOfAllPrisoners(prisoners, today, HOMICIDE);
+                return;
+            }
 
-        // Your IDE is going to tell you that some of these conditions can be removed as they're
-        // always true. That's correct, but they should be left in place as that makes this
-        // sequence much easier to follow.
-        if (isAllied && isSuccess && !isGoodEvent) {
-            changeStatusOfAllPrisoners(prisoners, today, HOMICIDE);
-            return;
-        }
+            if (isSuccess) {
+                changeStatusOfAllPrisoners(prisoners, today, ACTIVE);
+                return;
+            }
 
-        if (isAllied && !isSuccess && isGoodEvent) {
-            boolean isAccepted = choiceIndex == CHOICE_ACCEPTED;
+            // A good event after a failed mission: the enemy offers to ransom them back
+            boolean isAccepted = response == EndOfContractResponse.ACCEPT_RANSOM;
             if (isAccepted) {
                 performRansom(false, ransom, today);
             }
@@ -350,38 +369,10 @@ public class PrisonerMissionEndEvent {
             return;
         }
 
-        if (isAllied && !isSuccess && !isGoodEvent) {
-            changeStatusOfAllPrisoners(prisoners, today, HOMICIDE);
-            return;
-        }
-
-        if (!isAllied && isSuccess && isGoodEvent) {
-            if (choiceIndex == CHOICE_ACCEPTED) {
-                performRansom(true, ransom, today);
-                removeAllPrisoners(prisoners);
-            }
-            return;
-        }
-
-        if (!isAllied && isSuccess && !isGoodEvent) {
-            if (choiceIndex == CHOICE_ACCEPTED) {
-                removeAllPrisoners(prisoners);
-            }
-            return;
-        }
-
-        if (!isAllied && !isSuccess && isGoodEvent) {
-            if (choiceIndex == CHOICE_ACCEPTED) {
-                performRansom(true, ransom, today);
-                removeAllPrisoners(prisoners);
-            }
-            return;
-        }
-
-        if (!isAllied && !isSuccess && !isGoodEvent) {
-            if (choiceIndex == CHOICE_ACCEPTED) {
-                removeAllPrisoners(prisoners);
-            }
+        // Enemy prisoners: releasing and executing are handled above, which leaves accepting a ransom
+        if (response == EndOfContractResponse.ACCEPT_RANSOM) {
+            performRansom(true, ransom, today);
+            removeAllPrisoners(prisoners);
         }
     }
 

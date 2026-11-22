@@ -107,6 +107,11 @@ public class RankAwards {
 
             Person person = campaign.getPlayerForce().getHumanResources().getPerson(personId);
 
+            // Without this, an award the person already holds would be offered again at every ceremony
+            if (!award.canBeAwarded(person)) {
+                continue;
+            }
+
             isEligible = switch (award.getRange()) {
                 case "Promotion" -> (person.getRankNumeric() == requiredRankNumeric)
                                           && ((award.getSize() == null)
@@ -114,15 +119,8 @@ public class RankAwards {
                                                     (award.getSize()
                                                            .equalsIgnoreCase(person.getRankSystem().getCode())));
                 case "Inclusive" -> person.getRankNumeric() >= requiredRankNumeric;
-                case "Exclusive" -> {
-                    if (((requiredRankNumeric <= 20) && (person.getRankNumeric() <= 20))
-                              || ((requiredRankNumeric <= 30) && (person.getRankNumeric() <= 30))
-                              || ((requiredRankNumeric >= 31) && (person.getRankNumeric() >= 31))) {
-                        yield person.getRankNumeric() >= requiredRankNumeric;
-                    } else {
-                        yield false;
-                    }
-                }
+                case "Exclusive" -> isSameRankGroup(requiredRankNumeric, person.getRankNumeric())
+                                          && (person.getRankNumeric() >= requiredRankNumeric);
                 default -> false;
             };
 
@@ -132,5 +130,27 @@ public class RankAwards {
         }
 
         return AutoAwardsController.prepareAwardData(personId, eligibleAwards);
+    }
+
+    /**
+     * Checks whether two rank numerics are in the same rank group: enlisted (0-20), warrant officer (21-30), or officer
+     * (31 and above).
+     *
+     * @param firstRankNumeric  the first rank numeric
+     * @param secondRankNumeric the second rank numeric
+     *
+     * @return {@code true} if both ranks are in the same group
+     */
+    static boolean isSameRankGroup(int firstRankNumeric, int secondRankNumeric) {
+        return getRankGroup(firstRankNumeric) == getRankGroup(secondRankNumeric);
+    }
+
+    private static int getRankGroup(int rankNumeric) {
+        if (rankNumeric <= 20) {
+            return 0;
+        } else if (rankNumeric <= 30) {
+            return 1;
+        }
+        return 2;
     }
 }

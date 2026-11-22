@@ -60,9 +60,10 @@ public class RecoverMIAPersonnel {
     private final Campaign campaign;
 
     // SAR Modifiers (based on CamOps pg 223)
-    final int SAR_CONTAINS_VTOL_OR_WIGE = 1;
-    final int SAR_HAS_IMPROVED_SENSORS = 2; // largest only
-    final int SAR_HAS_ACTIVE_PROBE = 1; // largest only
+    // These make the search easier, so they lower the target number, as they do in CapturePrisoners
+    static final int SAR_CONTAINS_VTOL_OR_WIGE = -1;
+    static final int SAR_HAS_IMPROVED_SENSORS = -2; // largest only
+    static final int SAR_HAS_ACTIVE_PROBE = -1; // largest only
     private final TargetRoll sarTargetNumber = new TargetRoll(8, "Base TN"); // Target Number (CamOps pg 223)
 
     /**
@@ -120,6 +121,13 @@ public class RecoverMIAPersonnel {
         } else if (sarQuality >= activeProbeAvailability.getIndex()) {
             sarTargetNumber.addModifier(SAR_HAS_ACTIVE_PROBE, "SAR has Active Probe");
         }
+    }
+
+    /**
+     * @return the target number for the daily rescue roll, with its modifiers
+     */
+    TargetRoll getSarTargetNumber() {
+        return sarTargetNumber;
     }
 
     /**

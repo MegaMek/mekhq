@@ -74,14 +74,6 @@ public record CampaignEventProcessor(Campaign campaign) {
     }
 
     /**
-     * Handles unit crew assignment events.
-     *
-     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
-     * wrong.</p>
-     *
-     * @param personCrewAssignmentEvent the event containing the unit and crew assignment information
-     */
-    /**
      * Seats a newly arrived character in a support carrier when they belong in one.
      *
      * <p>Covers hiring, GM additions and story-arc characters. Retraining and returns to duty arrive as
@@ -178,6 +170,14 @@ public record CampaignEventProcessor(Campaign campaign) {
         SupportCarrierReconciler.onDeploymentChanged(campaign());
     }
 
+    /**
+     * Handles unit crew assignment events.
+     *
+     * <p><b>Important:</b> This method is not directly evoked, so IDEA will tell you it has no uses. IDEA is
+     * wrong.</p>
+     *
+     * @param personCrewAssignmentEvent the event containing the unit and crew assignment information
+     */
     @Subscribe
     public void handlePersonUnitAssignmentEvent(PersonCrewAssignmentEvent personCrewAssignmentEvent) {
         Unit unit = personCrewAssignmentEvent.getUnit();

@@ -59,7 +59,7 @@ public class AtBStaticWeightGenerator {
      *
      * @return the generated weight
      */
-    private static int getRandomWeight(final int unitType, final Faction faction,
+    public static int getRandomWeight(final int unitType, final Faction faction,
           final boolean regionVariations) {
         if (unitType == UnitType.AEROSPACE_FIGHTER) {
             return getRandomAerospaceWeight();

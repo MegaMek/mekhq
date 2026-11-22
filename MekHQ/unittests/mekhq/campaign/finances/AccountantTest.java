@@ -961,6 +961,97 @@ public class AccountantTest {
         assertEquals(expected, actual);
     }
 
+    @Test
+    void testGetMonthlyFoodAndHousingExpenses_PoorStandingRaisesBarrackCosts() {
+        Campaign mockCampaign = mockCampaign();
+
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
+        when(mockCampaignOptions.isUseFactionStandingBarracksCostsSafe()).thenReturn(true);
+
+        Accountant accountant = new Accountant(mockCampaign);
+
+        PlanetarySystem mockSystem = mock(PlanetarySystem.class);
+        CurrentLocation location = new CurrentLocation(mockSystem, 0);
+        when(mockCampaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(location);
+
+        Faction faction = new Faction();
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(faction);
+
+        LocalDate today = LocalDate.of(3025, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        // A Standing below neutral must raise costs, not be ignored in favor of a neutral default.
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of());
+
+        Faction localFaction = mock(Faction.class);
+        when(localFaction.getShortName()).thenReturn("LOCAL");
+        when(mockSystem.getFactionSet(today)).thenReturn(Set.of(localFaction));
+
+        FactionStandings factionStandings = mock(FactionStandings.class);
+        when(factionStandings.getRegardForFaction("LOCAL", true)).thenReturn(-45.0);
+        when(mockCampaign.getPlayerForce().getFactionStandings()).thenReturn(factionStandings);
+
+        Person officer = new Person(mockCampaign);
+        officer.setPrimaryRoleDirect(MEKWARRIOR);
+        officer.setRank(RWO_MIN + 1);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPersonnel()).thenReturn(List.of(officer));
+
+        double expectedMultiplier = 2.0;
+        Money expected = Money.of(HOUSING_OFFICER).multipliedBy(expectedMultiplier);
+        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
+
+        assertEquals(expected, actual);
+    }
+
+    @Test
+    void testGetMonthlyFoodAndHousingExpenses_NoContractOrLocalFactionsLeavesCostsUnchanged() {
+        Campaign mockCampaign = mockCampaign();
+
+        CampaignOptions mockCampaignOptions = mock(CampaignOptions.class);
+        when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
+        lenient().when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
+        lenient().when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_FOOD)).thenReturn(false);
+        when(mockCampaignOptions.get(CampaignOption.PAY_FOR_HOUSING)).thenReturn(true);
+        when(mockCampaignOptions.isUseFactionStandingBarracksCostsSafe()).thenReturn(true);
+
+        Accountant accountant = new Accountant(mockCampaign);
+
+        PlanetarySystem mockSystem = mock(PlanetarySystem.class);
+        CurrentLocation location = new CurrentLocation(mockSystem, 0);
+        when(mockCampaign.getPlayerForce().getForceDetachment().getCurrentLocation()).thenReturn(location);
+
+        Faction faction = new Faction();
+        when(mockCampaign.getPlayerForce().getFaction()).thenReturn(faction);
+
+        LocalDate today = LocalDate.of(3025, 1, 1);
+        when(mockCampaign.getLocalDate()).thenReturn(today);
+
+        // With no contract and no local factions, nobody's Standing applies.
+        when(mockCampaign.getActiveContracts()).thenReturn(List.of());
+
+        when(mockSystem.getFactionSet(today)).thenReturn(Set.of());
+
+        FactionStandings factionStandings = mock(FactionStandings.class);
+        when(mockCampaign.getPlayerForce().getFactionStandings()).thenReturn(factionStandings);
+
+        Person officer = new Person(mockCampaign);
+        officer.setPrimaryRoleDirect(MEKWARRIOR);
+        officer.setRank(RWO_MIN + 1);
+        when(mockCampaign.getPlayerForce().getHumanResources().getPersonnel()).thenReturn(List.of(officer));
+
+        double expectedMultiplier = 1.0;
+        Money expected = Money.of(HOUSING_OFFICER).multipliedBy(expectedMultiplier);
+        Money actual = accountant.getMonthlyFoodAndHousingExpenses();
+
+        assertEquals(expected, actual);
+    }
+
     /**
      * tests {@link Accountant#getPayRollSummary()}
      */

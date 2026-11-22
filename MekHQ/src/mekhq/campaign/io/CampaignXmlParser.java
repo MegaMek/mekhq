@@ -1737,14 +1737,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /**
-     * Processes a custom unit in a campaign.
-     *
-     * @param retVal The {@see Campaign} being parsed.
-     * @param wn     The current XML element representing a custom unit.
-     *
-     * @return A value indicating whether a new custom unit file was added to disk.
-     */
-    /**
      * Keeps an existing campaign on its original CamOps reputation instead of silently switching it to Chaos
      * Reputation.
      *
@@ -1803,6 +1795,14 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         return false;
     }
 
+    /**
+     * Processes a custom unit in a campaign.
+     *
+     * @param retVal The {@see Campaign} being parsed.
+     * @param wn     The current XML element representing a custom unit.
+     *
+     * @return A value indicating whether a new custom unit file was added to disk.
+     */
     private static boolean processCustom(Campaign retVal, Node wn) {
         String sCustomsDir = "data" +
                                    File.separator +

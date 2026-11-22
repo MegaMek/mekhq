@@ -49,6 +49,7 @@ import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.MethodSource;
 
@@ -181,5 +182,26 @@ class AgingMilestoneTest {
     void testGetLabel(AgingMilestone milestone) {
         String label = milestone.getLabel();
         assertTrue(isResourceKeyValid(label), "Invalid resource key for milestone: " + label);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+          // age, isClan, hasBloodname, rankIndex, expected
+          "24, true, false, 0, 0",
+          "30, true, false, 0, 0",
+          "31, true, false, 0, -2",
+          "50, true, false, 33, -2",
+          "31, true, false, 34, 0",
+          "45, true, true, 0, 0",
+          "51, true, false, 0, -3",
+          "60, true, false, 37, -3",
+          "51, true, false, 38, -2",
+          "75, true, true, 0, -2",
+          "101, true, true, 40, -2",
+          "75, false, false, 0, 0"
+    })
+    void testGetFameAgeModifier_isPenalty(int age, boolean isClan, boolean hasBloodname, int rankIndex,
+          int expected) {
+        assertEquals(expected, Aging.getFameAgeModifier(age, isClan, hasBloodname, rankIndex));
     }
 }

@@ -34,6 +34,7 @@ package mekhq.campaign.mission.contract.contractGeneration;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
@@ -50,12 +51,14 @@ import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
 import org.mockito.MockedStatic;
@@ -75,6 +78,27 @@ class AbstractContractDeterminationPayTest {
         when(options.get(option)).thenReturn(value);
         Campaign campaign = mock(Campaign.class);
         when(campaign.getCampaignOptions()).thenReturn(options);
+        return campaign;
+    }
+
+    /** A campaign with every option mocked off, so Faction Standing leaves contract pay unchanged. */
+    private static Campaign campaignWithoutStandingPay() {
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getCampaignOptions()).thenReturn(mock(CampaignOptions.class));
+        return campaign;
+    }
+
+    /** A campaign that applies Faction Standing to contract pay, holding the given Regard with every faction. */
+    private static Campaign campaignWithStandingPay(double regard) {
+        CampaignOptions options = mock(CampaignOptions.class);
+        when(options.isUseFactionStandingContractPaySafe()).thenReturn(true);
+        FactionStandings standings = mock(FactionStandings.class);
+        when(standings.getRegardForFaction(any(), eq(true))).thenReturn(regard);
+        PlayerForce playerForce = mock(PlayerForce.class);
+        when(playerForce.getFactionStandings()).thenReturn(standings);
+        Campaign campaign = mock(Campaign.class);
+        when(campaign.getCampaignOptions()).thenReturn(options);
+        when(campaign.getPlayerForce()).thenReturn(playerForce);
         return campaign;
     }
 
@@ -128,7 +152,7 @@ class AbstractContractDeterminationPayTest {
         // A non-pirate objective keeps the scheme's combat pay (the pirate-raid rule would zero it).
         when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.GARRISON_DUTY);
 
-        new FixedPay().determineContractPay(mock(Campaign.class), DATE, contract, mock(AbstractLocation.class));
+        new FixedPay().determineContractPay(campaignWithoutStandingPay(), DATE, contract, mock(AbstractLocation.class));
 
         ArgumentCaptor<ContractFinanceData> captor = ArgumentCaptor.forClass(ContractFinanceData.class);
         verify(contract).setContractFinanceData(captor.capture());
@@ -172,7 +196,7 @@ class AbstractContractDeterminationPayTest {
     void determineContractPayZeroesCombatForANonCovertPirateRaid() {
         AbstractContract contract = contractWith(ContractObjectiveType.PIRATE_RAID, false);
 
-        new FixedPay().determineContractPay(mock(Campaign.class), DATE, contract, mock(AbstractLocation.class));
+        new FixedPay().determineContractPay(campaignWithoutStandingPay(), DATE, contract, mock(AbstractLocation.class));
 
         ArgumentCaptor<ContractFinanceData> captor = ArgumentCaptor.forClass(ContractFinanceData.class);
         verify(contract).setContractFinanceData(captor.capture());
@@ -237,7 +261,7 @@ class AbstractContractDeterminationPayTest {
     @Test
     void getContractMonthlyPayAddsTheFalseFlagPremium() {
         // FixedPay.MONTHLY (500) * 1.25 = 625
-        assertEquals(Money.of(625), new FixedPay().getContractMonthlyPay(mock(Campaign.class), falseFlagContract()));
+        assertEquals(Money.of(625), new FixedPay().getContractMonthlyPay(campaignWithoutStandingPay(), falseFlagContract()));
     }
 
     @Test
@@ -250,14 +274,30 @@ class AbstractContractDeterminationPayTest {
     void getContractMonthlyPayHasNoPremiumWithoutAFalseFlag() {
         AbstractContract contract = contractWith(ContractObjectiveType.OBJECTIVE_RAID, false);
 
-        assertEquals(FixedPay.MONTHLY, new FixedPay().getContractMonthlyPay(mock(Campaign.class), contract));
+        assertEquals(FixedPay.MONTHLY, new FixedPay().getContractMonthlyPay(campaignWithoutStandingPay(), contract));
+    }
+
+    @Test
+    void getContractMonthlyPayAppliesAHighStandingMultiplier() {
+        AbstractContract contract = contractWith(ContractObjectiveType.OBJECTIVE_RAID, false);
+
+        // Regard 55 is Standing Level 8, which pays x1.2: 500 * 1.2 = 600
+        assertEquals(Money.of(600), new FixedPay().getContractMonthlyPay(campaignWithStandingPay(55.0), contract));
+    }
+
+    @Test
+    void getContractMonthlyPayAppliesALowStandingMultiplier() {
+        AbstractContract contract = contractWith(ContractObjectiveType.OBJECTIVE_RAID, false);
+
+        // Regard -55 is Standing Level 0, which pays x0.6: 500 * 0.6 = 300
+        assertEquals(Money.of(300), new FixedPay().getContractMonthlyPay(campaignWithStandingPay(-55.0), contract));
     }
 
     @Test
     void determineContractPayAppliesTheFalseFlagPremiumOnce() {
         AbstractContract contract = falseFlagContract();
 
-        new FixedPay().determineContractPay(mock(Campaign.class), DATE, contract, mock(AbstractLocation.class));
+        new FixedPay().determineContractPay(campaignWithoutStandingPay(), DATE, contract, mock(AbstractLocation.class));
 
         ArgumentCaptor<ContractFinanceData> captor = ArgumentCaptor.forClass(ContractFinanceData.class);
         verify(contract).setContractFinanceData(captor.capture());

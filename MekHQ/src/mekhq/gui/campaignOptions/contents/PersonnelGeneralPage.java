@@ -419,11 +419,6 @@ class PersonnelGeneralPage {
     }
 
     /**
-     * Creates the panel for blob crew settings in the General Page.
-     *
-     * @return a {@link JPanel} containing settings related to blob crews (temporary personnel pools)
-     */
-    /**
      * Builds the Support Teams section: whether support staff are organized into support carriers in the TOE.
      */
     private @Nonnull JPanel createSupportTeamsPanel() {
@@ -439,6 +434,11 @@ class PersonnelGeneralPage {
         return panel;
     }
 
+    /**
+     * Creates the panel for blob crew settings in the General Page.
+     *
+     * @return a {@link JPanel} containing settings related to blob crews (temporary personnel pools)
+     */
     private @Nonnull JPanel createBlobCrewPanel() {
         // Contents
         chkUseBlobInfantry = new CampaignOptionsCheckBox("UseBlobInfantry", getMetadata(new Version(0, 50, 12)));

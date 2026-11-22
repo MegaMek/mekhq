@@ -94,6 +94,9 @@ public class Aging {
      * If the character meets specific conditions, such as holding a high enough rank or possessing a blood name, the
      * fame multiplier is adjusted. The final result is scaled by a clan-specific fame multiplier.</p>
      *
+     * <p>The result is a penalty, so it is zero or negative. The magnitude is rounded before the sign is applied, so
+     * a scaled value of 1.5 becomes -2 rather than -1.</p>
+     *
      * @param characterAge The age of the character for which the fame modifier is being calculated.
      * @param isClan       Indicates whether the character is part of a clan. If {@code false}, the method returns 0.
      * @param hasBloodName Indicates whether the character possesses a blood name, which can decrease the fame
@@ -101,7 +104,7 @@ public class Aging {
      * @param rankIndex    The rank index of the character, used to determine if they meet rank-specific milestone
      *                     conditions for fame adjustment.
      *
-     * @return The calculated fame age modifier. Returns 0 if the character is not a clan member.
+     * @return The calculated fame age modifier, zero or negative. Returns 0 if the character is not a clan member.
      *
      * @author Illiani
      * @since 0.50.05
@@ -127,7 +130,7 @@ public class Aging {
 
         int modifier = fameMultiplier * CLAN_FAME_MULTIPLIER;
         double totalModifier = (double) modifier / AGING_SKILL_MODIFIER_DIVIDER;
-        return (int) round(totalModifier);
+        return -(int) round(totalModifier);
     }
 
     /**

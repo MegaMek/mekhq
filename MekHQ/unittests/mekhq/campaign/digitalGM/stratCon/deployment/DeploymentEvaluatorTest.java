@@ -93,7 +93,8 @@ class DeploymentEvaluatorTest {
         ReinforcementCost cost = DeploymentEvaluator.reinforcementCost(2, false, 2);
         assertEquals(3, cost.perForceSupportPoints());
         assertEquals(6, cost.totalSupportPoints());
-        assertEquals(-2, cost.targetNumberModifier());
+        // each force pays its own 2 extra points, so each roll gets the full -4
+        assertEquals(-4, cost.targetNumberModifier());
     }
 
     @Test
