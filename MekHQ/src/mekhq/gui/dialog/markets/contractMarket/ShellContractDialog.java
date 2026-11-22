@@ -76,7 +76,6 @@ import megamek.client.ui.preferences.PreferencesNode;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
 import mekhq.campaign.mission.contract.contractData.ContractCommandRights;
@@ -127,7 +126,6 @@ public class ShellContractDialog extends JDialog {
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ShellContractDialog";
 
     private static final int DEFAULT_LENGTH_MONTHS = 6;
-    private static final int MONEY_STEP = 1000;
     private static final int LABEL_WIDTH = 110;
     private static final int COLUMN_GAP = 22;
     /** The search type liaisons are generated for: shell contracts have no market, so treat them as a government's */
@@ -461,13 +459,7 @@ public class ShellContractDialog extends JDialog {
     }
 
     private void buildTermsRows(Grid grid) {
-        double monthlyPay = contract == null ? 0.0 : contract.getMonthlyPayOut().getAmount().doubleValue();
-        monthlyPaySpinner = new JSpinner(new SpinnerNumberModel(monthlyPay, 0.0, Double.MAX_VALUE, MONEY_STEP));
-        // Without this the editor sizes itself to fit Double.MAX_VALUE, blowing the row far past the viewport.
-        if (monthlyPaySpinner.getEditor() instanceof JSpinner.NumberEditor editor) {
-            editor.getTextField().setColumns(12);
-        }
-        EditorHud.styleSpinner(monthlyPaySpinner);
+        monthlyPaySpinner = EditorHud.moneySpinner(contract == null ? null : contract.getMonthlyPayOut());
         grid.add(row("field.monthlyPay", monthlyPaySpinner));
 
         List<ChaosContractStepsTable> salvageSteps = ShellContractFactory.getSalvageRightsSteps();
@@ -782,7 +774,7 @@ public class ShellContractDialog extends JDialog {
               startDate,
               ((Number) lengthSpinner.getValue()).intValue(),
               openEndedCheck.isSelected(),
-              Money.of(((Number) monthlyPaySpinner.getValue()).doubleValue()),
+              EditorHud.moneyValue(monthlyPaySpinner),
               (ChaosContractStepsTable) salvageCombo.getSelectedItem(),
               commandRights == null ? ShellContractFactory.DEFAULT_COMMAND_RIGHTS : commandRights);
 

@@ -143,7 +143,6 @@ public class ContractEditorDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(ContractEditorDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ChaosContractMarketDialog";
 
-    private static final int MONEY_STEP = 1000;
     private static final double FRACTIONAL_SCALE_STEP = 0.1;
     private static final int LABEL_WIDTH = 120;
     private static final int PREVIEW_WIDTH = 300;
@@ -886,7 +885,7 @@ public class ContractEditorDialog extends JDialog {
         finalPayoutEditable = contract.getStatus() != null;
         String finalPayoutNote = finalPayoutEditable ? null : getTextAt(RESOURCE_BUNDLE,
               "edit.contractMarket.note.finalPayout");
-        finalPayoutSpinner = moneySpinner(contract.getFinalPayout());
+        finalPayoutSpinner = EditorHud.moneySpinner(contract.getFinalPayout());
         finalPayoutSpinner.setEnabled(finalPayoutEditable);
         grid.add(trackedRow("edit.contractMarket.field.finalPayout", finalPayoutSpinner, finalPayoutNote,
               finalPayoutSpinner::getValue, finalPayoutSpinner));
@@ -951,14 +950,14 @@ public class ContractEditorDialog extends JDialog {
         Money monthlyPay = finance == null ? Money.zero() : finance.monthlyPay();
         Money combatPay = finance == null ? Money.zero() : finance.combatPay();
 
-        monthlyPaySpinner = moneySpinner(monthlyPay);
+        monthlyPaySpinner = EditorHud.moneySpinner(monthlyPay);
         monthlyPayAutomatic = financeAutomatic(monthlyPaySpinner);
         grid.add(trackedRow("edit.contractMarket.field.monthlyPay",
               withAutomatic(monthlyPaySpinner, monthlyPayAutomatic), null,
               () -> List.of(monthlyPaySpinner.getValue(), monthlyPayAutomatic.isSelected()), monthlyPaySpinner,
               monthlyPayAutomatic));
 
-        transportPaySpinner = moneySpinner(transport);
+        transportPaySpinner = EditorHud.moneySpinner(transport);
         transportPaySpinner.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE,
               "edit.contractMarket.field.transportPay.tooltip")));
         transportPayAutomatic = financeAutomatic(transportPaySpinner);
@@ -967,7 +966,7 @@ public class ContractEditorDialog extends JDialog {
               () -> List.of(transportPaySpinner.getValue(), transportPayAutomatic.isSelected()), transportPaySpinner,
               transportPayAutomatic));
 
-        combatPaySpinner = moneySpinner(combatPay);
+        combatPaySpinner = EditorHud.moneySpinner(combatPay);
         combatPayAutomatic = financeAutomatic(combatPaySpinner);
         grid.add(trackedRow("edit.contractMarket.field.combatPay",
               withAutomatic(combatPaySpinner, combatPayAutomatic), null,
@@ -1372,7 +1371,9 @@ public class ContractEditorDialog extends JDialog {
         if (monthlyPayAutomatic.isSelected() || transportPayAutomatic.isSelected()) {
             return getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.total.auto");
         }
-        Money total = moneyValue(monthlyPaySpinner).multipliedBy(lengthValue()).plus(moneyValue(transportPaySpinner));
+        Money total = EditorHud.moneyValue(monthlyPaySpinner)
+                            .multipliedBy(lengthValue())
+                            .plus(EditorHud.moneyValue(transportPaySpinner));
         return ContractMarketFormatting.compactMoney(total);
     }
 
@@ -1813,17 +1814,17 @@ public class ContractEditorDialog extends JDialog {
         // spinner value is used.
         Money transportPay = transportPayAutomatic.isSelected()
                                    ? AbstractContractGeneration.determineTransportPay(campaign, contract)
-                                   : moneyValue(transportPaySpinner);
+                                   : EditorHud.moneyValue(transportPaySpinner);
         // On "Automatic" the base is recomputed from the generator, then the pay / combat-pay characteristic is baked
         // on top - recomputing each commit keeps the multiplier idempotent. A manual spinner value is left untouched.
         Money monthlyPayValue = monthlyPayAutomatic.isSelected()
                                       ? ContractCharacteristics.bakeMonthlyPay(
               AbstractContractGeneration.determineMonthlyPay(campaign, contract), contract)
-                                      : moneyValue(monthlyPaySpinner);
+                                      : EditorHud.moneyValue(monthlyPaySpinner);
         Money combatPayValue = combatPayAutomatic.isSelected()
                                      ? ContractCharacteristics.bakeCombatPay(
               AbstractContractGeneration.determineCombatPay(campaign, contract), contract)
-                                     : moneyValue(combatPaySpinner);
+                                     : EditorHud.moneyValue(combatPaySpinner);
         contract.setContractFinanceData(new ContractFinanceData(transportPay, monthlyPayValue, combatPayValue));
         // The salvage taper follows the contract's (possibly edited) Scale
         contract.setSalvageTaperMultiplier(AbstractContractDeterminationPay.forCampaign(campaign)
@@ -1845,7 +1846,7 @@ public class ContractEditorDialog extends JDialog {
         // raid roll, unless the objective changed: then it starts afresh, as a new contract with that objective would.
         Money finalPayout = contract.getFinalPayout();
         if (finalPayoutEditable) {
-            Money spinnerPayout = moneyValue(finalPayoutSpinner);
+            Money spinnerPayout = EditorHud.moneyValue(finalPayoutSpinner);
             finalPayout = spinnerPayout.isZero() ? null : spinnerPayout;
         }
         boolean isPeaceful = (contract.getObjectiveType() == previousObjectiveType)
@@ -2160,17 +2161,6 @@ public class ContractEditorDialog extends JDialog {
         return automatic == null ? field : EditorHud.line(field, automatic);
     }
 
-    private static JSpinner moneySpinner(Money money) {
-        double amount = money == null ? 0.0 : money.getAmount().doubleValue();
-        JSpinner spinner = new JSpinner(new SpinnerNumberModel(amount, 0.0, Double.MAX_VALUE, MONEY_STEP));
-        // Without this the editor sizes itself to fit Double.MAX_VALUE, blowing the row far past the viewport.
-        if (spinner.getEditor() instanceof JSpinner.NumberEditor editor) {
-            editor.getTextField().setColumns(12);
-        }
-        EditorHud.styleSpinner(spinner);
-        return spinner;
-    }
-
     /**
      * An "Automatic" pill for a finance field. Finance determination is deterministic (derived from scale, terms, and
      * the journey to the target), so unlike the parameter automatics it is offered in both modes - defaulting on for a
@@ -2198,7 +2188,12 @@ public class ContractEditorDialog extends JDialog {
           ToDoubleFunction<ChaosContractStepsTable> multiplier) {
         // The figure per unit of multiplier, or NaN until it has stood at a non-zero multiplier
         double[] perMultiplier = { Double.NaN };
+        // The link's own figures are rounded to whole C-bills, so anchoring on them would drift with every step change
+        boolean[] isLinkSetting = { false };
         Runnable anchor = () -> {
+            if (isLinkSetting[0]) {
+                return;
+            }
             double currentMultiplier = multiplier.applyAsDouble(track.getSelected());
             if (currentMultiplier != 0) {
                 perMultiplier[0] = ((Number) spinner.getValue()).doubleValue() / currentMultiplier;
@@ -2215,7 +2210,9 @@ public class ContractEditorDialog extends JDialog {
                 spinner.setEnabled(false);
                 return;
             }
-            spinner.setValue(perMultiplier[0] * multiplier.applyAsDouble(track.getSelected()));
+            isLinkSetting[0] = true;
+            spinner.setValue(Math.round(perMultiplier[0] * multiplier.applyAsDouble(track.getSelected())));
+            isLinkSetting[0] = false;
         });
     }
 
@@ -2522,10 +2519,6 @@ public class ContractEditorDialog extends JDialog {
 
     private static int intValue(JSpinner spinner) {
         return ((Number) spinner.getValue()).intValue();
-    }
-
-    private static Money moneyValue(JSpinner spinner) {
-        return Money.of(((Number) spinner.getValue()).doubleValue());
     }
 
     private static <E> E enumValue(JComboBox<E> combo, E fallback) {

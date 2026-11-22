@@ -47,6 +47,7 @@ import java.util.function.Function;
 import javax.swing.*;
 
 import jakarta.annotation.Nullable;
+import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable;
 import mekhq.gui.baseComponents.hud.Hud;
 
@@ -65,6 +66,8 @@ import mekhq.gui.baseComponents.hud.Hud;
 final class EditorHud {
     /** How many steps the Contract Steps Table runs to. */
     static final int STEP_COUNT = ChaosContractStepsTable.values().length;
+    /** How much one click of a money spinner's arrows changes the amount */
+    private static final long MONEY_STEP = 1000L;
 
     private EditorHud() {
     }
@@ -527,6 +530,42 @@ final class EditorHud {
             field.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(3), scaleForGUI(6), scaleForGUI(3),
                   scaleForGUI(6)));
         }
+    }
+
+    /**
+     * Builds a spinner for an amount of money, in whole C-bills. The model holds {@link Long} values, so the box
+     * neither shows nor keeps decimal places; anything that sets the spinner's value must give it a {@link Long} too.
+     *
+     * @param money the amount to open on, rounded to the nearest C-bill, or {@code null} for zero
+     *
+     * @return the money spinner
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static JSpinner moneySpinner(@Nullable Money money) {
+        Long amount = money == null ? 0L : money.round().getAmount().longValue();
+        // Boxed arguments are deliberate: primitive longs would pick the constructor that makes a model of doubles
+        JSpinner spinner = new JSpinner(new SpinnerNumberModel(amount, Long.valueOf(0L), Long.valueOf(Long.MAX_VALUE),
+              Long.valueOf(MONEY_STEP)));
+        // Without this the editor sizes itself to fit Long.MAX_VALUE, blowing the row far past the viewport.
+        if (spinner.getEditor() instanceof JSpinner.NumberEditor editor) {
+            editor.getTextField().setColumns(12);
+        }
+        styleSpinner(spinner);
+        return spinner;
+    }
+
+    /**
+     * @param spinner a spinner built by {@link #moneySpinner}
+     *
+     * @return the amount the spinner holds
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static Money moneyValue(JSpinner spinner) {
+        return Money.of(((Number) spinner.getValue()).longValue());
     }
 
     /** Styles a text field for the HUD, with a faint colour for disabled text. */
