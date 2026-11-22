@@ -71,11 +71,11 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * Supply lines: the routes that keep each side's facilities supplied.
  *
  * <p>Each side has a supply network on each sector (see {@link StratConSupplyNetwork}): a route from every one of its
- * facilities back to a source of its supply. Its sources are its Comms Centers, Bases of Operations and Space Ports,
+ * facilities back to a source of its supply. Its sources are its Supply Depots, Bases of Operations and Space Ports,
  * and every road that leaves the sector. Routes are laid by the same search that lays the roads, at the costs of
  * {@link StratConRoadPlacer#supplyRouteCost}: they keep to the roads where those serve and strike out across country
- * where they don't, but never pass through a facility the other side holds. Each of a side's Supply Depots on its
- * network also links that side's facilities within {@value #DEPOT_RANGE} hexes straight to itself, without a road.</p>
+ * where they don't, but never pass through a facility the other side holds. Each of a side's Supply Depots also links
+ * that side's facilities within {@value #DEPOT_RANGE} hexes straight to itself, without a road.</p>
  *
  * <p>Routes are laid once and kept. A facility that turns up, or changes sides, is joined to its side's network by the
  * cheapest way there. A facility taken by the other side, or a source that is lost, sends every route that ran through
@@ -180,7 +180,7 @@ public final class StratConFacilitySupply {
      * @since 0.51.01
      */
     static boolean isSupplySource(FacilityType facilityType) {
-        return (facilityType == FacilityType.CommandCenter)
+        return (facilityType == FacilityType.SupplyDepot)
                      || (facilityType == FacilityType.BaseOfOperations)
                      || (facilityType == FacilityType.SpacePort);
     }
@@ -290,6 +290,78 @@ public final class StratConFacilitySupply {
     }
 
     /**
+     * The facilities in a sector that no route joins to a source of their side's supply. Unlike
+     * {@link #updateCutOffFacilities}, this takes no account of cuts and Supply Interdictions, which block a route
+     * without removing it. Reads the routes as they stand.
+     *
+     * @param track the sector
+     *
+     * @return the hexes of those facilities, on either side; empty for a sector with no roads
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<StratConCoords> getUnroutedFacilityHexes(StratConTrackState track) {
+        List<StratConCoords> unrouted = new ArrayList<>();
+        if (track.getRoads().isEmpty()) {
+            return unrouted;
+        }
+
+        for (boolean isPlayerSide : new boolean[] { true, false }) {
+            StratConSupplyNetwork network = track.getSupplyNetwork(isPlayerSide);
+            for (StratConCoords facilityHex : getFacilityHexes(track, isPlayerSide)) {
+                if (!network.isRouted(facilityHex)) {
+                    unrouted.add(facilityHex);
+                }
+            }
+        }
+        return unrouted;
+    }
+
+    /**
+     * The hexes where a facility of a side could be joined to that side's supply routes as they stand: those a route
+     * could be laid to, and those within reach of one of its Supply Depots. Hexes on the other side's supply routes are
+     * left out, since a facility there would block them. Does not check whether a hex is free.
+     *
+     * @param track        the sector
+     * @param isPlayerSide {@code true} for the player's side, {@code false} for the enemy's
+     *
+     * @return the hexes; empty if the side has no source of supply in the sector
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Set<StratConCoords> getSuppliableHexes(StratConTrackState track, boolean isPlayerSide) {
+        StepCost stepCost = StratConRoadPlacer.supplyRouteCost(track,
+              coords -> isHeldByOtherSide(track, coords, isPlayerSide));
+        Pathing pathing = StratConPathfinder.pathfind(track,
+              track.getSupplyNetwork(isPlayerSide).hexes(),
+              stepCost);
+
+        Set<StratConCoords> suppliableHexes = new LinkedHashSet<>(pathing.distance().keySet());
+        for (StratConCoords facilityHex : getFacilityHexes(track, isPlayerSide)) {
+            if (isRoutedSupplyDepot(track, facilityHex, isPlayerSide)) {
+                suppliableHexes.addAll(StratConHexGeometry.withinRadius(track, facilityHex, DEPOT_RANGE));
+            }
+        }
+        suppliableHexes.removeIf(coords -> isOnSupplyNetwork(track, coords, !isPlayerSide));
+        return suppliableHexes;
+    }
+
+    /**
+     * @return {@code true} if the hex holds one of the side's Supply Depots, on the side's network
+     */
+    private static boolean isRoutedSupplyDepot(StratConTrackState track, StratConCoords coords,
+          boolean isPlayerSide) {
+        StratConFacility facility = track.getFacility(coords);
+        return (facility != null)
+                     && isOnSide(facility, isPlayerSide)
+                     && !facility.isDefinitionMissing()
+                     && (facility.getFacilityType() == FacilityType.SupplyDepot)
+                     && track.getSupplyNetwork(isPlayerSide).isRouted(coords);
+    }
+
+    /**
      * Joins each of a side's facilities that has no route to the network, nearest first, as the roads join cities
      * (Prim's): Supply Depot links first, since they cost nothing, then the cheapest way from the network as it stands
      * to the nearest facility still without a route, again and again. A facility no way reaches is left without one.
@@ -341,13 +413,8 @@ public final class StratConFacilitySupply {
         boolean isLinked = true;
         while (isLinked && !unrouted.isEmpty()) {
             isLinked = false;
-            for (Map.Entry<StratConCoords, StratConFacility> entry : track.getFacilities().entrySet()) {
-                StratConFacility depot = entry.getValue();
-                StratConCoords depotCoords = entry.getKey();
-                if (!isOnSide(depot, isPlayerSide)
-                          || depot.isDefinitionMissing()
-                          || (depot.getFacilityType() != FacilityType.SupplyDepot)
-                          || !network.isRouted(depotCoords)) {
+            for (StratConCoords depotCoords : track.getFacilities().keySet()) {
+                if (!isRoutedSupplyDepot(track, depotCoords, isPlayerSide)) {
                     continue;
                 }
 
@@ -608,7 +675,7 @@ public final class StratConFacilitySupply {
      * @param track the sector
      *
      * @return {@code true} if the player's side has facilities in the sector but nowhere for its supply to start from:
-     *       no Comms Center, Base of Operations or Space Port of its own, and no road out of the sector the enemy
+     *       no Supply Depot, Base of Operations or Space Port of its own, and no road out of the sector the enemy
      *       doesn't hold. Every one of those facilities is then cut off. A sector with no roads has no supply lines,
      *       so it never counts.
      *

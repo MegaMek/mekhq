@@ -410,7 +410,8 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     /**
      * GM tool: clears the current sector and regenerates its terrain (and cities/roads), then repaints. Scenarios,
-     * facilities, and assigned forces are left in place.
+     * facilities, and assigned forces are left in place, except those the new terrain floods and the facilities it
+     * leaves where no supply route can reach.
      */
     public void regenerateCurrentSector() {
         if ((currentTrack == null) || (campaignState == null)) {

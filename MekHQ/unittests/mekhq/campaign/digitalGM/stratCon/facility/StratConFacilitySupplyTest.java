@@ -231,15 +231,48 @@ class StratConFacilitySupplyTest {
         }
 
         @Test
-        void aCommandCenterIsASourceOfItsOwnSupply() {
+        void aSupplyDepotIsASourceOfItsOwnSupply() {
             track.getRoadExits().clear();
-            StratConCoords commandCenter = road[0].translate(ROAD_DIRECTION + 3);
-            place(commandCenter, ForceAlignment.Opposing, FacilityType.CommandCenter);
+            StratConCoords depot = road[0].translate(ROAD_DIRECTION + 3);
+            place(depot, ForceAlignment.Opposing, FacilityType.SupplyDepot);
             StratConFacility facility = place(roadEnd, ForceAlignment.Opposing, FacilityType.MekBase);
 
             assertTrue(checkSupply().isEmpty());
             assertTrue(facility.isNetworked());
-            assertTrue(track.getEnemySupplyNetwork().isRoot(commandCenter));
+            assertTrue(track.getEnemySupplyNetwork().isRoot(depot));
+        }
+
+        @Test
+        void aSupplyDepotOnAnIslandSuppliesItselfAndTheFacilityNextToIt() {
+            StratConCoords depot = new StratConCoords(2, 2);
+            StratConCoords base = depot.translate(ROAD_DIRECTION);
+            for (StratConCoords island : List.of(depot, base)) {
+                for (StratConCoords neighbor : StratConHexGeometry.neighbors(track, island)) {
+                    if (!neighbor.equals(depot) && !neighbor.equals(base)) {
+                        track.setTerrainTile(neighbor, "Sea");
+                    }
+                }
+            }
+            place(depot, ForceAlignment.Allied, FacilityType.SupplyDepot);
+            place(base, ForceAlignment.Allied, FacilityType.MekBase);
+
+            assertTrue(checkSupply().isEmpty());
+            assertTrue(track.getPlayerSupplyNetwork().isRoot(depot));
+            assertEquals(depot, track.getPlayerSupplyNetwork().nextHex(base));
+        }
+
+        @Test
+        void aSupplyDepotLosesItsSupplyToTheSideThatTakesIt() {
+            track.getRoadExits().clear();
+            StratConFacility depot = place(roadEnd, ForceAlignment.Allied, FacilityType.SupplyDepot);
+            StratConCoords nearby = roadEnd.translate(ROAD_DIRECTION);
+            place(nearby, ForceAlignment.Allied, FacilityType.MekBase);
+            assertTrue(checkSupply().isEmpty());
+
+            depot.setOwner(ForceAlignment.Opposing);
+
+            assertEquals(Set.of(nearby), checkSupply());
+            assertTrue(track.getEnemySupplyNetwork().isRoot(roadEnd));
         }
 
         @Test
@@ -682,13 +715,13 @@ class StratConFacilitySupplyTest {
             place(roadEnd, ForceAlignment.Allied, FacilityType.TankBase);
             StratConFacilitySupply.processSupply(track, campaign, false);
 
-            StratConCoords commandCenter = new StratConCoords(3, 15);
-            place(commandCenter, ForceAlignment.Allied, FacilityType.CommandCenter);
+            StratConCoords depot = new StratConCoords(3, 15);
+            place(depot, ForceAlignment.Allied, FacilityType.SupplyDepot);
             StratConFacilitySupply.processSupply(track, campaign, false);
             assertFalse(track.isPlayerSupplyUnsourced());
             assertFalse(StratConFacilitySupply.isCutOff(track, roadEnd));
 
-            track.removeFacility(commandCenter);
+            track.removeFacility(depot);
             StratConFacilitySupply.processSupply(track, campaign, false);
 
             verify(campaign, times(2)).addReport(any(), eq(unsourcedReport()));
@@ -806,22 +839,22 @@ class StratConFacilitySupplyTest {
     @Nested
     class SupplyStatusTests {
         @Test
-        void anEnemyCommandCenterIsASupplySource() {
-            place(roadEnd, ForceAlignment.Opposing, FacilityType.CommandCenter);
+        void anEnemySupplyDepotIsASupplySource() {
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.SupplyDepot);
 
             assertTrue(StratConFacilitySupply.isSupplySource(track, roadEnd));
         }
 
         @Test
-        void aPlayerSupplyDepotIsNotASupplySource() {
-            place(roadEnd, ForceAlignment.Player, FacilityType.SupplyDepot);
+        void aPlayerCommandCenterIsNotASupplySource() {
+            place(roadEnd, ForceAlignment.Player, FacilityType.CommandCenter);
 
             assertFalse(StratConFacilitySupply.isSupplySource(track, roadEnd));
         }
 
         @Test
         void aNeutralFacilityIsNotASupplySourceEvenIfItsTypeWouldBe() {
-            place(roadEnd, ForceAlignment.Third, FacilityType.CommandCenter);
+            place(roadEnd, ForceAlignment.Third, FacilityType.SupplyDepot);
 
             assertFalse(StratConFacilitySupply.isSupplySource(track, roadEnd));
         }
@@ -833,7 +866,7 @@ class StratConFacilitySupplyTest {
 
         @Test
         void aSupplySourceShowsAsSourceRatherThanConnected() {
-            place(roadEnd, ForceAlignment.Opposing, FacilityType.CommandCenter);
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.SupplyDepot);
             checkSupply();
 
             assertEquals(StratConFacilitySupply.SupplyStatus.SOURCE,
@@ -851,7 +884,7 @@ class StratConFacilitySupplyTest {
 
         @Test
         void aCutOffSourceShowsAsCut() {
-            place(roadEnd, ForceAlignment.Opposing, FacilityType.CommandCenter);
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.SupplyDepot);
             track.getCutOffFacilities().add(roadEnd);
 
             assertEquals(StratConFacilitySupply.SupplyStatus.CUT,
@@ -861,7 +894,7 @@ class StratConFacilitySupplyTest {
         @Test
         void aSectorWithoutRoadsShowsNoSupplyStatus() {
             track.getRoads().clear();
-            place(roadEnd, ForceAlignment.Opposing, FacilityType.CommandCenter);
+            place(roadEnd, ForceAlignment.Opposing, FacilityType.SupplyDepot);
 
             assertEquals(StratConFacilitySupply.SupplyStatus.NONE,
                   StratConFacilitySupply.getSupplyStatus(track, roadEnd));

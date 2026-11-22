@@ -109,6 +109,12 @@ public class StratConContractInitializer {
     public static final int NUM_FORMATIONS_PER_TRACK = 3;
     public static final int ZERO_CELSIUS_IN_KELVIN = 273;
 
+    /**
+     * How many times a newly laid out sector's facilities are checked for a supply route and moved. Moving one re-lays
+     * the roads, which can leave another without a route; the limit keeps two from displacing each other forever.
+     */
+    private static final int MAX_SUPPLY_RELOCATION_PASSES = 3;
+
     /** Legacy sizing: hexes per required formation, laid out as a wider-than-tall rectangle. */
     private static final int LEGACY_HEXES_PER_FORMATION = 28;
 
@@ -266,6 +272,12 @@ public class StratConContractInitializer {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         boolean isUseMaplessMode = campaignOptions.isUseStratConMaplessMode();
 
+        // A running contract seeded again keeps the facilities it has, and they keep their hexes.
+        Set<StratConFacility> existingFacilities = new HashSet<>();
+        for (StratConTrackState track : campaignState.getTracks()) {
+            existingFacilities.addAll(track.getFacilities().values());
+        }
+
         // now seed the tracks with objectives and facilities
         boolean isFactorSupportPointsIntoScale =
               campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
@@ -410,6 +422,7 @@ public class StratConContractInitializer {
         if (!isUseMaplessMode) {
             for (StratConTrackState track : campaignState.getTracks()) {
                 connectFacilitiesToRoads(track, contract, campaign);
+                relocateUnroutedFacilities(track, contract, campaign, existingFacilities);
             }
         }
 
@@ -1561,7 +1574,8 @@ public class StratConContractInitializer {
      * alternate-terrain option is set, otherwise the legacy placer. The track's dimensions are kept, but a fresh
      * latitude band is rolled and the temperature is recomputed from it, and assigned forces are left untouched.
      * Scenarios and facilities are preserved, but any that the new coastline leaves on an ocean hex are relocated back
-     * onto land.
+     * onto land, and so are any facilities left where their side's supply can't reach (see
+     * {@link #relocateUnroutedFacilities}).
      *
      * @param track    the track to regenerate
      * @param contract the contract the track belongs to (source of the planet profile and Ares-Conventions status)
@@ -1600,6 +1614,79 @@ public class StratConContractInitializer {
 
         // Fold the planet-owner's facilities into the (possibly rebuilt) road network; a road-less generator ignores it.
         connectFacilitiesToRoads(track, contract, campaign);
+        relocateUnroutedFacilities(track, contract, campaign, Collections.emptySet());
+    }
+
+    /**
+     * Moves every facility in a newly laid out sector that no supply route can reach - one on an island with no road
+     * out, say - to a random free hex its side's routes can, carrying along whatever shares its hex. One with nowhere
+     * to go is left where it is, cut off. Does nothing while supply lines are out of use.
+     *
+     * <p>Call after {@link #connectFacilitiesToRoads}, once the roads and the rest of the sector's sources of supply
+     * are in place: they decide what can be reached, and aren't known while facilities are still being placed. Only for
+     * a sector being laid out; a facility cut off in play is left where it stands.</p>
+     *
+     * @param track           the sector
+     * @param contract        the contract, for the planet-owner road rules
+     * @param campaign        the campaign, for the current date and options
+     * @param fixedFacilities the facilities that must keep their hexes
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void relocateUnroutedFacilities(StratConTrackState track, AbstractContract contract, Campaign campaign,
+          Set<StratConFacility> fixedFacilities) {
+        if (!StratConFacilitySupply.isSupplyLinesActive(campaign)) {
+            return;
+        }
+
+        boolean isMoved = true;
+        for (int pass = 0; isMoved && (pass < MAX_SUPPLY_RELOCATION_PASSES); pass++) {
+            isMoved = false;
+            for (StratConCoords source : StratConFacilitySupply.getUnroutedFacilityHexes(track)) {
+                StratConFacility facility = track.getFacility(source);
+                if (fixedFacilities.contains(facility)) {
+                    continue;
+                }
+
+                StratConCoords destination = findSuppliableCoords(track, facility.isOwnerAlliedToPlayer());
+                if (destination == null) {
+                    continue;
+                }
+
+                // A hex revealed for the facility on it is revealed where the facility now stands.
+                if (facility.getVisible() && track.getRevealedCoords().contains(source)) {
+                    track.getRevealedCoords().add(destination);
+                }
+                relocateOccupant(track, source, destination);
+                isMoved = true;
+            }
+
+            if (isMoved) {
+                connectFacilitiesToRoads(track, contract, campaign);
+            }
+        }
+
+        for (StratConCoords coords : StratConFacilitySupply.getUnroutedFacilityHexes(track)) {
+            LOGGER.info("No supply route can be laid to the {} at {} in {}.",
+                  track.getFacility(coords).getDisplayableName(),
+                  coords.toBTString(),
+                  track.getDisplayableName());
+        }
+    }
+
+    /**
+     * @return a random free hex that a side's supply routes can reach, or {@code null} if there is none
+     */
+    private static @Nullable StratConCoords findSuppliableCoords(StratConTrackState track, boolean isPlayerSide) {
+        Collection<StratConCoords> forceCoords = track.getAssignedForceCoords().values();
+        List<StratConCoords> candidates = new ArrayList<>();
+        for (StratConCoords coords : StratConFacilitySupply.getSuppliableHexes(track, isPlayerSide)) {
+            if (isUnoccupied(track, coords, forceCoords, false, false)) {
+                candidates.add(coords);
+            }
+        }
+        return candidates.isEmpty() ? null : candidates.get(Compute.randomInt(candidates.size()));
     }
 
     /**
@@ -2904,36 +2991,14 @@ public class StratConContractInitializer {
         for (int y = 0; y < trackHeight; y++) {
             for (int x = 0; x < trackWidth; x++) {
                 StratConCoords coords = new StratConCoords(x, y);
-                // Ocean hexes never host scenarios or facilities.
-                if (StratConBiomeManifest.isOceanTerrain(trackState.getTerrainTile(coords))) {
-                    continue;
-                }
-
-                if (trackState.getScenario(coords) != null) {
-                    continue;
-                }
-
-                // A point of interest that occupies its hex keeps scenarios and facilities off it.
-                if (trackState.getOccupyingPointOfInterest(coords) != null) {
-                    continue;
-                }
-
-                boolean hasPlayerForces = forceCoords.contains(coords);
-                if (hasPlayerForces && !allowPlayerForces) {
-                    continue;
-                }
-
-                // Both rules must hold: a formation standing on an enemy facility does not make the facility a place
-                // for a scenario to spawn, or the enemy's scenario would become an assault the player never ordered.
-                StratConFacility facility = trackState.getFacility(coords);
-                if ((facility != null) && !(allowPlayerFacilities && facility.isOwnerAlliedToPlayer())) {
+                if (!isUnoccupied(trackState, coords, forceCoords, allowPlayerFacilities, allowPlayerForces)) {
                     continue;
                 }
 
                 int weight = defaultWeight;
-                if (facility != null) {
+                if (trackState.getFacility(coords) != null) {
                     weight = strategicEmphasis;
-                } else if (hasPlayerForces && emphasizeStrategicTargets) {
+                } else if (forceCoords.contains(coords) && emphasizeStrategicTargets) {
                     Set<Integer> formationsHere = trackState.getAssignedCoordForces().get(coords);
                     weight = getPlayerForceHexWeight((formationsHere == null) ? 0 : formationsHere.size());
                 }
@@ -2942,6 +3007,38 @@ public class StratConContractInitializer {
         }
 
         return weightedMap.randomItem();
+    }
+
+    /**
+     * @param forceCoords the hexes where player formations are deployed
+     *
+     * @return {@code true} if a scenario or facility could be placed on the hex, by the rules of
+     *       {@link #getUnoccupiedCoords(StratConTrackState, boolean, boolean, boolean)}
+     */
+    private static boolean isUnoccupied(StratConTrackState track, StratConCoords coords,
+          Collection<StratConCoords> forceCoords, boolean allowPlayerFacilities, boolean allowPlayerForces) {
+        // Ocean hexes never host scenarios or facilities.
+        if (StratConBiomeManifest.isOceanTerrain(track.getTerrainTile(coords))) {
+            return false;
+        }
+
+        if (track.getScenario(coords) != null) {
+            return false;
+        }
+
+        // A point of interest that occupies its hex keeps scenarios and facilities off it.
+        if (track.getOccupyingPointOfInterest(coords) != null) {
+            return false;
+        }
+
+        if (forceCoords.contains(coords) && !allowPlayerForces) {
+            return false;
+        }
+
+        // Both rules must hold: a formation standing on an enemy facility does not make the facility a place for a
+        // scenario to spawn, or the enemy's scenario would become an assault the player never ordered.
+        StratConFacility facility = track.getFacility(coords);
+        return (facility == null) || (allowPlayerFacilities && facility.isOwnerAlliedToPlayer());
     }
 
     /**
