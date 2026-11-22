@@ -1167,6 +1167,15 @@ public final class MHQOptions extends SuiteOptions {
         userPreferences.node(MHQConstants.AUTOSAVE_NODE).putBoolean(MHQConstants.SAVE_BEFORE_SCENARIOS_KEY, value);
     }
 
+    public boolean getAutosaveAfterScenariosValue() {
+        return userPreferences.node(MHQConstants.AUTOSAVE_NODE)
+                     .getBoolean(MHQConstants.SAVE_AFTER_SCENARIOS_KEY, false);
+    }
+
+    public void setAutosaveAfterScenariosValue(boolean value) {
+        userPreferences.node(MHQConstants.AUTOSAVE_NODE).putBoolean(MHQConstants.SAVE_AFTER_SCENARIOS_KEY, value);
+    }
+
     public boolean getAutosaveBeforeMissionEndValue() {
         return userPreferences.node(MHQConstants.AUTOSAVE_NODE).getBoolean(MHQConstants.SAVE_BEFORE_MISSION_END, false);
     }

@@ -78,6 +78,7 @@ public class PostScenarioDialogHandler {
      *   <li>Restarts "rats" (any required campaign activities or background processes).</li>
      *   <li>Cleans up temporary image files generated during the scenario.</li>
      *   <li>Triggers a {@link ScenarioResolvedEvent} to notify the system about the scenario resolution.</li>
+     *   <li>Requests an autosave of the resolved campaign, even if one of the earlier steps failed.</li>
      * </ul>
      *
      * <p>
@@ -94,6 +95,17 @@ public class PostScenarioDialogHandler {
      *                        resolution.
      */
     public static void handle(CampaignGUI campaignGUI, Campaign campaign, Scenario currentScenario,
+          ResolveScenarioTracker tracker) {
+        try {
+            processPostScenario(campaignGUI, campaign, currentScenario, tracker);
+        } finally {
+            // The scenario has already been applied to the campaign by this point, so a failure in the steps above must
+            // not cost the player the record of the battle.
+            campaign.getAutosaveService().requestAfterScenarioAutosave(campaign);
+        }
+    }
+
+    private static void processPostScenario(CampaignGUI campaignGUI, Campaign campaign, Scenario currentScenario,
           ResolveScenarioTracker tracker) {
         postCombatRetirementCheck(campaignGUI, campaign, currentScenario);
         postCombatAutoApplyAward(campaign, tracker);
