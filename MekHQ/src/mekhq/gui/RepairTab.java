@@ -59,6 +59,7 @@ import javax.swing.text.html.HTMLEditorKit;
 
 import jakarta.annotation.Nullable;
 import megamek.client.ui.entityreadout.EntityReadout;
+import megamek.client.ui.entityreadout.ReadoutSections;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JTablePreference;
 import megamek.client.ui.preferences.PreferencesNode;
@@ -120,6 +121,8 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
     private static final int TECH_ROW_HEIGHT = 75;
     private static final MMLogger LOGGER = MMLogger.create(RepairTab.class);
     private static final String PARTS_ACQUISITION_REFRESH = "RepairTab.partsAcquisition";
+    private static final List<ReadoutSections> SERVICED_UNIT_READOUT_SECTIONS = List.of(
+          ReadoutSections.BASE_DATA, ReadoutSections.SYSTEMS, ReadoutSections.LOADOUT);
 
     private JTable servicedUnitTable;
     private JTable taskTable;
@@ -676,9 +679,9 @@ public final class RepairTab extends CampaignGuiTab implements ITechWorkPanel {
             if (null != unit) {
                 EntityReadout mv = EntityReadout.createReadout(unit.getEntity(), true, true);
                 txtServicedUnitView.setText("<div style='font: 12pt monospaced'>" +
-                                                  mv.getBasicSection(ViewFormatting.HTML) +
-                                                  "<br>" +
-                                                  mv.getLoadoutSection(ViewFormatting.HTML) +
+                                                  mv.getReadout(null,
+                                                        ViewFormatting.HTML,
+                                                        SERVICED_UNIT_READOUT_SECTIONS) +
                                                   "</div>");
                 SwingUtilities.invokeLater(() -> scrollServicedUnitView.getVerticalScrollBar().setValue(0));
                 if (!unit.equals(selectedUnit)) {
