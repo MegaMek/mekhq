@@ -37,6 +37,7 @@ import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.P
 import static mekhq.campaign.personnel.skills.SkillType.EXP_REGULAR;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
@@ -109,7 +110,8 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
      * Constructs a new {@code CurrentLocationPanel}.
      *
      * @param minWidth              the minimum enforced width of the panel in pixels
-     * @param maxWidth              the maximum enforced width of the panel in pixels
+     * @param maxWidth              the width the panel grows to in pixels; only exceeded when the location text needs
+     *                              more room
      * @param iconMaxHeight         the maximum enforced height of the location image in pixels
      * @param campaign              the active {@link Campaign} instance
      * @param openRecruitmentDialog a {@link Runnable} that triggers the opening of the Recruitment Dialog UI
@@ -168,6 +170,28 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
     public void removeNotify() {
         MekHQ.unregisterHandler(this);
         super.removeNotify();
+    }
+
+    @Override
+    public Dimension getPreferredSize() {
+        return widenToFitContent(super.getPreferredSize());
+    }
+
+    @Override
+    public Dimension getMaximumSize() {
+        return widenToFitContent(super.getMaximumSize());
+    }
+
+    /**
+     * Widens the given size, if needed, so that the location text is not cut off. The text lines cannot wrap, as the
+     * top panel has no height to spare for a third line.
+     *
+     * @param size the size to widen
+     *
+     * @return a size of the same height that is at least as wide as the panel's content
+     */
+    private Dimension widenToFitContent(Dimension size) {
+        return new Dimension(Math.max(size.width, getLayout().preferredLayoutSize(this).width), size.height);
     }
 
     @Override
@@ -306,7 +330,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
         if (atmosphere.isTainted() || atmosphere.isToxic()) {
             atmosphereColor = ReportingUtilities.getNegativeColor();
         }
-        String atmosphereLabel = atmosphere.isBreathable() ? "" : atmosphere.toString();
+        String atmosphereLabel = getShortAtmosphereLabel(atmosphere);
 
         String pressureColor = getDefaultFontHexColor();
         if (pressure.isTrace() || pressure.isVeryHigh()) {
@@ -314,7 +338,7 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
         } else if (pressure.isVacuum()) {
             pressureColor = ReportingUtilities.getNegativeColor();
         }
-        String pressureLabel = pressure.isStandard() ? "" : pressure.name().toLowerCase();
+        String pressureLabel = pressure.isStandard() ? "" : pressure.name().toLowerCase().replace('_', ' ');
         if (pressure.isHigh() || pressure.isVeryHigh()) {
             pressureLabel += " pressure";
         }
@@ -344,6 +368,23 @@ public class CurrentLocationPanel extends ScalingWidthConstrainedPanel {
         return getFormattedTextAt("info.atmosphere",
               atmosphereColor, atmosphereLabel, pressureColor, pressureLabel,
               temperatureColor, temperature, gravityColor, gravity);
+    }
+
+    /**
+     * Returns a label for the atmosphere that is short enough for the top panel. The tooltip explains the shortened
+     * names.
+     *
+     * @param atmosphere the atmosphere to describe
+     *
+     * @return the short label, or an empty string for breathable air
+     */
+    private static String getShortAtmosphereLabel(AtmosphericTaint atmosphere) {
+        return switch (atmosphere) {
+            case BREATHABLE -> "";
+            case TAINTED_POISON -> getTextAt("info.atmosphere.taintedPoison");
+            case TOXIC_POISON -> getTextAt("info.atmosphere.toxicPoison");
+            case TAINTED_CAUSTIC, TAINTED_FLAME, TOXIC_CAUSTIC, TOXIC_FLAME -> atmosphere.toString();
+        };
     }
 
     /**
