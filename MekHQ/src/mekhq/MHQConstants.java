@@ -198,6 +198,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String SAVE_MONTHLY_KEY = "saveMonthly";
     public static final String SAVE_YEARLY_KEY = "saveYearly";
     public static final String SAVE_BEFORE_SCENARIOS_KEY = "saveBeforeScenarios";
+    public static final String SAVE_AFTER_SCENARIOS_KEY = "saveAfterScenarios";
     public static final String SAVE_BEFORE_MISSION_END = "saveBeforeMissionEnd";
     public static final String MAXIMUM_NUMBER_SAVES_KEY = "maximumNumberAutoSaves";
     public static final int DEFAULT_NUMBER_SAVES = 5;

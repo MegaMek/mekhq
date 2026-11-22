@@ -53,6 +53,16 @@ public interface IAutosaveService {
     void requestBeforeScenarioAutosave(Campaign campaign);
 
     /**
+     * Handles auto-saving after a scenario has been resolved.
+     *
+     * @param campaign Campaign to save
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void requestAfterScenarioAutosave(Campaign campaign);
+
+    /**
      * Handles auto-saving before a mission or contract ends.
      *
      * @param campaign Campaign to save
