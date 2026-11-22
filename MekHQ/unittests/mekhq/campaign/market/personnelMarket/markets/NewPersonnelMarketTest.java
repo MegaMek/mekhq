@@ -57,11 +57,15 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import megamek.common.compute.Compute;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -70,6 +74,7 @@ import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
+import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
@@ -78,6 +83,8 @@ import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 
 class NewPersonnelMarketTest {
     static PersonnelMarketEntry marketEntryAdmin = entry(ADMINISTRATOR, 1, 1);
@@ -129,6 +136,26 @@ class NewPersonnelMarketTest {
         NewPersonnelMarket.ensureMarketStyle(campaign, style);
 
         verify(campaign, never()).setNewPersonnelMarket(any(NewPersonnelMarket.class));
+    }
+
+    @Test
+    void testLastSelectedFilter_SurvivesSavingAndLoading() throws Exception {
+        NewPersonnelMarket market = new NewPersonnelMarket();
+        market.setLastSelectedFilter("MEKWARRIOR");
+        StringWriter xml = new StringWriter();
+        try (PrintWriter writer = new PrintWriter(xml)) {
+            writer.println("<newPersonnelMarket>");
+            market.writePersonnelMarketDataToXML(writer, 1);
+            writer.println("</newPersonnelMarket>");
+        }
+
+        Node node = MHQXMLUtility.newSafeDocumentBuilder()
+                          .parse(new InputSource(new StringReader(xml.toString())))
+                          .getDocumentElement();
+        NewPersonnelMarket loaded = NewPersonnelMarket.generatePersonnelMarketDataFromXML(mockCampaign(), node,
+              MHQConstants.VERSION);
+
+        assertEquals("MEKWARRIOR", loaded.getLastSelectedFilter());
     }
 
     @Test

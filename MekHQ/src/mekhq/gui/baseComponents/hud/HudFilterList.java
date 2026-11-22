@@ -57,6 +57,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+import java.util.function.ToIntFunction;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.JLabel;
@@ -122,6 +123,25 @@ public class HudFilterList<T> extends JPanel {
         refresh();
         revalidate();
         repaint();
+    }
+
+    /**
+     * Changes the rows' counts, leaving the rows themselves, the selection and the keyboard focus as they are.
+     *
+     * @param counts gives each row's count from the value it stands for; a negative count shows none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setCounts(ToIntFunction<T> counts) {
+        List<Item<T>> recounted = new ArrayList<>();
+        for (Item<T> item : items) {
+            recounted.add(new Item<>(item.value(), item.label(), counts.applyAsInt(item.value())));
+        }
+        items = List.copyOf(recounted);
+        for (Row row : rows) {
+            row.count.setText(formatCount(items.get(row.index).count()));
+        }
     }
 
     /**

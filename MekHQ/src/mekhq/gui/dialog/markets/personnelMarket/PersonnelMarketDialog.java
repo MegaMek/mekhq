@@ -40,9 +40,6 @@ import static mekhq.campaign.finances.enums.TransactionType.RECRUITMENT;
 import static mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle.MEKHQ;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.gui.dialog.markets.contractMarket.ContractMarketFormatting.compactMoney;
-import static mekhq.gui.enums.PersonnelFilter.ACTIVE;
-import static mekhq.gui.enums.PersonnelFilter.ALL;
-import static mekhq.gui.enums.PersonnelFilter.getStandardPersonnelFilters;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
@@ -58,9 +55,15 @@ import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
-import java.time.LocalDate;
-import java.util.*;
-import java.util.function.Consumer;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.Set;
+import java.util.TreeSet;
 import javax.swing.*;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
@@ -77,6 +80,7 @@ import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.PlanetarySystem;
@@ -94,7 +98,6 @@ import mekhq.gui.baseComponents.hud.HudStatTile;
 import mekhq.gui.baseComponents.hud.HudWrappingLabel;
 import mekhq.gui.dialog.AdvanceDaysDialog;
 import mekhq.gui.dialog.glossary.GlossaryConsole;
-import mekhq.gui.enums.PersonnelFilter;
 import mekhq.gui.view.PersonViewPanel;
 
 /**
@@ -145,10 +148,8 @@ public class PersonnelMarketDialog extends JDialog {
     private final CampaignOptions campaignOptions;
     private final List<Person> currentApplicants;
     private final Map<Person, ApplicantFacts> facts = new HashMap<>();
-    /** The role filters the rail can offer, in order; the market saves the chosen one as its index here. */
-    private final List<PersonnelFilter> filters;
 
-    private PersonnelFilter filter = ALL;
+    private ApplicantFilter filter;
     private ApplicantSort sort = ApplicantSort.EXPERIENCE;
     private boolean isSortReversed;
     /** {@code true} to show only applicants with at least one special ability. */
@@ -159,9 +160,14 @@ public class PersonnelMarketDialog extends JDialog {
     private final Set<Integer> experienceLevels = new TreeSet<>();
 
     private final JTextField searchField = new JTextField();
-    private final HudFilterList<PersonnelFilter> filterList = new HudFilterList<>(this::setFilter);
-    private final JPanel traitRows = Hud.column();
+    private final HudFilterList<ApplicantFilter> groupList = new HudFilterList<>(this::setFilter);
+    private final HudFilterList<ApplicantFilter> professionList = new HudFilterList<>(this::setFilter);
+    /** The professions' heading and rows, hidden when every applicant is a civilian. */
+    private final JPanel professionRows = Hud.column();
+    private final HudCheckBox abilitiesCheckBox = railCheckBox();
+    private final HudCheckBox flawsCheckBox = railCheckBox();
     private final JPanel experienceRows = Hud.column();
+    private final Map<Integer, HudCheckBox> experienceCheckBoxes = new HashMap<>();
     private final HudCheckBox goldenHelloCheckbox = new HudCheckBox("");
     private final JPanel dossierHolder = new JPanel(new BorderLayout());
     private final JLabel selectionLabel = Hud.hint("");
@@ -193,12 +199,7 @@ public class PersonnelMarketDialog extends JDialog {
         this.parent = campaign.getGUI().getFrame();
         this.currentApplicants = market.getCurrentApplicants();
 
-        List<PersonnelFilter> standardFilters = getStandardPersonnelFilters();
-        standardFilters.remove(ACTIVE);
-        this.filters = List.copyOf(standardFilters);
-        int savedFilter = market.getLastSelectedFilter();
-        // The saved filter can be out of range if the filter list has changed since it was saved.
-        this.filter = (savedFilter >= 0 && savedFilter < filters.size()) ? filters.get(savedFilter) : ALL;
+        this.filter = ApplicantFilter.fromKey(market.getLastSelectedFilter());
 
         for (Person applicant : currentApplicants) {
             facts.put(applicant, workOutFacts(applicant));
@@ -414,7 +415,10 @@ public class PersonnelMarketDialog extends JDialog {
         return holder;
     }
 
-    /** The role filter rail: a search field above one row per profession group on the board, with its count. */
+    /**
+     * The role filter rail: a search field above the broad role groups and the professions on the board, each with its
+     * count, and the checkboxes that narrow the board further.
+     */
     private JPanel buildRail() {
         JPanel rail = new JPanel(new BorderLayout());
         rail.setOpaque(true);
@@ -462,10 +466,23 @@ public class PersonnelMarketDialog extends JDialog {
         // Below the roles, checkboxes narrow the board further: to applicants with abilities or flaws, and to chosen
         // experience levels.
         JPanel rows = Hud.column();
-        rows.add(leftAligned(filterList));
+        rows.add(leftAligned(groupList));
+        professionRows.add(Box.createVerticalStrut(scaleForGUI(14)));
+        professionRows.add(leftAligned(railHeading(text("rail.personnelMarket.professions"))));
+        professionRows.add(leftAligned(professionList));
+        rows.add(leftAligned(professionRows));
         rows.add(Box.createVerticalStrut(scaleForGUI(14)));
         rows.add(leftAligned(railHeading(text("rail.personnelMarket.traits"))));
-        rows.add(leftAligned(traitRows));
+        abilitiesCheckBox.addActionListener(event -> {
+            isAbilitiesOnly = abilitiesCheckBox.isSelected();
+            refreshKeepingSelection();
+        });
+        rows.add(leftAligned(abilitiesCheckBox));
+        flawsCheckBox.addActionListener(event -> {
+            isFlawsOnly = flawsCheckBox.isSelected();
+            refreshKeepingSelection();
+        });
+        rows.add(leftAligned(flawsCheckBox));
         rows.add(Box.createVerticalStrut(scaleForGUI(14)));
         rows.add(leftAligned(railHeading(text("rail.personnelMarket.experience"))));
         rows.add(leftAligned(experienceRows));
@@ -488,22 +505,17 @@ public class PersonnelMarketDialog extends JDialog {
         return heading;
     }
 
-    /**
-     * A checkbox row in the rail: a filter's label and how many applicants it matches.
-     *
-     * @param label      the filter's label
-     * @param count      how many applicants it matches
-     * @param isSelected whether the filter is on
-     * @param onToggle   called with the new state when the player ticks or unticks it
-     */
-    private static HudCheckBox railCheckBox(String label, int count, boolean isSelected, Consumer<Boolean> onToggle) {
-        HudCheckBox checkBox = new HudCheckBox(getFormattedTextAt(RESOURCE_BUNDLE, "rail.personnelMarket.count",
-              label, count));
-        checkBox.setSelected(isSelected);
+    /** A checkbox row in the rail; {@link #label} gives it its text. */
+    private static HudCheckBox railCheckBox() {
+        HudCheckBox checkBox = new HudCheckBox("");
         checkBox.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(3), scaleForGUI(12), scaleForGUI(3),
               scaleForGUI(12)));
-        checkBox.addActionListener(event -> onToggle.accept(checkBox.isSelected()));
         return checkBox;
+    }
+
+    /** Labels a checkbox row in the rail with its filter's name and count. */
+    private static void label(HudCheckBox checkBox, String name, int count) {
+        checkBox.setText(getFormattedTextAt(RESOURCE_BUNDLE, "rail.personnelMarket.count", name, count));
     }
 
     /** The Golden Hello offer and a tip above the Recruit buttons. */
@@ -613,22 +625,20 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     /**
-     * Brings the board, the tiles and the footer up to date after the player filters, searches or sorts. The rail's
-     * counts are of every applicant, so they cannot have changed; its controls are left in place, keeping the keyboard
-     * focus on the one the player just used.
+     * Brings the board, the rail's counts, the tiles and the footer up to date after the player filters, searches or
+     * sorts. The rail's controls are left in place, keeping the keyboard focus on the one the player just used.
      *
      * @param keep          the applicants to keep selected, if still shown
      * @param fallbackIndex the board position to select if none of {@code keep} is shown
      */
     private void refreshBoard(Collection<Person> keep, int fallbackIndex) {
-        filterList.setSelected(filter);
+        groupList.setSelected(filter);
+        professionList.setSelected(filter);
 
-        List<Person> shown = new ArrayList<>();
-        for (Person applicant : currentApplicants) {
-            if (matchesFilters(applicant)) {
-                shown.add(applicant);
-            }
-        }
+        ApplicantMatches matches = matches(currentApplicants);
+        refreshCounts(matches);
+
+        List<Person> shown = matches.shown();
         shown.sort(sort.comparator(this::facts, campaign.getLocalDate(), isSortReversed));
 
         board.show(shown, currentApplicants.size(), keep, fallbackIndex, sort, isSortReversed, emptyBoardText());
@@ -651,102 +661,96 @@ public class PersonnelMarketDialog extends JDialog {
     }
 
     /**
-     * @param applicant an applicant
+     * @param applicants the applicants to filter
      *
-     * @return {@code true} if every filter lets the applicant through: the role, the search, the ability and flaw
-     *       checkboxes, and the chosen experience levels
+     * @return what the filters make of them: the role, the search, the ability and flaw checkboxes, and the chosen
+     *       experience levels
      */
-    private boolean matchesFilters(Person applicant) {
-        ApplicantFacts applicantFacts = facts(applicant);
+    private ApplicantMatches matches(List<Person> applicants) {
         String query = searchField.getText().strip().toLowerCase(Locale.ROOT);
-        return filter.getFilteredInformation(applicant, campaign.getLocalDate())
-                     && (query.isEmpty() || searchText(applicant).contains(query))
-                     && (!isAbilitiesOnly || applicantFacts.abilities() > 0)
-                     && (!isFlawsOnly || applicantFacts.flaws() > 0)
-                     && (experienceLevels.isEmpty() || experienceLevels.contains(applicantFacts.experienceLevel()));
+        List<Person> found = new ArrayList<>();
+        for (Person applicant : applicants) {
+            if (query.isEmpty() || searchText(applicant).contains(query)) {
+                found.add(applicant);
+            }
+        }
+        return new ApplicantMatches(found, this::facts, filter, isAbilitiesOnly, isFlawsOnly, experienceLevels);
+    }
+
+    /** Shows beside each filter how many applicants it would find with the player's other choices as they are. */
+    private void refreshCounts(ApplicantMatches matches) {
+        groupList.setCounts(matches::countOf);
+        professionList.setCounts(matches::countOf);
+        label(abilitiesCheckBox, text("rail.personnelMarket.abilities"), matches.withAbilities());
+        label(flawsCheckBox, text("rail.personnelMarket.flaws"), matches.withFlaws());
+        for (Map.Entry<Integer, HudCheckBox> entry : experienceCheckBoxes.entrySet()) {
+            int level = entry.getKey();
+            label(entry.getValue(), SkillType.getExperienceLevelName(level), matches.withLevel(level));
+        }
     }
 
     /**
-     * Refills the rail's filters with their counts: the roles, then the ability and flaw checkboxes, then one checkbox
-     * per experience level among the applicants. Each count is of every applicant, not only those shown, so the player
-     * can see what a filter would bring in.
+     * Refills the rail's filters: the roles, the ability and flaw checkboxes, then one checkbox per experience level
+     * among the applicants. Every filter some applicant matches keeps its row whatever else is chosen, so the rows never
+     * jump about as the player filters; {@link #refreshCounts} fills in their counts.
      */
     private void refreshFilters() {
         refreshRoleFilters();
 
-        int withAbilities = 0;
-        int withFlaws = 0;
-        for (Person applicant : currentApplicants) {
-            ApplicantFacts applicantFacts = facts(applicant);
-            if (applicantFacts.abilities() > 0) {
-                withAbilities++;
-            }
-            if (applicantFacts.flaws() > 0) {
-                withFlaws++;
-            }
-        }
-        traitRows.removeAll();
-        traitRows.add(leftAligned(railCheckBox(text("rail.personnelMarket.abilities"), withAbilities,
-              isAbilitiesOnly, isSelected -> {
-                  isAbilitiesOnly = isSelected;
-                  refreshKeepingSelection();
-              })));
-        traitRows.add(leftAligned(railCheckBox(text("rail.personnelMarket.flaws"), withFlaws, isFlawsOnly,
-              isSelected -> {
-                  isFlawsOnly = isSelected;
-                  refreshKeepingSelection();
-              })));
+        abilitiesCheckBox.setSelected(isAbilitiesOnly);
+        flawsCheckBox.setSelected(isFlawsOnly);
 
         // Highest level first, as the board's experience order runs. A ticked level stays on the rail even when no
         // applicant has it, so the player can see what is narrowing the board.
-        Map<Integer, Integer> levelCounts = new TreeMap<>(Comparator.reverseOrder());
-        for (Integer level : experienceLevels) {
-            levelCounts.put(level, 0);
-        }
+        Set<Integer> levels = new TreeSet<>(Comparator.reverseOrder());
+        levels.addAll(experienceLevels);
         for (Person applicant : currentApplicants) {
-            levelCounts.merge(facts(applicant).experienceLevel(), 1, Integer::sum);
+            levels.add(facts(applicant).experienceLevel());
         }
         experienceRows.removeAll();
-        for (Map.Entry<Integer, Integer> entry : levelCounts.entrySet()) {
-            int level = entry.getKey();
-            experienceRows.add(leftAligned(railCheckBox(SkillType.getExperienceLevelName(level), entry.getValue(),
-                  experienceLevels.contains(level), isSelected -> {
-                      if (isSelected) {
-                          experienceLevels.add(level);
-                      } else {
-                          experienceLevels.remove(level);
-                      }
-                      refreshKeepingSelection();
-                  })));
+        experienceCheckBoxes.clear();
+        for (int level : levels) {
+            HudCheckBox checkBox = railCheckBox();
+            checkBox.setSelected(experienceLevels.contains(level));
+            checkBox.addActionListener(event -> {
+                if (checkBox.isSelected()) {
+                    experienceLevels.add(level);
+                } else {
+                    experienceLevels.remove(level);
+                }
+                refreshKeepingSelection();
+            });
+            experienceCheckBoxes.put(level, checkBox);
+            experienceRows.add(leftAligned(checkBox));
         }
-        traitRows.revalidate();
-        traitRows.repaint();
         experienceRows.revalidate();
         experienceRows.repaint();
     }
 
-    /** Refills the role list: every applicant, then each profession group that has at least one applicant. */
+    /**
+     * Refills the role lists: the broad groups, which are always there, then the professions the applicants have, which
+     * follow the applicants as they are recruited and added.
+     */
     private void refreshRoleFilters() {
-        LocalDate today = campaign.getLocalDate();
-        List<HudFilterList.Item<PersonnelFilter>> items = new ArrayList<>();
-        items.add(new HudFilterList.Item<>(ALL, ALL.toString(), currentApplicants.size()));
-        for (PersonnelFilter candidate : filters) {
-            if (candidate == ALL) {
-                continue;
-            }
-            int count = 0;
-            for (Person applicant : currentApplicants) {
-                if (candidate.getFilteredInformation(applicant, today)) {
-                    count++;
-                }
-            }
-            // The chosen filter stays on the rail even when empty, so the player can see what is narrowing the board.
-            if (count > 0 || candidate == filter) {
-                items.add(new HudFilterList.Item<>(candidate, candidate.toString(), count));
-            }
+        List<PersonnelRole> professions = new ArrayList<>();
+        for (Person applicant : currentApplicants) {
+            professions.add(applicant.getPrimaryRole());
         }
-        filterList.setItems(items);
-        filterList.setSelected(filter);
+        List<ApplicantFilter> professionFilters = ApplicantFilter.professions(professions, filter);
+        groupList.setItems(filterItems(ApplicantFilter.groups()));
+        groupList.setSelected(filter);
+        professionList.setItems(filterItems(professionFilters));
+        professionList.setSelected(filter);
+        professionRows.setVisible(!professionFilters.isEmpty());
+    }
+
+    /** One row per filter, without its count until {@link #refreshCounts} fills it in. */
+    private static List<HudFilterList.Item<ApplicantFilter>> filterItems(List<ApplicantFilter> roleFilters) {
+        List<HudFilterList.Item<ApplicantFilter>> items = new ArrayList<>();
+        for (ApplicantFilter roleFilter : roleFilters) {
+            items.add(new HudFilterList.Item<>(roleFilter, roleFilter.label(), -1));
+        }
+        return items;
     }
 
     /**
@@ -830,10 +834,9 @@ public class PersonnelMarketDialog extends JDialog {
         return text.toString().toLowerCase(Locale.ROOT);
     }
 
-    private void setFilter(PersonnelFilter newFilter) {
+    private void setFilter(ApplicantFilter newFilter) {
         filter = newFilter;
-        int index = filters.indexOf(newFilter);
-        market.setLastSelectedFilter(Math.max(index, 0));
+        market.setLastSelectedFilter(newFilter.key());
         refreshKeepingSelection();
     }
 
@@ -867,11 +870,11 @@ public class PersonnelMarketDialog extends JDialog {
 
     /** Clears every filter and the search without refreshing anything; the caller refreshes once afterwards. */
     private void resetFilters() {
-        filter = ALL;
+        filter = ApplicantFilter.ALL;
         isAbilitiesOnly = false;
         isFlawsOnly = false;
         experienceLevels.clear();
-        market.setLastSelectedFilter(Math.max(filters.indexOf(ALL), 0));
+        market.setLastSelectedFilter(filter.key());
         isClearingFilters = true;
         try {
             searchField.setText("");
@@ -1065,7 +1068,7 @@ public class PersonnelMarketDialog extends JDialog {
         currentApplicants.add(applicant);
         facts.put(applicant, workOutFacts(applicant));
 
-        if (!matchesFilters(applicant)) {
+        if (matches(List.of(applicant)).shown().isEmpty()) {
             // Clear the filters so the new applicant is in view; the refresh below then selects them.
             resetFilters();
         }

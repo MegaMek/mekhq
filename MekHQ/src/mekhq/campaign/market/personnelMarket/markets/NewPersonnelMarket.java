@@ -126,7 +126,7 @@ public class NewPersonnelMarket {
     List<PersonnelRole> rareProfessions = new ArrayList<>();
     int recruitmentRolls;
     private List<Person> currentApplicants = new ArrayList<>();
-    private int lastSelectedFilter;
+    private String lastSelectedFilter = "";
 
     // These values should be generated during object initialization only so that any changes to the underlying YAML
     // can be accounted for. Otherwise, we will end up with a situation where bugs or other variables get 'locked'
@@ -245,7 +245,7 @@ public class NewPersonnelMarket {
                 } else if (nodeName.equalsIgnoreCase("recruitmentRolls")) {
                     personnelMarket.setRecruitmentRolls(MathUtility.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("lastSelectedFilter")) {
-                    personnelMarket.setLastSelectedFilter(MathUtility.parseInt(nodeContents));
+                    personnelMarket.setLastSelectedFilter(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("currentApplicants")) {
                     processApplicantNodes(personnelMarket, childNode, version);
                 }
@@ -660,26 +660,27 @@ public class NewPersonnelMarket {
     }
 
     /**
-     * Returns the index or filter value last used for applicant selection.
+     * Returns the role filter last used to narrow the applicants.
      *
-     * @return filter index
+     * @return the filter, as the market's window saved it; empty if none has been. Saves from before 0.51.01 hold a
+     *       number, which no longer means anything.
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public int getLastSelectedFilter() {
+    public String getLastSelectedFilter() {
         return lastSelectedFilter;
     }
 
     /**
-     * Sets the last-used selection filter value.
+     * Sets the role filter last used to narrow the applicants.
      *
-     * @param lastSelectedFilter filter index
+     * @param lastSelectedFilter the filter, as the market's window saves it
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public void setLastSelectedFilter(int lastSelectedFilter) {
+    public void setLastSelectedFilter(String lastSelectedFilter) {
         this.lastSelectedFilter = lastSelectedFilter;
     }
 
