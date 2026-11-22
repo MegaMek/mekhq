@@ -42,7 +42,7 @@ import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.c
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.processMassLoyaltyChange;
 
 import java.time.LocalDate;
-import java.util.Collection;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -297,7 +297,8 @@ public class GoingRogue {
     private static void processPersonnel(Campaign campaign, boolean isDefection, Person commander,
           @Nullable Person second, int divisiveness, boolean isEveryoneFollowing) {
         final LocalDate today = campaign.getLocalDate();
-        Collection<Person> allPersonnel = campaign.getPlayerForce().getHumanResources().getPersonnel();
+        // Killing a prisoner removes them from the roster, so we need to iterate over a copy
+        List<Person> allPersonnel = new ArrayList<>(campaign.getPlayerForce().getHumanResources().getPersonnel());
         Set<Person> preProcessedPersonnel = new HashSet<>();
 
         preProcessedPersonnel.add(commander);
@@ -396,7 +397,8 @@ public class GoingRogue {
           Set<Person> preProcessedPersonnel) {
         Genealogy genealogy = person.getGenealogy();
         Person spouse = genealogy.getSpouse();
-        List<Person> children = genealogy.getChildren();
+        // Killing a prisoner also clears their genealogy links, so we need to iterate over a copy
+        List<Person> children = new ArrayList<>(genealogy.getChildren());
 
         // Spouses follow each other to their fate. This prevents us from needing to add handlers for split
         // relationships

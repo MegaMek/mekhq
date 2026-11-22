@@ -122,6 +122,7 @@ import mekhq.Utilities;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -2021,6 +2022,48 @@ public class Person implements ILocatable {
         this.setEduTagAlongs(new ArrayList<>());
 
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
+
+        // Deliberately the last step, so everything that reacts to the death still finds the prisoner on the roster
+        removeFromRosterIfDeadPrisoner(campaign);
+    }
+
+    /**
+     * Determines whether this person died while being held prisoner by the campaign. Bondsmen, and those becoming
+     * bondsmen, are not considered to be prisoners.
+     *
+     * @return {@code true} if this person is a prisoner, and is dead
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isDeadPrisoner() {
+        return getStatus().isDead() && getPrisonerStatus().isCurrentPrisoner();
+    }
+
+    /**
+     * Removes this person from the campaign roster if they are a prisoner who has died.
+     *
+     * <p>Dead prisoners have no further part to play in the campaign. Were they left on the roster, the player could
+     * still free, execute, or ransom them.</p>
+     *
+     * <p>Does nothing if this person isn't on the roster, which avoids processing the removal again should their cause
+     * of death be changed after they have already been removed.</p>
+     *
+     * @param campaign the campaign holding this person prisoner
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void removeFromRosterIfDeadPrisoner(Campaign campaign) {
+        if (!isDeadPrisoner()) {
+            return;
+        }
+
+        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+        if (humanResources.getPerson(getId()) == this) {
+            // The death itself has already been reported
+            humanResources.removePerson(campaign, this, false);
+        }
     }
 
     /**
