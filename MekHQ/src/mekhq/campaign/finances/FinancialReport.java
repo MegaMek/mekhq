@@ -221,7 +221,7 @@ public class FinancialReport {
         Accountant accountant = campaign.getAccountant();
 
         if (campaignOptions.isChargingMaintenance()) {
-            financialReport.maintenance = accountant.getWeeklyMaintenanceCosts().multipliedBy(4);
+            financialReport.maintenance = accountant.getProjectedMonthlyMaintenanceCosts();
         }
         if (campaignOptions.get(CampaignOption.PAY_FOR_SALARIES)) {
             financialReport.salaries = accountant.getPayRoll();

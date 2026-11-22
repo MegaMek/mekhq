@@ -42,13 +42,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
-import java.util.List;
-
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
-import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.personnel.Person;
 import org.junit.jupiter.api.BeforeEach;
@@ -76,6 +73,10 @@ class SalvageModeMaintenanceTest {
         doReturn(Money.of(100)).when(unit).getWeeklyMaintenanceCost();
     }
 
+    private Money getProjectedDailyMaintenance() {
+        return Maintenance.getProjectedDailyMaintenanceCost(campaign, unit, false, false, false);
+    }
+
     @Test
     void unitInRepairModeIsMaintained() {
         unit.setSalvage(false);
@@ -94,11 +95,18 @@ class SalvageModeMaintenanceTest {
 
     @Test
     void unitInSalvageModeCostsNoUpkeep() {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        lenient().when(campaignOptions.isChargingMaintenance()).thenReturn(true);
+        lenient().when(campaignOptions.get(CampaignOption.CHECK_MAINTENANCE)).thenReturn(true);
+        lenient().when(campaignOptions.get(CampaignOption.MAINTENANCE_CYCLE_DAYS)).thenReturn(7);
+        lenient().when(campaignOptions.get(CampaignOption.MAINTENANCE_OFF_CONTRACT)).thenReturn(true);
+        lenient().when(campaignOptions.get(CampaignOption.MAINTENANCE_IN_TRANSIT)).thenReturn(true);
+
         unit.setSalvage(false);
-        assertEquals(Money.of(100), Accountant.getWeeklyMaintenanceTotal(List.of(unit)));
+        assertTrue(getProjectedDailyMaintenance().isPositive());
 
         unit.setSalvage(true);
-        assertEquals(Money.zero(), Accountant.getWeeklyMaintenanceTotal(List.of(unit)));
+        assertEquals(Money.zero(), getProjectedDailyMaintenance());
     }
 
     @Test

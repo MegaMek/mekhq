@@ -103,7 +103,7 @@ class FinancesHotSpotsUpkeepTest {
         when(accountant.getOverheadExpenses()).thenReturn(OVERHEAD);
         when(accountant.getPeacetimeCost(anyBoolean())).thenReturn(PEACETIME);
         when(accountant.getMonthlyFoodAndHousingExpenses()).thenReturn(Money.zero());
-        when(accountant.getWeeklyMaintenanceCosts()).thenReturn(Money.zero());
+        when(accountant.getProjectedMonthlyMaintenanceCosts()).thenReturn(Money.zero());
         when(campaign.getAccountant()).thenReturn(accountant);
 
         finances = new Finances();

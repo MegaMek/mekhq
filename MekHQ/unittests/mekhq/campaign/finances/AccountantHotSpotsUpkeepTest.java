@@ -55,6 +55,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
@@ -357,6 +358,12 @@ class AccountantHotSpotsUpkeepTest {
 
     @Nested
     class PlanetaryMaintenanceReduction {
+        private static final double DELTA = 0.01;
+        private static final int CYCLE_DAYS = 7;
+        /** Away from combat contracts a cycle takes four times as long, so 1,000 is charged every 28 days */
+        private static final double FULL_MONTHLY_MAINTENANCE =
+              1_000 * ContractExpenseProjection.DAYS_PER_MONTH / (CYCLE_DAYS * 4);
+
         private PlanetarySystem currentSystem;
 
         @BeforeEach
@@ -365,12 +372,14 @@ class AccountantHotSpotsUpkeepTest {
             campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, true);
             campaignOptions.set(CampaignOption.USE_PLANETARY_COST_REDUCTIONS, true);
             campaignOptions.set(CampaignOption.PLANETARY_COST_REDUCTIONS_FOR_MAINTENANCE, true);
+            campaignOptions.set(CampaignOption.CHECK_MAINTENANCE, true);
+            campaignOptions.set(CampaignOption.MAINTENANCE_CYCLE_DAYS, CYCLE_DAYS);
 
             Unit unit = mock(Unit.class);
             when(unit.requiresMaintenance()).thenReturn(true);
             when(unit.getTech()).thenReturn(mock(Person.class));
             when(unit.getMaintenanceCost()).thenReturn(Money.of(1_000));
-            when(unit.getWeeklyMaintenanceCost()).thenReturn(Money.of(200));
+            when(unit.getMaintenanceCycleDuration(CYCLE_DAYS)).thenReturn(CYCLE_DAYS);
             List<Unit> allUnits = List.of(unit);
             when(campaign.getAllUnits()).thenReturn(allUnits);
             List<AbstractContract> noContracts = List.of();
@@ -384,20 +393,25 @@ class AccountantHotSpotsUpkeepTest {
             when(currentSystem.getHiringHallLevel(TODAY)).thenReturn(HiringHallLevel.STANDARD);
         }
 
+        private void assertMonthlyForecast(double expected) {
+            assertEquals(expected, accountant.getProjectedMonthlyMaintenanceCosts().getAmount().doubleValue(), DELTA);
+        }
+
         @Test
         void maintenanceIsReducedOffContract() {
             assertEquals(Money.of(500), accountant.getMaintenanceCosts());
-            assertEquals(Money.of(100), accountant.getWeeklyMaintenanceCosts());
+            assertMonthlyForecast(FULL_MONTHLY_MAINTENANCE * 0.5);
         }
 
         @Test
         void maintenanceIsNotReducedOnContract() {
             AbstractContract contract = mock(AbstractContract.class);
+            when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.GARRISON_DUTY);
             List<AbstractContract> activeContracts = List.of(contract);
             when(campaign.getActiveContracts()).thenReturn(activeContracts);
 
             assertEquals(Money.of(1_000), accountant.getMaintenanceCosts());
-            assertEquals(Money.of(200), accountant.getWeeklyMaintenanceCosts());
+            assertMonthlyForecast(FULL_MONTHLY_MAINTENANCE);
         }
 
         @Test

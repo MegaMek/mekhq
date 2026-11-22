@@ -69,6 +69,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.contract.AbstractContract;
+import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.Person;
@@ -1844,49 +1845,6 @@ public class AccountantTest {
     }
 
     /**
-     * tests {@link Accountant#getWeeklyMaintenanceTotal(java.util.Collection)}
-     */
-    @Nested
-    class TestGetWeeklyMaintenanceTotal {
-        @Test
-        void testGetWeeklyMaintenanceTotal_sumsAllUnitsRegardlessOfMaintenanceSettings() {
-            Unit unitA = mock(Unit.class);
-            when(unitA.requiresMaintenance()).thenReturn(true);
-            when(unitA.getWeeklyMaintenanceCost()).thenReturn(Money.of(10));
-
-            Unit unitB = mock(Unit.class);
-            when(unitB.requiresMaintenance()).thenReturn(true);
-            when(unitB.getWeeklyMaintenanceCost()).thenReturn(Money.of(20));
-
-            Money actual = getWeeklyMaintenanceTotal(List.of(unitA, unitB));
-
-            assertEquals(Money.of(30), actual);
-        }
-
-        @Test
-        void testGetWeeklyMaintenanceTotal_excludesUnitsThatDontRequireMaintenance() {
-            Unit maintainedUnit = mock(Unit.class);
-            when(maintainedUnit.requiresMaintenance()).thenReturn(true);
-            when(maintainedUnit.getWeeklyMaintenanceCost()).thenReturn(Money.of(10));
-
-            Unit mothballedUnit = mock(Unit.class);
-            when(mothballedUnit.requiresMaintenance()).thenReturn(false);
-            when(mothballedUnit.getWeeklyMaintenanceCost()).thenReturn(Money.of(20));
-
-            Money actual = getWeeklyMaintenanceTotal(List.of(maintainedUnit, mothballedUnit));
-
-            assertEquals(Money.of(10), actual);
-        }
-
-        @Test
-        void testGetWeeklyMaintenanceTotal_emptyCollectionIsZero() {
-            Money actual = getWeeklyMaintenanceTotal(List.of());
-
-            assertEquals(Money.zero(), actual);
-        }
-    }
-
-    /**
      * tests
      * {@link Accountant#getOverheadTotal(java.util.Collection, CampaignOptions, boolean, LocalDate, int, int,
      * java.util.Map, boolean)}
@@ -2572,6 +2530,149 @@ public class AccountantTest {
     }
 
     /**
+     * tests {@link Accountant#getProjectedMonthlyMaintenanceCosts()}
+     */
+    @Nested
+    class TestGetProjectedMonthlyMaintenanceCosts {
+        private static final double DELTA = 0.01;
+        private static final double CYCLE_COST = 700.0;
+        private static final int CYCLE_DAYS = 7;
+
+        /** A month off a combat contract: one 7 day cycle passes every 28 days */
+        private static final double OFF_CONTRACT_MONTH =
+              CYCLE_COST * ContractExpenseProjection.DAYS_PER_MONTH / (CYCLE_DAYS * 4);
+
+        Campaign mockCampaign;
+        CampaignOptions campaignOptions;
+        Accountant accountant;
+
+        @BeforeEach
+        void beforeEach() {
+            mockCampaign = mockCampaign();
+            campaignOptions = new CampaignOptions();
+            campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, true);
+            campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, false);
+            campaignOptions.set(CampaignOption.CHECK_MAINTENANCE, true);
+            campaignOptions.set(CampaignOption.MAINTENANCE_CYCLE_DAYS, CYCLE_DAYS);
+            when(mockCampaign.getCampaignOptions()).thenReturn(campaignOptions);
+            setActiveContracts();
+            accountant = new Accountant(mockCampaign);
+        }
+
+        private void setActiveContracts(AbstractContract... contracts) {
+            List<AbstractContract> activeContracts = List.of(contracts);
+            when(mockCampaign.getActiveContracts()).thenReturn(activeContracts);
+        }
+
+        private void setUnits(Unit... units) {
+            List<Unit> allUnits = List.of(units);
+            when(mockCampaign.getAllUnits()).thenReturn(allUnits);
+        }
+
+        private AbstractContract contractWith(ContractObjectiveType objectiveType) {
+            AbstractContract contract = mock(AbstractContract.class);
+            when(contract.getObjectiveType()).thenReturn(objectiveType);
+            return contract;
+        }
+
+        private Unit maintainedUnit() {
+            Unit unit = mock(Unit.class);
+            when(unit.requiresMaintenance()).thenReturn(true);
+            when(unit.getMaintenanceCost()).thenReturn(Money.of(CYCLE_COST));
+            when(unit.getMaintenanceCycleDuration(CYCLE_DAYS)).thenReturn(CYCLE_DAYS);
+            return unit;
+        }
+
+        private void assertForecast(double expected) {
+            assertEquals(expected, accountant.getProjectedMonthlyMaintenanceCosts().getAmount().doubleValue(), DELTA);
+        }
+
+        @Test
+        void testOffContract_runsAtQuarterPace() {
+            setUnits(maintainedUnit());
+
+            assertForecast(OFF_CONTRACT_MONTH);
+        }
+
+        @Test
+        void testGarrisonContract_runsAtQuarterPace() {
+            setUnits(maintainedUnit());
+            setActiveContracts(contractWith(ContractObjectiveType.GARRISON_DUTY));
+
+            assertForecast(OFF_CONTRACT_MONTH);
+        }
+
+        @Test
+        void testCombatContract_runsAtFullPaceWithTheCombatMultiplier() {
+            campaignOptions.set(CampaignOption.COMBAT_CONTRACT_MAINTENANCE_COST_MULTIPLIER, 0.5);
+            setUnits(maintainedUnit());
+            setActiveContracts(contractWith(ContractObjectiveType.OBJECTIVE_RAID));
+
+            assertForecast(CYCLE_COST * ContractExpenseProjection.DAYS_PER_MONTH / CYCLE_DAYS * 0.5);
+        }
+
+        @Test
+        void testSumsEveryUnitThatRequiresMaintenance() {
+            Unit mothballedUnit = maintainedUnit();
+            when(mothballedUnit.requiresMaintenance()).thenReturn(false);
+            setUnits(maintainedUnit(), maintainedUnit(), mothballedUnit);
+
+            assertForecast(OFF_CONTRACT_MONTH * 2);
+        }
+
+        @Test
+        void testRuggedUnit_isChargedLessOften() {
+            Unit ruggedUnit = maintainedUnit();
+            when(ruggedUnit.getMaintenanceCycleDuration(CYCLE_DAYS)).thenReturn(CYCLE_DAYS * 2);
+            setUnits(ruggedUnit);
+
+            assertForecast(OFF_CONTRACT_MONTH / 2);
+        }
+
+        @Test
+        void testInTransitMultiplier_appliesOnlyToTravellingUnits() {
+            campaignOptions.set(CampaignOption.IN_TRANSIT_MAINTENANCE_COST_MULTIPLIER, 0.5);
+            Unit travellingUnit = maintainedUnit();
+            when(travellingUnit.hasLocation()).thenReturn(true);
+            when(travellingUnit.isOnPlanet()).thenReturn(false);
+            setUnits(maintainedUnit(), travellingUnit);
+
+            assertForecast(OFF_CONTRACT_MONTH * 1.5);
+        }
+
+        @Test
+        void testMaintenancePausedOffContract_isZero() {
+            campaignOptions.set(CampaignOption.MAINTENANCE_OFF_CONTRACT, false);
+            setUnits(maintainedUnit());
+
+            assertForecast(0);
+        }
+
+        @Test
+        void testMaintenanceNotChecked_isZero() {
+            campaignOptions.set(CampaignOption.CHECK_MAINTENANCE, false);
+            setUnits(maintainedUnit());
+
+            assertForecast(0);
+        }
+
+        @Test
+        void testMaintenanceNotCharged_isZero() {
+            campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, false);
+            setUnits(maintainedUnit());
+
+            assertForecast(0);
+        }
+
+        @Test
+        void testNoUnits_isZero() {
+            setUnits();
+
+            assertForecast(0);
+        }
+    }
+
+    /**
      * These tests confirm that the thin instance-method wrappers correctly extract values from the wrapped
      * {@link Campaign} (formations, hangar, campaign options, salary-eligible personnel, etc.) and forward them to
      * their static counterparts, since those counterparts are otherwise only ever exercised directly with hand-built
@@ -2628,18 +2729,6 @@ public class AccountantTest {
             Money actual = accountant.getMaintenanceCosts();
 
             assertEquals(Money.zero(), actual);
-        }
-
-        @Test
-        void testGetWeeklyMaintenanceCosts_delegatesToStaticTotal() {
-            Unit unit = mock(Unit.class);
-            when(unit.requiresMaintenance()).thenReturn(true);
-            when(unit.getWeeklyMaintenanceCost()).thenReturn(Money.of(20));
-            when(mockCampaign.getAllUnits()).thenReturn(List.of(unit));
-
-            Money actual = accountant.getWeeklyMaintenanceCosts();
-
-            assertEquals(Money.of(20), actual);
         }
 
         @Test

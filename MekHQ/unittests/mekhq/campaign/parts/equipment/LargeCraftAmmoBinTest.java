@@ -32,8 +32,6 @@
  */
 package mekhq.campaign.parts.equipment;
 
-import static org.mockito.Mockito.lenient;
-
 import static mekhq.campaign.parts.AmmoUtilities.getAmmoType;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -42,6 +40,7 @@ import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
@@ -1656,7 +1655,7 @@ public class LargeCraftAmmoBinTest {
 
     /**
      * A work action on a bay handles a single ton, so a fabrication attempt is priced for a single ton no matter how
-     * much of the bay is empty. It must not scale with the bay's capacity the way
+     * much of the bay is empty. It must not scale with the missing shots the way
      * {@link LargeCraftAmmoBin#getValueNeeded()} does.
      */
     @Test
@@ -1686,8 +1685,38 @@ public class LargeCraftAmmoBinTest {
         missingEverything.setFabricating(true);
         assertEquals(oneTonAttempt, missingEverything.getFabricationCost());
 
-        // The capacity-scaled reload value would have charged far more for that same one-ton attempt.
-        assertTrue(oneTonAttempt.isLessThan(missingEverything.getValueNeeded()));
+        // Filling the whole bay is worth far more than that one ton.
+        assertTrue(missingOneTon.getValueNeeded().isLessThan(missingEverything.getValueNeeded()));
+    }
+
+    /** The bay's capacity is already in its shot count, so it must not be multiplied in a second time. */
+    @Test
+    public void valueNeededCountsTheBaysTonnageOnce() {
+        Campaign mockCampaign = mockCampaign();
+        when(mockCampaign.getCampaignOptions()).thenReturn(new CampaignOptions());
+        AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
+        int capacity = 10;
+        Money pricePerTon = Money.of(ammoType.getRawCost());
+
+        LargeCraftAmmoBin missingOneTon = new LargeCraftAmmoBin(0, ammoType, 42, ammoType.getShots(), capacity,
+              mockCampaign);
+        assertEquals(pricePerTon, missingOneTon.getValueNeeded());
+
+        LargeCraftAmmoBin missingEverything = new LargeCraftAmmoBin(0, ammoType, 42, ammoType.getShots() * capacity,
+              capacity, mockCampaign);
+        assertEquals(pricePerTon.multipliedBy(capacity), missingEverything.getValueNeeded());
+    }
+
+    /** As {@link #valueNeededCountsTheBaysTonnageOnce()}, for the peacetime training ammunition cost. */
+    @Test
+    public void trainingAmmunitionCountsTheBaysTonnageOnce() {
+        AmmoType ammoType = getAmmoType("ISLRM20 Ammo");
+        int capacity = 10;
+
+        LargeCraftAmmoBin ammoBin = new LargeCraftAmmoBin(0, ammoType, 42, 0, capacity, mockCampaign());
+
+        assertEquals(Money.of(ammoType.getRawCost()).multipliedBy(capacity),
+              ammoBin.getStandardMunitionCapacityValue());
     }
 
     /** The one-ton basis is the ammunition's own per-ton price, so a costlier munition costs more to fabricate. */

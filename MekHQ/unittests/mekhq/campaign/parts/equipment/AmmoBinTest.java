@@ -91,6 +91,8 @@ import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.xml.sax.SAXException;
@@ -1650,6 +1652,22 @@ public class AmmoBinTest {
 
             assertFalse(ammoBin1.isSamePartType(ammoBin2));
         }
+    }
+
+    /**
+     * These rounds list no weight, so their weight is worked out from how many make up a ton. Dividing a ton back by
+     * that weight falls just short of the true count, which must not cost the ton a shot.
+     */
+    @ParameterizedTest
+    @ValueSource(strings = { "ISSRM6 Ammo", "ISStreakSRM6 Ammo", "ISSRT6 Ammo", "ISHVAC5 Ammo", "ISAC5p Ammo",
+                             "ISHVAC2 Ammo" })
+    public void aFullTonCostsThePriceOfATon(String ammoName) {
+        AmmoType ammoType = getAmmoType(ammoName);
+        AmmoBin ammoBin = new AmmoBin(0, ammoType, -1, 0, false, false, mockCampaign());
+        Money pricePerTon = Money.of(ammoType.getRawCost());
+
+        assertEquals(pricePerTon, ammoBin.getStickerPrice());
+        assertEquals(pricePerTon, ammoBin.getStandardMunitionCapacityValue());
     }
 
     @Nested
