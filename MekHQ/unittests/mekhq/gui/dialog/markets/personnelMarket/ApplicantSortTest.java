@@ -129,6 +129,22 @@ class ApplicantSortTest {
     }
 
     @Test
+    void examSortPutsTheHighestScoreFirstAndBreaksTiesByName() {
+        // Compared as text 100 would sort below 9
+        Person nine = applicant("A", PersonnelRole.SOLDIER, 4, 100, 20);
+        Person hundred = applicant("B", PersonnelRole.SOLDIER, 1, 100, 20);
+        Person fiftyB = applicant("Bravo", PersonnelRole.SOLDIER, 3, 100, 20);
+        Person fiftyA = applicant("alpha", PersonnelRole.SOLDIER, 2, 100, 20);
+        when(nine.getPerformanceExamScore()).thenReturn(9);
+        when(hundred.getPerformanceExamScore()).thenReturn(100);
+        when(fiftyB.getPerformanceExamScore()).thenReturn(50);
+        when(fiftyA.getPerformanceExamScore()).thenReturn(50);
+
+        assertEquals(List.of(hundred, fiftyA, fiftyB, nine), sorted(ApplicantSort.EXAM, false));
+        assertEquals(List.of(nine, fiftyA, fiftyB, hundred), sorted(ApplicantSort.EXAM, true));
+    }
+
+    @Test
     void roleSortGroupsByProfessionWithTheMostExperiencedFirst() {
         Person soldierGreen = applicant("A", PersonnelRole.SOLDIER, 1, 100, 20);
         Person soldierVeteran = applicant("B", PersonnelRole.SOLDIER, 3, 100, 20);
@@ -185,6 +201,8 @@ class ApplicantSortTest {
     void reversingAnOrderReversesApplicantsThatDiffer(ApplicantSort sort) {
         Person low = applicant("A", PersonnelRole.DOCTOR, 1, 100, 20, 0, 0);
         Person high = applicant("B", PersonnelRole.SOLDIER, 5, 9_000, 60, 4, 4);
+        when(low.getPerformanceExamScore()).thenReturn(10);
+        when(high.getPerformanceExamScore()).thenReturn(90);
 
         int forward = Integer.signum(sort.comparator(facts::get, TODAY, false).compare(low, high));
         int backward = Integer.signum(sort.comparator(facts::get, TODAY, true).compare(low, high));

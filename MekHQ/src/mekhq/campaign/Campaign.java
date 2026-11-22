@@ -3744,6 +3744,10 @@ public class Campaign implements ITechManager {
      * Cleans incongruent data present in the campaign
      */
     public void cleanUp() {
+        // Repairs campaigns saved with a personnel market that does not match their options, such as those started from
+        // the New Player Quickstart, which left the campaign with the disabled market
+        NewPersonnelMarket.ensureMarketStyle(this, campaignOptions.get(CampaignOption.PERSONNEL_MARKET_STYLE));
+
         // Cleans non-existing spouses
         for (Person person : getPlayerForce().getPersonnel().values()) {
             if (person.getGenealogy().hasSpouse()) {

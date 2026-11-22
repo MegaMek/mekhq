@@ -47,7 +47,6 @@ import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -81,9 +80,9 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.hud.Hud;
+import mekhq.gui.baseComponents.hud.HudWrapPanel;
 import mekhq.gui.baseComponents.hud.HudWrappingLabel;
 import mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketDialog.ApplicantFacts;
-import mekhq.gui.utilities.WrapLayout;
 
 /**
  * The dossier on the right of the personnel market: everything the player weighs before hiring the highlighted
@@ -222,7 +221,7 @@ final class ApplicantDossier {
         text.add(leftAligned(role));
         text.add(Box.createVerticalStrut(scaleForGUI(8)));
 
-        JPanel factRow = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(6), scaleForGUI(4)));
+        JPanel factRow = new HudWrapPanel(scaleForGUI(6), scaleForGUI(4));
         factRow.add(PersonnelMarketHud.fact(SkillType.getExperienceLevelName(facts.experienceLevel()),
               experienceColor(facts.experienceLevel())));
         factRow.add(PersonnelMarketHud.fact(getFormattedTextAt(RESOURCE_BUNDLE, "dossier.personnelMarket.age",
@@ -344,7 +343,7 @@ final class ApplicantDossier {
             addSpanning(section, Hud.hint(text("dossier.personnelMarket.abilities.none")), 2);
             return section;
         }
-        JPanel badges = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(5), scaleForGUI(4)));
+        JPanel badges = new HudWrapPanel(scaleForGUI(5), scaleForGUI(4));
         // Abilities first, then flaws, so the two read as groups.
         for (boolean flaws : new boolean[] { false, true }) {
             for (Ability ability : abilities) {

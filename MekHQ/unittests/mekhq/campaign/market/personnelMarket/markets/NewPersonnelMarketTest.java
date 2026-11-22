@@ -45,32 +45,46 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
+import java.io.PrintWriter;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
 import megamek.common.compute.Compute;
+import mekhq.MHQConstants;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
+import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
+import org.w3c.dom.Node;
+import org.xml.sax.InputSource;
 
 class NewPersonnelMarketTest {
     static PersonnelMarketEntry marketEntryAdmin = entry(ADMINISTRATOR, 1, 1);
@@ -90,6 +104,58 @@ class NewPersonnelMarketTest {
         when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
         return mockCampaignOptions;
+    }
+
+    @ParameterizedTest
+    @EnumSource(PersonnelMarketStyle.class)
+    void testCreateMarket_FollowsTheStyle(PersonnelMarketStyle style) {
+        assertEquals(style, NewPersonnelMarket.createMarket(style).getAssociatedPersonnelMarketStyle());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PersonnelMarketStyle.class, mode = EnumSource.Mode.EXCLUDE, names = "PERSONNEL_MARKET_DISABLED")
+    void testEnsureMarketStyle_ReplacesTheDisabledMarketOfANewCampaign(PersonnelMarketStyle style) {
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket()).thenReturn(new NewPersonnelMarket());
+
+        NewPersonnelMarket.ensureMarketStyle(campaign, style);
+
+        ArgumentCaptor<NewPersonnelMarket> replacement = ArgumentCaptor.forClass(NewPersonnelMarket.class);
+        verify(campaign).setNewPersonnelMarket(replacement.capture());
+        assertEquals(style, replacement.getValue().getAssociatedPersonnelMarketStyle());
+        assertSame(campaign, replacement.getValue().getCampaign());
+    }
+
+    @ParameterizedTest
+    @EnumSource(PersonnelMarketStyle.class)
+    void testEnsureMarketStyle_KeepsAMarketThatAlreadyMatches(PersonnelMarketStyle style) {
+        Campaign campaign = mockCampaign();
+        NewPersonnelMarket currentMarket = NewPersonnelMarket.createMarket(style);
+        when(campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket()).thenReturn(currentMarket);
+
+        NewPersonnelMarket.ensureMarketStyle(campaign, style);
+
+        verify(campaign, never()).setNewPersonnelMarket(any(NewPersonnelMarket.class));
+    }
+
+    @Test
+    void testLastSelectedFilter_SurvivesSavingAndLoading() throws Exception {
+        NewPersonnelMarket market = new NewPersonnelMarket();
+        market.setLastSelectedFilter("MEKWARRIOR");
+        StringWriter xml = new StringWriter();
+        try (PrintWriter writer = new PrintWriter(xml)) {
+            writer.println("<newPersonnelMarket>");
+            market.writePersonnelMarketDataToXML(writer, 1);
+            writer.println("</newPersonnelMarket>");
+        }
+
+        Node node = MHQXMLUtility.newSafeDocumentBuilder()
+                          .parse(new InputSource(new StringReader(xml.toString())))
+                          .getDocumentElement();
+        NewPersonnelMarket loaded = NewPersonnelMarket.generatePersonnelMarketDataFromXML(mockCampaign(), node,
+              MHQConstants.VERSION);
+
+        assertEquals("MEKWARRIOR", loaded.getLastSelectedFilter());
     }
 
     @Test

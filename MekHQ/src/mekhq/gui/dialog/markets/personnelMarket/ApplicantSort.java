@@ -59,6 +59,8 @@ enum ApplicantSort {
     ABILITIES,
     /** Most flaws first. */
     FLAWS,
+    /** Highest performance exam score first. */
+    EXAM,
     /** Grouped by profession, the most experienced first within each. */
     ROLE,
     /** Alphabetical by full name. */
@@ -99,6 +101,7 @@ enum ApplicantSort {
             case COST -> Comparator.comparing((Person person) -> facts.apply(person).hiringCost());
             case ABILITIES -> Comparator.comparingInt((Person person) -> facts.apply(person).abilities()).reversed();
             case FLAWS -> Comparator.comparingInt((Person person) -> facts.apply(person).flaws()).reversed();
+            case EXAM -> Comparator.comparingInt(Person::getPerformanceExamScore).reversed();
             case ROLE -> Comparator.comparing((Person person) -> person.getPrimaryRole().toString(),
                   String.CASE_INSENSITIVE_ORDER).thenComparing(mostExperienced);
             case NAME -> byName;

@@ -126,7 +126,7 @@ public class NewPersonnelMarket {
     List<PersonnelRole> rareProfessions = new ArrayList<>();
     int recruitmentRolls;
     private List<Person> currentApplicants = new ArrayList<>();
-    private int lastSelectedFilter;
+    private String lastSelectedFilter = "";
 
     // These values should be generated during object initialization only so that any changes to the underlying YAML
     // can be accounted for. Otherwise, we will end up with a situation where bugs or other variables get 'locked'
@@ -143,6 +143,47 @@ public class NewPersonnelMarket {
     public NewPersonnelMarket() {
         clanMarketEntries = new HashMap<>();
         innerSphereMarketEntries = new HashMap<>();
+    }
+
+    /**
+     * Creates an empty market that follows a style's rules. It is not attached to a campaign.
+     *
+     * @param style the market style
+     *
+     * @return the new market
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static NewPersonnelMarket createMarket(PersonnelMarketStyle style) {
+        return switch (style) {
+            case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
+            case MEKHQ -> new PersonnelMarketMekHQ();
+            case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised();
+            case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict();
+        };
+    }
+
+    /**
+     * Makes sure a campaign's market follows a style's rules, replacing it with an empty one that does if it follows
+     * another's. Call this whenever the campaign's {@link CampaignOption#PERSONNEL_MARKET_STYLE} may have changed: the
+     * option only says which market to use, and a campaign left with the disabled market never gets an applicant.
+     *
+     * @param campaign the campaign
+     * @param style    the style its market should follow
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void ensureMarketStyle(Campaign campaign, PersonnelMarketStyle style) {
+        NewPersonnelMarket currentMarket = campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket();
+        if (currentMarket != null && currentMarket.getAssociatedPersonnelMarketStyle() == style) {
+            return;
+        }
+
+        NewPersonnelMarket replacementMarket = createMarket(style);
+        replacementMarket.setCampaign(campaign);
+        campaign.setNewPersonnelMarket(replacementMarket);
     }
 
     /**
@@ -171,12 +212,7 @@ public class NewPersonnelMarket {
                 String nodeContents = childNode.getTextContent().trim();
                 if (nodeName.equalsIgnoreCase("associatedPersonnelMarketStyle")) {
                     PersonnelMarketStyle marketStyle = PersonnelMarketStyle.fromString(nodeContents);
-                    personnelMarket = switch (marketStyle) {
-                        case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
-                        case MEKHQ -> new PersonnelMarketMekHQ();
-                        case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised();
-                        case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict();
-                    };
+                    personnelMarket = createMarket(marketStyle);
                     personnelMarket.setCampaign(campaign);
                 }
             }
@@ -209,7 +245,7 @@ public class NewPersonnelMarket {
                 } else if (nodeName.equalsIgnoreCase("recruitmentRolls")) {
                     personnelMarket.setRecruitmentRolls(MathUtility.parseInt(nodeContents));
                 } else if (nodeName.equalsIgnoreCase("lastSelectedFilter")) {
-                    personnelMarket.setLastSelectedFilter(MathUtility.parseInt(nodeContents));
+                    personnelMarket.setLastSelectedFilter(nodeContents);
                 } else if (nodeName.equalsIgnoreCase("currentApplicants")) {
                     processApplicantNodes(personnelMarket, childNode, version);
                 }
@@ -624,26 +660,27 @@ public class NewPersonnelMarket {
     }
 
     /**
-     * Returns the index or filter value last used for applicant selection.
+     * Returns the role filter last used to narrow the applicants.
      *
-     * @return filter index
+     * @return the filter, as the market's window saved it; empty if none has been. Saves from before 0.51.01 hold a
+     *       number, which no longer means anything.
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public int getLastSelectedFilter() {
+    public String getLastSelectedFilter() {
         return lastSelectedFilter;
     }
 
     /**
-     * Sets the last-used selection filter value.
+     * Sets the role filter last used to narrow the applicants.
      *
-     * @param lastSelectedFilter filter index
+     * @param lastSelectedFilter the filter, as the market's window saves it
      *
      * @author Illiani
      * @since 0.50.06
      */
-    public void setLastSelectedFilter(int lastSelectedFilter) {
+    public void setLastSelectedFilter(String lastSelectedFilter) {
         this.lastSelectedFilter = lastSelectedFilter;
     }
 

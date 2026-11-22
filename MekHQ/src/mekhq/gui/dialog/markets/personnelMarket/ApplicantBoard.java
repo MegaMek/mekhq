@@ -46,7 +46,6 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -68,14 +67,14 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudChip;
+import mekhq.gui.baseComponents.hud.HudWrapPanel;
 import mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketDialog.ApplicantFacts;
-import mekhq.gui.utilities.WrapLayout;
 
 /**
  * The applicant board in the middle of the personnel market: the sort chips, then one card per applicant the role
  * filter and search let through, then a count of what is shown and the GM's tools. Each card shows the applicant's
- * portrait, name, profession, age and gender, their experience and anything notable (abilities, flaws, a rare
- * profession), and what they cost to hire.
+ * portrait, name, profession, age and gender, their experience and anything notable (abilities, flaws, their exam
+ * score, a rare profession), and what they cost to hire.
  *
  * <p>Several applicants can be picked at once with Ctrl- and Shift-click; the most recently clicked is the one the
  * dossier shows. Double-clicking an applicant opens their full personnel record.</p>
@@ -84,7 +83,8 @@ import mekhq.gui.utilities.WrapLayout;
  * @since 0.51.01
  */
 final class ApplicantBoard {
-    static final int BOARD_WIDTH = 430;
+    /** The board's width in the market's default window, for measuring cards before the list has a width. */
+    private static final int BOARD_WIDTH = 540;
     private static final int PORTRAIT_SIZE = 40;
     /** The widest hiring cost a card's figure is sized for, so every card's figure column lines up. */
     private static final double WIDEST_FIGURE = 8_880_000;
@@ -99,6 +99,8 @@ final class ApplicantBoard {
     private final JLabel emptyNotice = Hud.notice("");
     private final JLabel matches = Hud.hint("");
     private final Map<Person, Icon> portraits = new HashMap<>();
+    /** Each applicant's card text, kept because its HTML is slow to build and the list asks for it at every measure. */
+    private final Map<Person, CardText> cardTexts = new HashMap<>();
     private boolean updatingList;
 
     ApplicantBoard(PersonnelMarketDialog market) {
@@ -107,10 +109,9 @@ final class ApplicantBoard {
         root.setBackground(GROUND);
         root.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(14), scaleForGUI(10),
               scaleForGUI(14)));
-        root.setPreferredSize(new Dimension(scaleForGUI(BOARD_WIDTH), 0));
 
         // The chips wrap onto a second line rather than running off the board's edge.
-        JPanel sortRow = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(4), scaleForGUI(2)));
+        JPanel sortRow = new HudWrapPanel(scaleForGUI(4), scaleForGUI(2));
         sortRow.add(keyLabel(getTextAt(RESOURCE_BUNDLE, "board.personnelMarket.sort").toUpperCase(Locale.ROOT)));
         for (ApplicantSort sort : ApplicantSort.values()) {
             HudChip chip = new HudChip(sort.label(), () -> market.setSort(sort));
@@ -225,7 +226,9 @@ final class ApplicantBoard {
         updatingList = true;
         try {
             listModel.clear();
-            shown.forEach(listModel::addElement);
+            // Added all at once: while the first row is the lead, adding rows one by one makes the list measure every
+            // card again for each row, which takes seconds on a full board.
+            listModel.addAll(shown);
             List<Integer> indices = new ArrayList<>();
             for (Person person : keep) {
                 int index = shown.indexOf(person);
@@ -283,9 +286,30 @@ final class ApplicantBoard {
         list.requestFocusInWindow();
     }
 
-    /** Forgets an applicant's cached portrait, once they have left the board. */
+    /** Forgets an applicant's cached portrait and card text, once they have left the board. */
     void forget(Person person) {
         portraits.remove(person);
+        cardTexts.remove(person);
+    }
+
+    /** An applicant's card text, which remembers the width it was last wrapped to. */
+    private static final class CardText extends JLabel {
+        private int wrappedWidth = -1;
+
+        private CardText(String html) {
+            setVerticalAlignment(SwingConstants.TOP);
+            setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
+            setText(html);
+        }
+
+        private void wrapTo(int width) {
+            if (width != wrappedWidth) {
+                wrappedWidth = width;
+                PersonnelMarketHud.fitHtmlToWidth(this, width);
+                // Setting a preferred size does not invalidate the card, which would keep its old height.
+                invalidate();
+            }
+        }
     }
 
     /**
@@ -298,16 +322,13 @@ final class ApplicantBoard {
         private static final int TEXT_CHROME = 10 + 10 + 3 + PORTRAIT_SIZE + 10 + 10 + 6;
 
         private final JLabel portrait = PersonnelMarketHud.portrait(null, scaleForGUI(PORTRAIT_SIZE));
-        private final JLabel text = new JLabel();
+        private @Nullable CardText text;
         private final JLabel figure = new JLabel();
         private final JLabel figureKey = new JLabel();
         private final int figureWidth;
 
         private ApplicantRenderer() {
             super(new BorderLayout(scaleForGUI(10), 0));
-            text.setVerticalAlignment(SwingConstants.TOP);
-            text.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
-
             figure.setFont(hudFont(Font.BOLD, 1.05f, 0.0f));
             figure.setAlignmentX(Component.RIGHT_ALIGNMENT);
             figureKey.setFont(hudFont(Font.BOLD, 0.66f, 0.12f));
@@ -329,7 +350,6 @@ final class ApplicantBoard {
             figureHolder.add(figureColumn, BorderLayout.NORTH);
 
             add(Hud.topAligned(portrait), BorderLayout.WEST);
-            add(text, BorderLayout.CENTER);
             add(figureHolder, BorderLayout.EAST);
         }
 
@@ -338,8 +358,35 @@ final class ApplicantBoard {
               boolean isSelected, boolean cellHasFocus) {
             ApplicantFacts facts = market.facts(person);
             portrait.setIcon(portraits.computeIfAbsent(person,
-                  key -> PersonnelMarketHud.portraitIcon(key, scaleForGUI(PORTRAIT_SIZE))));
+                  key -> PersonnelMarketHud.lazyPortraitIcon(key, scaleForGUI(PORTRAIT_SIZE))));
+            CardText cardText = cardTexts.computeIfAbsent(person, key -> new CardText(cardHtml(key, facts)));
+            if (cardText != text) {
+                if (text != null) {
+                    remove(text);
+                }
+                text = cardText;
+                add(cardText, BorderLayout.CENTER);
+            }
+            cardText.wrapTo(textWidth(source));
 
+            Money cost = facts.hiringCost();
+            figure.setText(cost.isPositive() ? compactMoney(cost) : getTextAt(RESOURCE_BUNDLE,
+                  "board.personnelMarket.free"));
+            figure.setForeground(market.balance().isLessThan(cost) ? DANGER : ACCENT_BRIGHT);
+
+            setOpaque(true);
+            setBackground(isSelected ? SURFACE : SURFACE_DEEP);
+            setBorder(BorderFactory.createCompoundBorder(
+                  BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
+                  BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, scaleForGUI(isSelected ? 3 : 0), 0, 0, ACCENT),
+                        BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(isSelected ? 7 : 10),
+                              scaleForGUI(8), scaleForGUI(10)))));
+            return this;
+        }
+
+        /** An applicant's card text: their name, then who they are, then their tags. */
+        private String cardHtml(Person person, ApplicantFacts facts) {
             String separator = getTextAt(RESOURCE_BUNDLE, "value.personnelMarket.separator");
             StringBuilder html = new StringBuilder("<html><b style='color:").append(hex(TEXT)).append("'>")
                                        .append(escape(person.getFullName())).append("</b>");
@@ -361,27 +408,13 @@ final class ApplicantBoard {
                   facts.abilities() > 0 ? READY : TEXT_FAINT));
             tags.add(tag(getFormattedTextAt(RESOURCE_BUNDLE, "tag.personnelMarket.flaws", facts.flaws()),
                   facts.flaws() > 0 ? DANGER : TEXT_FAINT));
+            tags.add(tag(getFormattedTextAt(RESOURCE_BUNDLE, "tag.personnelMarket.exam",
+                  person.getPerformanceExamScore()), TEXT_MUTED));
             if (market.isRare(person)) {
                 tags.add(tag(getTextAt(RESOURCE_BUNDLE, "tag.personnelMarket.rare"), AMBER));
             }
             html.append("<br><b>").append(String.join(separator, tags)).append("</b>");
-            text.setText(html.append("</html>").toString());
-            PersonnelMarketHud.fitHtmlToWidth(text, textWidth(source));
-
-            Money cost = facts.hiringCost();
-            figure.setText(cost.isPositive() ? compactMoney(cost) : getTextAt(RESOURCE_BUNDLE,
-                  "board.personnelMarket.free"));
-            figure.setForeground(market.balance().isLessThan(cost) ? DANGER : ACCENT_BRIGHT);
-
-            setOpaque(true);
-            setBackground(isSelected ? SURFACE : SURFACE_DEEP);
-            setBorder(BorderFactory.createCompoundBorder(
-                  BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
-                  BorderFactory.createCompoundBorder(
-                        BorderFactory.createMatteBorder(0, scaleForGUI(isSelected ? 3 : 0), 0, 0, ACCENT),
-                        BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(isSelected ? 7 : 10),
-                              scaleForGUI(8), scaleForGUI(10)))));
-            return this;
+            return html.append("</html>").toString();
         }
 
         private static String tag(String text, Color color) {

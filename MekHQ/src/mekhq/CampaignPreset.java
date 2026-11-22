@@ -61,9 +61,11 @@ import megamek.common.util.sorter.NaturalOrderComparator;
 import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOptionsMarshaller;
 import mekhq.campaign.campaignOptions.CampaignOptionsUnmarshaller;
+import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.SpecialAbility;
 import mekhq.campaign.personnel.ranks.RankSystem;
@@ -323,6 +325,8 @@ public class CampaignPreset {
     public void applyContinuousOptions(final Campaign campaign) {
         if (campaignOptions != null) {
             campaign.setCampaignOptions(campaignOptions);
+            // The option alone does not change which market the campaign has
+            NewPersonnelMarket.ensureMarketStyle(campaign, campaignOptions.get(CampaignOption.PERSONNEL_MARKET_STYLE));
         }
         if (gameOptions != null) {
             campaign.setGameOptions(gameOptions);
