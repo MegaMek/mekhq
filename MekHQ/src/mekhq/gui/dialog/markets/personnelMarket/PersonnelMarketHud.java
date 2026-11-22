@@ -40,14 +40,17 @@ import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 
 import java.awt.AlphaComposite;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Image;
 import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import java.io.File;
 import java.time.LocalDate;
+import java.util.function.Supplier;
 import javax.swing.BorderFactory;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -129,6 +132,57 @@ final class PersonnelMarketHud {
             return null;
         }
         return new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
+    }
+
+    /**
+     * As {@link #portraitIcon}, but the image is only loaded when the icon is first painted. Loading and scaling a
+     * portrait is slow, and a list measures every row it holds while painting only the few in view.
+     *
+     * @param person the person
+     * @param size   the scaled edge length
+     *
+     * @return the icon, always {@code size} square; it paints nothing if the person has neither portrait nor logo
+     */
+    static Icon lazyPortraitIcon(Person person, int size) {
+        return new LazyIcon(size, () -> portraitIcon(person, size));
+    }
+
+    /** A square icon whose image is loaded the first time it is painted. */
+    static final class LazyIcon implements Icon {
+        private final int size;
+        private final Supplier<Icon> loader;
+        private boolean isLoaded;
+        private @Nullable Icon icon;
+
+        /**
+         * @param size   the edge length of the icon the loader gives
+         * @param loader loads the icon, or gives {@code null} if there is none; called once
+         */
+        LazyIcon(int size, Supplier<Icon> loader) {
+            this.size = size;
+            this.loader = loader;
+        }
+
+        @Override
+        public void paintIcon(Component component, Graphics graphics, int x, int y) {
+            if (!isLoaded) {
+                isLoaded = true;
+                icon = loader.get();
+            }
+            if (icon != null) {
+                icon.paintIcon(component, graphics, x, y);
+            }
+        }
+
+        @Override
+        public int getIconWidth() {
+            return size;
+        }
+
+        @Override
+        public int getIconHeight() {
+            return size;
+        }
     }
 
     /**

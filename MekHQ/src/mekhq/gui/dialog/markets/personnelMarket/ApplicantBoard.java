@@ -99,6 +99,8 @@ final class ApplicantBoard {
     private final JLabel emptyNotice = Hud.notice("");
     private final JLabel matches = Hud.hint("");
     private final Map<Person, Icon> portraits = new HashMap<>();
+    /** Each applicant's card text, kept because its HTML is slow to build and the list asks for it at every measure. */
+    private final Map<Person, CardText> cardTexts = new HashMap<>();
     private boolean updatingList;
 
     ApplicantBoard(PersonnelMarketDialog market) {
@@ -284,9 +286,30 @@ final class ApplicantBoard {
         list.requestFocusInWindow();
     }
 
-    /** Forgets an applicant's cached portrait, once they have left the board. */
+    /** Forgets an applicant's cached portrait and card text, once they have left the board. */
     void forget(Person person) {
         portraits.remove(person);
+        cardTexts.remove(person);
+    }
+
+    /** An applicant's card text, which remembers the width it was last wrapped to. */
+    private static final class CardText extends JLabel {
+        private int wrappedWidth = -1;
+
+        private CardText(String html) {
+            setVerticalAlignment(SwingConstants.TOP);
+            setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
+            setText(html);
+        }
+
+        private void wrapTo(int width) {
+            if (width != wrappedWidth) {
+                wrappedWidth = width;
+                PersonnelMarketHud.fitHtmlToWidth(this, width);
+                // Setting a preferred size does not invalidate the card, which would keep its old height.
+                invalidate();
+            }
+        }
     }
 
     /**
@@ -299,16 +322,13 @@ final class ApplicantBoard {
         private static final int TEXT_CHROME = 10 + 10 + 3 + PORTRAIT_SIZE + 10 + 10 + 6;
 
         private final JLabel portrait = PersonnelMarketHud.portrait(null, scaleForGUI(PORTRAIT_SIZE));
-        private final JLabel text = new JLabel();
+        private @Nullable CardText text;
         private final JLabel figure = new JLabel();
         private final JLabel figureKey = new JLabel();
         private final int figureWidth;
 
         private ApplicantRenderer() {
             super(new BorderLayout(scaleForGUI(10), 0));
-            text.setVerticalAlignment(SwingConstants.TOP);
-            text.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
-
             figure.setFont(hudFont(Font.BOLD, 1.05f, 0.0f));
             figure.setAlignmentX(Component.RIGHT_ALIGNMENT);
             figureKey.setFont(hudFont(Font.BOLD, 0.66f, 0.12f));
@@ -330,7 +350,6 @@ final class ApplicantBoard {
             figureHolder.add(figureColumn, BorderLayout.NORTH);
 
             add(Hud.topAligned(portrait), BorderLayout.WEST);
-            add(text, BorderLayout.CENTER);
             add(figureHolder, BorderLayout.EAST);
         }
 
@@ -339,8 +358,35 @@ final class ApplicantBoard {
               boolean isSelected, boolean cellHasFocus) {
             ApplicantFacts facts = market.facts(person);
             portrait.setIcon(portraits.computeIfAbsent(person,
-                  key -> PersonnelMarketHud.portraitIcon(key, scaleForGUI(PORTRAIT_SIZE))));
+                  key -> PersonnelMarketHud.lazyPortraitIcon(key, scaleForGUI(PORTRAIT_SIZE))));
+            CardText cardText = cardTexts.computeIfAbsent(person, key -> new CardText(cardHtml(key, facts)));
+            if (cardText != text) {
+                if (text != null) {
+                    remove(text);
+                }
+                text = cardText;
+                add(cardText, BorderLayout.CENTER);
+            }
+            cardText.wrapTo(textWidth(source));
 
+            Money cost = facts.hiringCost();
+            figure.setText(cost.isPositive() ? compactMoney(cost) : getTextAt(RESOURCE_BUNDLE,
+                  "board.personnelMarket.free"));
+            figure.setForeground(market.balance().isLessThan(cost) ? DANGER : ACCENT_BRIGHT);
+
+            setOpaque(true);
+            setBackground(isSelected ? SURFACE : SURFACE_DEEP);
+            setBorder(BorderFactory.createCompoundBorder(
+                  BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
+                  BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, scaleForGUI(isSelected ? 3 : 0), 0, 0, ACCENT),
+                        BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(isSelected ? 7 : 10),
+                              scaleForGUI(8), scaleForGUI(10)))));
+            return this;
+        }
+
+        /** An applicant's card text: their name, then who they are, then their tags. */
+        private String cardHtml(Person person, ApplicantFacts facts) {
             String separator = getTextAt(RESOURCE_BUNDLE, "value.personnelMarket.separator");
             StringBuilder html = new StringBuilder("<html><b style='color:").append(hex(TEXT)).append("'>")
                                        .append(escape(person.getFullName())).append("</b>");
@@ -368,23 +414,7 @@ final class ApplicantBoard {
                 tags.add(tag(getTextAt(RESOURCE_BUNDLE, "tag.personnelMarket.rare"), AMBER));
             }
             html.append("<br><b>").append(String.join(separator, tags)).append("</b>");
-            text.setText(html.append("</html>").toString());
-            PersonnelMarketHud.fitHtmlToWidth(text, textWidth(source));
-
-            Money cost = facts.hiringCost();
-            figure.setText(cost.isPositive() ? compactMoney(cost) : getTextAt(RESOURCE_BUNDLE,
-                  "board.personnelMarket.free"));
-            figure.setForeground(market.balance().isLessThan(cost) ? DANGER : ACCENT_BRIGHT);
-
-            setOpaque(true);
-            setBackground(isSelected ? SURFACE : SURFACE_DEEP);
-            setBorder(BorderFactory.createCompoundBorder(
-                  BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
-                  BorderFactory.createCompoundBorder(
-                        BorderFactory.createMatteBorder(0, scaleForGUI(isSelected ? 3 : 0), 0, 0, ACCENT),
-                        BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(isSelected ? 7 : 10),
-                              scaleForGUI(8), scaleForGUI(10)))));
-            return this;
+            return html.append("</html>").toString();
         }
 
         private static String tag(String text, Color color) {
