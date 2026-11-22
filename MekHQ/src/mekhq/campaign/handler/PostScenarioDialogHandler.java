@@ -121,8 +121,8 @@ public class PostScenarioDialogHandler {
                   e,
                   """
                         A critical error has occurred during the scenario resolution. This issue is under investigation.\
-                        
-                        
+
+
                         Please open an issue report and include your MekHQ log file for further assessment.""",
                   "Critical Error"
             );
