@@ -146,6 +146,47 @@ public class NewPersonnelMarket {
     }
 
     /**
+     * Creates an empty market that follows a style's rules. It is not attached to a campaign.
+     *
+     * @param style the market style
+     *
+     * @return the new market
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static NewPersonnelMarket createMarket(PersonnelMarketStyle style) {
+        return switch (style) {
+            case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
+            case MEKHQ -> new PersonnelMarketMekHQ();
+            case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised();
+            case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict();
+        };
+    }
+
+    /**
+     * Makes sure a campaign's market follows a style's rules, replacing it with an empty one that does if it follows
+     * another's. Call this whenever the campaign's {@link CampaignOption#PERSONNEL_MARKET_STYLE} may have changed: the
+     * option only says which market to use, and a campaign left with the disabled market never gets an applicant.
+     *
+     * @param campaign the campaign
+     * @param style    the style its market should follow
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void ensureMarketStyle(Campaign campaign, PersonnelMarketStyle style) {
+        NewPersonnelMarket currentMarket = campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket();
+        if (currentMarket != null && currentMarket.getAssociatedPersonnelMarketStyle() == style) {
+            return;
+        }
+
+        NewPersonnelMarket replacementMarket = createMarket(style);
+        replacementMarket.setCampaign(campaign);
+        campaign.setNewPersonnelMarket(replacementMarket);
+    }
+
+    /**
      * Generates Personnel Market data by loading it from an XML document node.
      *
      * @param campaign   The relevant campaign save
@@ -171,12 +212,7 @@ public class NewPersonnelMarket {
                 String nodeContents = childNode.getTextContent().trim();
                 if (nodeName.equalsIgnoreCase("associatedPersonnelMarketStyle")) {
                     PersonnelMarketStyle marketStyle = PersonnelMarketStyle.fromString(nodeContents);
-                    personnelMarket = switch (marketStyle) {
-                        case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
-                        case MEKHQ -> new PersonnelMarketMekHQ();
-                        case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised();
-                        case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict();
-                    };
+                    personnelMarket = createMarket(marketStyle);
                     personnelMarket.setCampaign(campaign);
                 }
             }

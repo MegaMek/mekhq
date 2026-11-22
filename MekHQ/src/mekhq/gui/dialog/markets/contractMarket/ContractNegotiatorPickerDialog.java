@@ -42,7 +42,6 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -87,8 +86,8 @@ import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
+import mekhq.gui.baseComponents.hud.HudWrapPanel;
 import mekhq.gui.baseComponents.hud.HudWrappingLabel;
-import mekhq.gui.utilities.WrapLayout;
 
 /**
  * A modal dialog for choosing the officer who will represent the player at a contract's negotiation table, drawn as a
@@ -573,7 +572,9 @@ public class ContractNegotiatorPickerDialog extends JDialog {
         Person highlight = keep != null && shown.contains(keep) ? keep : (shown.isEmpty() ? null : shown.getFirst());
         updatingList = true;
         listModel.clear();
-        shown.forEach(listModel::addElement);
+        // Added all at once: while the first row is the lead, adding rows one by one makes the list measure every card
+        // again for each row, which takes seconds on a full list.
+        listModel.addAll(shown);
         if (highlight != null) {
             list.setSelectedValue(highlight, true);
         }
@@ -821,7 +822,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
         text.add(leftAligned(role));
         text.add(Box.createVerticalStrut(scaleForGUI(8)));
 
-        JPanel stats = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(6), scaleForGUI(4)));
+        JPanel stats = new HudWrapPanel(scaleForGUI(6), scaleForGUI(4));
         Skill skill = person.getSkill(SkillType.S_NEGOTIATION);
         if (skill == null) {
             stats.add(stat(getFormattedTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.stat.untrained",

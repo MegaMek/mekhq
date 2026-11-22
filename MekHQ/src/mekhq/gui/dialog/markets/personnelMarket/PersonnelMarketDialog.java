@@ -51,6 +51,8 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Font;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.Toolkit;
 import java.awt.event.ActionEvent;
 import java.awt.event.KeyEvent;
@@ -119,6 +121,8 @@ public class PersonnelMarketDialog extends JDialog {
     /** How many tips there are, numbered from zero, for the one shown in the footer. */
     private static final int TIP_COUNT = 11;
     private static final int RAIL_WIDTH = 220;
+    /** The board's share of the width beside the rail; the dossier has the rest. */
+    private static final double BOARD_SHARE = 0.58;
     private static final Dimension MINIMUM_SIZE = scaleForGUI(1120, 640);
     private static final Dimension DEFAULT_SIZE = scaleForGUI(1150, 800);
     private static final Dimension FULL_RECORD_SIZE = scaleForGUI(760, 820);
@@ -227,19 +231,19 @@ public class PersonnelMarketDialog extends JDialog {
         content.add(north, BorderLayout.NORTH);
 
         board = new ApplicantBoard(this);
-        JPanel left = Hud.transparentPanel(new BorderLayout());
-        left.add(buildRail(), BorderLayout.WEST);
-        left.add(board.getComponent(), BorderLayout.CENTER);
-
         dossierHolder.setOpaque(true);
         dossierHolder.setBackground(GROUND);
         dossierHolder.setBorder(BorderFactory.createMatteBorder(0, scaleForGUI(1), 0, 0, BORDER));
 
+        JPanel columns = Hud.transparentPanel(new GridBagLayout());
+        addColumn(columns, board.getComponent(), BOARD_SHARE);
+        addColumn(columns, dossierHolder, 1.0 - BOARD_SHARE);
+
         JPanel body = new JPanel(new BorderLayout());
         body.setOpaque(true);
         body.setBackground(GROUND);
-        body.add(left, BorderLayout.WEST);
-        body.add(dossierHolder, BorderLayout.CENTER);
+        body.add(buildRail(), BorderLayout.WEST);
+        body.add(columns, BorderLayout.CENTER);
         content.add(body, BorderLayout.CENTER);
         content.add(buildFooter(), BorderLayout.SOUTH);
         setContentPane(content);
@@ -266,6 +270,26 @@ public class PersonnelMarketDialog extends JDialog {
         setLocationRelativeTo(parent);
         setPreferences(); // Must be before setVisible
         setVisible(true); // Should always be last
+    }
+
+    /**
+     * Adds a full-height column that takes a share of the width. Its own preferred width is ignored, so the columns
+     * never shift as their content changes, such as when another applicant's dossier is shown.
+     *
+     * @param columns the panel to add the column to, laid out by a {@link GridBagLayout}
+     * @param column  the column
+     * @param share   the share of the panel's width it takes
+     */
+    private static void addColumn(JPanel columns, JComponent column, double share) {
+        column.setPreferredSize(new Dimension(0, 0));
+        column.setMinimumSize(new Dimension(0, 0));
+        GridBagConstraints constraints = new GridBagConstraints();
+        constraints.gridx = columns.getComponentCount();
+        constraints.gridy = 0;
+        constraints.weightx = share;
+        constraints.weighty = 1.0;
+        constraints.fill = GridBagConstraints.BOTH;
+        columns.add(column, constraints);
     }
 
     /** The market's identity and live tiles above the guide button, in the style of the Oracle Console. */

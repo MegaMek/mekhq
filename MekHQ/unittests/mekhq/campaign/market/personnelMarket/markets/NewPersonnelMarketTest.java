@@ -45,11 +45,15 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
+import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
+import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
@@ -61,6 +65,7 @@ import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.records.PersonnelMarketEntry;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -68,7 +73,9 @@ import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
+import org.mockito.ArgumentCaptor;
 import org.mockito.ArgumentMatchers;
 import org.mockito.MockedStatic;
 
@@ -90,6 +97,38 @@ class NewPersonnelMarketTest {
         when(mockCampaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION)).thenReturn(false);
         when(mockCampaignOptions.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT)).thenReturn(false);
         return mockCampaignOptions;
+    }
+
+    @ParameterizedTest
+    @EnumSource(PersonnelMarketStyle.class)
+    void testCreateMarket_FollowsTheStyle(PersonnelMarketStyle style) {
+        assertEquals(style, NewPersonnelMarket.createMarket(style).getAssociatedPersonnelMarketStyle());
+    }
+
+    @ParameterizedTest
+    @EnumSource(value = PersonnelMarketStyle.class, mode = EnumSource.Mode.EXCLUDE, names = "PERSONNEL_MARKET_DISABLED")
+    void testEnsureMarketStyle_ReplacesTheDisabledMarketOfANewCampaign(PersonnelMarketStyle style) {
+        Campaign campaign = mockCampaign();
+        when(campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket()).thenReturn(new NewPersonnelMarket());
+
+        NewPersonnelMarket.ensureMarketStyle(campaign, style);
+
+        ArgumentCaptor<NewPersonnelMarket> replacement = ArgumentCaptor.forClass(NewPersonnelMarket.class);
+        verify(campaign).setNewPersonnelMarket(replacement.capture());
+        assertEquals(style, replacement.getValue().getAssociatedPersonnelMarketStyle());
+        assertSame(campaign, replacement.getValue().getCampaign());
+    }
+
+    @ParameterizedTest
+    @EnumSource(PersonnelMarketStyle.class)
+    void testEnsureMarketStyle_KeepsAMarketThatAlreadyMatches(PersonnelMarketStyle style) {
+        Campaign campaign = mockCampaign();
+        NewPersonnelMarket currentMarket = NewPersonnelMarket.createMarket(style);
+        when(campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket()).thenReturn(currentMarket);
+
+        NewPersonnelMarket.ensureMarketStyle(campaign, style);
+
+        verify(campaign, never()).setNewPersonnelMarket(any(NewPersonnelMarket.class));
     }
 
     @Test

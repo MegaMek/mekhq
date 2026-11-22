@@ -41,9 +41,6 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
-import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsRevised;
-import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsStrict;
-import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketMekHQ;
 import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 
 class MarketsOptionsModel {
@@ -179,17 +176,7 @@ class MarketsOptionsModel {
         if (personnelMarketStyle != null) {
             // No campaign when saving a preset, whose options must not swap out the running campaign's market
             if (campaign != null) {
-                NewPersonnelMarket currentMarket = campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket();
-                if (personnelMarketStyle != currentMarket.getAssociatedPersonnelMarketStyle()) {
-                    NewPersonnelMarket replacementMarket = switch (personnelMarketStyle) {
-                        case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
-                        case MEKHQ -> new PersonnelMarketMekHQ();
-                        case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised();
-                        case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict();
-                    };
-                    replacementMarket.setCampaign(campaign);
-                    campaign.setNewPersonnelMarket(replacementMarket);
-                }
+                NewPersonnelMarket.ensureMarketStyle(campaign, personnelMarketStyle);
             }
             options.set(CampaignOption.PERSONNEL_MARKET_STYLE, personnelMarketStyle);
         }

@@ -46,7 +46,6 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
@@ -68,14 +67,14 @@ import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudChip;
+import mekhq.gui.baseComponents.hud.HudWrapPanel;
 import mekhq.gui.dialog.markets.personnelMarket.PersonnelMarketDialog.ApplicantFacts;
-import mekhq.gui.utilities.WrapLayout;
 
 /**
  * The applicant board in the middle of the personnel market: the sort chips, then one card per applicant the role
  * filter and search let through, then a count of what is shown and the GM's tools. Each card shows the applicant's
- * portrait, name, profession, age and gender, their experience and anything notable (abilities, flaws, a rare
- * profession), and what they cost to hire.
+ * portrait, name, profession, age and gender, their experience and anything notable (abilities, flaws, their exam
+ * score, a rare profession), and what they cost to hire.
  *
  * <p>Several applicants can be picked at once with Ctrl- and Shift-click; the most recently clicked is the one the
  * dossier shows. Double-clicking an applicant opens their full personnel record.</p>
@@ -84,7 +83,8 @@ import mekhq.gui.utilities.WrapLayout;
  * @since 0.51.01
  */
 final class ApplicantBoard {
-    static final int BOARD_WIDTH = 430;
+    /** The board's width in the market's default window, for measuring cards before the list has a width. */
+    private static final int BOARD_WIDTH = 540;
     private static final int PORTRAIT_SIZE = 40;
     /** The widest hiring cost a card's figure is sized for, so every card's figure column lines up. */
     private static final double WIDEST_FIGURE = 8_880_000;
@@ -107,10 +107,9 @@ final class ApplicantBoard {
         root.setBackground(GROUND);
         root.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(14), scaleForGUI(10),
               scaleForGUI(14)));
-        root.setPreferredSize(new Dimension(scaleForGUI(BOARD_WIDTH), 0));
 
         // The chips wrap onto a second line rather than running off the board's edge.
-        JPanel sortRow = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(4), scaleForGUI(2)));
+        JPanel sortRow = new HudWrapPanel(scaleForGUI(4), scaleForGUI(2));
         sortRow.add(keyLabel(getTextAt(RESOURCE_BUNDLE, "board.personnelMarket.sort").toUpperCase(Locale.ROOT)));
         for (ApplicantSort sort : ApplicantSort.values()) {
             HudChip chip = new HudChip(sort.label(), () -> market.setSort(sort));
@@ -225,7 +224,9 @@ final class ApplicantBoard {
         updatingList = true;
         try {
             listModel.clear();
-            shown.forEach(listModel::addElement);
+            // Added all at once: while the first row is the lead, adding rows one by one makes the list measure every
+            // card again for each row, which takes seconds on a full board.
+            listModel.addAll(shown);
             List<Integer> indices = new ArrayList<>();
             for (Person person : keep) {
                 int index = shown.indexOf(person);
@@ -361,6 +362,8 @@ final class ApplicantBoard {
                   facts.abilities() > 0 ? READY : TEXT_FAINT));
             tags.add(tag(getFormattedTextAt(RESOURCE_BUNDLE, "tag.personnelMarket.flaws", facts.flaws()),
                   facts.flaws() > 0 ? DANGER : TEXT_FAINT));
+            tags.add(tag(getFormattedTextAt(RESOURCE_BUNDLE, "tag.personnelMarket.exam",
+                  person.getPerformanceExamScore()), TEXT_MUTED));
             if (market.isRare(person)) {
                 tags.add(tag(getTextAt(RESOURCE_BUNDLE, "tag.personnelMarket.rare"), AMBER));
             }

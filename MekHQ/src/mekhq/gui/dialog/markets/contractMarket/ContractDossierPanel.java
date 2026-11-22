@@ -65,9 +65,9 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudConfirmButton;
+import mekhq.gui.baseComponents.hud.HudWrapPanel;
 import mekhq.gui.baseComponents.hud.HudWrappingTextLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
-import mekhq.gui.utilities.WrapLayout;
 import mekhq.gui.view.PlanetViewPanel;
 import org.apache.commons.lang3.StringUtils;
 
@@ -404,7 +404,7 @@ public class ContractDossierPanel extends JPanel {
 
         // The contract's random characteristics ride along at the foot of the Terms column.
         if (!contract.getCharacteristics().isEmpty()) {
-            JPanel flow = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(5), scaleForGUI(5)));
+            JPanel flow = new HudWrapPanel(scaleForGUI(5), scaleForGUI(5));
             List<ContractCharacteristic> ordered = new ArrayList<>(contract.getCharacteristics());
             ordered.sort(Comparator.comparing(ContractCharacteristic::getName));
             for (ContractCharacteristic characteristic : ordered) {
