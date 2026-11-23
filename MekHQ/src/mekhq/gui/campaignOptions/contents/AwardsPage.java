@@ -166,7 +166,7 @@ class AwardsPage {
      */
     private JPanel createAwardsGeneralOptionsPanel() {
         // Contents
-        lblAwardBonusStyle = new CampaignOptionsLabel("AwardBonusStyle");
+        lblAwardBonusStyle = new CampaignOptionsLabel("AwardBonusStyle", getMetadata(new Version("0.49.20")));
         lblAwardBonusStyle.addMouseListener(createTipPanelUpdater("AwardBonusStyle"));
         comboAwardBonusStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -182,25 +182,26 @@ class AwardsPage {
         });
         comboAwardBonusStyle.addMouseListener(createTipPanelUpdater("AwardBonusStyle"));
 
-        lblAwardTierSize = new CampaignOptionsLabel("AwardTierSize");
+        lblAwardTierSize = new CampaignOptionsLabel("AwardTierSize", getMetadata(new Version("0.49.20")));
         lblAwardTierSize.addMouseListener(createTipPanelUpdater("AwardTierSize"));
         spnAwardTierSize = new CampaignOptionsSpinner("AwardTierSize", 5, 1, 100, 1);
         spnAwardTierSize.addMouseListener(createTipPanelUpdater("AwardTierSize"));
 
-        chkEnableAutoAwards = new CampaignOptionsCheckBox("EnableAutoAwards");
+        chkEnableAutoAwards = new CampaignOptionsCheckBox("EnableAutoAwards", getMetadata(new Version("0.49.20")));
         chkEnableAutoAwards.addMouseListener(createTipPanelUpdater("EnableAutoAwards"));
 
         chkUseReplaceEdgeAwards = new CampaignOptionsCheckBox("UseReplaceEdgeAwards",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkUseReplaceEdgeAwards.addMouseListener(createTipPanelUpdater("UseReplaceEdgeAwards"));
 
-        chkIssuePosthumousAwards = new CampaignOptionsCheckBox("IssuePosthumousAwards");
+        chkIssuePosthumousAwards = new CampaignOptionsCheckBox("IssuePosthumousAwards",
+              getMetadata(new Version("0.49.20")));
         chkIssuePosthumousAwards.addMouseListener(createTipPanelUpdater("IssuePosthumousAwards"));
 
-        chkIssueBestAwardOnly = new CampaignOptionsCheckBox("IssueBestAwardOnly");
+        chkIssueBestAwardOnly = new CampaignOptionsCheckBox("IssueBestAwardOnly", getMetadata(new Version("0.49.20")));
         chkIssueBestAwardOnly.addMouseListener(createTipPanelUpdater("IssueBestAwardOnly"));
 
-        chkIgnoreStandardSet = new CampaignOptionsCheckBox("IgnoreStandardSet");
+        chkIgnoreStandardSet = new CampaignOptionsCheckBox("IgnoreStandardSet", getMetadata(new Version("0.49.20")));
         chkIgnoreStandardSet.addMouseListener(createTipPanelUpdater("IgnoreStandardSet"));
 
         // Layout the Panel
@@ -226,36 +227,41 @@ class AwardsPage {
      */
     private @Nonnull JPanel createAutoAwardsFilterPanel() {
         // Contents
-        chkEnableContractAwards = new CampaignOptionsCheckBox("EnableContractAwards");
+        chkEnableContractAwards = new CampaignOptionsCheckBox("EnableContractAwards",
+              getMetadata(new Version("0.49.20")));
         chkEnableContractAwards.addMouseListener(createTipPanelUpdater("EnableContractAwards"));
         chkEnableFactionHunterAwards = new CampaignOptionsCheckBox("EnableFactionHunterAwards",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(new Version("0.49.20"), CampaignOptionFlag.IMPORTANT));
         chkEnableFactionHunterAwards
               .addMouseListener(createTipPanelUpdater("EnableFactionHunterAwards"));
         chkEnableInjuryAwards = new CampaignOptionsCheckBox("EnableInjuryAwards",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(new Version("0.49.20"), CampaignOptionFlag.IMPORTANT));
         chkEnableInjuryAwards.addMouseListener(createTipPanelUpdater("EnableInjuryAwards"));
-        chkEnableIndividualKillAwards = new CampaignOptionsCheckBox("EnableIndividualKillAwards");
+        chkEnableIndividualKillAwards = new CampaignOptionsCheckBox("EnableIndividualKillAwards",
+              getMetadata(new Version("0.49.20")));
         chkEnableIndividualKillAwards.addMouseListener(createTipPanelUpdater("EnableIndividualKillAwards"));
-        chkEnableFormationKillAwards = new CampaignOptionsCheckBox("EnableFormationKillAwards");
+        chkEnableFormationKillAwards = new CampaignOptionsCheckBox("EnableFormationKillAwards",
+              getMetadata(new Version("0.49.20")));
         chkEnableFormationKillAwards
               .addMouseListener(createTipPanelUpdater("EnableFormationKillAwards"));
-        chkEnableRankAwards = new CampaignOptionsCheckBox("EnableRankAwards");
+        chkEnableRankAwards = new CampaignOptionsCheckBox("EnableRankAwards", getMetadata(new Version("0.49.20")));
         chkEnableRankAwards.addMouseListener(createTipPanelUpdater("EnableRankAwards"));
-        chkEnableScenarioAwards = new CampaignOptionsCheckBox("EnableScenarioAwards");
+        chkEnableScenarioAwards = new CampaignOptionsCheckBox("EnableScenarioAwards",
+              getMetadata(new Version("0.49.20")));
         chkEnableScenarioAwards.addMouseListener(createTipPanelUpdater("EnableScenarioAwards"));
-        chkEnableSkillAwards = new CampaignOptionsCheckBox("EnableSkillAwards");
+        chkEnableSkillAwards = new CampaignOptionsCheckBox("EnableSkillAwards", getMetadata(new Version("0.49.20")));
         chkEnableSkillAwards.addMouseListener(createTipPanelUpdater("EnableSkillAwards"));
-        chkEnableTheatreOfWarAwards = new CampaignOptionsCheckBox("EnableTheatreOfWarAwards");
+        chkEnableTheatreOfWarAwards = new CampaignOptionsCheckBox("EnableTheatreOfWarAwards",
+              getMetadata(new Version("0.49.20")));
         chkEnableTheatreOfWarAwards
               .addMouseListener(createTipPanelUpdater("EnableTheatreOfWarAwards"));
         chkEnableTimeAwards = new CampaignOptionsCheckBox("EnableTimeAwards",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(new Version("0.49.20"), CampaignOptionFlag.IMPORTANT));
         chkEnableTimeAwards.addMouseListener(createTipPanelUpdater("EnableTimeAwards"));
         chkEnableTrainingAwards = new CampaignOptionsCheckBox("EnableTrainingAwards",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(new Version("0.49.20"), CampaignOptionFlag.IMPORTANT));
         chkEnableTrainingAwards.addMouseListener(createTipPanelUpdater("EnableTrainingAwards"));
-        chkEnableMiscAwards = new CampaignOptionsCheckBox("EnableMiscAwards");
+        chkEnableMiscAwards = new CampaignOptionsCheckBox("EnableMiscAwards", getMetadata(new Version("0.49.20")));
         chkEnableMiscAwards.addMouseListener(createTipPanelUpdater("EnableMiscAwards"));
 
         // Layout the Panel

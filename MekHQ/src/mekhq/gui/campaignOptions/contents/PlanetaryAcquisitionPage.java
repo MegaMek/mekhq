@@ -32,7 +32,6 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -45,13 +44,14 @@ import javax.swing.SpinnerNumberModel;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.enums.PlanetaryAcquisitionFactionLimit;
 import mekhq.campaign.universe.PlanetarySystem.PlanetaryRating;
 import mekhq.campaign.universe.PlanetarySystem.PlanetarySophistication;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsModifierTablePanel;
@@ -148,31 +148,35 @@ class PlanetaryAcquisitionPage {
      */
     private @Nonnull JPanel createOptionsPanel() {
         usePlanetaryAcquisitions = new CampaignOptionsCheckBox("UsePlanetaryAcquisitions",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
+              getMetadata(new Version("0.45.02"), CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         usePlanetaryAcquisitions.addMouseListener(createTipPanelUpdater("UsePlanetaryAcquisitions"));
 
-        lblMaxJumpPlanetaryAcquisitions = new CampaignOptionsLabel("MaxJumpPlanetaryAcquisitions");
+        lblMaxJumpPlanetaryAcquisitions = new CampaignOptionsLabel("MaxJumpPlanetaryAcquisitions",
+              getMetadata(new Version("0.45.02")));
         lblMaxJumpPlanetaryAcquisitions.addMouseListener(createTipPanelUpdater("MaxJumpPlanetaryAcquisitions"));
         spnMaxJumpPlanetaryAcquisitions = new CampaignOptionsSpinner("MaxJumpPlanetaryAcquisitions", 2, 0, 5, 1);
         spnMaxJumpPlanetaryAcquisitions.addMouseListener(createTipPanelUpdater("MaxJumpPlanetaryAcquisitions"));
 
-        lblPlanetaryAcquisitionsFactionLimits = new CampaignOptionsLabel("PlanetaryAcquisitionsFactionLimits");
+        lblPlanetaryAcquisitionsFactionLimits = new CampaignOptionsLabel("PlanetaryAcquisitionsFactionLimits",
+              getMetadata(new Version("0.45.02")));
         lblPlanetaryAcquisitionsFactionLimits.addMouseListener(createTipPanelUpdater("PlanetaryAcquisitionsFactionLimits"));
 
         disallowPlanetaryAcquisitionClanCrossover = new CampaignOptionsCheckBox(
-              "DisallowPlanetaryAcquisitionClanCrossover");
+              "DisallowPlanetaryAcquisitionClanCrossover", getMetadata(new Version("0.45.02")));
         disallowPlanetaryAcquisitionClanCrossover.addMouseListener(createTipPanelUpdater("DisallowPlanetaryAcquisitionClanCrossover"));
 
-        disallowClanPartsFromIS = new CampaignOptionsCheckBox("DisallowClanPartsFromIS");
+        disallowClanPartsFromIS = new CampaignOptionsCheckBox("DisallowClanPartsFromIS",
+              getMetadata(new Version("0.45.02")));
         disallowClanPartsFromIS.addMouseListener(createTipPanelUpdater("DisallowClanPartsFromIS"));
 
-        lblPenaltyClanPartsFromIS = new CampaignOptionsLabel("PenaltyClanPartsFromIS");
+        lblPenaltyClanPartsFromIS = new CampaignOptionsLabel("PenaltyClanPartsFromIS",
+              getMetadata(new Version("0.45.02")));
         lblPenaltyClanPartsFromIS.addMouseListener(createTipPanelUpdater("PenaltyClanPartsFromIS"));
         spnPenaltyClanPartsFromIS = new CampaignOptionsSpinner("PenaltyClanPartsFromIS", 0, 0, 12, 1);
         spnPenaltyClanPartsFromIS.addMouseListener(createTipPanelUpdater("PenaltyClanPartsFromIS"));
 
         usePlanetaryAcquisitionsVerbose = new CampaignOptionsCheckBox("UsePlanetaryAcquisitionsVerbose",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(new Version("0.45.02"), CampaignOptionFlag.IMPORTANT));
         usePlanetaryAcquisitionsVerbose.addMouseListener(createTipPanelUpdater("UsePlanetaryAcquisitionsVerbose"));
 
         // Layout the Panel

@@ -32,8 +32,6 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -43,12 +41,13 @@ import javax.swing.JPanel;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
 
@@ -134,21 +133,22 @@ public class AttributesAndTraitsPage {
      */
     private @Nonnull JPanel createAttributesAndTraitsPanel() {
         chkUseAttributes = new CampaignOptionsCheckBox("UseAttributes",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.05"), CampaignOptionFlag.IMPORTANT));
         chkUseAttributes.addMouseListener(createTipPanelUpdater("UseAttributes"));
-        chkRandomizeAttributes = new CampaignOptionsCheckBox("RandomizeAttributes");
+        chkRandomizeAttributes = new CampaignOptionsCheckBox("RandomizeAttributes",
+              getMetadata(new Version("0.50.05")));
         chkRandomizeAttributes.addMouseListener(createTipPanelUpdater("RandomizeAttributes"));
         chkDisplayAllAttributes = new CampaignOptionsCheckBox("DisplayAllAttributes",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         chkDisplayAllAttributes.addMouseListener(createTipPanelUpdater("DisplayAllAttributes"));
         chkUseAgeEffects = new CampaignOptionsCheckBox("UseAgeEffects",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
+                getMetadata(new Version("0.50.05"), CampaignOptionFlag.IMPORTANT,
                         CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseAgeEffects.addMouseListener(createTipPanelUpdater("UseAgeEffects"));
-        chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits");
+        chkRandomizeTraits = new CampaignOptionsCheckBox("RandomizeTraits", getMetadata(new Version("0.50.05")));
         chkRandomizeTraits.addMouseListener(createTipPanelUpdater("RandomizeTraits"));
         chkUseSmallArmsOnly = new CampaignOptionsCheckBox("UseSmallArmsOnly",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.10")));
         chkUseSmallArmsOnly.addMouseListener(createTipPanelUpdater("UseSmallArmsOnly"));
 
         final SettingsFormPanel panel = new SettingsFormPanel("AttributesAndTraitsPanel",

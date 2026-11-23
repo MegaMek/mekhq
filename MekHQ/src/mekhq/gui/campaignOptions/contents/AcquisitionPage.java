@@ -32,7 +32,6 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -210,10 +209,11 @@ class AcquisitionPage {
         lblChoiceAcquireSkill.addMouseListener(createTipPanelUpdater("ChoiceAcquireSkill"));
 
         chkUseFunctionalAppraisal = new CampaignOptionsCheckBox("UseFunctionalAppraisal",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.50.07"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseFunctionalAppraisal.addMouseListener(createTipPanelUpdater("UseFunctionalAppraisal"));
 
-        lblProcurementPersonnelPick = new CampaignOptionsLabel("ProcurementPersonnelPick");
+        lblProcurementPersonnelPick = new CampaignOptionsLabel("ProcurementPersonnelPick",
+              getMetadata(new Version("0.50.05")));
         lblProcurementPersonnelPick.addMouseListener(createTipPanelUpdater("ProcurementPersonnelPick"));
 
         lblAcquireClanPenalty = new CampaignOptionsLabel("AcquireClanPenalty");
@@ -257,11 +257,11 @@ class AcquisitionPage {
         choiceTransitTimeUnits.addMouseListener(createTipPanelUpdater("TransitTimeUnits"));
 
         chkNoDeliveriesInTransit = new CampaignOptionsCheckBox("NoDeliveriesInTransit",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         chkNoDeliveriesInTransit.addMouseListener(createTipPanelUpdater("NoDeliveriesInTransit"));
 
         chkUseMarginOfSuccessDelivery = new CampaignOptionsCheckBox("UseMarginOfSuccessDelivery",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.7"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseMarginOfSuccessDelivery.addMouseListener(createTipPanelUpdater("UseMarginOfSuccessDelivery"));
 
         final SettingsFormPanel panel = new SettingsFormPanel("DeliveryPanel",
@@ -283,17 +283,19 @@ class AcquisitionPage {
      */
     private @Nonnull JPanel createAutoLogisticsPanel() {
         // Content
-        lblAutoLogisticsMekHead = new CampaignOptionsLabel("AutoLogisticsMekHead");
+        lblAutoLogisticsMekHead = new CampaignOptionsLabel("AutoLogisticsMekHead", getMetadata(new Version("0.50.03")));
         lblAutoLogisticsMekHead.addMouseListener(createTipPanelUpdater("AutoLogisticsMekHead"));
         spnAutoLogisticsMekHead = new CampaignOptionsSpinner("AutoLogisticsMekHead", 200, 0, 10000, 1);
         spnAutoLogisticsMekHead.addMouseListener(createTipPanelUpdater("AutoLogisticsMekHead"));
 
-        lblAutoLogisticsMekLocation = new CampaignOptionsLabel("AutoLogisticsMekLocation");
+        lblAutoLogisticsMekLocation = new CampaignOptionsLabel("AutoLogisticsMekLocation",
+              getMetadata(new Version("0.50.03")));
         lblAutoLogisticsMekLocation.addMouseListener(createTipPanelUpdater("AutoLogisticsMekLocation"));
         spnAutoLogisticsMekLocation = new CampaignOptionsSpinner("AutoLogisticsMekLocation", 100, 0, 10000, 1);
         spnAutoLogisticsMekLocation.addMouseListener(createTipPanelUpdater("AutoLogisticsMekLocation"));
 
-        lblAutoLogisticsNonRepairableLocation = new CampaignOptionsLabel("AutoLogisticsNonRepairableLocation");
+        lblAutoLogisticsNonRepairableLocation = new CampaignOptionsLabel("AutoLogisticsNonRepairableLocation",
+              getMetadata(new Version("0.50.03")));
         lblAutoLogisticsNonRepairableLocation.addMouseListener(createTipPanelUpdater("AutoLogisticsNonRepairableLocation"));
         spnAutoLogisticsNonRepairableLocation = new CampaignOptionsSpinner("AutoLogisticsNonRepairableLocation",
               0,
@@ -302,65 +304,69 @@ class AcquisitionPage {
               1);
         spnAutoLogisticsNonRepairableLocation.addMouseListener(createTipPanelUpdater("AutoLogisticsNonRepairableLocation"));
 
-        lblAutoLogisticsArmor = new CampaignOptionsLabel("AutoLogisticsArmor");
+        lblAutoLogisticsArmor = new CampaignOptionsLabel("AutoLogisticsArmor", getMetadata(new Version("0.50.03")));
         lblAutoLogisticsArmor.addMouseListener(createTipPanelUpdater("AutoLogisticsArmor"));
         spnAutoLogisticsArmor = new CampaignOptionsSpinner("AutoLogisticsArmor", 500, 0, 10000, 1);
         spnAutoLogisticsArmor.addMouseListener(createTipPanelUpdater("AutoLogisticsArmor"));
 
-        lblAutoLogisticsAmmunition = new CampaignOptionsLabel("AutoLogisticsAmmunition");
+        lblAutoLogisticsAmmunition = new CampaignOptionsLabel("AutoLogisticsAmmunition",
+              getMetadata(new Version("0.50.03")));
         lblAutoLogisticsAmmunition.addMouseListener(createTipPanelUpdater("AutoLogisticsAmmunition"));
         spnAutoLogisticsAmmunition = new CampaignOptionsSpinner("AutoLogisticsAmmunition", 500, 0, 10000, 1);
         spnAutoLogisticsAmmunition.addMouseListener(createTipPanelUpdater("AutoLogisticsAmmunition"));
 
-        lblAutoLogisticsHeatSink = new CampaignOptionsLabel("AutoLogisticsHeatSink");
+        lblAutoLogisticsHeatSink = new CampaignOptionsLabel("AutoLogisticsHeatSink",
+              getMetadata(new Version("0.50.03")));
         lblAutoLogisticsHeatSink.addMouseListener(createTipPanelUpdater("AutoLogisticsHeatSink"));
         spnAutoLogisticsHeatSink = new CampaignOptionsSpinner("AutoLogisticsHeatSink", 250, 0, 10000, 1);
         spnAutoLogisticsHeatSink.addMouseListener(createTipPanelUpdater("AutoLogisticsHeatSink"));
 
-        lblAutoLogisticsWeapons = new CampaignOptionsLabel("AutoLogisticsWeapons");
+        lblAutoLogisticsWeapons = new CampaignOptionsLabel("AutoLogisticsWeapons", getMetadata(new Version("0.50.06")));
         lblAutoLogisticsWeapons.addMouseListener(createTipPanelUpdater("AutoLogisticsWeapons"));
         spnAutoLogisticsWeapons = new CampaignOptionsSpinner("AutoLogisticsWeapons", 50, 0, 10000, 1);
         spnAutoLogisticsWeapons.addMouseListener(createTipPanelUpdater("AutoLogisticsWeapons"));
 
-        lblAutoLogisticsActuators = new CampaignOptionsLabel("AutoLogisticsActuators");
+        lblAutoLogisticsActuators = new CampaignOptionsLabel("AutoLogisticsActuators",
+              getMetadata(new Version("0.50.04")));
         lblAutoLogisticsActuators.addMouseListener(createTipPanelUpdater("AutoLogisticsActuators"));
         spnAutoLogisticsActuators = new CampaignOptionsSpinner("AutoLogisticsActuators", 250, 0, 10000, 1);
         spnAutoLogisticsActuators.addMouseListener(createTipPanelUpdater("AutoLogisticsActuators"));
 
-        lblAutoLogisticsJumpJets = new CampaignOptionsLabel("AutoLogisticsJumpJets");
+        lblAutoLogisticsJumpJets = new CampaignOptionsLabel("AutoLogisticsJumpJets",
+              getMetadata(new Version("0.50.04")));
         lblAutoLogisticsJumpJets.addMouseListener(createTipPanelUpdater("AutoLogisticsJumpJets"));
         spnAutoLogisticsJumpJets = new CampaignOptionsSpinner("AutoLogisticsJumpJets", 250, 0, 10000, 1);
         spnAutoLogisticsJumpJets.addMouseListener(createTipPanelUpdater("AutoLogisticsJumpJets"));
 
         lblAutoLogisticsHeadComponents = new CampaignOptionsLabel("AutoLogisticsHeadComponents",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         lblAutoLogisticsHeadComponents.addMouseListener(createTipPanelUpdater("AutoLogisticsHeadComponents"));
         spnAutoLogisticsHeadComponents = new CampaignOptionsSpinner("AutoLogisticsHeadComponents", 15, 0, 10000, 1);
         spnAutoLogisticsHeadComponents.addMouseListener(createTipPanelUpdater("AutoLogisticsHeadComponents"));
 
-        lblAutoLogisticsEngines = new CampaignOptionsLabel("AutoLogisticsEngines");
+        lblAutoLogisticsEngines = new CampaignOptionsLabel("AutoLogisticsEngines", getMetadata(new Version("0.50.04")));
         lblAutoLogisticsEngines.addMouseListener(createTipPanelUpdater("AutoLogisticsEngines"));
         spnAutoLogisticsEngines = new CampaignOptionsSpinner("AutoLogisticsEngines", 250, 0, 10000, 1);
         spnAutoLogisticsEngines.addMouseListener(createTipPanelUpdater("AutoLogisticsEngines"));
 
-        lblAutoLogisticsGyros = new CampaignOptionsLabel("AutoLogisticsGyros", getMetadata(new Version(0, 51, 1)));
+        lblAutoLogisticsGyros = new CampaignOptionsLabel("AutoLogisticsGyros", getMetadata(new Version("0.51.01.1")));
         lblAutoLogisticsGyros.addMouseListener(createTipPanelUpdater("AutoLogisticsGyros"));
         spnAutoLogisticsGyros = new CampaignOptionsSpinner("AutoLogisticsGyros", 0, 0, 10000, 1);
         spnAutoLogisticsGyros.addMouseListener(createTipPanelUpdater("AutoLogisticsGyros"));
 
-        lblAutoLogisticsOther = new CampaignOptionsLabel("AutoLogisticsOther");
+        lblAutoLogisticsOther = new CampaignOptionsLabel("AutoLogisticsOther", getMetadata(new Version("0.50.03")));
         lblAutoLogisticsOther.addMouseListener(createTipPanelUpdater("AutoLogisticsOther"));
         spnAutoLogisticsOther = new CampaignOptionsSpinner("AutoLogisticsOther", 50, 0, 10000, 1);
         spnAutoLogisticsOther.addMouseListener(createTipPanelUpdater("AutoLogisticsOther"));
 
         lblAutoLogisticsEquipmentKit = new CampaignOptionsLabel("AutoLogisticsEquipmentKit",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         lblAutoLogisticsEquipmentKit.addMouseListener(createTipPanelUpdater("AutoLogisticsEquipmentKit"));
         spnAutoLogisticsEquipmentKit = new CampaignOptionsSpinner("AutoLogisticsEquipmentKit", 0, 0, 10000, 1);
         spnAutoLogisticsEquipmentKit.addMouseListener(createTipPanelUpdater("AutoLogisticsEquipmentKit"));
 
         lblAutoLogisticsBomb = new CampaignOptionsLabel("AutoLogisticsBomb",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         lblAutoLogisticsBomb.addMouseListener(createTipPanelUpdater("AutoLogisticsBomb"));
         spnAutoLogisticsBomb = new CampaignOptionsSpinner("AutoLogisticsBomb", 0, 0, 10000, 1);
         spnAutoLogisticsBomb.addMouseListener(createTipPanelUpdater("AutoLogisticsBomb"));

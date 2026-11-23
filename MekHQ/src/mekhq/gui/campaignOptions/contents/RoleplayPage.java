@@ -63,7 +63,7 @@ import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 public class RoleplayPage {
     private static final int FORM_LABEL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_LABEL_WIDTH;
     private static final int FORM_CONTROL_COLUMN_WIDTH = SettingsFormPanel.DEFAULT_CONTROL_WIDTH;
-    private static final Version INTRODUCED = new Version(0, 51, 1);
+    private static final Version INTRODUCED = new Version("0.51.01.1");
 
     private final CampaignOptions campaignOptions;
     private int maximumOracleLogEntries;

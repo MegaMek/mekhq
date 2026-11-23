@@ -36,11 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
-import megamek.Version;
-import org.junit.jupiter.api.Test;
-
 import java.util.Collections;
 import java.util.EnumSet;
+
+import megamek.Version;
+import org.junit.jupiter.api.Test;
 
 class CampaignOptionsUtilitiesTest {
 
@@ -78,25 +78,21 @@ class CampaignOptionsUtilitiesTest {
 
     @Test
     void testFormatBadges_WithVersion() {
-        // Metadata with current version should include development badge
+        // A version badge shows the version number as colored text
         CampaignOptionsMetadata metadata = new CampaignOptionsMetadata(
-            megamek.SuiteConstants.VERSION,
+            new Version(0, 51, 1),
             Collections.emptySet()
         );
 
         String result = CampaignOptionsUtilities.formatBadges(metadata);
 
-        // Should contain a colored Material Symbols font badge for the development version
-        if (!result.isEmpty()) {
-            assertTrue(result.contains("<font"));
-            assertTrue(result.contains("color="));
-            assertTrue(result.contains("</font>"));
-        }
+        assertTrue(result.contains("color="), result);
+        assertTrue(result.contains(">0.51.01</font>"), result);
     }
 
     @Test
     void testFormatBadges_WithOldVersion() {
-        // Old version (before last milestone) should not show version badge
+        // Older versions still show their version number
         Version oldVersion = new Version(0, 49, 0);
         CampaignOptionsMetadata metadata = new CampaignOptionsMetadata(
             oldVersion,
@@ -105,8 +101,7 @@ class CampaignOptionsUtilitiesTest {
 
         String result = CampaignOptionsUtilities.formatBadges(metadata);
 
-        // Should return empty string (no version badge for old versions)
-        assertEquals("", result);
+        assertTrue(result.contains(">0.49.00</font>"), result);
     }
 
     @Test

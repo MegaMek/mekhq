@@ -32,7 +32,6 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -127,21 +126,21 @@ class FactionStandingPage {
     private @Nonnull JPanel createFactionStandingTrackingPanel() {
         // Contents
         chkTrackFactionStanding = new CampaignOptionsCheckBox("TrackFactionStanding",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+                getMetadata(new Version("0.50.07"), CampaignOptionFlag.CUSTOM_SYSTEM,
                         CampaignOptionFlag.DOCUMENTED));
         chkTrackFactionStanding
                 .addMouseListener(createTipPanelUpdater("TrackFactionStanding"));
 
         chkTrackClimateRegardChanges = new CampaignOptionsCheckBox("TrackClimateRegardChanges",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         chkTrackClimateRegardChanges.addMouseListener(createTipPanelUpdater("TrackClimateRegardChanges"));
 
         chkUseFactionStandingUltimatums = new CampaignOptionsCheckBox("UseFactionStandingUltimatums",
-                getMetadata(new Version(0, 51, 1)));
+                getMetadata(new Version("0.51.01.1")));
         chkUseFactionStandingUltimatums.addMouseListener(createTipPanelUpdater("UseFactionStandingUltimatums"));
 
         JLabel lblRegardMultiplier = new CampaignOptionsLabel("RegardMultiplier",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         lblRegardMultiplier.addMouseListener(createTipPanelUpdater("RegardMultiplier"));
         spnRegardMultiplier = new CampaignOptionsSpinner("RegardMultiplier", 1.0, 0.1, 3.0, 0.1);
         spnRegardMultiplier.addMouseListener(createTipPanelUpdater("RegardMultiplier"));
@@ -168,44 +167,44 @@ class FactionStandingPage {
     private @Nonnull JPanel createFactionStandingModifiersPanel() {
         // Contents
         chkUseFactionStandingNegotiation = new CampaignOptionsCheckBox("UseFactionStandingNegotiation",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         chkUseFactionStandingNegotiation.addMouseListener(createTipPanelUpdater("UseFactionStandingNegotiation"));
 
         chkUseFactionStandingResupply = new CampaignOptionsCheckBox("UseFactionStandingResupply",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         chkUseFactionStandingResupply.addMouseListener(createTipPanelUpdater("UseFactionStandingResupply"));
 
         chkUseFactionStandingCommandCircuit = new CampaignOptionsCheckBox("UseFactionStandingCommandCircuit",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         chkUseFactionStandingCommandCircuit.addMouseListener(createTipPanelUpdater("UseFactionStandingCommandCircuit"));
 
         chkUseFactionStandingOutlawed = new CampaignOptionsCheckBox("UseFactionStandingOutlawed",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         chkUseFactionStandingOutlawed.addMouseListener(createTipPanelUpdater("UseFactionStandingOutlawed"));
 
         chkUseFactionStandingBatchallRestrictions = new CampaignOptionsCheckBox(
                 "UseFactionStandingBatchallRestrictions",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         chkUseFactionStandingBatchallRestrictions.addMouseListener(createTipPanelUpdater("UseFactionStandingBatchallRestrictions"));
 
         chkUseFactionStandingRecruitment = new CampaignOptionsCheckBox("UseFactionStandingRecruitment",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         chkUseFactionStandingRecruitment.addMouseListener(createTipPanelUpdater("UseFactionStandingRecruitment"));
 
         chkUseFactionStandingBarracksCosts = new CampaignOptionsCheckBox("UseFactionStandingBarracksCosts",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         chkUseFactionStandingBarracksCosts.addMouseListener(createTipPanelUpdater("UseFactionStandingBarracksCosts"));
 
         chkUseFactionStandingUnitMarket = new CampaignOptionsCheckBox("UseFactionStandingUnitMarket",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         chkUseFactionStandingUnitMarket.addMouseListener(createTipPanelUpdater("UseFactionStandingUnitMarket"));
 
         chkUseFactionStandingContractPay = new CampaignOptionsCheckBox("UseFactionStandingContractPay",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         chkUseFactionStandingContractPay.addMouseListener(createTipPanelUpdater("UseFactionStandingContractPay"));
 
         chkUseFactionStandingSupportPoints = new CampaignOptionsCheckBox("UseFactionStandingSupportPoints",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         chkUseFactionStandingSupportPoints.addMouseListener(createTipPanelUpdater("UseFactionStandingSupportPoints"));
 
         // Layout the Panel

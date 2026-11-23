@@ -184,12 +184,14 @@ class PriceMultipliersPage {
      */
     private @Nonnull JPanel createGeneralMultipliersPanel() {
         // Contents
-        lblCommonPartPriceMultiplier = new CampaignOptionsLabel("CommonPartPriceMultiplier");
+        lblCommonPartPriceMultiplier = new CampaignOptionsLabel("CommonPartPriceMultiplier",
+              getMetadata(new Version("0.49.03")));
         lblCommonPartPriceMultiplier.addMouseListener(createTipPanelUpdater("CommonPartPriceMultiplier"));
         spnCommonPartPriceMultiplier = new CampaignOptionsSpinner("CommonPartPriceMultiplier", 1.0, 0.1, 100, 0.1);
         spnCommonPartPriceMultiplier.addMouseListener(createTipPanelUpdater("CommonPartPriceMultiplier"));
 
-        lblInnerSphereUnitPriceMultiplier = new CampaignOptionsLabel("InnerSphereUnitPriceMultiplier");
+        lblInnerSphereUnitPriceMultiplier = new CampaignOptionsLabel("InnerSphereUnitPriceMultiplier",
+              getMetadata(new Version("0.49.03")));
         lblInnerSphereUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("InnerSphereUnitPriceMultiplier"));
         spnInnerSphereUnitPriceMultiplier = new CampaignOptionsSpinner("InnerSphereUnitPriceMultiplier",
                 1.0,
@@ -198,7 +200,8 @@ class PriceMultipliersPage {
                 0.1);
         spnInnerSphereUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("InnerSphereUnitPriceMultiplier"));
 
-        lblInnerSpherePartPriceMultiplier = new CampaignOptionsLabel("InnerSpherePartPriceMultiplier");
+        lblInnerSpherePartPriceMultiplier = new CampaignOptionsLabel("InnerSpherePartPriceMultiplier",
+              getMetadata(new Version("0.49.03")));
         lblInnerSpherePartPriceMultiplier.addMouseListener(createTipPanelUpdater("InnerSpherePartPriceMultiplier"));
         spnInnerSpherePartPriceMultiplier = new CampaignOptionsSpinner("InnerSpherePartPriceMultiplier",
                 1.0,
@@ -207,17 +210,20 @@ class PriceMultipliersPage {
                 0.1);
         spnInnerSpherePartPriceMultiplier.addMouseListener(createTipPanelUpdater("InnerSpherePartPriceMultiplier"));
 
-        lblClanUnitPriceMultiplier = new CampaignOptionsLabel("ClanUnitPriceMultiplier");
+        lblClanUnitPriceMultiplier = new CampaignOptionsLabel("ClanUnitPriceMultiplier",
+              getMetadata(new Version("0.49.03")));
         lblClanUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanUnitPriceMultiplier"));
         spnClanUnitPriceMultiplier = new CampaignOptionsSpinner("ClanUnitPriceMultiplier", 1.0, 0.1, 100, 0.1);
         spnClanUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanUnitPriceMultiplier"));
 
-        lblClanPartPriceMultiplier = new CampaignOptionsLabel("ClanPartPriceMultiplier");
+        lblClanPartPriceMultiplier = new CampaignOptionsLabel("ClanPartPriceMultiplier",
+              getMetadata(new Version("0.49.03")));
         lblClanPartPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanPartPriceMultiplier"));
         spnClanPartPriceMultiplier = new CampaignOptionsSpinner("ClanPartPriceMultiplier", 1.0, 0.1, 100, 0.1);
         spnClanPartPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanPartPriceMultiplier"));
 
-        lblMixedTechUnitPriceMultiplier = new CampaignOptionsLabel("MixedTechUnitPriceMultiplier");
+        lblMixedTechUnitPriceMultiplier = new CampaignOptionsLabel("MixedTechUnitPriceMultiplier",
+              getMetadata(new Version("0.49.03")));
         lblMixedTechUnitPriceMultiplier.addMouseListener(createTipPanelUpdater("MixedTechUnitPriceMultiplier"));
         spnMixedTechUnitPriceMultiplier = new CampaignOptionsSpinner("MixedTechUnitPriceMultiplier",
                 1.0,
@@ -247,7 +253,7 @@ class PriceMultipliersPage {
     private @Nonnull JPanel createAcquisitionMultipliersPanel() {
         // Contents
         lblClanTechInvasionPriceMultiplier = new CampaignOptionsLabel("ClanTechInvasionPriceMultiplier",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.7")));
         lblClanTechInvasionPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanTechInvasionPriceMultiplier"));
         spnClanTechInvasionPriceMultiplier = new CampaignOptionsSpinner("ClanTechInvasionPriceMultiplier",
                 1.0,
@@ -257,7 +263,7 @@ class PriceMultipliersPage {
         spnClanTechInvasionPriceMultiplier.addMouseListener(createTipPanelUpdater("ClanTechInvasionPriceMultiplier"));
 
         lblClanTechPostInvasionPriceMultiplier = new CampaignOptionsLabel("ClanTechPostInvasionPriceMultiplier",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.7")));
         lblClanTechPostInvasionPriceMultiplier.addMouseListener(
                 createTipPanelUpdater("ClanTechPostInvasionPriceMultiplier"));
         spnClanTechPostInvasionPriceMultiplier = new CampaignOptionsSpinner("ClanTechPostInvasionPriceMultiplier",
@@ -269,7 +275,7 @@ class PriceMultipliersPage {
                 createTipPanelUpdater("ClanTechPostInvasionPriceMultiplier"));
 
         lblSuccessionWarsAdvancedTechPriceMultiplier = new CampaignOptionsLabel(
-              "SuccessionWarsAdvancedTechPriceMultiplier", getMetadata(new Version(0, 51, 1)));
+              "SuccessionWarsAdvancedTechPriceMultiplier", getMetadata(new Version("0.51.01.7")));
         lblSuccessionWarsAdvancedTechPriceMultiplier.addMouseListener(
                 createTipPanelUpdater("SuccessionWarsAdvancedTechPriceMultiplier"));
         spnSuccessionWarsAdvancedTechPriceMultiplier = new CampaignOptionsSpinner(
@@ -282,7 +288,7 @@ class PriceMultipliersPage {
                 createTipPanelUpdater("SuccessionWarsAdvancedTechPriceMultiplier"));
 
         lblTechRatingEPriceMultiplier = new CampaignOptionsLabel("TechRatingEPriceMultiplier",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.7")));
         lblTechRatingEPriceMultiplier.addMouseListener(createTipPanelUpdater("TechRatingEPriceMultiplier"));
         spnTechRatingEPriceMultiplier = new CampaignOptionsSpinner("TechRatingEPriceMultiplier",
                 1.0,
@@ -292,7 +298,7 @@ class PriceMultipliersPage {
         spnTechRatingEPriceMultiplier.addMouseListener(createTipPanelUpdater("TechRatingEPriceMultiplier"));
 
         lblTechRatingFPriceMultiplier = new CampaignOptionsLabel("TechRatingFPriceMultiplier",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.7")));
         lblTechRatingFPriceMultiplier.addMouseListener(createTipPanelUpdater("TechRatingFPriceMultiplier"));
         spnTechRatingFPriceMultiplier = new CampaignOptionsSpinner("TechRatingFPriceMultiplier",
                 1.0,
@@ -310,7 +316,7 @@ class PriceMultipliersPage {
                 spnTechRatingFPriceMultiplier };
 
         chkApplyAcquisitionMultipliersToParts = new CampaignOptionsCheckBox("ApplyAcquisitionMultipliersToParts",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.7"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkApplyAcquisitionMultipliersToParts.addMouseListener(
               createTipPanelUpdater("ApplyAcquisitionMultipliersToParts"));
 
@@ -385,7 +391,8 @@ class PriceMultipliersPage {
      */
     private @Nonnull JPanel createOtherMultipliersPanel() {
         // Contents
-        lblDamagedPartsValueMultiplier = new CampaignOptionsLabel("DamagedPartsValueMultiplier");
+        lblDamagedPartsValueMultiplier = new CampaignOptionsLabel("DamagedPartsValueMultiplier",
+              getMetadata(new Version("0.49.03")));
         lblDamagedPartsValueMultiplier.addMouseListener(createTipPanelUpdater("DamagedPartsValueMultiplier"));
         spnDamagedPartsValueMultiplier = new CampaignOptionsSpinner("DamagedPartsValueMultiplier",
                 0.33,
@@ -394,7 +401,8 @@ class PriceMultipliersPage {
                 0.05);
         spnDamagedPartsValueMultiplier.addMouseListener(createTipPanelUpdater("DamagedPartsValueMultiplier"));
 
-        lblUnrepairablePartsValueMultiplier = new CampaignOptionsLabel("UnrepairablePartsValueMultiplier");
+        lblUnrepairablePartsValueMultiplier = new CampaignOptionsLabel("UnrepairablePartsValueMultiplier",
+              getMetadata(new Version("0.49.03")));
         lblUnrepairablePartsValueMultiplier.addMouseListener(createTipPanelUpdater("UnrepairablePartsValueMultiplier"));
         spnUnrepairablePartsValueMultiplier = new CampaignOptionsSpinner("UnrepairablePartsValueMultiplier",
                 0.10,
@@ -403,7 +411,8 @@ class PriceMultipliersPage {
                 0.05);
         spnUnrepairablePartsValueMultiplier.addMouseListener(createTipPanelUpdater("UnrepairablePartsValueMultiplier"));
 
-        lblCancelledOrderRefundMultiplier = new CampaignOptionsLabel("CancelledOrderRefundMultiplier");
+        lblCancelledOrderRefundMultiplier = new CampaignOptionsLabel("CancelledOrderRefundMultiplier",
+              getMetadata(new Version("0.49.03")));
         lblCancelledOrderRefundMultiplier.addMouseListener(createTipPanelUpdater("CancelledOrderRefundMultiplier"));
         spnCancelledOrderRefundMultiplier = new CampaignOptionsSpinner("CancelledOrderRefundMultiplier",
                 0.50,

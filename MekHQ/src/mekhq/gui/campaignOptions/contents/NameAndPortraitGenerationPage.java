@@ -33,7 +33,6 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -119,26 +118,28 @@ class NameAndPortraitGenerationPage {
         personnelRoles = PersonnelRole.getCombatRoles();
         personnelRoles.addAll(PersonnelRole.getSupportRoles());
 
-        chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange");
+        chkAssignPortraitOnRoleChange = new CampaignOptionsCheckBox("AssignPortraitOnRoleChange",
+              getMetadata(new Version("0.43.05")));
         chkAssignPortraitOnRoleChange.addMouseListener(createTipPanelUpdater("AssignPortraitOnRoleChange"));
 
-        chkAllowDuplicatePortraits = new CampaignOptionsCheckBox("AllowDuplicatePortraits");
+        chkAllowDuplicatePortraits = new CampaignOptionsCheckBox("AllowDuplicatePortraits",
+              getMetadata(new Version("0.50.04")));
         chkAllowDuplicatePortraits.addMouseListener(createTipPanelUpdater("AllowDuplicatePortraits"));
 
         chkUseGenderedPortraitsOnly = new CampaignOptionsCheckBox("UseGenderedPortraitsOnly",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.10")));
         chkUseGenderedPortraitsOnly.addMouseListener(createTipPanelUpdater("UseGenderedPortraitsOnly"));
 
         chkNoRandomPortraitsForChildren = new CampaignOptionsCheckBox("NoRandomPortraitsForChildren",
-                getMetadata(new Version(0, 51, 0)));
+                getMetadata(new Version("0.51.00")));
         chkNoRandomPortraitsForChildren.addMouseListener(createTipPanelUpdater("NoRandomPortraitsForChildren"));
 
         chkRandomPortraitsForOfficersOnly = new CampaignOptionsCheckBox("RandomPortraitsForOfficersOnly",
-                getMetadata(new Version(0, 51, 1)));
+                getMetadata(new Version("0.51.01.8")));
         chkRandomPortraitsForOfficersOnly.addMouseListener(createTipPanelUpdater("RandomPortraitsForOfficersOnly"));
 
         chkChildPortraitsWhenComingOfAge = new CampaignOptionsCheckBox("ChildPortraitsWhenComingOfAge",
-                getMetadata(new Version(0, 51, 0)));
+                getMetadata(new Version("0.51.00")));
         chkChildPortraitsWhenComingOfAge.addMouseListener(createTipPanelUpdater("ChildPortraitsWhenComingOfAge"));
 
         chkUseOriginFactionForNames = new CampaignOptionsCheckBox("UseOriginFactionForNames");
