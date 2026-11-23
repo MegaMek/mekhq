@@ -34,6 +34,7 @@ package mekhq.campaign.unit.crewAssignment;
 
 import java.util.*;
 import java.util.function.Predicate;
+import java.util.function.ToIntBiFunction;
 import java.util.function.ToIntFunction;
 
 import jakarta.annotation.Nullable;
@@ -648,11 +649,62 @@ public class AssignmentPlan {
      * @since 0.51.01
      */
     public StageResult fillSeats(final List<Person> people, final List<Unit> units, final SeatType type) {
+        return fillSeats(people, units, type, (person, unit) -> 0);
+    }
+
+    /**
+     * Stages people into one kind of seat on the given units, as one step of history, seating each person on a unit
+     * they prefer first. Every pairing of a person and a unit with a preference above zero is tried, strongest
+     * preference first, then best person, then unit order; a person stays out of this pass once seated. Everyone left
+     * is then seated as {@link #fillSeats(List, List, SeatType)} does.
+     *
+     * @param people     the people, best first
+     * @param units      the units, in the order they should be filled
+     * @param type       the seat to fill
+     * @param preference how strongly a person should crew a unit; zero or less for no preference
+     *
+     * @return what was staged; nobody is reported left over, as nobody was promised a seat
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public StageResult fillSeats(final List<Person> people, final List<Unit> units, final SeatType type,
+          final ToIntBiFunction<Person, Unit> preference) {
         final List<Runnable> reverts = new ArrayList<>();
         final List<StagedAssignment> staged = new ArrayList<>();
+
+        record Match(Person person, int personRank, Unit unit, int unitRank, int strength) {}
+        final List<Match> matches = new ArrayList<>();
+        for (int personRank = 0; personRank < people.size(); personRank++) {
+            final Person person = people.get(personRank);
+            for (int unitRank = 0; unitRank < units.size(); unitRank++) {
+                final Unit unit = units.get(unitRank);
+                final int strength = preference.applyAsInt(person, unit);
+                if (strength > 0) {
+                    matches.add(new Match(person, personRank, unit, unitRank, strength));
+                }
+            }
+        }
+        matches.sort(Comparator.comparingInt(Match::strength).reversed()
+                           .thenComparingInt(Match::personRank)
+                           .thenComparingInt(Match::unitRank));
+        final Set<Person> placed = new HashSet<>();
+        for (Match match : matches) {
+            if (!placed.contains(match.person()) && canStage(match.person(), match.unit(), type)) {
+                final StagedAssignment change = put(match.person(), match.unit(), type, reverts);
+                if (change != null) {
+                    staged.add(change);
+                }
+                placed.add(match.person());
+            }
+        }
+
         for (Person person : people) {
             if (!hasOpenSeat(units, type)) {
                 break;
+            }
+            if (placed.contains(person)) {
+                continue;
             }
             for (Unit unit : units) {
                 if (canStage(person, unit, type)) {

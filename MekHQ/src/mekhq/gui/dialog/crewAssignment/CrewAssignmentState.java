@@ -32,11 +32,13 @@
  */
 package mekhq.gui.dialog.crewAssignment;
 
+import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.PriorityQueue;
 import java.util.Set;
 
 import jakarta.annotation.Nullable;
@@ -49,6 +51,7 @@ import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.SeatEligibility;
 import mekhq.campaign.unit.crewAssignment.SeatType;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.FamiliarityEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.SkillEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
@@ -616,6 +619,44 @@ final class CrewAssignmentState {
             best = Math.max(best, score);
         }
         return best;
+    }
+
+    /**
+     * Finds the chassis a person is most familiar with, keeping only the best {@code limit}, so a person familiar with
+     * a great many chassis costs no more to show than one familiar with a few.
+     *
+     * @param person a person
+     * @param limit  how many chassis to keep
+     *
+     * @return up to {@code limit} chassis the person has any familiarity with, most familiar first, then by chassis
+     *       name; and how many such chassis there are in all
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static FamiliarityEntry familiarChassis(Person person, int limit) {
+        Comparator<Map.Entry<String, Integer>> mostFamiliarFirst =
+              Map.Entry.<String, Integer>comparingByValue().reversed()
+                    .thenComparing(Map.Entry.<String, Integer>comparingByKey());
+        // Least familiar at the head, so the queue can drop it whenever it grows past the limit
+        PriorityQueue<Map.Entry<String, Integer>> best = new PriorityQueue<>(mostFamiliarFirst.reversed());
+        int count = 0;
+        for (Map.Entry<String, Integer> entry : person.getChassisFamiliarity().entrySet()) {
+            if (entry.getValue() <= 0) {
+                continue;
+            }
+            count++;
+            best.add(Map.entry(entry.getKey(), entry.getValue()));
+            if (best.size() > limit) {
+                best.poll();
+            }
+        }
+        if (count == 0) {
+            return FamiliarityEntry.NONE;
+        }
+        List<Map.Entry<String, Integer>> top = new ArrayList<>(best);
+        top.sort(mostFamiliarFirst);
+        return new FamiliarityEntry(List.copyOf(top), count);
     }
 
     /**

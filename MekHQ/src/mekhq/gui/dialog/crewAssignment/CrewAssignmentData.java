@@ -110,14 +110,35 @@ final class CrewAssignmentData {
     record SkillEntry(String name, int value, int level) {}
 
     /**
+     * The chassis a person is most familiar with. Only the few most familiar are kept, as a person can be familiar
+     * with any number of chassis.
+     *
+     * @param top   at most {@link #MAX_FAMILIAR_CHASSIS} chassis and the person's familiarity with each, most familiar
+     *              first
+     * @param count how many chassis the person has any familiarity with
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    record FamiliarityEntry(List<Map.Entry<String, Integer>> top, int count) {
+        static final FamiliarityEntry NONE = new FamiliarityEntry(List.of(), 0);
+    }
+
+    /** How many chassis a person row names when listing what the person is familiar with. */
+    static final int MAX_FAMILIAR_CHASSIS = 5;
+
+    /**
      * A person and what the dialog shows about them.
      *
-     * @param skills  the person's skills, by name
-     * @param hits    the person's hits, counting advanced medical injuries
-     * @param fatigue the person's effective fatigue, or {@code null} when the campaign does not use fatigue
+     * @param skills      the person's skills, by name
+     * @param hits        the person's hits, counting advanced medical injuries
+     * @param fatigue     the person's effective fatigue, or {@code null} when the campaign does not use fatigue
+     * @param familiarity the chassis the person is most familiar with; {@link FamiliarityEntry#NONE} while the
+     *                    campaign does not use chassis familiarity
      */
     record PersonEntry(Person person, SkillLevel skillLevel, List<AbilityEntry> abilities,
-          Map<String, SkillEntry> skills, int hits, @Nullable Integer fatigue, String searchText) {}
+          Map<String, SkillEntry> skills, int hits, @Nullable Integer fatigue, String searchText,
+          FamiliarityEntry familiarity) {}
 
     private final Map<UUID, UnitEntry> units = new LinkedHashMap<>();
     private final Map<UUID, PersonEntry> people = new LinkedHashMap<>();
@@ -163,7 +184,7 @@ final class CrewAssignmentData {
         levels.keySet().stream()
               .sorted(ranking)
               .forEach(person -> people.put(person.getId(), describe(campaign, person, levels.get(person),
-                    useFatigue)));
+                    useFatigue, familiarityMode.isEnabled())));
 
         List<UnitEntry> unitEntries = new ArrayList<>();
         for (Unit unit : location.selectUnits(campaign)) {
@@ -213,7 +234,8 @@ final class CrewAssignmentData {
         return person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat() || person.isTech();
     }
 
-    private static PersonEntry describe(Campaign campaign, Person person, SkillLevel level, boolean useFatigue) {
+    private static PersonEntry describe(Campaign campaign, Person person, SkillLevel level, boolean useFatigue,
+          boolean useFamiliarity) {
         List<AbilityEntry> abilities = new ArrayList<>();
         for (Enumeration<IOption> options = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES);
               options.hasMoreElements(); ) {
@@ -240,8 +262,11 @@ final class CrewAssignmentData {
             }
         }
         Integer fatigue = useFatigue ? Fatigue.getEffectiveFatigue(person, campaign) : null;
+        FamiliarityEntry familiarity = useFamiliarity ?
+                                             CrewAssignmentState.familiarChassis(person, MAX_FAMILIAR_CHASSIS) :
+                                             FamiliarityEntry.NONE;
         return new PersonEntry(person, level, List.copyOf(abilities), skills, person.getTotalInjurySeverity(),
-              fatigue, search.toString().toLowerCase(Locale.ROOT));
+              fatigue, search.toString().toLowerCase(Locale.ROOT), familiarity);
     }
 
     /**

@@ -56,7 +56,8 @@ class CrewAssignmentStateConditionTest {
     private static PersonEntry entry(int hits, boolean isPregnant) {
         Person person = mock(Person.class);
         when(person.isPregnant()).thenReturn(isPregnant);
-        return new PersonEntry(person, SkillLevel.REGULAR, List.of(), Map.of(), hits, null, "");
+        return new PersonEntry(person, SkillLevel.REGULAR, List.of(), Map.of(), hits, null, "",
+              CrewAssignmentData.FamiliarityEntry.NONE);
     }
 
     @Test

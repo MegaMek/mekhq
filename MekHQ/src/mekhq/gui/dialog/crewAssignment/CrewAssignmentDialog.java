@@ -241,7 +241,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             state.peopleQuery = text;
             refresh();
         }, new CrewRowRenderers.PersonRow(plan, this::isSelected, this::isTechsPage, () -> state.selectedUnit,
-                    () -> state.skill),
+                    () -> state.skill, state::familiarityChassis),
               PERSON_ROW_HEIGHT,
               this::onPersonRow);
         // A click on a Review row does nothing by itself; its links open the unit or person it names
@@ -1098,7 +1098,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             }
         } else if (state.targetSeat != null) {
             StageResult result = AutoFill.fill(data.plan(), shownUnitList(), state.targetSeat, candidates,
-                  data.ranking());
+                  data.ranking(), data.familiarityMode());
             reportStaged(result.staged().size(), result.leftOver().size());
         }
         refresh();
@@ -1371,7 +1371,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         board.resetCards();
         // The row renderers hold the plan they draw from, so they are given the new one
         peoplePage.setRenderer(new CrewRowRenderers.PersonRow(data.plan(), this::isSelected,
-              this::isTechsPage, () -> state.selectedUnit, () -> state.skill));
+              this::isTechsPage, () -> state.selectedUnit, () -> state.skill,
+              state::familiarityChassis));
         reviewPage.setRenderer(new CrewRowRenderers.ReviewRow(data.plan()));
         // Last, as clearing a search field refreshes the dialog, which must see the new plan
         board.setSearchText("");
