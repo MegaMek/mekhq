@@ -35,9 +35,7 @@ package mekhq.gui.campaignOptions;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -167,14 +165,7 @@ public class CampaignOptionsUtilities {
               settingsBadge(CampaignOptionFlag.DOCUMENTED),
               settingsBadge(CampaignOptionFlag.IMPORTANT),
               settingsBadge(CampaignOptionFlag.RECOMMENDED)));
-        entries.add(new SettingsBadge(
-              getTextAt(RESOURCE_BUNDLE, "badge.development.symbol").codePointAt(0),
-              Color.decode(getTextAt(RESOURCE_BUNDLE, "badge.development.color")),
-              getTextAt(RESOURCE_BUNDLE, "legend.development")));
-        entries.add(new SettingsBadge(
-              getTextAt(RESOURCE_BUNDLE, "badge.milestone.symbol").codePointAt(0),
-              Color.decode(getTextAt(RESOURCE_BUNDLE, "badge.milestone.color")),
-              getTextAt(RESOURCE_BUNDLE, "legend.milestone")));
+        entries.addAll(CampaignOptionsMetadata.addedSinceLegendEntries());
         return entries;
     }
 
@@ -325,11 +316,11 @@ public class CampaignOptionsUtilities {
      * The badges include:
      * <ul>
      *   <li>Special flag symbols (if any) - displayed first, uncolored</li>
-     *   <li>Added since badge - colored star indicating when the option was added</li>
+     *   <li>Added since badge - the version the option was added in</li>
      * </ul>
      *
      * <p>
-     * Development releases use a filled purple star (★), while milestone releases use a hollow green star (☆).
+     * The version is purple if the option was added after the last Core release, and blue otherwise.
      * </p>
      *
      * @param metadata the campaign option metadata, or null if no badges should be shown

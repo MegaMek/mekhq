@@ -32,15 +32,18 @@
  */
 package mekhq.gui.campaignOptions;
 
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.Color;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
-import java.util.MissingResourceException;
+import java.util.List;
 import java.util.Set;
 
 import jakarta.annotation.Nullable;
+import megamek.SuiteConstants;
 import megamek.Version;
 import megamek.client.ui.settings.SettingsBadge;
 
@@ -56,14 +59,14 @@ public record CampaignOptionsMetadata(
       Set<CampaignOptionFlag> flags
 ) {
     /**
-     * Indicates when a campaign option was added, displayed as a colored star badge.
+     * How a campaign option's version badge is colored, relative to the last Core release.
      */
     private enum AddedSinceBadge {
-        /** Added since the last development release - shown as a filled purple star (★) */
-        DEVELOPMENT("development"),
+        /** Added after the last Core release - the version is shown in purple. */
+        SINCE_LAST_CORE("sinceLastCore"),
 
-        /** Added since the last milestone release - shown as a hollow green star (☆) */
-        MILESTONE("milestone");
+        /** Added in the last Core release or earlier - the version is shown in blue. */
+        LAST_CORE_OR_EARLIER("lastCoreOrEarlier");
 
         private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignOptionsDialog";
 
@@ -74,30 +77,61 @@ public record CampaignOptionsMetadata(
         }
 
         /**
+         * Classifies an option's version against the last Core release.
+         *
+         * @param version  the version the option was added in
+         * @param lastCore the last Core release
+         *
+         * @return {@link #SINCE_LAST_CORE} if the option is newer than the last Core release, otherwise
+         *       {@link #LAST_CORE_OR_EARLIER}
+         */
+        static AddedSinceBadge of(Version version, Version lastCore) {
+            return version.isHigherThan(lastCore) ? SINCE_LAST_CORE : LAST_CORE_OR_EARLIER;
+        }
+
+        /**
          * Gets the color for this badge from the properties file.
          *
-         * @return the color hex code, or "#000000" if not found
+         * @return the color, or the label foreground if the color cannot be read
          */
-        String getColor() {
+        @Nullable Color getColor() {
             try {
-                return getTextAt(RESOURCE_BUNDLE, "badge." + key + ".color");
-            } catch (MissingResourceException e) {
-                return "#000000";
+                return Color.decode(getTextAt(RESOURCE_BUNDLE, "badge." + key + ".color"));
+            } catch (NumberFormatException e) {
+                return null;
             }
         }
 
         /**
-         * Gets the symbol for this badge from the properties file.
-         *
-         * @return the symbol, or "?" if not found
+         * @return the localized legend description for this badge
          */
-        String getSymbol() {
-            try {
-                return getTextAt(RESOURCE_BUNDLE, "badge." + key + ".symbol");
-            } catch (MissingResourceException e) {
-                return "?";
-            }
+        String getDescription() {
+            return getTextAt(RESOURCE_BUNDLE, "legend." + key);
         }
+
+        /**
+         * @param lastCore the last Core release
+         *
+         * @return the sample text shown for this badge in the legend, such as "&gt; 0.51.00"
+         */
+        String getLegendSample(Version lastCore) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "legend." + key + ".sample", lastCore.toString());
+        }
+    }
+
+    /**
+     * Builds the legend entries explaining the version badges, using the last Core release as the dividing line.
+     *
+     * @return the legend entries, newest first
+     */
+    static List<SettingsBadge> addedSinceLegendEntries() {
+        Version lastCore = SuiteConstants.LAST_MILESTONE;
+        List<SettingsBadge> entries = new ArrayList<>();
+        for (AddedSinceBadge badge : AddedSinceBadge.values()) {
+            entries.add(SettingsBadge.ofText(badge.getLegendSample(lastCore), badge.getColor(),
+                  badge.getDescription()));
+        }
+        return entries;
     }
 
     /**
@@ -124,56 +158,35 @@ public record CampaignOptionsMetadata(
     }
 
     /**
-     * Determines which badge to display based on the version.
-     * <p>
-     * - If the version equals the current running version: DEVELOPMENT badge (added since last development release)
-     * - If the version is after the last milestone: MILESTONE badge (added since last milestone release)
-     * - Otherwise: no badge (older feature)
+     * Gets the formatted HTML badge for the "added since" indicator, if present.
      *
-     * @return the appropriate badge type, or null if no version is set or feature is not recent
+     * @return the HTML-formatted, colored version number, or an empty string if no version is set
      */
-    private AddedSinceBadge getBadgeType() {
+    String getAddedSinceBadgeHtml() {
+        SettingsBadge badge = getAddedSinceSettingsBadge();
+        return badge == null ? "" : badge.toHtml();
+    }
+
+    /**
+     * @return this option's version as a colored text badge, or {@code null} when no version is set
+     */
+    @Nullable SettingsBadge getAddedSinceSettingsBadge() {
+        return getAddedSinceSettingsBadge(SuiteConstants.LAST_MILESTONE);
+    }
+
+    /**
+     * Builds this option's version badge: purple if the option was added after the given Core release, blue
+     * otherwise.
+     *
+     * @param lastCore the last Core release
+     *
+     * @return this option's version as a colored text badge, or {@code null} when no version is set
+     */
+    @Nullable SettingsBadge getAddedSinceSettingsBadge(Version lastCore) {
         if (version == null) {
             return null;
         }
-
-        // If this version equals the current running version → added since last development
-        if (version.equals(megamek.SuiteConstants.VERSION)) {
-            return AddedSinceBadge.DEVELOPMENT;
-        }
-
-        // If this version is after the last milestone → added since last milestone
-        if (version.compareTo(megamek.SuiteConstants.LAST_MILESTONE) > 0) {
-            return AddedSinceBadge.MILESTONE;
-        }
-
-        // Old feature, no badge
-        return null;
-    }
-
-    /**
-     * Gets the formatted HTML badge for the "added since" indicator, if present.
-     *
-     * @return an HTML-formatted colored star badge, or empty string if not recently added
-     */
-    String getAddedSinceBadgeHtml() {
-        AddedSinceBadge badge = getBadgeType();
-        if (badge == null) {
-            return "";
-        }
-        return String.format(" <font face=\"Material Symbols Rounded\" color=\"%s\">%s</font>",
-              badge.getColor(), badge.getSymbol());
-    }
-
-    /**
-     * @return the resolved generic settings badge for this option's version, or {@code null} when it is not recent
-     */
-    @Nullable SettingsBadge getAddedSinceSettingsBadge() {
-        AddedSinceBadge badge = getBadgeType();
-        if (badge == null) {
-            return null;
-        }
-        String description = getTextAt(AddedSinceBadge.RESOURCE_BUNDLE, "legend." + badge.key);
-        return new SettingsBadge(badge.getSymbol().codePointAt(0), Color.decode(badge.getColor()), description);
+        AddedSinceBadge badge = AddedSinceBadge.of(version, lastCore);
+        return SettingsBadge.ofText(version.toString(), badge.getColor(), badge.getDescription());
     }
 }
