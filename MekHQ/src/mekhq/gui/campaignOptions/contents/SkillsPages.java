@@ -413,10 +413,10 @@ public class SkillsPages {
      * @return a {@link JPanel} containing the Edge and Attribute cost controls.
      */
     private @Nonnull JPanel createEdgeCostPanel() {
-        JLabel lblEdgeCost = new CampaignOptionsLabel("EdgeCost");
+        JLabel lblEdgeCost = new CampaignOptionsLabel("EdgeCost", getMetadata(new Version("0.43.05")));
         spnEdgeCost = new CampaignOptionsSpinner("EdgeCost", 100, 0, 500, 1);
 
-        JLabel lblAttributeCost = new CampaignOptionsLabel("AttributeCost", getMetadata(new Version(0, 51, 0)));
+        JLabel lblAttributeCost = new CampaignOptionsLabel("AttributeCost", getMetadata(new Version("0.50.10")));
         spnAttributeCost = new CampaignOptionsSpinner("AttributeCost", 100, 0, 500, 1);
 
         // Borderless content panel with both cost controls side by side

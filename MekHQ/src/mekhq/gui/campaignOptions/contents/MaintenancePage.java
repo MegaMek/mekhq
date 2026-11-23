@@ -136,7 +136,7 @@ class MaintenancePage {
         spnMaintenanceBonus.addMouseListener(createTipPanelUpdater("MaintenanceBonus"));
 
         lblDefaultMaintenanceTime = new CampaignOptionsLabel("DefaultMaintenanceTime",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(new Version("0.50.01"), CampaignOptionFlag.RECOMMENDED));
         lblDefaultMaintenanceTime.addMouseListener(createTipPanelUpdater("DefaultMaintenanceTime"));
         spnDefaultMaintenanceTime = new CampaignOptionsSpinner("DefaultMaintenanceTime",
                 1, 1, 4, 1);
@@ -152,22 +152,23 @@ class MaintenancePage {
         reverseQualityNames.addMouseListener(createTipPanelUpdater("ReverseQualityNames"));
 
         chkUseRandomUnitQualities = new CampaignOptionsCheckBox("UseRandomUnitQualities",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(new Version("0.49.20"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseRandomUnitQualities.addMouseListener(createTipPanelUpdater("UseRandomUnitQualities"));
 
-        chkUsePlanetaryModifiers = new CampaignOptionsCheckBox("UsePlanetaryModifiers");
+        chkUsePlanetaryModifiers = new CampaignOptionsCheckBox("UsePlanetaryModifiers",
+              getMetadata(new Version("0.50.00")));
         chkUsePlanetaryModifiers.addMouseListener(createTipPanelUpdater("UsePlanetaryModifiers"));
 
         useUnofficialMaintenance = new CampaignOptionsCheckBox("UseUnofficialMaintenance",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+                getMetadata(new Version("0.45.04"), CampaignOptionFlag.CUSTOM_SYSTEM,
                         CampaignOptionFlag.IMPORTANT));
         useUnofficialMaintenance.addMouseListener(createTipPanelUpdater("UseUnofficialMaintenance"));
 
-        logMaintenance = new CampaignOptionsCheckBox("LogMaintenance");
+        logMaintenance = new CampaignOptionsCheckBox("LogMaintenance", getMetadata(new Version("0.47.06")));
         logMaintenance.addMouseListener(createTipPanelUpdater("LogMaintenance"));
 
         chkTechsMaintainConventionalInfantry = new CampaignOptionsCheckBox("TechsMaintainConventionalInfantry",
-                getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.IMPORTANT));
         chkTechsMaintainConventionalInfantry.addMouseListener(
                 createTipPanelUpdater("TechsMaintainConventionalInfantry"));
 
@@ -188,7 +189,7 @@ class MaintenancePage {
                 .section("lblMaintenanceSituationPanel.text",
                         "lblMaintenanceSituationPanel.summary",
                         situationPanel,
-                        getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM))
+                        getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM))
                 .section("lblMaintenanceQualityPanel.text",
                         "lblMaintenanceQualityPanel.summary",
                         qualityPanel,
@@ -221,17 +222,21 @@ class MaintenancePage {
      * @since 0.51.01
      */
     private @Nonnull JPanel createMaintenanceSituationPanel() {
-        chkMaintenanceOnContract = new CampaignOptionsCheckBox("MaintenanceOnContract", getMetadata(new Version(0, 51, 1)));
+        chkMaintenanceOnContract = new CampaignOptionsCheckBox("MaintenanceOnContract",
+              getMetadata(new Version("0.51.01.1")));
         chkMaintenanceOnContract.addMouseListener(createTipPanelUpdater("MaintenanceOnContract"));
 
-        chkMaintenanceOffContract = new CampaignOptionsCheckBox("MaintenanceOffContract", getMetadata(new Version(0, 51, 1)));
+        chkMaintenanceOffContract = new CampaignOptionsCheckBox("MaintenanceOffContract",
+              getMetadata(new Version("0.51.01.1")));
         chkMaintenanceOffContract.addMouseListener(createTipPanelUpdater("MaintenanceOffContract"));
 
-        chkMaintenanceInTransit = new CampaignOptionsCheckBox("MaintenanceInTransit", getMetadata(new Version(0, 51, 1)));
+        chkMaintenanceInTransit = new CampaignOptionsCheckBox("MaintenanceInTransit",
+              getMetadata(new Version("0.51.01.1")));
         chkMaintenanceInTransit.addMouseListener(createTipPanelUpdater("MaintenanceInTransit"));
 
         lblCombatContractMaintenanceCostMultiplier =
-                new CampaignOptionsLabel("CombatContractMaintenanceCostMultiplier", getMetadata(new Version(0, 51, 1)));
+                new CampaignOptionsLabel("CombatContractMaintenanceCostMultiplier",
+                      getMetadata(new Version("0.51.01.1")));
         lblCombatContractMaintenanceCostMultiplier.addMouseListener(
                 createTipPanelUpdater("CombatContractMaintenanceCostMultiplier"));
         spnCombatContractMaintenanceCostMultiplier = new CampaignOptionsSpinner(
@@ -239,7 +244,8 @@ class MaintenancePage {
         spnCombatContractMaintenanceCostMultiplier.addMouseListener(
                 createTipPanelUpdater("CombatContractMaintenanceCostMultiplier"));
 
-        lblInTransitMaintenanceCostMultiplier = new CampaignOptionsLabel("InTransitMaintenanceCostMultiplier", getMetadata(new Version(0, 51, 1)));
+        lblInTransitMaintenanceCostMultiplier = new CampaignOptionsLabel("InTransitMaintenanceCostMultiplier",
+              getMetadata(new Version("0.51.01.1")));
         lblInTransitMaintenanceCostMultiplier.addMouseListener(
                 createTipPanelUpdater("InTransitMaintenanceCostMultiplier"));
         spnInTransitMaintenanceCostMultiplier = new CampaignOptionsSpinner("InTransitMaintenanceCostMultiplier",
@@ -282,7 +288,7 @@ class MaintenancePage {
      */
     private @Nonnull JPanel createInterstellarTravelPanel() {
         lblLithiumFusionBatteryMode = new CampaignOptionsLabel("LithiumFusionBatteryMode",
-                getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM));
         lblLithiumFusionBatteryMode.addMouseListener(createTipPanelUpdater("LithiumFusionBatteryMode"));
         comboLithiumFusionBatteryMode = new MMComboBox<>("comboLithiumFusionBatteryMode",
                 LithiumFusionBatteryMode.values());

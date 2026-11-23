@@ -34,7 +34,6 @@ package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -311,47 +310,48 @@ class StratConPage {
 
         // Content
         lblStratConPlayType = new CampaignOptionsLabel("StratConPlayType",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED));
+              getMetadata(new Version("0.50.10"), CampaignOptionFlag.DOCUMENTED));
         lblStratConPlayType.addMouseListener(createTipPanelUpdater("StratConPlayType"));
         comboStratConPlayType.addMouseListener(createTipPanelUpdater("StratConPlayType"));
         chkUseAdvancedScouting = new CampaignOptionsCheckBox("UseAdvancedScouting",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.50.07"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseAdvancedScouting.addMouseListener(createTipPanelUpdater("UseAdvancedScouting"));
         chkEssentialScenariosOnly = new CampaignOptionsCheckBox("EssentialScenariosOnly",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkEssentialScenariosOnly.addMouseListener(createTipPanelUpdater("EssentialScenariosOnly"));
         chkContractsUseSpecialMechanics = new CampaignOptionsCheckBox("ContractsUseSpecialMechanics",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkContractsUseSpecialMechanics.addMouseListener(createTipPanelUpdater("ContractsUseSpecialMechanics"));
         chkUseEmployerLostPlanetReactions = new CampaignOptionsCheckBox("UseEmployerLostPlanetReactions",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseEmployerLostPlanetReactions.addMouseListener(createTipPanelUpdater("UseEmployerLostPlanetReactions"));
         chkUseFacilityOperations = new CampaignOptionsCheckBox("UseFacilityOperations",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseFacilityOperations.addMouseListener(createTipPanelUpdater("UseFacilityOperations"));
         chkUseSupplyLines = new CampaignOptionsCheckBox("UseSupplyLines",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseSupplyLines.addMouseListener(createTipPanelUpdater("UseSupplyLines"));
         chkNoSeedForces = new CampaignOptionsCheckBox("NoSeedForces",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         chkNoSeedForces.addMouseListener(createTipPanelUpdater("NoSeedForces"));
-        chkUseGenericBattleValue = new CampaignOptionsCheckBox("UseGenericBattleValue");
+        chkUseGenericBattleValue = new CampaignOptionsCheckBox("UseGenericBattleValue",
+              getMetadata(new Version("0.50.01")));
         chkUseGenericBattleValue.addMouseListener(createTipPanelUpdater("UseGenericBattleValue"));
-        chkUseVerboseBidding = new CampaignOptionsCheckBox("UseVerboseBidding");
+        chkUseVerboseBidding = new CampaignOptionsCheckBox("UseVerboseBidding", getMetadata(new Version("0.50.01")));
         chkUseVerboseBidding.addMouseListener(createTipPanelUpdater("UseVerboseBidding"));
         lblStratConSectorCountMethod = new CampaignOptionsLabel("StratConSectorCountMethod",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         lblStratConSectorCountMethod.addMouseListener(createTipPanelUpdater("StratConSectorCountMethod"));
         comboStratConSectorCountMethod.addMouseListener(createTipPanelUpdater("StratConSectorCountMethod"));
         chkUseStratConAlternateSectorTerrain = new CampaignOptionsCheckBox("UseStratConAlternateSectorTerrain",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkUseStratConAlternateSectorTerrain.addMouseListener(createTipPanelUpdater("UseStratConAlternateSectorTerrain"));
         lblStratConSectorSizeMultiplier = new CampaignOptionsLabel("StratConSectorSizeMultiplier",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         spnStratConSectorSizeMultiplier = new CampaignOptionsSpinner("StratConSectorSizeMultiplier", 1.0, 0.25, 2.0,
               0.1);
         lblFacilityDensity = new CampaignOptionsLabel("FacilityDensity",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM));
         lblFacilityDensity.addMouseListener(createTipPanelUpdater("FacilityDensity"));
         spnFacilityDensity = new CampaignOptionsSpinner("FacilityDensity", 1.0, 0.5, 2.0, 0.1);
         spnFacilityDensity.addMouseListener(createTipPanelUpdater("FacilityDensity"));
@@ -382,7 +382,7 @@ class StratConPage {
                              .section("lblUniversalMoralePanel.text",
                                    "lblUniversalMoralePanel.summary",
                                    moralePanel,
-                                   getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                                   getMetadata(new Version("0.50.10"), CampaignOptionFlag.CUSTOM_SYSTEM))
                              .section("lblAutoResolvePanel.text",
                                    "lblAutoResolvePanel.summary",
                                    autoResolvePanel,
@@ -409,53 +409,62 @@ class StratConPage {
         // General
         lblSkillLevel = new CampaignOptionsLabel("SkillLevel");
         lblBoardScalingType = new CampaignOptionsLabel("BoardScalingType",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.11")));
 
         // CallSigns
-        chkAutoGenerateOpForCallSigns = new CampaignOptionsCheckBox("AutoGenerateOpForCallSigns");
-        lblMinimumCallsignSkillLevel = new CampaignOptionsLabel("MinimumCallsignSkillLevel");
+        chkAutoGenerateOpForCallSigns = new CampaignOptionsCheckBox("AutoGenerateOpForCallSigns",
+              getMetadata(new Version("0.50.07")));
+        lblMinimumCallsignSkillLevel = new CampaignOptionsLabel("MinimumCallsignSkillLevel",
+              getMetadata(new Version("0.50.07")));
         comboMinimumCallsignSkillLevel = new MMComboBox<>("comboMinimumCallsignSkillLevel", getSkillLevelOptions());
 
         // OpFor Generation
-        lblOpForLanceTypeMeks = new CampaignOptionsLabel("OpForLanceTypeMeks");
+        lblOpForLanceTypeMeks = new CampaignOptionsLabel("OpForLanceTypeMeks", getMetadata(new Version("0.50.01")));
         spnOpForLanceTypeMeks = new CampaignOptionsSpinner("OpForLanceTypeMeks", 0, 0, 10, 1);
-        lblOpForLanceTypeMixed = new CampaignOptionsLabel("OpForLanceTypeMixed");
+        lblOpForLanceTypeMixed = new CampaignOptionsLabel("OpForLanceTypeMixed", getMetadata(new Version("0.49.12")));
         spnOpForLanceTypeMixed = new CampaignOptionsSpinner("OpForLanceTypeMixed", 0, 0, 10, 1);
-        lblOpForLanceTypeVehicle = new CampaignOptionsLabel("OpForLanceTypeVehicle");
+        lblOpForLanceTypeVehicle = new CampaignOptionsLabel("OpForLanceTypeVehicle",
+              getMetadata(new Version("0.49.12")));
         spnOpForLanceTypeVehicles = new CampaignOptionsSpinner("OpForLanceTypeVehicle", 0, 0, 10, 1);
 
         chkUseDropShips = new CampaignOptionsCheckBox("UseDropShips");
         chkRestrictScenariosToFleetCapability = new CampaignOptionsCheckBox("RestrictScenariosToFleetCapability",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkRestrictScenariosToFleetCapability.addMouseListener(
               createTipPanelUpdater("RestrictScenariosToFleetCapability"));
-        chkRegionalMekVariations = new CampaignOptionsCheckBox("RegionalMekVariations");
-        chkAttachedPlayerCamouflage = new CampaignOptionsCheckBox("AttachedPlayerCamouflage");
-        chkPlayerControlsAttachedUnits = new CampaignOptionsCheckBox("PlayerControlsAttachedUnits");
+        chkRegionalMekVariations = new CampaignOptionsCheckBox("RegionalMekVariations",
+              getMetadata(new Version("0.50.01")));
+        chkAttachedPlayerCamouflage = new CampaignOptionsCheckBox("AttachedPlayerCamouflage",
+              getMetadata(new Version("0.47.07")));
+        chkPlayerControlsAttachedUnits = new CampaignOptionsCheckBox("PlayerControlsAttachedUnits",
+              getMetadata(new Version("0.47.10")));
         chkUseAdvancedBuildingGunEmplacements = new CampaignOptionsCheckBox("UseAdvancedBuildingGunEmplacements",
-              getMetadata(new Version(0, 50, 12)));
-        lblSPAUpgradeIntensity = new CampaignOptionsLabel("SPAUpgradeIntensity");
+              getMetadata(new Version("0.50.12")));
+        lblSPAUpgradeIntensity = new CampaignOptionsLabel("SPAUpgradeIntensity", getMetadata(new Version("0.49.08")));
         spnSPAUpgradeIntensity = new CampaignOptionsSpinner("SPAUpgradeIntensity", 0, -1, 3, 1);
         lblReinforcementBaseTargetNumber = new CampaignOptionsLabel("ReinforcementBaseTargetNumber",
-              getMetadata(new Version(0, 51, 0)));
+              getMetadata(new Version("0.51.00")));
         spnReinforcementBaseTargetNumber = new CampaignOptionsSpinner("ReinforcementBaseTargetNumber",
               7, -10, 10, 1);
         chkAutoConfigMunitions = new CampaignOptionsCheckBox("AutoConfigMunitions",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA,
+              getMetadata(new Version("0.50.01"),
                     CampaignOptionFlag.CUSTOM_SYSTEM,
                     CampaignOptionFlag.DOCUMENTED));
 
         // Scenario Modifiers
-        chkClansObeyBiddingRules = new CampaignOptionsCheckBox("ClansObeyBiddingRules");
-        lblEnemyFacilityModifierDieSize = new CampaignOptionsLabel("EnemyFacilityModifierDieSize");
+        chkClansObeyBiddingRules = new CampaignOptionsCheckBox("ClansObeyBiddingRules",
+              getMetadata(new Version("0.51.00")));
+        lblEnemyFacilityModifierDieSize = new CampaignOptionsLabel("EnemyFacilityModifierDieSize",
+              getMetadata(new Version("0.51.00")));
         spnEnemyFacilityModifierDieSize = new CampaignOptionsSpinner("EnemyFacilityModifierDieSize", 2, 0, 10, 1);
-        lblAlliedFacilityModifierDieSize = new CampaignOptionsLabel("AlliedFacilityModifierDieSize");
+        lblAlliedFacilityModifierDieSize = new CampaignOptionsLabel("AlliedFacilityModifierDieSize",
+              getMetadata(new Version("0.51.00")));
         spnAlliedFacilityModifierDieSize = new CampaignOptionsSpinner("AlliedFacilityModifierDieSize", 2, 0, 10, 1);
-        lblScenarioModMax = new CampaignOptionsLabel("ScenarioModMax", getMetadata(new Version(0, 51, 0)));
+        lblScenarioModMax = new CampaignOptionsLabel("ScenarioModMax", getMetadata(new Version("0.49.20")));
         spnScenarioModMax = new CampaignOptionsSpinner("ScenarioModMax", 3, 0, 10, 1);
-        lblScenarioModChance = new CampaignOptionsLabel("ScenarioModChance", getMetadata(new Version(0, 51, 0)));
+        lblScenarioModChance = new CampaignOptionsLabel("ScenarioModChance", getMetadata(new Version("0.49.20")));
         spnScenarioModChance = new CampaignOptionsSpinner("ScenarioModChance", 25, 5, 100, 5);
-        lblScenarioModBV = new CampaignOptionsLabel("ScenarioModBV");
+        lblScenarioModBV = new CampaignOptionsLabel("ScenarioModBV", getMetadata(new Version("0.49.20")));
         spnScenarioModBV = new CampaignOptionsSpinner("ScenarioModBV", 50, 5, 100, 5);
 
         // Map Generation
@@ -463,8 +472,8 @@ class StratConPage {
         chkUseLightConditions = new CampaignOptionsCheckBox("UseLightConditions");
         chkUsePlanetaryConditions = new CampaignOptionsCheckBox("UsePlanetaryConditions");
         chkUseNoTornadoes = new CampaignOptionsCheckBox("UseNoTornadoes",
-              getMetadata(MILESTONE_BEFORE_METADATA));
-        lblFixedMapChance = new CampaignOptionsLabel("FixedMapChance");
+              getMetadata(new Version("0.50.10")));
+        lblFixedMapChance = new CampaignOptionsLabel("FixedMapChance", getMetadata(new Version("0.49.03")));
         spnFixedMapChance = new CampaignOptionsSpinner("FixedMapChance", 0, 0, 100, 1);
 
         // Parts
@@ -472,37 +481,37 @@ class StratConPage {
 
         // Morale
         lblMoraleDecisiveVictory = new CampaignOptionsLabel("MoraleDecisiveVictory",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         spnMoraleDecisiveVictory = new CampaignOptionsSpinner("MoraleDecisiveVictory",
               3, 1, 10, 1,
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         lblMoraleVictory = new CampaignOptionsLabel("MoraleVictory",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         spnMoraleVictory = new CampaignOptionsSpinner("MoraleVictory",
               2, 1, 10, 1,
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         lblMoraleDefeat = new CampaignOptionsLabel("MoraleDefeat",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         spnMoraleDefeat = new CampaignOptionsSpinner("MoraleDefeat",
               -2, -10, -1, 1,
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         lblMoraleDecisiveDefeat = new CampaignOptionsLabel("MoraleDecisiveDefeat",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         spnMoraleDecisiveDefeat = new CampaignOptionsSpinner("MoraleDecisiveDefeat",
               -3, -10, -1, 1,
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
 
         // Auto Resolve
         lblAutoResolveMethod = new CampaignOptionsLabel("AutoResolveMethod",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(new Version("0.50.02"), CampaignOptionFlag.IMPORTANT));
         lblAutoResolveNumberOfScenarios = new CampaignOptionsLabel("AutoResolveNumberOfScenarios",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(new Version("0.50.02"), CampaignOptionFlag.IMPORTANT));
         spnAutoResolveNumberOfScenarios = new CampaignOptionsSpinner("AutoResolveNumberOfScenarios",
               250, 10, 1000, 10);
         chkAutoResolveVictoryChanceEnabled = new CampaignOptionsCheckBox("AutoResolveVictoryChanceEnabled",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(new Version("0.50.02"), CampaignOptionFlag.IMPORTANT));
         chkAutoResolveExperimentalPacarGuiEnabled = new CampaignOptionsCheckBox(
-              "AutoResolveExperimentalPacarGuiEnabled");
+              "AutoResolveExperimentalPacarGuiEnabled", getMetadata(new Version("0.50.03")));
     }
 
     /**

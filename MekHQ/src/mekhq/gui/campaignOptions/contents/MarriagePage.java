@@ -35,6 +35,7 @@ package mekhq.gui.campaignOptions.contents;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
@@ -46,6 +47,7 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.personnel.enums.RandomMarriageMethod;
@@ -135,20 +137,24 @@ class MarriagePage {
      */
     private @Nonnull JPanel createMarriageGeneralOptionsPanel() {
         // Contents
-        chkUseManualMarriages = new CampaignOptionsCheckBox("UseManualMarriages");
+        chkUseManualMarriages = new CampaignOptionsCheckBox("UseManualMarriages", getMetadata(new Version("0.47.10")));
         chkUseManualMarriages.addMouseListener(createTipPanelUpdater("UseManualMarriages"));
-        chkUseClanPersonnelMarriages = new CampaignOptionsCheckBox("UseClanPersonnelMarriages");
+        chkUseClanPersonnelMarriages = new CampaignOptionsCheckBox("UseClanPersonnelMarriages",
+              getMetadata(new Version("0.49.12")));
         chkUseClanPersonnelMarriages.addMouseListener(createTipPanelUpdater("UseClanPersonnelMarriages"));
-        chkUsePrisonerMarriages = new CampaignOptionsCheckBox("UsePrisonerMarriages");
+        chkUsePrisonerMarriages = new CampaignOptionsCheckBox("UsePrisonerMarriages",
+              getMetadata(new Version("0.49.06")));
         chkUsePrisonerMarriages.addMouseListener(createTipPanelUpdater("UsePrisonerMarriages"));
 
-        lblCheckMutualAncestorsDepth = new CampaignOptionsLabel("CheckMutualAncestorsDepth");
+        lblCheckMutualAncestorsDepth = new CampaignOptionsLabel("CheckMutualAncestorsDepth",
+              getMetadata(new Version("0.47.05")));
         lblCheckMutualAncestorsDepth.addMouseListener(createTipPanelUpdater("CheckMutualAncestorsDepth"));
         spnCheckMutualAncestorsDepth = new CampaignOptionsSpinner("CheckMutualAncestorsDepth",
                 4, 0, 20, 1);
         spnCheckMutualAncestorsDepth.addMouseListener(createTipPanelUpdater("CheckMutualAncestorsDepth"));
 
-        chkLogMarriageNameChanges = new CampaignOptionsCheckBox("LogMarriageNameChanges");
+        chkLogMarriageNameChanges = new CampaignOptionsCheckBox("LogMarriageNameChanges",
+              getMetadata(new Version("0.49.06")));
         chkLogMarriageNameChanges.addMouseListener(createTipPanelUpdater("LogMarriageNameChanges"));
 
         // Layout the Panel
@@ -174,7 +180,7 @@ class MarriagePage {
      */
     private @Nonnull JPanel createRandomMarriagePanel() {
         // Contents
-        lblRandomMarriageMethod = new CampaignOptionsLabel("RandomMarriageMethod");
+        lblRandomMarriageMethod = new CampaignOptionsLabel("RandomMarriageMethod", getMetadata(new Version("0.49.06")));
         lblRandomMarriageMethod.addMouseListener(createTipPanelUpdater("RandomMarriageMethod"));
         comboRandomMarriageMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -190,24 +196,29 @@ class MarriagePage {
         });
         comboRandomMarriageMethod.addMouseListener(createTipPanelUpdater("RandomMarriageMethod"));
 
-        chkUseRandomClanPersonnelMarriages = new CampaignOptionsCheckBox("UseRandomClanPersonnelMarriages");
+        chkUseRandomClanPersonnelMarriages = new CampaignOptionsCheckBox("UseRandomClanPersonnelMarriages",
+              getMetadata(new Version("0.49.12")));
         chkUseRandomClanPersonnelMarriages.addMouseListener(createTipPanelUpdater("UseRandomClanPersonnelMarriages"));
-        chkUseRandomPrisonerMarriages = new CampaignOptionsCheckBox("UseRandomPrisonerMarriages");
+        chkUseRandomPrisonerMarriages = new CampaignOptionsCheckBox("UseRandomPrisonerMarriages",
+              getMetadata(new Version("0.49.06")));
         chkUseRandomPrisonerMarriages.addMouseListener(createTipPanelUpdater("UseRandomPrisonerMarriages"));
 
-        lblRandomMarriageAgeRange = new CampaignOptionsLabel("RandomMarriageAgeRange");
+        lblRandomMarriageAgeRange = new CampaignOptionsLabel("RandomMarriageAgeRange",
+              getMetadata(new Version("0.49.06")));
         lblRandomMarriageAgeRange.addMouseListener(createTipPanelUpdater("RandomMarriageAgeRange"));
         spnRandomMarriageAgeRange = new CampaignOptionsSpinner("RandomMarriageAgeRange",
                 10, 0, 100, 1);
         spnRandomMarriageAgeRange.addMouseListener(createTipPanelUpdater("RandomMarriageAgeRange"));
 
-        lblRandomMarriageDiceSize = new CampaignOptionsLabel("RandomMarriageDiceSize");
+        lblRandomMarriageDiceSize = new CampaignOptionsLabel("RandomMarriageDiceSize",
+              getMetadata(new Version("0.50.01")));
         lblRandomMarriageDiceSize.addMouseListener(createTipPanelUpdater("RandomMarriageDiceSize"));
         spnRandomMarriageDiceSize = new CampaignOptionsSpinner("RandomMarriageDiceSize",
                 5000, 0, 100000, 1);
         spnRandomMarriageDiceSize.addMouseListener(createTipPanelUpdater("RandomMarriageDiceSize"));
 
-        lblRandomNewDependentMarriage = new CampaignOptionsLabel("RandomNewDependentMarriage");
+        lblRandomNewDependentMarriage = new CampaignOptionsLabel("RandomNewDependentMarriage",
+              getMetadata(new Version("0.50.01")));
         lblRandomNewDependentMarriage.addMouseListener(createTipPanelUpdater("RandomNewDependentMarriage"));
         spnRandomNewDependentMarriage = new CampaignOptionsSpinner("RandomNewDependentMarriage",
                 20, 0, 100000, 1);

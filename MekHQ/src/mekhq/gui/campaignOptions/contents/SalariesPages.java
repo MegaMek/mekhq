@@ -61,6 +61,7 @@ import javax.swing.table.TableRowSorter;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.settings.SettingsFormPanel;
 import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import megamek.client.ui.util.UIUtil;
@@ -189,7 +190,7 @@ public class SalariesPages {
 
         if (type == PersonnelRoleSubType.COMBAT) {
             chkDisableSecondaryRoleSalary = new CampaignOptionsCheckBox("DisableSecondaryRoleSalary",
-                getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(new Version("0.49.20"), CampaignOptionFlag.CUSTOM_SYSTEM));
             chkDisableSecondaryRoleSalary.addMouseListener(createTipPanelUpdater("DisableSecondaryRoleSalary"));
 
             builder.section("lblSalaryRulesPanel.text", "lblSalaryRulesPanel.summary", createSalaryRulesPanel())
@@ -257,7 +258,8 @@ public class SalariesPages {
         spnAntiMekSalary = new CampaignOptionsSpinner("AntiMekSalary", 0, 0, 100, 0.01);
         spnAntiMekSalary.addMouseListener(createTipPanelUpdater("AntiMekSalary"));
 
-        lblSpecialistInfantrySalary = new CampaignOptionsLabel("SpecialistInfantrySalary");
+        lblSpecialistInfantrySalary = new CampaignOptionsLabel("SpecialistInfantrySalary",
+              getMetadata(new Version("0.49.04")));
         lblSpecialistInfantrySalary.addMouseListener(createTipPanelUpdater("SpecialistInfantrySalary"));
         spnSpecialistInfantrySalary = new CampaignOptionsSpinner("SpecialistInfantrySalary", 0, 0, 100, 0.01);
         spnSpecialistInfantrySalary.addMouseListener(createTipPanelUpdater("SpecialistInfantrySalary"));

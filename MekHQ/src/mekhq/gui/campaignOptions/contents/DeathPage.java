@@ -33,7 +33,6 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -47,6 +46,7 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
@@ -95,12 +95,13 @@ class DeathPage {
 
         // Contents
         lblRandomDeathMultiplier = new CampaignOptionsLabel("RandomDeathMultiplier",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.04"), CampaignOptionFlag.DOCUMENTED, CampaignOptionFlag.IMPORTANT));
         lblRandomDeathMultiplier.addMouseListener(createTipPanelUpdater("RandomDeathMultiplier"));
         spnRandomDeathMultiplier = new CampaignOptionsSpinner("RandomDeathMultiplier", 1.0, 0, 100.0, 0.01);
         spnRandomDeathMultiplier.addMouseListener(createTipPanelUpdater("RandomDeathMultiplier"));
 
-        chkUseRandomDeathSuicideCause = new CampaignOptionsCheckBox("UseRandomDeathSuicideCause");
+        chkUseRandomDeathSuicideCause = new CampaignOptionsCheckBox("UseRandomDeathSuicideCause",
+              getMetadata(new Version("0.49.08")));
         chkUseRandomDeathSuicideCause.addMouseListener(createTipPanelUpdater("UseRandomDeathSuicideCause"));
 
         JPanel deathOptionsPanel = createDeathOptionsPanel();

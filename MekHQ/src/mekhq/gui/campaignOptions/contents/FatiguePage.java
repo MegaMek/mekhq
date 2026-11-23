@@ -32,7 +32,6 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -44,9 +43,10 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -98,31 +98,32 @@ class FatiguePage {
         CampaignOptionsHeaderPanel fatigueHeader = new CampaignOptionsHeaderPanel("FatiguePage", imageAddress);
 
         // Contents
-        chkUseFatigue = new CampaignOptionsCheckBox("UseFatigue");
+        chkUseFatigue = new CampaignOptionsCheckBox("UseFatigue", getMetadata(new Version("0.49.20")));
         chkUseFatigue.addMouseListener(createTipPanelUpdater("UseFatigue"));
 
         lblFatigueRate = new CampaignOptionsLabel("FatigueRate",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.49.20"), CampaignOptionFlag.IMPORTANT));
         lblFatigueRate.addMouseListener(createTipPanelUpdater("FatigueRate"));
         spnFatigueRate = new CampaignOptionsSpinner("FatigueRate",
                 1, 1, 10, 1);
         spnFatigueRate.addMouseListener(createTipPanelUpdater("FatigueRate"));
 
         chkUseInjuryFatigue = new CampaignOptionsCheckBox("UseInjuryFatigue",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(new Version("0.49.20"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseInjuryFatigue.addMouseListener(createTipPanelUpdater("UseInjuryFatigue"));
 
-        lblFieldKitchenCapacity = new CampaignOptionsLabel("FieldKitchenCapacity");
+        lblFieldKitchenCapacity = new CampaignOptionsLabel("FieldKitchenCapacity", getMetadata(new Version("0.49.20")));
         lblFieldKitchenCapacity.addMouseListener(createTipPanelUpdater("FieldKitchenCapacity"));
         spnFieldKitchenCapacity = new CampaignOptionsSpinner("FieldKitchenCapacity",
                 150, 0, 450, 1);
         spnFieldKitchenCapacity.addMouseListener(createTipPanelUpdater("FieldKitchenCapacity"));
 
-        chkFieldKitchenIgnoreNonCombatants = new CampaignOptionsCheckBox("FieldKitchenIgnoreNonCombatants");
+        chkFieldKitchenIgnoreNonCombatants = new CampaignOptionsCheckBox("FieldKitchenIgnoreNonCombatants",
+              getMetadata(new Version("0.50.00")));
         chkFieldKitchenIgnoreNonCombatants.addMouseListener(createTipPanelUpdater("FieldKitchenIgnoreNonCombatants"));
 
         lblFatigueUndeploymentThreshold = new CampaignOptionsLabel("FatigueUndeploymentThreshold",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+                getMetadata(new Version("0.50.10"), CampaignOptionFlag.CUSTOM_SYSTEM,
                         CampaignOptionFlag.IMPORTANT));
         lblFatigueUndeploymentThreshold.addMouseListener(createTipPanelUpdater("FatigueUndeploymentThreshold"));
         spnFatigueUndeploymentThreshold = new CampaignOptionsSpinner("FatigueUndeploymentThreshold",
@@ -130,7 +131,7 @@ class FatiguePage {
         spnFatigueUndeploymentThreshold.addMouseListener(createTipPanelUpdater("FatigueUndeploymentThreshold"));
 
         lblFatigueLeaveThreshold = new CampaignOptionsLabel("FatigueLeaveThreshold",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+                getMetadata(new Version("0.49.20"), CampaignOptionFlag.CUSTOM_SYSTEM,
                         CampaignOptionFlag.IMPORTANT));
         lblFatigueLeaveThreshold.addMouseListener(createTipPanelUpdater("FatigueLeaveThreshold"));
         spnFatigueLeaveThreshold = new CampaignOptionsSpinner("FatigueLeaveThreshold",

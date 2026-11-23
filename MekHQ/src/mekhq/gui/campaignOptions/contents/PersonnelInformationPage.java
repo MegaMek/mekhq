@@ -43,6 +43,7 @@ import javax.swing.JPanel;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.personnel.enums.TimeInDisplayFormat;
@@ -107,20 +108,23 @@ class PersonnelInformationPage {
         comboTimeInRankDisplayFormat = new MMComboBox<>("comboTimeInRankDisplayFormat",
               TimeInDisplayFormat.values());
 
-        chkUseTimeInService = new CampaignOptionsCheckBox("UseTimeInService");
+        chkUseTimeInService = new CampaignOptionsCheckBox("UseTimeInService", getMetadata(new Version("0.43.05")));
         chkUseTimeInService.addMouseListener(createTipPanelUpdater("UseTimeInService"));
-        lblTimeInServiceDisplayFormat = new CampaignOptionsLabel("TimeInServiceDisplayFormat");
+        lblTimeInServiceDisplayFormat = new CampaignOptionsLabel("TimeInServiceDisplayFormat",
+              getMetadata(new Version("0.47.06")));
         lblTimeInServiceDisplayFormat.addMouseListener(createTipPanelUpdater("TimeInServiceDisplayFormat"));
-        chkUseTimeInRank = new CampaignOptionsCheckBox("UseTimeInRank");
+        chkUseTimeInRank = new CampaignOptionsCheckBox("UseTimeInRank", getMetadata(new Version("0.47.06")));
         chkUseTimeInRank.addMouseListener(createTipPanelUpdater("UseTimeInRank"));
-        lblTimeInRankDisplayFormat = new CampaignOptionsLabel("TimeInRankDisplayFormat");
+        lblTimeInRankDisplayFormat = new CampaignOptionsLabel("TimeInRankDisplayFormat",
+              getMetadata(new Version("0.47.06")));
         lblTimeInRankDisplayFormat.addMouseListener(createTipPanelUpdater("TimeInRankDisplayFormat"));
-        chkTrackTotalEarnings = new CampaignOptionsCheckBox("TrackTotalEarnings");
+        chkTrackTotalEarnings = new CampaignOptionsCheckBox("TrackTotalEarnings", getMetadata(new Version("0.47.06")));
         chkTrackTotalEarnings
               .addMouseListener(createTipPanelUpdater("TrackTotalEarnings"));
-        chkTrackTotalXPEarnings = new CampaignOptionsCheckBox("TrackTotalXPEarnings");
+        chkTrackTotalXPEarnings = new CampaignOptionsCheckBox("TrackTotalXPEarnings",
+              getMetadata(new Version("0.49.04")));
         chkTrackTotalXPEarnings.addMouseListener(createTipPanelUpdater("TrackTotalXPEarnings"));
-        chkShowOriginFaction = new CampaignOptionsCheckBox("ShowOriginFaction");
+        chkShowOriginFaction = new CampaignOptionsCheckBox("ShowOriginFaction", getMetadata(new Version("0.45.03")));
         chkShowOriginFaction
               .addMouseListener(createTipPanelUpdater("ShowOriginFaction"));
 
@@ -166,13 +170,17 @@ class PersonnelInformationPage {
         chkUseTransfers = new CampaignOptionsCheckBox("UseTransfers",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
         chkUseTransfers.addMouseListener(createTipPanelUpdater("UseTransfers"));
-        chkUseExtendedTOEForceName = new CampaignOptionsCheckBox("UseExtendedTOEForceName");
+        chkUseExtendedTOEForceName = new CampaignOptionsCheckBox("UseExtendedTOEForceName",
+              getMetadata(new Version("0.49.06")));
         chkUseExtendedTOEForceName.addMouseListener(createTipPanelUpdater("UseExtendedTOEForceName"));
-        chkPersonnelLogSkillGain = new CampaignOptionsCheckBox("PersonnelLogSkillGain");
+        chkPersonnelLogSkillGain = new CampaignOptionsCheckBox("PersonnelLogSkillGain",
+              getMetadata(new Version("0.49.03")));
         chkPersonnelLogSkillGain.addMouseListener(createTipPanelUpdater("PersonnelLogSkillGain"));
-        chkPersonnelLogAbilityGain = new CampaignOptionsCheckBox("PersonnelLogAbilityGain");
+        chkPersonnelLogAbilityGain = new CampaignOptionsCheckBox("PersonnelLogAbilityGain",
+              getMetadata(new Version("0.49.03")));
         chkPersonnelLogAbilityGain.addMouseListener(createTipPanelUpdater("PersonnelLogAbilityGain"));
-        chkPersonnelLogEdgeGain = new CampaignOptionsCheckBox("PersonnelLogEdgeGain");
+        chkPersonnelLogEdgeGain = new CampaignOptionsCheckBox("PersonnelLogEdgeGain",
+              getMetadata(new Version("0.49.03")));
         chkPersonnelLogEdgeGain.addMouseListener(createTipPanelUpdater("PersonnelLogEdgeGain"));
 
         // Layout the Panel

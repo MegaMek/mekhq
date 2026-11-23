@@ -48,16 +48,17 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
+import megamek.client.ui.settings.SettingsFormPanel;
+import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsModifierTablePanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
-import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsSpinner;
 
 /**
@@ -348,7 +349,7 @@ class RandomizationPage {
 
     private void createSecondarySkillControls() {
         lblRoleplaySkillsModifier = new CampaignOptionsLabel("RoleplaySkillsModifier",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.05"), CampaignOptionFlag.IMPORTANT));
         lblRoleplaySkillsModifier.addMouseListener(createTipPanelUpdater("RoleplaySkillsModifier"));
         spnRoleplaySkillsModifier = new CampaignOptionsSpinner("RoleplaySkillsModifier", 0, -12, 12, 1);
         spnRoleplaySkillsModifier.addMouseListener(createTipPanelUpdater("RoleplaySkillsModifier"));

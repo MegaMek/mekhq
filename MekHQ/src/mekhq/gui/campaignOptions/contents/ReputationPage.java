@@ -33,7 +33,6 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -147,10 +146,12 @@ class ReputationPage {
      */
     private @Nonnull JPanel createReputationGeneralPanel() {
         // Contents
-        chkUseChaosReputation = new CampaignOptionsCheckBox("UseChaosReputation", getMetadata(new Version(0, 51, 1)));
+        chkUseChaosReputation = new CampaignOptionsCheckBox("UseChaosReputation",
+              getMetadata(new Version("0.51.01.1")));
         chkUseChaosReputation.addMouseListener(createTipPanelUpdater("UseChaosReputation"));
 
-        JLabel lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier");
+        JLabel lblManualUnitRatingModifier = new CampaignOptionsLabel("ManualUnitRatingModifier",
+              getMetadata(new Version("0.47.11")));
         lblManualUnitRatingModifier.addMouseListener(createTipPanelUpdater("ManualUnitRatingModifier"));
         manualUnitRatingModifier = new CampaignOptionsSpinner("ManualUnitRatingModifier", 0, -1000, 1000, 1);
         manualUnitRatingModifier.addMouseListener(createTipPanelUpdater("ManualUnitRatingModifier"));
@@ -174,32 +175,32 @@ class ReputationPage {
     private @Nonnull JPanel createChaosReputationPanel() {
         // Contents
         chkCampaignLevelChaosReputation = new CampaignOptionsCheckBox("CampaignLevelChaosReputation",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkCampaignLevelChaosReputation.addMouseListener(createTipPanelUpdater("CampaignLevelChaosReputation"));
 
         chkChaosDebtPenaltiesStack = new CampaignOptionsCheckBox("ChaosDebtPenaltiesStack",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkChaosDebtPenaltiesStack.addMouseListener(createTipPanelUpdater("ChaosDebtPenaltiesStack"));
 
         chkChaosNoPartialSuccessReputation = new CampaignOptionsCheckBox("ChaosNoPartialSuccessReputation",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkChaosNoPartialSuccessReputation.addMouseListener(createTipPanelUpdater("ChaosNoPartialSuccessReputation"));
 
         chkUseFailedContractReputationLoss = new CampaignOptionsCheckBox("UseFailedContractReputationLoss",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkUseFailedContractReputationLoss.addMouseListener(
               createTipPanelUpdater("UseFailedContractReputationLoss"));
 
         chkChaosPersonalityAffectsReputation = new CampaignOptionsCheckBox("ChaosPersonalityAffectsReputation",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkChaosPersonalityAffectsReputation.addMouseListener(createTipPanelUpdater("ChaosPersonalityAffectsReputation"));
 
         chkChaosNewRecruitsHaveReputation = new CampaignOptionsCheckBox("ChaosNewRecruitsHaveReputation",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkChaosNewRecruitsHaveReputation.addMouseListener(createTipPanelUpdater("ChaosNewRecruitsHaveReputation"));
 
         JLabel lblChaosReputationCap = new CampaignOptionsLabel("ChaosReputationCap",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         lblChaosReputationCap.addMouseListener(createTipPanelUpdater("ChaosReputationCap"));
         chaosReputationCap = new CampaignOptionsSpinner("ChaosReputationCap", 0, 0, 1000, 1);
         chaosReputationCap.addMouseListener(createTipPanelUpdater("ChaosReputationCap"));
@@ -257,17 +258,17 @@ class ReputationPage {
         btnResetCriminalRecord = createResetCriminalRecordButton();
 
         chkRequireSupportForceTransportation = new CampaignOptionsCheckBox("RequireSupportForceTransportation",
-              getMetadata(new Version(0, 51, 0)));
+              getMetadata(new Version("0.51.00")));
         chkRequireSupportForceTransportation.addMouseListener(createTipPanelUpdater("RequireSupportForceTransportation"));
 
         chkReduceReputationPerformanceModifier = new CampaignOptionsCheckBox("ReduceReputationPerformanceModifier",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
+              getMetadata(new Version("0.50.04"), CampaignOptionFlag.IMPORTANT,
                     CampaignOptionFlag.RECOMMENDED));
         chkReduceReputationPerformanceModifier.addMouseListener(createTipPanelUpdater(
               "ReduceReputationPerformanceModifier"));
 
         chkReputationPerformanceModifierCutOff = new CampaignOptionsCheckBox("ReputationPerformanceModifierCutOff",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
+              getMetadata(new Version("0.50.04"), CampaignOptionFlag.IMPORTANT,
                     CampaignOptionFlag.RECOMMENDED));
         chkReputationPerformanceModifierCutOff.addMouseListener(createTipPanelUpdater(
               "ReputationPerformanceModifierCutOff"));
@@ -286,7 +287,7 @@ class ReputationPage {
     }
 
     private CampaignOptionsMetadata getResetCriminalRecordMetadata() {
-        return getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT);
+        return getMetadata(new Version("0.50.05"), CampaignOptionFlag.IMPORTANT);
     }
 
     /**

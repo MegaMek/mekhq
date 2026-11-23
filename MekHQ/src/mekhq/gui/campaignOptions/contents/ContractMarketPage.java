@@ -35,7 +35,6 @@ package mekhq.gui.campaignOptions.contents;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionFlag.CUSTOM_SYSTEM;
 import static mekhq.gui.campaignOptions.CampaignOptionFlag.RECOMMENDED;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
@@ -210,7 +209,7 @@ class ContractMarketPage {
      */
     private @Nonnull JPanel createContractMarketGeneralOptionsPanel() {
         // Contents
-        lblContractMarketMethod = new CampaignOptionsLabel("ContractMarketMethod");
+        lblContractMarketMethod = new CampaignOptionsLabel("ContractMarketMethod", getMetadata(new Version("0.49.03")));
         lblContractMarketMethod
               .addMouseListener(createTipPanelUpdater("ContractMarketMethod"));
         comboContractMarketMethod = new MMComboBox<>("comboContractMarketMethod");
@@ -220,7 +219,7 @@ class ContractMarketPage {
         comboContractMarketMethod
               .addMouseListener(createTipPanelUpdater("ContractMarketMethod"));
 
-        lblContractSearchRadius = new CampaignOptionsLabel("ContractSearchRadius");
+        lblContractSearchRadius = new CampaignOptionsLabel("ContractSearchRadius", getMetadata(new Version("0.49.12")));
         lblContractSearchRadius
               .addMouseListener(createTipPanelUpdater("ContractSearchRadius"));
         spnContractSearchRadius = new CampaignOptionsSpinner("ContractSearchRadius", 300, 1, 2500, 100);
@@ -231,10 +230,10 @@ class ContractMarketPage {
         chkVariableContractLength.addMouseListener(createTipPanelUpdater("VariableContractLength"));
 
         chkUseTwoWayPay = new CampaignOptionsCheckBox("UseTwoWayPay",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.50.10")));
         chkUseTwoWayPay.addMouseListener(createTipPanelUpdater("UseTwoWayPay"));
 
-        lblSalvageSystem = new CampaignOptionsLabel("SalvageSystem", getMetadata(new Version(0, 51, 1)));
+        lblSalvageSystem = new CampaignOptionsLabel("SalvageSystem", getMetadata(new Version("0.51.01.1")));
         lblSalvageSystem.addMouseListener(createTipPanelUpdater("SalvageSystem"));
         comboSalvageSystem = new MMComboBox<>("comboSalvageSystem", SalvageSystem.values());
         comboSalvageSystem.setRenderer(new DefaultListCellRenderer() {
@@ -252,23 +251,23 @@ class ContractMarketPage {
         comboSalvageSystem.addMouseListener(createTipPanelUpdater("SalvageSystem"));
 
         chkUseRiskySalvage = new CampaignOptionsCheckBox("UseRiskySalvage",
-              getMetadata(MILESTONE_BEFORE_METADATA, CUSTOM_SYSTEM));
+              getMetadata(new Version("0.50.10"), CUSTOM_SYSTEM));
         chkUseRiskySalvage.addMouseListener(createTipPanelUpdater("UseRiskySalvage"));
 
         chkKeepEnemyCamouflageOnSalvage = new CampaignOptionsCheckBox("KeepEnemyCamouflageOnSalvage",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkKeepEnemyCamouflageOnSalvage.addMouseListener(createTipPanelUpdater("KeepEnemyCamouflageOnSalvage"));
 
         chkReduceSalvageQuality = new CampaignOptionsCheckBox("ReduceSalvageQuality",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.7"), CUSTOM_SYSTEM));
         chkReduceSalvageQuality.addMouseListener(createTipPanelUpdater("ReduceSalvageQuality"));
 
         chkEnableSalvageFlagByDefault = new CampaignOptionsCheckBox("EnableSalvageFlagByDefault",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         chkEnableSalvageFlagByDefault.addMouseListener(createTipPanelUpdater("EnableSalvageFlagByDefault"));
 
         chkUseClanSalvageClause = new CampaignOptionsCheckBox("UseClanSalvageClause",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkUseClanSalvageClause.addMouseListener(createTipPanelUpdater("UseClanSalvageClause"));
 
         comboSalvageSystem.addActionListener(event -> updateSalvageTeamOptionsEnabledState());
@@ -277,61 +276,64 @@ class ContractMarketPage {
         chkBLCSaleValue = new CampaignOptionsCheckBox("BLCSaleValue");
         chkBLCSaleValue.addMouseListener(createTipPanelUpdater("BLCSaleValue"));
 
-        chkOverageRepaymentInFinalPayment = new CampaignOptionsCheckBox("OverageRepaymentInFinalPayment");
+        chkOverageRepaymentInFinalPayment = new CampaignOptionsCheckBox("OverageRepaymentInFinalPayment",
+              getMetadata(new Version("0.47.12")));
         chkOverageRepaymentInFinalPayment.addMouseListener(createTipPanelUpdater("OverageRepaymentInFinalPayment"));
 
-        chkUseDynamicDifficulty = new CampaignOptionsCheckBox("UseDynamicDifficulty");
+        chkUseDynamicDifficulty = new CampaignOptionsCheckBox("UseDynamicDifficulty",
+              getMetadata(new Version("0.50.05")));
         chkUseDynamicDifficulty
               .addMouseListener(createTipPanelUpdater("UseDynamicDifficulty"));
 
         chkUseBolsterContractSkill = new CampaignOptionsCheckBox("UseBolsterContractSkill",
-              getMetadata(MILESTONE_BEFORE_METADATA, CUSTOM_SYSTEM));
+              getMetadata(new Version("0.50.10"), CUSTOM_SYSTEM));
         chkUseBolsterContractSkill.addMouseListener(createTipPanelUpdater("UseBolsterContractSkill"));
 
         chkUseChaosScaleSupportPointConversion = new CampaignOptionsCheckBox("UseChaosScaleSupportPointConversion",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkUseChaosScaleSupportPointConversion.addMouseListener(
                 createTipPanelUpdater("UseChaosScaleSupportPointConversion"));
 
         chkUseContractFactionModifiers = new CampaignOptionsCheckBox("UseContractFactionModifiers",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CUSTOM_SYSTEM));
         chkUseContractFactionModifiers.addMouseListener(createTipPanelUpdater("UseContractFactionModifiers"));
 
         chkUseIntelObfuscation = new CampaignOptionsCheckBox("UseIntelObfuscation",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CUSTOM_SYSTEM));
         chkUseIntelObfuscation.addMouseListener(createTipPanelUpdater("UseIntelObfuscation"));
 
         chkUseNonNegotiableTerms = new CampaignOptionsCheckBox("UseNonNegotiableTerms",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CUSTOM_SYSTEM));
         chkUseNonNegotiableTerms.addMouseListener(createTipPanelUpdater("UseNonNegotiableTerms"));
 
         chkUseActiveNegotiators = new CampaignOptionsCheckBox("UseActiveNegotiators",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CUSTOM_SYSTEM));
         chkUseActiveNegotiators.addMouseListener(createTipPanelUpdater("UseActiveNegotiators"));
 
         chkUseRandomContractCharacteristics = new CampaignOptionsCheckBox("UseRandomContractCharacteristics",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CUSTOM_SYSTEM));
         chkUseRandomContractCharacteristics.addMouseListener(
               createTipPanelUpdater("UseRandomContractCharacteristics"));
 
         chkUseOperationCodenames = new CampaignOptionsCheckBox("UseOperationCodenames",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CUSTOM_SYSTEM));
         chkUseOperationCodenames.addMouseListener(createTipPanelUpdater("UseOperationCodenames"));
 
         chkHideContractType = new CampaignOptionsCheckBox("HideContractType",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM, RECOMMENDED));
+              getMetadata(new Version("0.51.01.1"), CUSTOM_SYSTEM, RECOMMENDED));
         chkHideContractType.addMouseListener(createTipPanelUpdater("HideContractType"));
 
-        lblDropShipBonusPercentage = new CampaignOptionsLabel("DropShipBonusPercentage");
+        lblDropShipBonusPercentage = new CampaignOptionsLabel("DropShipBonusPercentage",
+              getMetadata(new Version("0.50.00")));
         lblDropShipBonusPercentage.addMouseListener(createTipPanelUpdater("DropShipBonusPercentage"));
         spnDropShipBonusPercentage = new CampaignOptionsSpinner("DropShipBonusPercentage", 0, 0, 20, 5);
         spnDropShipBonusPercentage.addMouseListener(createTipPanelUpdater("DropShipBonusPercentage"));
 
         chkUseDropShipBonusInSpace = new CampaignOptionsCheckBox("UseDropShipBonusInSpace",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CUSTOM_SYSTEM));
         chkUseDropShipBonusInSpace.addMouseListener(createTipPanelUpdater("UseDropShipBonusInSpace"));
 
-        lblPityContracts = new CampaignOptionsLabel("PityContracts", getMetadata(new Version(0, 51, 0)));
+        lblPityContracts = new CampaignOptionsLabel("PityContracts", getMetadata(new Version("0.51.00")));
         lblPityContracts.addMouseListener(createTipPanelUpdater("PityContracts"));
         spnPityContracts = new CampaignOptionsSpinner("PityContracts", 4, 0, 20, 1);
         spnPityContracts.addMouseListener(createTipPanelUpdater("PityContracts"));
@@ -382,13 +384,13 @@ class ContractMarketPage {
      */
     private @Nonnull JPanel createContractTermMultipliersPanel() {
         lblContractBasePayMultiplier = new CampaignOptionsLabel("ContractBasePayMultiplier",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CUSTOM_SYSTEM));
         lblContractBasePayMultiplier.addMouseListener(createTipPanelUpdater("ContractBasePayMultiplier"));
         spnContractBasePayMultiplier = new CampaignOptionsSpinner("ContractBasePayMultiplier", 1.0, 0.1, 2.0, 0.1);
         spnContractBasePayMultiplier.addMouseListener(createTipPanelUpdater("ContractBasePayMultiplier"));
 
         lblContractStraightSupportMultiplier = new CampaignOptionsLabel("ContractStraightSupportMultiplier",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CUSTOM_SYSTEM));
         lblContractStraightSupportMultiplier.addMouseListener(
               createTipPanelUpdater("ContractStraightSupportMultiplier"));
         spnContractStraightSupportMultiplier = new CampaignOptionsSpinner("ContractStraightSupportMultiplier",
@@ -397,7 +399,7 @@ class ContractMarketPage {
               createTipPanelUpdater("ContractStraightSupportMultiplier"));
 
         lblContractBattlefieldLossMultiplier = new CampaignOptionsLabel("ContractBattlefieldLossMultiplier",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CUSTOM_SYSTEM));
         lblContractBattlefieldLossMultiplier.addMouseListener(
               createTipPanelUpdater("ContractBattlefieldLossMultiplier"));
         spnContractBattlefieldLossMultiplier = new CampaignOptionsSpinner("ContractBattlefieldLossMultiplier",
@@ -406,13 +408,13 @@ class ContractMarketPage {
               createTipPanelUpdater("ContractBattlefieldLossMultiplier"));
 
         lblContractTransportMultiplier = new CampaignOptionsLabel("ContractTransportMultiplier",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CUSTOM_SYSTEM));
         lblContractTransportMultiplier.addMouseListener(createTipPanelUpdater("ContractTransportMultiplier"));
         spnContractTransportMultiplier = new CampaignOptionsSpinner("ContractTransportMultiplier", 1.0, 0.1, 2.0, 0.1);
         spnContractTransportMultiplier.addMouseListener(createTipPanelUpdater("ContractTransportMultiplier"));
 
         lblContractSalvageMultiplier = new CampaignOptionsLabel("ContractSalvageMultiplier",
-              getMetadata(new Version(0, 51, 1), CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CUSTOM_SYSTEM));
         lblContractSalvageMultiplier.addMouseListener(createTipPanelUpdater("ContractSalvageMultiplier"));
         spnContractSalvageMultiplier = new CampaignOptionsSpinner("ContractSalvageMultiplier", 1.0, 0.1, 2.0, 0.1);
         spnContractSalvageMultiplier.addMouseListener(createTipPanelUpdater("ContractSalvageMultiplier"));
@@ -443,23 +445,24 @@ class ContractMarketPage {
         // A general Chaos-pay option (applies to the default scheme, not the legacy bases): whether Chaos support-point
         // pay is converted to C-bills. Enabled by default.
         chkUseChaosSupportPointConversion = new CampaignOptionsCheckBox("UseChaosSupportPointConversion",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkUseChaosSupportPointConversion.addMouseListener(createTipPanelUpdater("UseChaosSupportPointConversion"));
         chkBasePayOnlyConsidersScale = new CampaignOptionsCheckBox("BasePayOnlyConsidersScale",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkBasePayOnlyConsidersScale.addMouseListener(createTipPanelUpdater("BasePayOnlyConsidersScale"));
         chkCapContractScaleByHiringHall = new CampaignOptionsCheckBox("CapContractScaleByHiringHall",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkCapContractScaleByHiringHall.addMouseListener(createTipPanelUpdater("CapContractScaleByHiringHall"));
         chkTaperCombatPayAndSalvageByScale = new CampaignOptionsCheckBox("TaperCombatPayAndSalvageByScale",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkTaperCombatPayAndSalvageByScale.addMouseListener(createTipPanelUpdater("TaperCombatPayAndSalvageByScale"));
-        chkUseFractionalScale = new CampaignOptionsCheckBox("UseFractionalScale", getMetadata(new Version(0, 51, 1)));
+        chkUseFractionalScale = new CampaignOptionsCheckBox("UseFractionalScale",
+              getMetadata(new Version("0.51.01.1")));
         chkUseFractionalScale.addMouseListener(createTipPanelUpdater("UseFractionalScale"));
 
         // Top-level pay scheme: the default Chaos Campaign scheme, or the legacy force-value / payroll schemes whose
         // basis and options are configured in the nested card below. Leaving the box unticked keeps Chaos pay.
-        chkUseLegacyOptions = new CampaignOptionsCheckBox("UseLegacyOptions", getMetadata(new Version(0, 51, 1)));
+        chkUseLegacyOptions = new CampaignOptionsCheckBox("UseLegacyOptions", getMetadata(new Version("0.51.01.1")));
         chkUseLegacyOptions.addMouseListener(createTipPanelUpdater("UseLegacyOptions"));
 
         btnContractEquipment = new JRadioButton(getTextAt(getCampaignOptionsResourceBundle(),
@@ -479,11 +482,11 @@ class ContractMarketPage {
         contractGroup.add(btnContractPersonnel);
 
         chkUseAlternatePaymentMode = new CampaignOptionsCheckBox("UseAlternatePaymentMode",
-              getMetadata(MILESTONE_BEFORE_METADATA, CUSTOM_SYSTEM));
+              getMetadata(new Version("0.50.11"), CUSTOM_SYSTEM));
         chkUseAlternatePaymentMode.addMouseListener(createTipPanelUpdater("UseAlternatePaymentMode"));
 
         chkUseDiminishingContractPay = new CampaignOptionsCheckBox("UseDiminishingContractPay",
-              getMetadata(MILESTONE_BEFORE_METADATA, CUSTOM_SYSTEM));
+              getMetadata(new Version("0.50.11"), CUSTOM_SYSTEM));
         chkUseDiminishingContractPay.addMouseListener(createTipPanelUpdater("UseDiminishingContractPay"));
 
         chkEquipContractSaleValue = new CampaignOptionsCheckBox("EquipContractSaleValue");
@@ -498,7 +501,7 @@ class ContractMarketPage {
               0.1);
         spnEquipPercent.addMouseListener(createTipPanelUpdater("EquipPercent"));
 
-        lblDropShipPercent = new CampaignOptionsLabel("DropShipPercent");
+        lblDropShipPercent = new CampaignOptionsLabel("DropShipPercent", getMetadata(new Version("0.49.12")));
         lblDropShipPercent.addMouseListener(createTipPanelUpdater("DropShipPercent"));
         spnDropShipPercent = new CampaignOptionsSpinner("DropShipPercent",
               0.1,
@@ -507,7 +510,7 @@ class ContractMarketPage {
               0.1);
         spnDropShipPercent.addMouseListener(createTipPanelUpdater("DropShipPercent"));
 
-        lblJumpShipPercent = new CampaignOptionsLabel("JumpShipPercent");
+        lblJumpShipPercent = new CampaignOptionsLabel("JumpShipPercent", getMetadata(new Version("0.49.12")));
         lblJumpShipPercent.addMouseListener(createTipPanelUpdater("JumpShipPercent"));
         spnJumpShipPercent = new CampaignOptionsSpinner("JumpShipPercent",
               0.1,
@@ -516,7 +519,7 @@ class ContractMarketPage {
               0.1);
         spnJumpShipPercent.addMouseListener(createTipPanelUpdater("JumpShipPercent"));
 
-        lblWarShipPercent = new CampaignOptionsLabel("WarShipPercent");
+        lblWarShipPercent = new CampaignOptionsLabel("WarShipPercent", getMetadata(new Version("0.49.12")));
         lblWarShipPercent.addMouseListener(createTipPanelUpdater("WarShipPercent"));
         spnWarShipPercent = new CampaignOptionsSpinner("WarShipPercent",
               0.1,

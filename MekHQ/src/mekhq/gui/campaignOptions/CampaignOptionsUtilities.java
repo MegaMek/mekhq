@@ -100,16 +100,10 @@ public class CampaignOptionsUtilities {
         return scaleForGUI(860);
     }
     /**
-     * Version marker for campaign options that existed before the metadata system was implemented and shouldn't have a
-     * version badge.
+     * Version marker for campaign options that predate MekHQ's first tagged release (0.3.24), so the release that added
+     * them cannot be determined. These options show no version badge.
      */
     public static final Version LEGACY_RULE_BEFORE_METADATA = null;
-
-    /**
-     * Version marker for campaign options that existed before the metadata system was implemented, but still since the
-     * most recent milestone. This variable should be deprecated once the next milestone is declared.
-     */
-    public static final Version MILESTONE_BEFORE_METADATA = new Version(0, 50, 10);
 
     /**
      * Cache for reusing CampaignOptionMetadata instances to avoid creating duplicate objects.

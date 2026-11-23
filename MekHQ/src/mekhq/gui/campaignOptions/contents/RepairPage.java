@@ -33,7 +33,6 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -108,15 +107,15 @@ class RepairPage {
         CampaignOptionsHeaderPanel repairHeader = new CampaignOptionsHeaderPanel("RepairPage", imageAddress);
 
         chkTechsUseAdministration = new CampaignOptionsCheckBox("TechsUseAdministration",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.50.05"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkTechsUseAdministration.addMouseListener(createTipPanelUpdater("TechsUseAdministration"));
 
         chkUseGlobalTechSkillsOnly = new CampaignOptionsCheckBox("UseGlobalTechSkillsOnly",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkUseGlobalTechSkillsOnly.addMouseListener(createTipPanelUpdater("UseGlobalTechSkillsOnly"));
 
         chkUsefulAsTechs = new CampaignOptionsCheckBox("UsefulAsTechs",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.50.07"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUsefulAsTechs.addMouseListener(createTipPanelUpdater("UsefulAsTechs"));
 
         useEraModsCheckBox = new CampaignOptionsCheckBox("UseEraModsCheckBox");
@@ -131,26 +130,26 @@ class RepairPage {
         useQuirksBox.addMouseListener(createTipPanelUpdater("UseQuirksBox"));
 
         chkUseFabrication = new CampaignOptionsCheckBox("UseFabrication",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkUseFabrication.addMouseListener(createTipPanelUpdater("UseFabrication"));
 
         chkUseBalancedFabrication = new CampaignOptionsCheckBox("UseBalancedFabrication",
-              getMetadata(new Version(0, 51, 1),
+              getMetadata(new Version("0.51.01.1"),
                     CampaignOptionFlag.CUSTOM_SYSTEM,
                     CampaignOptionFlag.IMPORTANT,
                     CampaignOptionFlag.RECOMMENDED));
         chkUseBalancedFabrication.addMouseListener(createTipPanelUpdater("UseBalancedFabrication"));
 
         chkMaintenanceFabrication = new CampaignOptionsCheckBox("MaintenanceFabrication",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkMaintenanceFabrication.addMouseListener(
               createTipPanelUpdater("MaintenanceFabrication"));
 
         chkUseAmmoFabrication = new CampaignOptionsCheckBox("UseAmmoFabrication",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseAmmoFabrication.addMouseListener(createTipPanelUpdater("UseAmmoFabrication"));
 
-        useAeroSystemHitsBox = new CampaignOptionsCheckBox("UseAeroSystemHitsBox");
+        useAeroSystemHitsBox = new CampaignOptionsCheckBox("UseAeroSystemHitsBox", getMetadata(new Version("0.45.00")));
         useAeroSystemHitsBox.addMouseListener(createTipPanelUpdater("UseAeroSystemHitsBox"));
 
         useDamageMargin = new CampaignOptionsCheckBox("UseDamageMargin");

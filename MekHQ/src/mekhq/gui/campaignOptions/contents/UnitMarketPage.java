@@ -34,6 +34,7 @@ package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import javax.swing.JCheckBox;
 import javax.swing.JLabel;
@@ -42,10 +43,11 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -95,21 +97,24 @@ class UnitMarketPage {
         CampaignOptionsHeaderPanel unitMarketHeader = new CampaignOptionsHeaderPanel("UnitMarketPage", imageAddress);
 
         // Contents
-        lblUnitMarketMethod = new CampaignOptionsLabel("UnitMarketMethod");
+        lblUnitMarketMethod = new CampaignOptionsLabel("UnitMarketMethod", getMetadata(new Version("0.49.03")));
         lblUnitMarketMethod.addMouseListener(createTipPanelUpdater("UnitMarketMethod"));
         comboUnitMarketMethod = new MMComboBox<>("comboUnitMarketMethod", UnitMarketMethod.values());
         comboUnitMarketMethod.addMouseListener(createTipPanelUpdater("UnitMarketMethod"));
 
-        chkUnitMarketRegionalMekVariations = new CampaignOptionsCheckBox("UnitMarketRegionalMekVariations");
+        chkUnitMarketRegionalMekVariations = new CampaignOptionsCheckBox("UnitMarketRegionalMekVariations",
+              getMetadata(new Version("0.50.01")));
         chkUnitMarketRegionalMekVariations.addMouseListener(createTipPanelUpdater("UnitMarketRegionalMekVariations"));
 
-        lblUnitMarketArtilleryUnitChance = new CampaignOptionsLabel("UnitMarketArtilleryUnitChance");
+        lblUnitMarketArtilleryUnitChance = new CampaignOptionsLabel("UnitMarketArtilleryUnitChance",
+              getMetadata(new Version("0.50.10")));
         lblUnitMarketArtilleryUnitChance.addMouseListener(createTipPanelUpdater("UnitMarketArtilleryUnitChance"));
         spnUnitMarketArtilleryUnitChance = new CampaignOptionsSpinner("UnitMarketArtilleryUnitChance", 30, 0, 100,
                 1);
         spnUnitMarketArtilleryUnitChance.addMouseListener(createTipPanelUpdater("UnitMarketArtilleryUnitChance"));
 
-        lblUnitMarketRarityModifier = new CampaignOptionsLabel("UnitMarketRarityModifier");
+        lblUnitMarketRarityModifier = new CampaignOptionsLabel("UnitMarketRarityModifier",
+              getMetadata(new Version("0.50.00")));
         lblUnitMarketRarityModifier.addMouseListener(createTipPanelUpdater("UnitMarketRarityModifier"));
         spnUnitMarketRarityModifier = new CampaignOptionsSpinner("UnitMarketRarityModifier", 0, -10, 10, 1);
         spnUnitMarketRarityModifier.addMouseListener(createTipPanelUpdater("UnitMarketRarityModifier"));
@@ -117,7 +122,8 @@ class UnitMarketPage {
         chkInstantUnitMarketDelivery = new CampaignOptionsCheckBox("InstantUnitMarketDelivery");
         chkInstantUnitMarketDelivery.addMouseListener(createTipPanelUpdater("InstantUnitMarketDelivery"));
 
-        chkMothballUnitMarketDeliveries = new CampaignOptionsCheckBox("MothballUnitMarketDeliveries");
+        chkMothballUnitMarketDeliveries = new CampaignOptionsCheckBox("MothballUnitMarketDeliveries",
+              getMetadata(new Version("0.50.04")));
         chkMothballUnitMarketDeliveries.addMouseListener(createTipPanelUpdater("MothballUnitMarketDeliveries"));
 
         chkUnitMarketReportRefresh = new CampaignOptionsCheckBox("UnitMarketReportRefresh");

@@ -33,8 +33,6 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -49,11 +47,12 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.randomEvents.prisoners.PrisonerCaptureStyle;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -134,7 +133,7 @@ class PrisonersAndDependentsPage {
      */
     private @Nonnull JPanel createPrisonersPanel() {
         // Contents
-        lblPrisonerCaptureStyle = new CampaignOptionsLabel("PrisonerCaptureStyle");
+        lblPrisonerCaptureStyle = new CampaignOptionsLabel("PrisonerCaptureStyle", getMetadata(new Version("0.47.11")));
         lblPrisonerCaptureStyle.addMouseListener(createTipPanelUpdater("PrisonerCaptureStyle"));
         comboPrisonerCaptureStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -150,11 +149,12 @@ class PrisonersAndDependentsPage {
         });
         comboPrisonerCaptureStyle.addMouseListener(createTipPanelUpdater("PrisonerCaptureStyle"));
 
-        chkResetTemporaryPrisonerCapacity = new CampaignOptionsCheckBox("ResetTemporaryPrisonerCapacity");
+        chkResetTemporaryPrisonerCapacity = new CampaignOptionsCheckBox("ResetTemporaryPrisonerCapacity",
+              getMetadata(new Version("0.50.05")));
         chkResetTemporaryPrisonerCapacity.addMouseListener(createTipPanelUpdater("ResetTemporaryPrisonerCapacity"));
 
         chkUseFunctionalEscapeArtist = new CampaignOptionsCheckBox("UseFunctionalEscapeArtist",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(new Version("0.50.07"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseFunctionalEscapeArtist.addMouseListener(createTipPanelUpdater("UseFunctionalEscapeArtist"));
 
         // Layout the Panel
@@ -176,21 +176,23 @@ class PrisonersAndDependentsPage {
      */
     private @Nonnull JPanel createDependentsPanel() {
         // Contents
-        chkUseRandomDependentAddition = new CampaignOptionsCheckBox("UseRandomDependentAddition");
+        chkUseRandomDependentAddition = new CampaignOptionsCheckBox("UseRandomDependentAddition",
+              getMetadata(new Version("0.49.07")));
         chkUseRandomDependentAddition.addMouseListener(createTipPanelUpdater("UseRandomDependentAddition"));
 
-        chkUseRandomDependentRemoval = new CampaignOptionsCheckBox("UseRandomDependentRemoval");
+        chkUseRandomDependentRemoval = new CampaignOptionsCheckBox("UseRandomDependentRemoval",
+              getMetadata(new Version("0.49.07")));
         chkUseRandomDependentRemoval.addMouseListener(createTipPanelUpdater("UseRandomDependentRemoval"));
 
         lblDependentProfessionDieSize = new CampaignOptionsLabel("DependentProfessionDieSize",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.07"), CampaignOptionFlag.IMPORTANT));
         lblDependentProfessionDieSize.addMouseListener(createTipPanelUpdater("DependentProfessionDieSize"));
         spnDependentProfessionDieSize = new CampaignOptionsSpinner("DependentProfessionDieSize",
                 4, 0, 100, 1);
         spnDependentProfessionDieSize.addMouseListener(createTipPanelUpdater("DependentProfessionDieSize"));
 
         lblCivilianProfessionDieSize = new CampaignOptionsLabel("CivilianProfessionDieSize",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.07"), CampaignOptionFlag.IMPORTANT));
         lblCivilianProfessionDieSize.addMouseListener(createTipPanelUpdater("CivilianProfessionDieSize"));
         spnCivilianProfessionDieSize = new CampaignOptionsSpinner("CivilianProfessionDieSize",
                 2, 0, 100, 1);
