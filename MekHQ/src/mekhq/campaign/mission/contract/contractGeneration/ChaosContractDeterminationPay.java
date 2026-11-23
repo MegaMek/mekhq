@@ -125,8 +125,14 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
     }
 
     /**
-     * When contract Scale is capped by the Hiring Hall, the employer only covers the costs of the part of the force the
-     * job needs: the capped Scale as a share of the committed force's Scale.
+     * When the Hiring Hall caps the job's Scale, the employer only covers the costs of the part of the force the job
+     * needs: the capped Scale as a share of the committed force's Scale.
+     *
+     * <p>Both Scales are worked out from the force as it is now, the same way generation caps a contract (see
+     * {@link ChaosScaleLimits#capScaleByHiringHall}), rather than from the Scale stored on the contract. That stored
+     * Scale is a snapshot from when the offer was generated, so comparing it against today's force would treat any
+     * growth since then (units added, or moved into combat formations) as a Hiring Hall cap, and cut Base Pay even
+     * where the Hiring Hall caps nothing.</p>
      *
      * @param campaign the campaign
      * @param contract the contract being paid
@@ -143,15 +149,17 @@ public class ChaosContractDeterminationPay extends AbstractContractDetermination
 
         PlayerForce playerForce = campaign.getPlayerForce();
         boolean useFractionalScale = campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE);
-        double uncappedScale = ChaosContractDeterminationScale.getEconomicScale(
-              AbstractContractGeneration.determineUncappedScale(campaign, playerForce, playerForce.getHangar(), contract),
+        double exactUncappedScale = AbstractContractGeneration.determineUncappedScale(campaign, playerForce,
+              playerForce.getHangar(), contract);
+        double uncappedScale = ChaosContractDeterminationScale.getEconomicScale(exactUncappedScale,
               useFractionalScale);
-        double contractScale = contract.getEconomicScale(useFractionalScale);
-        if (uncappedScale <= 0 || contractScale >= uncappedScale) {
+        double jobScale = ChaosContractDeterminationScale.getEconomicScale(
+              ChaosScaleLimits.capScaleByHiringHall(campaign, exactUncappedScale), useFractionalScale);
+        if (uncappedScale <= 0 || jobScale >= uncappedScale) {
             return 1.0;
         }
 
-        return Math.max(0, contractScale) / uncappedScale;
+        return jobScale / uncappedScale;
     }
 
     /**

@@ -71,7 +71,6 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.enums.HiringHallLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 public abstract class AbstractContractGeneration {
@@ -411,14 +410,7 @@ public abstract class AbstractContractGeneration {
         double scale = determineUncappedScale(campaign, playerForce, detachmentHangar, contract);
 
         // Hiring halls only broker jobs of the size they can support; a larger force is paid for the job, not itself
-        PlanetarySystem currentSystem = campaign.getCurrentSystem();
-        if (campaign.getCampaignOptions().get(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL)
-                  && currentSystem != null) {
-            HiringHallLevel hiringHallLevel = currentSystem.getHiringHallLevel(campaign.getLocalDate());
-            scale = Math.min(scale, ChaosScaleLimits.getMaximumContractScale(hiringHallLevel));
-        }
-
-        return scale;
+        return ChaosScaleLimits.capScaleByHiringHall(campaign, scale);
     }
 
     /**
