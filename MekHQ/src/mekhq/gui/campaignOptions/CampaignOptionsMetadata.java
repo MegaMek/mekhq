@@ -40,6 +40,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.EnumSet;
 import java.util.List;
+import java.util.Locale;
 import java.util.Set;
 
 import jakarta.annotation.Nullable;
@@ -115,7 +116,7 @@ public record CampaignOptionsMetadata(
          * @return the sample text shown for this badge in the legend, such as "&gt; 0.51.00"
          */
         String getLegendSample(Version lastCore) {
-            return getFormattedTextAt(RESOURCE_BUNDLE, "legend." + key + ".sample", lastCore.toString());
+            return getFormattedTextAt(RESOURCE_BUNDLE, "legend." + key + ".sample", formatVersionNumber(lastCore));
         }
     }
 
@@ -187,6 +188,24 @@ public record CampaignOptionsMetadata(
             return null;
         }
         AddedSinceBadge badge = AddedSinceBadge.of(version, lastCore);
-        return SettingsBadge.ofText(version.toString(), badge.getColor(), badge.getDescription());
+        return SettingsBadge.ofText(formatVersionNumber(version), badge.getColor(), badge.getDescription());
+    }
+
+    /**
+     * Formats a version as its release number alone, such as {@code 0.51.01} or {@code 0.49.19.1}.
+     *
+     * <p>{@link Version#toString()} also appends the build information (branch and git hash) on PR and nightly
+     * builds, which says nothing about when an option was added, so it is left out here.</p>
+     *
+     * @param version the version to format
+     *
+     * @return the version number without any build information
+     */
+    private static String formatVersionNumber(Version version) {
+        return String.format(Locale.ROOT, "%d.%02d.%02d%s",
+              version.getMajor(),
+              version.getMinor(),
+              version.getPatch(),
+              version.hasRevision() ? "." + version.getRevision() : "");
     }
 }

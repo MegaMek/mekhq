@@ -198,7 +198,7 @@ class CampaignOptionsMetadataTest {
 
         String result = metadata.getAddedSinceBadgeHtml();
 
-        assertTrue(result.contains(">" + version + "</font>"), result);
+        assertTrue(result.contains(">0.49.00</font>"), result);
         assertFalse(result.contains("Material Symbols Rounded"), result);
     }
 
@@ -210,7 +210,12 @@ class CampaignOptionsMetadataTest {
               entries.stream().map(SettingsBadge::color).toList());
         for (SettingsBadge entry : entries) {
             assertTrue(entry.isText());
-            assertTrue(entry.text().contains(SuiteConstants.LAST_MILESTONE.toString()), entry.text());
+            // The legend names the last Core release by its number alone, without any PR or nightly build suffix
+            Version lastCore = SuiteConstants.LAST_MILESTONE;
+            String lastCoreNumber = String.format("%d.%02d.%02d", lastCore.getMajor(), lastCore.getMinor(),
+                  lastCore.getPatch());
+            assertTrue(entry.text().contains(lastCoreNumber), entry.text());
+            assertFalse(entry.text().contains(lastCoreNumber + "-"), entry.text());
         }
     }
 
