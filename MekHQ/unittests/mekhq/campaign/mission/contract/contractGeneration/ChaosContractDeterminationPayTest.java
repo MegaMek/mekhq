@@ -57,6 +57,8 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.enums.HiringHallLevel;
 import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -87,6 +89,7 @@ class ChaosContractDeterminationPayTest {
     private CampaignOptions campaignOptions;
     private Accountant accountant;
     private LocalHangar hangar;
+    private PlanetarySystem currentSystem;
     private MockedStatic<ContractExpenseProjection> projection;
 
     @BeforeEach
@@ -118,6 +121,15 @@ class ChaosContractDeterminationPayTest {
         List<Unit> noUnits = List.of();
         when(hangar.getUnits()).thenReturn(noUnits);
         when(campaign.getPlayerForce().getHangar()).thenReturn(hangar);
+
+        // A Great Hiring Hall caps nothing; tests that check the cap pick a smaller one
+        currentSystem = mock(PlanetarySystem.class);
+        when(campaign.getCurrentSystem()).thenReturn(currentSystem);
+        hiringHallOf(HiringHallLevel.GREAT);
+    }
+
+    private void hiringHallOf(HiringHallLevel hiringHallLevel) {
+        when(currentSystem.getHiringHallLevel(any())).thenReturn(hiringHallLevel);
     }
 
     @AfterEach
@@ -378,7 +390,9 @@ class ChaosContractDeterminationPayTest {
         @Test
         void cappedContractCoversOnlyItsShare() {
             campaignOptions.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, true);
+            hiringHallOf(HiringHallLevel.NONE);
 
+            // Scale 8 capped to 2
             uncappedScaleOf(8, () -> {
                 assertEquals(0.25, ChaosContractDeterminationPay.getJobShare(campaign, contract(2, 1.0)), DELTA);
                 assertEquals(Money.of(250_000), payScheme.getMonthlyPay(campaign, contract(2, 1.0)));
@@ -386,42 +400,67 @@ class ChaosContractDeterminationPayTest {
         }
 
         @Test
-        void uncappedContractCoversEverything() {
+        void forceWithinTheCapIsCoveredInFull() {
             campaignOptions.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, true);
+            hiringHallOf(HiringHallLevel.QUESTIONABLE);
 
             uncappedScaleOf(4, () ->
                   assertEquals(1.0, ChaosContractDeterminationPay.getJobShare(campaign, contract(4, 1.0)), DELTA));
         }
 
-        /** A GM-edited Scale above the force's own must never pay more than the full costs. */
+        /**
+         * The contract's stored Scale is a snapshot from when the offer was generated. A force that has grown since
+         * (here from a single 'Mek to a company) must not be paid as if the Hiring Hall had capped it - the Hiring Hall
+         * here caps nothing.
+         */
         @Test
-        void shareNeverExceedsOne() {
+        void forceGrowthSinceGenerationIsNotTreatedAsACap() {
+            campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
             campaignOptions.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, true);
+            hiringHallOf(HiringHallLevel.GREAT);
 
-            uncappedScaleOf(3, () ->
-                  assertEquals(1.0, ChaosContractDeterminationPay.getJobShare(campaign, contract(9, 1.0)), DELTA));
+            uncappedScaleOf(0.35, () -> {
+                assertEquals(1.0, ChaosContractDeterminationPay.getJobShare(campaign, contract(0.05, 1.0)), DELTA);
+                assertEquals(Money.of(1_000_000), payScheme.getMonthlyPay(campaign, contract(0.05, 1.0)));
+            });
+        }
+
+        /** The share follows today's force and Hiring Hall, whatever Scale is stored on the contract. */
+        @Test
+        void shareIgnoresTheStoredContractScale() {
+            campaignOptions.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, true);
+            hiringHallOf(HiringHallLevel.NONE);
+
+            uncappedScaleOf(8, () -> {
+                assertEquals(0.25, ChaosContractDeterminationPay.getJobShare(campaign, contract(1, 1.0)), DELTA);
+                assertEquals(0.25, ChaosContractDeterminationPay.getJobShare(campaign, contract(9, 1.0)), DELTA);
+            });
         }
 
         /** No committed combat force: nothing to divide by, so the costs are covered in full. */
         @Test
         void emptyForceIsCoveredInFull() {
             campaignOptions.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, true);
+            hiringHallOf(HiringHallLevel.NONE);
 
             uncappedScaleOf(0, () ->
                   assertEquals(1.0, ChaosContractDeterminationPay.getJobShare(campaign, contract(0, 1.0)), DELTA));
         }
 
+        /** In transit there is no Hiring Hall to cap the job, so the costs are covered in full. */
         @Test
-        void negativeScaleIsTreatedAsNoShare() {
+        void noShareInTransit() {
             campaignOptions.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, true);
+            when(campaign.getCurrentSystem()).thenReturn(null);
 
-            uncappedScaleOf(5, () ->
-                  assertEquals(0.0, ChaosContractDeterminationPay.getJobShare(campaign, contract(-1, 1.0)), DELTA));
+            uncappedScaleOf(8, () ->
+                  assertEquals(1.0, ChaosContractDeterminationPay.getJobShare(campaign, contract(2, 1.0)), DELTA));
         }
 
         @Test
         void shareAndBasePayMultiplierCombine() {
             campaignOptions.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, true);
+            hiringHallOf(HiringHallLevel.QUESTIONABLE);
 
             // 1,000,000 x (4 / 8) x 1.5
             uncappedScaleOf(8, () ->
@@ -657,6 +696,7 @@ class ChaosContractDeterminationPayTest {
         void jobShareUsesTheExactScales() {
             campaignOptions.set(CampaignOption.USE_FRACTIONAL_SCALE, true);
             campaignOptions.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, true);
+            hiringHallOf(HiringHallLevel.NONE);
 
             try (MockedStatic<AbstractContractGeneration> generation = mockStatic(AbstractContractGeneration.class)) {
                 generation.when(() -> AbstractContractGeneration.determineUncappedScale(any(), any(), any(), any()))
