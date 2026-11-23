@@ -79,7 +79,8 @@ class CrewAssignmentStateSkillsTest {
             int level = (Integer) skills[index + 1];
             byName.put(name, new SkillEntry(name, 10 - level, level));
         }
-        return new PersonEntry(person, SkillLevel.REGULAR, List.of(), Map.copyOf(byName), 0, null, "");
+        return new PersonEntry(person, SkillLevel.REGULAR, List.of(), Map.copyOf(byName), 0, null, "",
+              CrewAssignmentData.FamiliarityEntry.NONE);
     }
 
     private static PersonEntry mekWarrior(Object... skills) {

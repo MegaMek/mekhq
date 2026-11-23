@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.crewAssignment;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -73,6 +74,7 @@ import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudLinkList;
 import mekhq.gui.baseComponents.hud.HudToolTip;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.FamiliarityEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.SkillEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SkillGroup;
@@ -297,18 +299,24 @@ final class CrewRowRenderers {
         private final JLabel where = label(LINE_FONT, TEXT_MUTED);
         /** Hits and fatigue, on the second line beside where the person serves. */
         private final JLabel condition = label(LINE_FONT, TEXT_MUTED);
+        /** The chassis the person is most familiar with, or the selected unit's; empty while familiarity is off. */
+        private final JLabel familiarity = label(LINE_FONT, TEXT_MUTED);
+        /** The selected unit's chassis, whose familiarity the row shows first, or {@code null} for none. */
+        private final Supplier<String> familiarityChassis;
         /** The skill values that matter for the choice at hand, such as "3/4 · Scouting 5". */
         private final JLabel skills = label(LINE_FONT, TEXT);
         private final JLabel abilities = badge();
         private final JLabel skill = label(SKILL_FONT, TEXT);
 
         /**
-         * @param skillUnit  the unit whose gunnery and piloting skills to show, or {@code null} for each person's own
-         *                   combat role's
-         * @param skillGroup the group of skills to show each person's best of, or {@code null} for none
+         * @param skillUnit          the unit whose gunnery and piloting skills to show, or {@code null} for each
+         *                           person's own combat role's
+         * @param skillGroup         the group of skills to show each person's best of, or {@code null} for none
+         * @param familiarityChassis the selected unit's chassis, whose familiarity is shown first, or {@code null}
+         *                           to show each person's best chassis
          */
         PersonRow(AssignmentPlan plan, Predicate<Person> isSelected, BooleanSupplier isTechView,
-              Supplier<Unit> skillUnit, Supplier<SkillGroup> skillGroup) {
+              Supplier<Unit> skillUnit, Supplier<SkillGroup> skillGroup, Supplier<String> familiarityChassis) {
             // No tick box: one person is selected at a time, shown by the row's accent bar and lighter background
             super(false);
             this.plan = plan;
@@ -316,9 +324,12 @@ final class CrewRowRenderers {
             this.isTechView = isTechView;
             this.skillUnit = skillUnit;
             this.skillGroup = skillGroup;
+            this.familiarityChassis = familiarityChassis;
             secondLine.add(where);
             secondLine.add(Box.createHorizontalStrut(scaleForGUI(10)));
             secondLine.add(condition);
+            secondLine.add(Box.createHorizontalStrut(scaleForGUI(10)));
+            secondLine.add(familiarity);
             badges.add(skills);
             badges.add(Box.createHorizontalStrut(scaleForGUI(10)));
             badges.add(abilities);
@@ -372,6 +383,7 @@ final class CrewRowRenderers {
             }
 
             showSkills(entry);
+            showFamiliarity(entry);
 
             int count = entry.abilities().size();
             abilities.setVisible(count > 0);
@@ -425,6 +437,41 @@ final class CrewRowRenderers {
             skills.setToolTipText(named.isEmpty() ? null :
                                         HudToolTip.html(getTextAt(RESOURCE_BUNDLE, "row.skills.title"),
                                               String.join(", ", named)));
+        }
+
+        /**
+         * Names the chassis the person knows best, such as "Familiar: Orion 200 (+1 more)". With a unit selected, its
+         * chassis is named instead, in green, if the person has any familiarity with it. The tooltip lists the few
+         * chassis the person knows best, ending in an ellipsis when there are more, as a person can know any number.
+         */
+        private void showFamiliarity(PersonEntry entry) {
+            FamiliarityEntry known = entry.familiarity();
+            familiarity.setVisible(known.count() > 0);
+            if (known.count() == 0) {
+                familiarity.setText("");
+                familiarity.setToolTipText(null);
+                return;
+            }
+            String selected = familiarityChassis.get();
+            int selectedScore = (selected == null) ? 0 : entry.person().getChassisFamiliarity(selected);
+            boolean showsSelected = selectedScore > 0;
+            String chassis = showsSelected ? selected : known.top().get(0).getKey();
+            int score = showsSelected ? selectedScore : known.top().get(0).getValue();
+            int others = known.count() - 1;
+            familiarity.setText((others == 0) ?
+                                      getFormattedTextAt(RESOURCE_BUNDLE, "row.familiarity", chassis, score) :
+                                      getFormattedTextAt(RESOURCE_BUNDLE, "row.familiarity.more", chassis, score,
+                                            others));
+            familiarity.setForeground(showsSelected ? READY : TEXT);
+
+            // Such as "Orion 200, Marauder 120, Rifleman 85...", the trailing ellipsis marking chassis left unlisted
+            String listed = known.top().stream()
+                                  .map(chassisEntry -> chassisEntry.getKey() + ' ' + chassisEntry.getValue())
+                                  .collect(Collectors.joining(", "));
+            if (known.count() > known.top().size()) {
+                listed += "...";
+            }
+            familiarity.setToolTipText(wordWrap(listed));
         }
     }
 

@@ -35,15 +35,19 @@ package mekhq.gui.dialog.crewAssignment;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 
 import megamek.common.units.Entity;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.FamiliarityEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.FamiliarityBand;
 import org.junit.jupiter.api.Test;
 
@@ -104,5 +108,38 @@ class CrewAssignmentStateFamiliarityTest {
 
         state.selectedUnit = unitWithChassis("Locust");
         assertEquals("Locust", state.familiarityChassis());
+    }
+
+    @Test
+    void familiarChassisListsTheMostFamiliarFirstAndSkipsZero() {
+        Person person = personWith(Map.of("Atlas", 150, "Locust", 250, "Commando", 0, "Archer", 150));
+
+        FamiliarityEntry familiarity = CrewAssignmentState.familiarChassis(person, 5);
+
+        assertEquals(List.of(Map.entry("Locust", 250), Map.entry("Archer", 150), Map.entry("Atlas", 150)),
+              familiarity.top());
+        assertEquals(3, familiarity.count());
+    }
+
+    @Test
+    void familiarChassisKeepsOnlyTheBestUpToTheLimitButCountsThemAll() {
+        Map<String, Integer> many = new HashMap<>();
+        for (int i = 1; i <= 500; i++) {
+            many.put("Chassis " + i, i % 301);
+        }
+        many.put("Orion", 300);
+
+        FamiliarityEntry familiarity = CrewAssignmentState.familiarChassis(personWith(many), 3);
+
+        assertEquals(List.of(Map.entry("Chassis 300", 300), Map.entry("Orion", 300), Map.entry("Chassis 299", 299)),
+              familiarity.top());
+        // Chassis 301 has 0 familiarity, so it is not counted
+        assertEquals(500, familiarity.count());
+    }
+
+    @Test
+    void familiarChassisIsNoneWithoutFamiliarity() {
+        assertSame(FamiliarityEntry.NONE, CrewAssignmentState.familiarChassis(personWith(Map.of()), 5));
+        assertSame(FamiliarityEntry.NONE, CrewAssignmentState.familiarChassis(personWith(Map.of("Atlas", 0)), 5));
     }
 }

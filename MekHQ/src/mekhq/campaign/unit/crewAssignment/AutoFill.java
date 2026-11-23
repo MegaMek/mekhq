@@ -39,11 +39,14 @@ import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.ToIntBiFunction;
 import java.util.function.ToIntFunction;
 
 import megamek.common.enums.SkillLevel;
+import megamek.common.units.Entity;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.unit.Unit;
 
 /**
@@ -54,6 +57,9 @@ import mekhq.campaign.unit.Unit;
  * @since 0.51.01
  */
 public final class AutoFill {
+    /** The familiarity points between steps where familiarity bonuses change. */
+    static final int FAMILIARITY_STEP = 100;
+
     private AutoFill() {
     }
 
@@ -75,6 +81,29 @@ public final class AutoFill {
      */
     public static AssignmentPlan.StageResult fill(final AssignmentPlan plan, final List<Unit> units,
           final SeatType type, final Collection<Person> candidates, final Comparator<Person> ranking) {
+        return fill(plan, units, type, candidates, ranking, Familiarity.DISABLED);
+    }
+
+    /**
+     * As {@link #fill(AssignmentPlan, List, SeatType, Collection, Comparator)}, but people are first seated on units
+     * whose chassis they are familiar with, highest familiarity step first; see {@link #byFamiliarity}. Everyone else
+     * is then seated best first.
+     *
+     * @param plan            the plan to stage into
+     * @param units           the units, in the order they should be filled
+     * @param type            the seat to fill
+     * @param candidates      the people to choose from; anyone with a unit, or a staged change, is skipped
+     * @param ranking         best first; see {@link #byExperience}
+     * @param familiarityMode the campaign's chassis familiarity mode; while disabled, familiarity is ignored
+     *
+     * @return what was staged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static AssignmentPlan.StageResult fill(final AssignmentPlan plan, final List<Unit> units,
+          final SeatType type, final Collection<Person> candidates, final Comparator<Person> ranking,
+          final Familiarity familiarityMode) {
         final List<Person> pool = new ArrayList<>();
         for (Person person : candidates) {
             if ((person.getUnit() == null) && (plan.changeFor(person) == null)) {
@@ -82,7 +111,32 @@ public final class AutoFill {
             }
         }
         pool.sort(ranking);
-        return plan.fillSeats(pool, units, type);
+        return plan.fillSeats(pool, units, type, byFamiliarity(familiarityMode));
+    }
+
+    /**
+     * How strongly a person should crew a unit, by their familiarity with its chassis: the number of whole
+     * {@value #FAMILIARITY_STEP}-point steps they have reached, as that is where familiarity bonuses change. Below the
+     * first step, or while familiarity is disabled, there is no preference, so experience alone decides.
+     *
+     * @param familiarityMode the campaign's chassis familiarity mode
+     *
+     * @return the preference, zero for none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static ToIntBiFunction<Person, Unit> byFamiliarity(final Familiarity familiarityMode) {
+        if (!familiarityMode.isEnabled()) {
+            return (person, unit) -> 0;
+        }
+        return (person, unit) -> {
+            final Entity entity = unit.getEntity();
+            if ((entity == null) || !entity.isChassisFamiliarityEligible()) {
+                return 0;
+            }
+            return person.getChassisFamiliarity(entity.getChassis()) / FAMILIARITY_STEP;
+        };
     }
 
     /**
