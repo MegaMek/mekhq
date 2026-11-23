@@ -330,10 +330,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panInfo.add(lblRatingHead, gridBagConstraints);
         lblRating = new ClickableLabel(evt -> {
             if (getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION)) {
-                if (getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
-                    // Campaign-level tracking surfaces its breakdown via the rating tooltip, not a report dialog.
-                    return;
-                }
                 new ChaosReputationReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true);
             } else {
                 new ReputationReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true);
