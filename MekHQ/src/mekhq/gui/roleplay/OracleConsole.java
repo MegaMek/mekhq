@@ -215,6 +215,9 @@ public class OracleConsole extends JDialog {
         addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent event) {
+                if (journalPage != null) {
+                    journalPage.closing();
+                }
                 MekHQ.unregisterHandler(OracleConsole.this);
                 if (openConsole == OracleConsole.this) {
                     openConsole = null;
