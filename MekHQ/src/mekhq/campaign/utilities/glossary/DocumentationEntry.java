@@ -56,7 +56,6 @@ public enum DocumentationEntry {
     CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS",
           "glossaryDocs/MegaMek -MekHQ Chaos Campaign Guide",
           "0.50.07", "0.50.07", "0.50.07"),
-    COOP_CAMPAIGNS("COOP_CAMPAIGNS", "glossaryDocs/MekHQ Co-Op Campaign Guide v1", "0.50.07", "0.50.07", "0.50.07"),
     EDUCATION_MODULE("EDUCATION_MODULE",
           "glossaryDocs/Education Module",
           "0.50.07", "0.50.10", "0.50.10"),
