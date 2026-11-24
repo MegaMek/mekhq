@@ -133,9 +133,11 @@ public class RankValidator {
             }
         }
 
-        // We do require a single default profession
+        // We do require a single default profession. Every redirect would otherwise lead to another redirect, which the
+        // loop check below would reject anyway, but with a message that hides the real problem.
         if (defaultProfessions.isEmpty()) {
             LOGGER.error("You cannot have Rank Index 0 all indicate alternative professions for {}", rankSystem);
+            return false;
         }
 
         // Now, we need to check each profession
