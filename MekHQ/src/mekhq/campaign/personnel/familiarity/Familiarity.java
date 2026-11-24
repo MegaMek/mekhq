@@ -294,12 +294,12 @@ public enum Familiarity {
 
         String chassis = unitEntity.getChassis();
         for (Person crew : unit.getCrew()) {
-            addFamiliarity(campaign, crew, chassis, cap, familiarityGain);
+            addFamiliarity(campaign, mode, crew, chassis, cap, familiarityGain);
         }
 
         Person unitTech = unit.getTech();
         if (unitTech != null) {
-            gateMultipleTechAssignments(campaign, unitTech, chassis, cap, familiarityGain);
+            gateMultipleTechAssignments(campaign, mode, unitTech, chassis, cap, familiarityGain);
         }
     }
 
@@ -334,18 +334,35 @@ public enum Familiarity {
             return;
         }
 
-        addFamiliarity(campaign, person, unitEntity.getChassis(), cap, gainType.rollFamiliarity(speed));
+        addFamiliarity(campaign, mode, person, unitEntity.getChassis(), cap, gainType.rollFamiliarity(speed));
     }
 
-    private static void gateMultipleTechAssignments(Campaign campaign, Person unitTech, String chassis, int cap,
-          int familiarityGain) {
+    private static void gateMultipleTechAssignments(Campaign campaign, Familiarity mode, Person unitTech,
+          String chassis, int cap, int familiarityGain) {
         boolean singleUnitAssignment = unitTech.getTechUnits().size() == 1;
         if (singleUnitAssignment) {
-            addFamiliarity(campaign, unitTech, chassis, cap, familiarityGain);
+            addFamiliarity(campaign, mode, unitTech, chassis, cap, familiarityGain);
         }
     }
 
-    private static void addFamiliarity(Campaign campaign, Person crew, String chassis, int cap, int familiarityGain) {
+    /**
+     * Applies a familiarity gain to one character, then reports it if the gain brought them up to {@code cap}.
+     *
+     * <p>The report only claims <b>Maximum Familiarity</b> when {@code cap} is the mode's full
+     * {@link #getFamiliarityCap() familiarity cap}. A lower cap is a context-specific ceiling (currently only training
+     * passes one: {@link #getTrainingCap()} for the trainee's own chassis and half that for the educator's), so
+     * reaching it gets a training-specific report instead, as the character can still earn more familiarity
+     * elsewhere.</p>
+     *
+     * @param campaign        the current campaign, which receives the report
+     * @param mode            the active familiarity mode, supplying the full familiarity cap
+     * @param crew            the character gaining familiarity
+     * @param chassis         the base chassis name
+     * @param cap             the maximum familiarity this gain may raise the character to
+     * @param familiarityGain the gain before per-character trait modifiers
+     */
+    private static void addFamiliarity(Campaign campaign, Familiarity mode, Person crew, String chassis, int cap,
+          int familiarityGain) {
         PersonnelOptions options = crew.getOptions();
         boolean hasIronBond = options.booleanOption(FAMILIARITY_IRON_BOND);
         boolean isEmotionallyUnavailable = options.booleanOption(FAMILIARITY_EMOTIONALLY_UNAVAILABLE);
@@ -368,7 +385,10 @@ public enum Familiarity {
         boolean nowCapped = crew.getChassisFamiliarity(chassis) == cap;
 
         if (!alreadyCapped && nowCapped) {
-            String report = getFormattedTextAt(RESOURCE_BUNDLE, "FamiliarityMode.cappedFamiliarity",
+            String reportKey = (cap >= mode.getFamiliarityCap())
+                  ? "FamiliarityMode.cappedFamiliarity"
+                  : "FamiliarityMode.cappedTrainingFamiliarity";
+            String report = getFormattedTextAt(RESOURCE_BUNDLE, reportKey,
                   crew.getHyperlinkedFullTitle(), spanOpeningWithCustomColor(getAmazingColor()),
                   CLOSING_SPAN_TAG,
                   chassis);
