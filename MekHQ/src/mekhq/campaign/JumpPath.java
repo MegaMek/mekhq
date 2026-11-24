@@ -379,42 +379,49 @@ public class JumpPath {
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "jumpPath");
     }
 
-    public static JumpPath generateInstanceFromXML(Node wn, Campaign c) {
-        JumpPath retVal = null;
+    public static JumpPath generateInstanceFromXML(Node jumpPathNode, Campaign campaign) {
+        JumpPath jumpPath = null;
 
         try {
-            retVal = new JumpPath();
+            jumpPath = new JumpPath();
             String targetPlanetId = null;
             String originPlanetId = null;
-            NodeList nl = wn.getChildNodes();
+            NodeList childNodes = jumpPathNode.getChildNodes();
 
-            for (int x = 0; x < nl.getLength(); x++) {
-                Node wn2 = nl.item(x);
-                if (wn2.getNodeName().equalsIgnoreCase("planetName")) {
-                    PlanetarySystem p = c.getSystemByName(wn2.getTextContent());
-                    if (null != p) {
-                        retVal.addSystem(p);
-                    } else {
-                        LOGGER.error("Couldn't find planet named {}", wn2.getTextContent());
+            for (int index = 0; index < childNodes.getLength(); index++) {
+                Node childNode = childNodes.item(index);
+                if (childNode.getNodeName().equalsIgnoreCase("planetName")) {
+                    // Despite the tag name, writeToXML stores the system id. Ids and names differ for disambiguated
+                    // systems (e.g. "Elgin (Chisholm 2878-)" vs "Elgin"), so resolve by id first and only fall back
+                    // to a name lookup for older saves that stored names.
+                    String systemKey = childNode.getTextContent().trim();
+                    PlanetarySystem planetarySystem = campaign.getSystemById(systemKey);
+                    if (null == planetarySystem) {
+                        planetarySystem = campaign.getSystemByName(systemKey);
                     }
-                } else if (wn2.getNodeName().equalsIgnoreCase("targetPlanetId")) {
-                    targetPlanetId = wn2.getTextContent();
-                } else if (wn2.getNodeName().equalsIgnoreCase("originPlanetId")) {
-                    originPlanetId = wn2.getTextContent();
+                    if (null != planetarySystem) {
+                        jumpPath.addSystem(planetarySystem);
+                    } else {
+                        LOGGER.error("Couldn't find planet named {}", childNode.getTextContent());
+                    }
+                } else if (childNode.getNodeName().equalsIgnoreCase("targetPlanetId")) {
+                    targetPlanetId = childNode.getTextContent();
+                } else if (childNode.getNodeName().equalsIgnoreCase("originPlanetId")) {
+                    originPlanetId = childNode.getTextContent();
                 }
             }
 
             // Resolve the target planet against the destination system after the whole path is built.
-            if ((targetPlanetId != null) && (retVal.getLastSystem() != null)) {
-                retVal.setTargetPlanet(retVal.getLastSystem().getPlanetById(targetPlanetId));
+            if ((targetPlanetId != null) && (jumpPath.getLastSystem() != null)) {
+                jumpPath.setTargetPlanet(jumpPath.getLastSystem().getPlanetById(targetPlanetId));
             }
-            if ((originPlanetId != null) && (retVal.getFirstSystem() != null)) {
-                retVal.setOriginPlanet(retVal.getFirstSystem().getPlanetById(originPlanetId));
+            if ((originPlanetId != null) && (jumpPath.getFirstSystem() != null)) {
+                jumpPath.setOriginPlanet(jumpPath.getFirstSystem().getPlanetById(originPlanetId));
             }
-        } catch (Exception ex) {
-            LOGGER.error("", ex);
+        } catch (Exception exception) {
+            LOGGER.error("", exception);
         }
 
-        return retVal;
+        return jumpPath;
     }
 }
