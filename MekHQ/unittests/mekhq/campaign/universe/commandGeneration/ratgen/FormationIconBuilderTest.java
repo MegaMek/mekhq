@@ -34,6 +34,7 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ArrayList;
@@ -42,6 +43,7 @@ import java.util.Map;
 
 import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
+import megamek.common.units.EntityWeightClass;
 import mekhq.MHQConstants;
 import mekhq.MHQStaticDirectoryManager;
 import mekhq.campaign.Campaign;
@@ -338,6 +340,22 @@ class FormationIconBuilderTest {
     private static List<String> typeFilenames(Formation formation) {
         return ((LayeredFormationIcon) formation.getFormationIcon()).getPieces()
                      .get(LayeredFormationIconLayer.TYPE).stream().map(FormationPieceIcon::getFilename).toList();
+    }
+
+
+    @Test
+    @DisplayName("Weight classes map to the StratOps letter files, including super-heavy")
+    void weightClassFilenameMatchesShippedFiles() {
+        assertEquals("Light.png", FormationIconBuilder.weightClassFilename(EntityWeightClass.WEIGHT_ULTRA_LIGHT));
+        assertEquals("Light.png", FormationIconBuilder.weightClassFilename(EntityWeightClass.WEIGHT_LIGHT));
+        assertEquals("Medium.png", FormationIconBuilder.weightClassFilename(EntityWeightClass.WEIGHT_MEDIUM));
+        assertEquals("Heavy.png", FormationIconBuilder.weightClassFilename(EntityWeightClass.WEIGHT_HEAVY));
+        assertEquals("Assault.png", FormationIconBuilder.weightClassFilename(EntityWeightClass.WEIGHT_ASSAULT));
+        assertEquals("Superheavy.png", FormationIconBuilder.weightClassFilename(EntityWeightClass.WEIGHT_SUPER_HEAVY));
+        assertEquals("Light.png", FormationIconBuilder.weightClassFilename(EntityWeightClass.WEIGHT_SMALL_SUPPORT));
+        assertEquals("Medium.png", FormationIconBuilder.weightClassFilename(EntityWeightClass.WEIGHT_MEDIUM_SUPPORT));
+        assertEquals("Heavy.png", FormationIconBuilder.weightClassFilename(EntityWeightClass.WEIGHT_LARGE_SUPPORT));
+        assertNull(FormationIconBuilder.weightClassFilename(EntityWeightClass.WEIGHT_LARGE_DROP));
     }
 
     /**

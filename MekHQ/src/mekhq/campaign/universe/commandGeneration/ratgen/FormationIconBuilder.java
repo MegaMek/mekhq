@@ -114,6 +114,14 @@ public final class FormationIconBuilder {
     private static final String VTOL_TYPE_FILENAME = "Airship.png";
     private static final String GUN_EMPLACEMENT_TYPE_FILENAME = "Headquarters.png";
 
+    private static final String LIGHT_TYPE_FILENAME = "Light.png";
+    private static final String MEDIUM_TYPE_FILENAME = "Medium.png";
+    private static final String HEAVY_TYPE_FILENAME = "Heavy.png";
+    private static final String ASSAULT_TYPE_FILENAME = "Assault.png";
+    private static final String SUPER_HEAVY_TYPE_FILENAME = "Superheavy.png";
+    private static final List<String> WEIGHT_CLASS_FILENAMES = List.of(LIGHT_TYPE_FILENAME, MEDIUM_TYPE_FILENAME,
+          HEAVY_TYPE_FILENAME, ASSAULT_TYPE_FILENAME, SUPER_HEAVY_TYPE_FILENAME);
+
     /**
      * Every StratOps type file this builder draws. A TYPE layer made only of these was drawn here, or by a player who
      * picked exactly what the builder would have, so redrawing it to match the formation's units takes nothing from
@@ -469,10 +477,32 @@ public final class FormationIconBuilder {
               GUN_EMPLACEMENT_TYPE_FILENAME, MEDICAL_TYPE_FILENAME, MAINTENANCE_TYPE_FILENAME,
               HEADQUARTERS_TYPE_FILENAME, SUPPLY_TYPE_FILENAME));
         // The weight-class letters, drawn beside a silhouette or alone for vehicles.
-        for (int weightClass = 0; weightClass < EntityWeightClass.SIZE; weightClass++) {
-            filenames.add(EntityWeightClass.getClassName(weightClass) + ".png");
-        }
+        filenames.addAll(WEIGHT_CLASS_FILENAMES);
         return Set.copyOf(filenames);
+    }
+
+    /**
+     * The StratOps weight-class letter for a weight class.
+     *
+     * <p>The files are not named after MegaMek's weight class names: super-heavy is {@code Superheavy.png}, where
+     * the name is "Colossal/Super-Heavy", and ultra-light and the support vehicle classes have no letter of their own.
+     * Deriving the filename from the name drew no letter on a super-heavy 'Mek formation and a generic 'Mek on a
+     * super-heavy tank formation.</p>
+     *
+     * @param weightClass an {@link EntityWeightClass} code
+     *
+     * @return the letter's filename, or {@code null} for a class with no matching letter
+     */
+    static @Nullable String weightClassFilename(int weightClass) {
+        return switch (weightClass) {
+            case EntityWeightClass.WEIGHT_ULTRA_LIGHT, EntityWeightClass.WEIGHT_LIGHT,
+                 EntityWeightClass.WEIGHT_SMALL_SUPPORT -> LIGHT_TYPE_FILENAME;
+            case EntityWeightClass.WEIGHT_MEDIUM, EntityWeightClass.WEIGHT_MEDIUM_SUPPORT -> MEDIUM_TYPE_FILENAME;
+            case EntityWeightClass.WEIGHT_HEAVY, EntityWeightClass.WEIGHT_LARGE_SUPPORT -> HEAVY_TYPE_FILENAME;
+            case EntityWeightClass.WEIGHT_ASSAULT -> ASSAULT_TYPE_FILENAME;
+            case EntityWeightClass.WEIGHT_SUPER_HEAVY -> SUPER_HEAVY_TYPE_FILENAME;
+            default -> null;
+        };
     }
 
     /** Whether the file is one of the echelon shapes this builder draws for the faction family. */
@@ -640,7 +670,7 @@ public final class FormationIconBuilder {
 
         int dominantType = determineDominantUnitType(formation, unitLookup);
         int weightClass = determineWeightClass(formation, unitLookup);
-        String weightFilename = EntityWeightClass.getClassName(weightClass) + ".png";
+        String weightFilename = weightClassFilename(weightClass);
         String stratOps = MHQConstants.LAYERED_FORCE_ICON_TYPE_STRAT_OPS_PATH;
         LOGGER.info("[CompanyGen][Icons] formation '{}' dominantType={} ({}) weightClass={} ({})",
               formation.getName(), dominantType, UnitType.getTypeName(dominantType),
@@ -689,8 +719,9 @@ public final class FormationIconBuilder {
      * Adds a single TYPE piece; verifies it exists on disk before adding so a missing icon falls
      * back to the BattleMek (Center) generic silhouette.
      */
-    private static void appendSingle(LayeredFormationIcon icon, String folder, String filename) throws Exception {
-        if (MHQStaticDirectoryManager.getFormationIcons().getItem(
+    private static void appendSingle(LayeredFormationIcon icon, String folder, @Nullable String filename)
+          throws Exception {
+        if ((filename == null) || MHQStaticDirectoryManager.getFormationIcons().getItem(
               LayeredFormationIconLayer.TYPE.getLayerPath() + folder, filename) == null) {
             icon.getPieces().get(LayeredFormationIconLayer.TYPE).add(
                   new FormationPieceIcon(LayeredFormationIconLayer.TYPE,
@@ -708,7 +739,7 @@ public final class FormationIconBuilder {
      * and to BattleMek (Center) if the silhouette itself is missing.
      */
     private static void appendPairOrCenter(LayeredFormationIcon icon, String silhouetteFolder,
-          String silhouetteFilename, String weightFolder, String weightFilename) throws Exception {
+          String silhouetteFilename, String weightFolder, @Nullable String weightFilename) throws Exception {
         if (MHQStaticDirectoryManager.getFormationIcons().getItem(
               LayeredFormationIconLayer.TYPE.getLayerPath() + silhouetteFolder,
               silhouetteFilename) == null) {
@@ -720,7 +751,7 @@ public final class FormationIconBuilder {
         }
         icon.getPieces().get(LayeredFormationIconLayer.TYPE).add(
               new FormationPieceIcon(LayeredFormationIconLayer.TYPE, silhouetteFolder, silhouetteFilename));
-        if (MHQStaticDirectoryManager.getFormationIcons().getItem(
+        if ((weightFilename != null) && MHQStaticDirectoryManager.getFormationIcons().getItem(
               LayeredFormationIconLayer.TYPE.getLayerPath() + weightFolder, weightFilename) != null) {
             icon.getPieces().get(LayeredFormationIconLayer.TYPE).add(
                   new FormationPieceIcon(LayeredFormationIconLayer.TYPE, weightFolder, weightFilename));

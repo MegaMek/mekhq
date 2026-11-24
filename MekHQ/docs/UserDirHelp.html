@@ -1,0 +1,213 @@
+<!DOCTYPE html>
+<html lang="en">
+<head><title>User Directory Help</title></head>
+<body>
+<H1>How to Use the User Data Directory</H1>
+
+<P>
+    Use this directory for resources you want to share between different installs or versions of MegaMek, MegaMekLab and
+    MekHQ. Because it lives outside the installation, its contents survive upgrades. The directory should be an absolute
+    path such as D:/MyBTStuff (in other words, not relative to your MegaMek directory).
+</P>
+
+<P>
+    The same setting is shared by all three programs. It can be set in MekHQ under <I>File &gt; MekHQ Client Options
+    &gt; Advanced &gt; User Files Directory</I>, in MegaMek's client settings, or in MegaMekLab's settings. The
+    MegaMek Launcher can also supply a directory for a single run (the <code>megamek.userDir</code> system property),
+    which takes precedence over the saved setting.
+</P>
+
+<P>
+    Generally, content in the user directory is added to the content that ships with the programs. In some cases it
+    replaces shipped content with the same name, code or file path; those cases are noted below. Most content is read
+    at startup, so restart after adding files unless the relevant screen has a refresh button.
+</P>
+
+<P>
+    Do not confuse this with the <code>userdata</code> folder inside each installation. That folder is part of the
+    install and is not shared between installs or carried across upgrades.
+</P>
+
+<H2>Shared by MegaMek, MegaMekLab and MekHQ</H2>
+<UL>
+    <LI><B>Fonts</B> (.ttf files) can be placed anywhere in the user data directory (i.e., in the directory itself or
+        in any subfolder).
+
+    <LI><B>Units</B> (.mtf, .blk, .mep, .hmv, .tdb, .hmp and .bfs files, or .zip files containing them) can be placed
+        anywhere in the user data directory. Folders named <code>unsupported</code> or <code>.mml_tmp</code> are
+        skipped.
+
+    <LI><B>Camo</B> images must be placed in &lt;user data directory&gt;/data/images/camo/. In this subfolder, further
+        subfolders can be used (optional).
+
+    <LI><B>Portrait</B> images must be placed in &lt;user data directory&gt;/data/images/portraits/. In this subfolder,
+        further subfolders can be used (optional). For MekHQ's random portraits, see the <I>Random Portraits</I> guide
+        on the Glossary's Documentation page (<code>docs/mekhq/glossaryDocs/Portrait Generation.md</code>) for the
+        folder names that are used.
+
+    <LI><B>Unit fluff</B> images (.png, .jpg, .jpeg or .gif) must be placed in &lt;user data
+        directory&gt;/data/images/fluff/&lt;unit type&gt;/. The unit type folders are <code>Mek</code>,
+        <code>ProtoMek</code>, <code>BattleArmor</code>, <code>Infantry</code>, <code>Vehicle</code>,
+        <code>Fighter</code>, <code>ConvFighter</code>, <code>Small Craft</code>, <code>DropShip</code>,
+        <code>JumpShip</code>, <code>WarShip</code>, <code>Space Station</code> and <code>Asset</code>. An image is
+        used for a unit when its file name matches the unit's model or chassis (anything after an underscore is ignored,
+        so <code>Atlas_alt.png</code> matches every Atlas). Images can also be sorted into
+        &lt;unit type&gt;/&lt;chassis&gt;/ or &lt;unit type&gt;/&lt;chassis&gt;/&lt;model&gt;/ folders, where every
+        image in the folder matches. Images in the user directory are preferred over the shipped ones.
+
+    <LI><B>Record sheet</B> images, used in preference to fluff images when printing record sheets, can be placed in
+        &lt;user data directory&gt;/data/images/rs/&lt;unit type&gt;/, using the same unit type folders and naming
+        as unit fluff.
+
+    <LI><B>Factions and commands</B>: YAML files (.yml, or .zip files containing them) can be placed in &lt;user data
+        directory&gt;/data/universe/factions/ and &lt;user data directory&gt;/data/universe/commands/. A file with the
+        same faction key as a shipped faction replaces it. See <I>Faction Logos</I> below.
+
+    <LI><B>Faction icons</B> (.png) can be placed in &lt;user data directory&gt;/data/images/universe/factions/. An
+        icon there replaces a shipped icon with the same file name.
+
+    <LI><B>Bloodnames</B>: YAML files (.yml) can be placed in &lt;user data directory&gt;/data/universe/bloodnames/.
+</UL>
+
+<H2>MegaMek</H2>
+<UL>
+    <LI><B>Skin</B> definition files (.xml) can be placed anywhere in the user data directory.
+
+    <LI><B>Scenarios</B> (.mms files) can be placed in &lt;user data directory&gt;/data/scenarios/. Subfolders can be
+        used, and the first subfolder level is shown as a group in the scenario chooser.
+</UL>
+
+<H2>MegaMekLab</H2>
+<P>
+    The user directory is used to restore your most recent session. If you set the startup mode of MegaMekLab to
+    "Restore Tabs", a hidden folder called <code>.mml_tmp</code> is created in your user directory. You should not touch
+    this folder; changing its contents may cause MegaMekLab to fail to start. If "Restore Tabs" is set and MegaMekLab is
+    failing to start, try deleting the <code>.mml_tmp</code> folder, in case it was corrupted.
+</P>
+
+<H2>MekHQ</H2>
+<UL>
+    <LI><B>Formation icons</B> (formerly force icons) must be placed in &lt;user data directory&gt;/data/images/force/.
+        The directory structure of this folder should mirror that in your MekHQ folder at /data/images/force/: layered
+        icon pieces go in the matching folders under <code>Pieces/</code>, and unit icons in <code>Units/</code>. See
+        the <I>Formation Icons</I> guide on the Glossary's Documentation page
+        (<code>docs/mekhq/glossaryDocs/Force Icons.md</code>).
+
+    <LI><B>Rank systems</B> can be defined in &lt;user data directory&gt;/data/universe/ranks.xml. Each system needs a
+        code that is not already in use; a system that reuses a shipped code is rejected. See the <I>Rank Systems</I> guide
+        on the Glossary's Documentation page (<code>docs/mekhq/glossaryDocs/Ranks.md</code>).
+
+    <LI><B>Award sets</B> (.xml) can be placed in &lt;user data directory&gt;/data/universe/awards/. The file name is
+        the set name, and a file with the same name as a shipped set replaces it. The award images go in &lt;user data
+        directory&gt;/data/images/awards/&lt;set name&gt;/, in <code>medals/</code>, <code>ribbons/</code> and
+        <code>misc/</code> subfolders.
+
+    <LI><B>Academies</B> (.xml) can be placed in &lt;user data directory&gt;/data/universe/academies/.
+
+    <LI><B>Planetary systems</B>: YAML files (.yml), each containing a single system, can be placed in &lt;user data
+        directory&gt;/data/universe/planetary_systems/. Subfolders and .zip files containing .yml files can be used. A
+        system with the same ID as a shipped system replaces it.
+
+    <LI><B>Campaign presets</B> (.xml) can be placed in &lt;user data directory&gt;/data/campaignPresets/. When a user
+        directory is set, presets you save from MekHQ are saved here (otherwise they go to the installation's
+        <code>userdata/data/campaignPresets/</code> folder).
+
+    <LI><B>Life Paths</B> (.json) for the Advanced Character Builder can be placed in &lt;user data
+        directory&gt;/advancedCharacterBuilder/lifePaths/. Note that this folder is <I>not</I> inside
+        <code>data/</code>.
+
+    <LI><B>MekHQ's MegaMekLab tab</B> opens its save dialogs in the user data directory.
+</UL>
+
+<H2>Faction Logos</H2>
+<P>
+    A faction's emblem, used in MekHQ (including on the interstellar map) and in MegaMek, comes from its
+    <code>icon</code> field. This is a file name in data/images/universe/factions/; an image with that name in &lt;user
+    data directory&gt;/data/images/universe/factions/ is used in preference to the installed one. The
+    <code>iconChanges</code> field selects different images by game year. A command without an icon of its own uses
+    the icon of its parent faction.
+</P>
+<pre>
+icon: my_faction.png
+iconChanges:
+  3080: my_later_faction.png
+</pre>
+<P>
+    Older faction files may use the <code>logo</code> and <code>logoChanges</code> fields instead. These still work
+    in MekHQ, but only when the faction has no <code>icon</code>, and MegaMek ignores them. Their paths are relative to
+    data/images/force/Pieces/Logos/, again preferring the copy in &lt;user data directory&gt;. For example,
+    <code>logo: Custom/My Faction.png</code> uses &lt;user data directory&gt;/data/images/force/Pieces/Logos/Custom/My
+    Faction.png if it exists. New faction files should use <code>icon</code>.
+</P>
+<P>
+    Factions with neither an icon nor a logo, or whose image cannot be loaded, use the generic Clan or mercenary logo.
+    Use a PNG with a transparent background: the interstellar map draws the emblem's silhouette as a faint,
+    faction-colored watermark rather than displaying the original colors. Independent and abandoned territories never
+    show an emblem; otherwise the faction must own territory, and zoom, available territory size and collisions with
+    other emblems still affect visibility. Selecting a campaign unit icon does not set a territorial faction emblem.
+    Restart MekHQ after changing faction definitions or logo images.
+</P>
+
+<P>
+    This is an example of a suitable directory structure with a few example files:
+</P>
+<pre>
+    D:/myBTStuff
+        Oxanium.ttf
+        Exo.ttf
+        MyMMSkin.xml
+        /campaign_units
+            Atlas AS8-XT.mtf
+        /advancedCharacterBuilder
+            /lifePaths
+                My Life Path.json
+        /data
+            Jura.ttf
+            /campaignPresets
+                My Preset.xml
+            /scenarios
+                MyScenario.mms
+            /universe
+                ranks.xml
+                /awards
+                    MyAwards.xml
+                /academies
+                    My Academies.xml
+                /factions
+                    MYF.yml
+                /planetary_systems
+                    mySecretPlanet.yml
+            /images
+                /camo
+                    myForceCamo.png
+                    /oldcamo
+                        camo1.png
+                        camo2.png
+                /portraits
+                    myPortrait1.png
+                    /Female
+                        /MekWarrior
+                            myPilot.png
+                /fluff
+                    /Mek
+                        Atlas.png
+                    /DropShip
+                        Colossus.png
+                /awards
+                    /MyAwards
+                        /medals
+                        /ribbons
+                        /misc
+                /universe
+                    /factions
+                        my_faction.png
+                /force
+                    /Units
+                        MyUnitLogo.png
+                    /Pieces
+                        /Logos
+                            /Custom
+                                My Faction.png
+</pre>
+</body>
+</html>

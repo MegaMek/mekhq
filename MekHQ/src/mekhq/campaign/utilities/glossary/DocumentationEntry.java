@@ -48,24 +48,22 @@ import mekhq.MHQConstants;
  *
  * <p>This class provides methods to retrieve localized titles, sort entries, and look up entries by name.</p>
  *
+ * <p>Each document is a Markdown file under {@code docs/mekhq/}, shown in the Glossary Console's reader. The files
+ * are written in GitHub-flavored Markdown, so they read the same in the repository.</p>
+ *
  * @author Illiani
  * @since 0.50.07
  */
 public enum DocumentationEntry {
-    AWARDS_MODULE("AWARDS_MODULE", "glossaryDocs/Awards Module", "0.50.07", "0.50.07", "0.50.07"),
-    CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS",
-          "glossaryDocs/MegaMek -MekHQ Chaos Campaign Guide",
-          "0.50.07", "0.50.07", "0.50.07"),
-    COOP_CAMPAIGNS("COOP_CAMPAIGNS", "glossaryDocs/MekHQ Co-Op Campaign Guide v1", "0.50.07", "0.50.07", "0.50.07"),
-    EDUCATION_MODULE("EDUCATION_MODULE",
-          "glossaryDocs/Education Module",
-          "0.50.07", "0.50.10", "0.50.10"),
-    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "glossaryDocs/0_MHQ New Player Guide", "0.50.07", "0.50.11", "0.50.11");
+    FORMATION_ICONS("FORMATION_ICONS", "glossaryDocs/Force Icons", "0.49.06", "0.51.01.13", "0.51.01.13"),
+    RANDOM_PORTRAITS("RANDOM_PORTRAITS", "glossaryDocs/Portrait Generation", "0.47.04", "0.51.01.13",
+          "0.51.01.13"),
+    RANKS("RANKS", "glossaryDocs/Ranks", "0.49.00", "0.51.01.13", "0.51.01.13");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";
 
     private final String DIRECTORY = "docs/mekhq/";
-    private final String FILE_EXTENSION = ".pdf";
+    private final String FILE_EXTENSION = ".md";
 
     private final String lookUpName;
     private final String fileAddress;
@@ -80,7 +78,7 @@ public enum DocumentationEntry {
      * as {@code 0.51.01.4}. A change not yet released takes the version of the release it will ship in.</p>
      *
      * @param lookUpName          the resource key used to look up this entry's localized strings
-     * @param fileAddress         the document address
+     * @param fileAddress         the document's path under {@code docs/mekhq/}, without its {@code .md} extension
      * @param versionAdded        the release that first listed this document in the glossary
      * @param versionLastUpdated  the release that last shipped a significant revision of the document
      * @param versionLastVerified the release in which the document was last checked against the game and found
