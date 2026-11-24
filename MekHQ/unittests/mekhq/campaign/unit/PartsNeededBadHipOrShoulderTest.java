@@ -33,6 +33,8 @@
 package mekhq.campaign.unit;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -94,6 +96,19 @@ class PartsNeededBadHipOrShoulderTest {
         assertEquals(1, limbsNeeded.size());
         assertTrue(limbsNeeded.getFirst().isAcceptableReplacement(locationOf(Mek.LOC_LEFT_LEG).clone(), false),
               "The listed limb is a left leg for a 55 ton Mek");
+    }
+
+    @Test
+    void theListedLimbBelongsToTheMekThatNeedsIt() {
+        breakTheActuatorIn(Mek.LOC_LEFT_LEG, HIP_SLOT);
+
+        List<MissingMekLocation> limbsNeeded = limbsNeeded();
+
+        assertEquals(1, limbsNeeded.size());
+        assertSame(wolverine, limbsNeeded.getFirst().getUnit(),
+              "The acquisitions dialog names the unit each needed part is for (issue #11154)");
+        assertFalse(wolverine.getParts().contains(limbsNeeded.getFirst()),
+              "The listed limb is not fitted to the Mek");
     }
 
     @Test

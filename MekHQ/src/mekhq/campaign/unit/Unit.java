@@ -1368,6 +1368,9 @@ public class Unit implements ITechnology, ILocatable {
         }
         LOGGER.debug("[PartsNeeded] {}: {} has a broken hip or shoulder, so a replacement is needed", getName(),
               location.getName());
+        // The replacement is never added to this unit's parts, but the acquisition dialog lists the unit each needed
+        // part belongs to, so it must know which unit it is for.
+        replacement.setUnit(this);
         missingParts.add(replacement);
     }
 
