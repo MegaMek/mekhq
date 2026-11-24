@@ -274,12 +274,15 @@ public class SalvageRecoveryConsole extends JDialog {
         HudButton guideButton = new HudButton("?  " + guideText("button").toUpperCase(Locale.ROOT), false, true);
         guideButton.setToolTipText(guideText("button.toolTipText"));
         guideButton.addActionListener(event -> openGuide());
-        JPanel titleControls = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(8), 0));
-        titleControls.add(buildConditionChips());
-        titleControls.add(guideButton);
-        titleRow.add(titleControls, BorderLayout.EAST);
+        titleRow.add(guideButton, BorderLayout.EAST);
         commandBar.add(leftAligned(titleRow));
         commandBar.add(Box.createVerticalStrut(scaleForGUI(6)));
+
+        JComponent conditionChips = buildConditionChips();
+        if (conditionChips.getComponentCount() > 0) {
+            commandBar.add(leftAligned(conditionChips));
+            commandBar.add(Box.createVerticalStrut(scaleForGUI(6)));
+        }
         commandBar.add(leftAligned(Hud.hint(instructions())));
         return commandBar;
     }
@@ -310,7 +313,7 @@ public class SalvageRecoveryConsole extends JDialog {
      * them).
      */
     private JComponent buildConditionChips() {
-        JPanel chipsRow = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(6), 0));
+        JPanel chipsRow = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         RecoveryTimeData conditions = representativeConditions();
         if (conditions == null) {
             return chipsRow;
@@ -325,7 +328,7 @@ public class SalvageRecoveryConsole extends JDialog {
         double total = 1.0 + conditions.weatherMultiplier() + conditions.windMultiplier() +
                              conditions.temperatureMultiplier() + conditions.gravityMultiplier() +
                              conditions.atmosphereMultiplier() + conditions.lightMultiplier();
-        chipsRow.add(conditionChip(formatted("condition.total", total), ACCENT_BRIGHT, BORDER_CYAN));
+        addChip(chipsRow, conditionChip(formatted("condition.total", total), ACCENT_BRIGHT, BORDER_CYAN));
         return chipsRow;
     }
 
@@ -349,9 +352,20 @@ public class SalvageRecoveryConsole extends JDialog {
 
     private void addConditionChip(JPanel chipsRow, String conditionKey, double multiplier) {
         if (multiplier > 0.0) {
-            chipsRow.add(conditionChip(formatted("condition.chip", text("condition." + conditionKey), multiplier),
+            addChip(chipsRow, conditionChip(formatted("condition.chip", text("condition." + conditionKey), multiplier),
                   TEXT_MUTED, BORDER));
         }
+    }
+
+    /**
+     * Adds a chip to the row, spaced from the one before it. The gap goes only between chips (not before the first),
+     * so the row's left edge lines up with the title above it.
+     */
+    private static void addChip(JPanel chipsRow, JComponent chip) {
+        if (chipsRow.getComponentCount() > 0) {
+            chipsRow.add(Box.createHorizontalStrut(scaleForGUI(6)));
+        }
+        chipsRow.add(chip);
     }
 
     private static JLabel conditionChip(String text, Color foreground, Color border) {
