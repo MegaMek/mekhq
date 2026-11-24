@@ -74,6 +74,16 @@ class GuideMarkdownTest {
         assertTrue(html.contains("<a name='the-ssldf-system'></a>"), html);
     }
 
+    @Test
+    void repeatedHeadingsGetNumberedAnchors() {
+        String html = GuideMarkdown.toHtml("# Ranks\n\n## Ranks\n\n## Notes\n\n## Notes\n\n## Notes 1\n");
+
+        assertTrue(html.contains("<a name='ranks-1'></a>"), html);
+        assertTrue(html.contains("<a name='notes'></a>"), html);
+        assertTrue(html.contains("<a name='notes-1'></a>"), html);
+        assertTrue(html.contains("<a name='notes-1-1'></a>"), html);
+    }
+
     @ParameterizedTest
     @EnumSource(DocumentationEntry.class)
     void everyGuideReadsAndItsInPageLinksLand(DocumentationEntry entry) throws IOException {

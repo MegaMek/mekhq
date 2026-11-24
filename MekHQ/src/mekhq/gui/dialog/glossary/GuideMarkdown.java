@@ -36,8 +36,10 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.regex.Pattern;
 
 import mekhq.campaign.utilities.glossary.DocumentationEntry;
@@ -58,7 +60,7 @@ import org.commonmark.renderer.html.HtmlRenderer;
  * <p>The guides are written in GitHub-flavored Markdown, so they read well on GitHub too: tables are supported, and
  * a link to {@code #a-heading} jumps to that heading. The reader is a Swing HTML pane, which knows neither heading
  * ids nor table sections, so each heading gets a named anchor of its GitHub id, and {@code thead} and {@code tbody}
- * are left out. A guide's opening level-one heading is dropped too, as the console shows the guide's title above
+ * are left out. As on GitHub, a repeated heading's id gets {@code -1}, {@code -2} and so on. A guide's opening level-one heading is dropped too, as the console shows the guide's title above
  * the text.</p>
  *
  * @author Illiani
@@ -107,19 +109,42 @@ final class GuideMarkdown {
      */
     static String toHtml(String markdown) {
         Node document = PARSER.parse(markdown);
+        // How often each id has been given, so that a repeated heading gets a suffix as it does on GitHub
+        Map<String, Integer> occurrences = new HashMap<>();
         Node first = document.getFirstChild();
         if (first instanceof Heading heading && heading.getLevel() == 1) {
+            // GitHub still gives the title its id, so a later heading of the same text gets a suffix there
+            uniqueId(headingId(heading), occurrences);
             heading.unlink();
         }
         document.accept(new AbstractVisitor() {
             @Override
             public void visit(Heading heading) {
                 HtmlInline anchor = new HtmlInline();
-                anchor.setLiteral("<a name='" + headingId(heading) + "'></a>");
+                anchor.setLiteral("<a name='" + uniqueId(headingId(heading), occurrences) + "'></a>");
                 heading.prependChild(anchor);
             }
         });
         return TABLE_SECTIONS.matcher(RENDERER.render(document)).replaceAll("");
+    }
+
+    /**
+     * Makes a heading's id unique the way GitHub does: the first heading with an id keeps it, and each later one gets
+     * {@code -1}, {@code -2} and so on, skipping any suffixed id that is already taken.
+     *
+     * @param id          the heading's id, from {@link #headingId(Heading)}
+     * @param occurrences how often each id has been given so far in this guide; updated
+     *
+     * @return the id to use
+     */
+    private static String uniqueId(String id, Map<String, Integer> occurrences) {
+        String unique = id;
+        while (occurrences.containsKey(unique)) {
+            int count = occurrences.merge(id, 1, Integer::sum);
+            unique = id + '-' + count;
+        }
+        occurrences.put(unique, 0);
+        return unique;
     }
 
     /**

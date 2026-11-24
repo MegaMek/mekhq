@@ -1329,8 +1329,8 @@ public class GlossaryConsole extends JDialog {
         String html;
         try {
             html = GuideMarkdown.read(document);
-        } catch (IOException ex) {
-            LOGGER.error(ex, "Unable to read the document {}", document.getFileAddress());
+        } catch (IOException exception) {
+            LOGGER.error(exception, "Unable to read the document {}", document.getFileAddress());
             html = getFormattedTextAt(RESOURCE_BUNDLE, "GlossaryConsole.documentation.unreadable",
                   escape(GuideMarkdown.fileFor(document).getAbsolutePath()));
         }
