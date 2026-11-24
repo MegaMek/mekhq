@@ -142,7 +142,7 @@ class GuideReaderTest {
         assertEquals("one two", GuideReader.clean("  one\n\t two \uFEFF"));
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(allowZeroInvocations = true)
     @EnumSource(DocumentationEntry.class)
     void everyGuideThatShipsWithMekHQReads(DocumentationEntry entry) throws IOException {
         GuideDocument guide = GuideReader.read(GuideReader.fileFor(entry));

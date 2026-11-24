@@ -48,18 +48,14 @@ import mekhq.MHQConstants;
  *
  * <p>This class provides methods to retrieve localized titles, sort entries, and look up entries by name.</p>
  *
+ * <p>There are currently no documents: their content now lives in {@link GlossaryEntry} entries. The enum is kept so
+ * that a guide can be added again without rebuilding the Glossary Console's Documentation page.</p>
+ *
  * @author Illiani
  * @since 0.50.07
  */
 public enum DocumentationEntry {
-    AWARDS_MODULE("AWARDS_MODULE", "glossaryDocs/Awards Module", "0.50.07", "0.50.07", "0.50.07"),
-    CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS",
-          "glossaryDocs/MegaMek -MekHQ Chaos Campaign Guide",
-          "0.50.07", "0.50.07", "0.50.07"),
-    EDUCATION_MODULE("EDUCATION_MODULE",
-          "glossaryDocs/Education Module",
-          "0.50.07", "0.50.10", "0.50.10"),
-    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "glossaryDocs/0_MHQ New Player Guide", "0.50.07", "0.50.11", "0.50.11");
+    ;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";
 

@@ -334,6 +334,8 @@ public class GlossaryConsole extends JDialog {
 
         modeSelector = new HudModeSelector<>(Mode.class, Mode::label, this::showMode);
         modeSelector.setSelected(Mode.GLOSSARY);
+        // Every guide has been folded into the glossary, so the Documentation page stays locked until one is added
+        modeSelector.setModeEnabled(Mode.DOCUMENTATION, DocumentationEntry.values().length > 0);
         entriesTile = new HudStatTile(getTextAt(RESOURCE_BUNDLE, "GlossaryConsole.tile.entries"), "");
         unreadTile = new HudStatTile(getTextAt(RESOURCE_BUNDLE, "GlossaryConsole.tile.unread"),
               getTextAt(RESOURCE_BUNDLE, "GlossaryConsole.tile.unread.sub"));

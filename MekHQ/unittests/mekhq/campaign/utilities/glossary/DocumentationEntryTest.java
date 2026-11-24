@@ -53,7 +53,7 @@ import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 class DocumentationEntryTest {
-    @ParameterizedTest
+    @ParameterizedTest(allowZeroInvocations = true)
     @EnumSource(DocumentationEntry.class)
     void testAllEntriesHaveValidTitle(DocumentationEntry entry) {
         String title = entry.getTitle();
@@ -87,7 +87,7 @@ class DocumentationEntryTest {
         assertEquals(lookUpNames.size(), uniqueTitles.size(), "Titles are not unique.");
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(allowZeroInvocations = true)
     @EnumSource(DocumentationEntry.class)
     void testGetFileAddressReturnsExistingFile(DocumentationEntry documentationEntry) {
         String filePath = documentationEntry.getFileAddress();
@@ -98,7 +98,7 @@ class DocumentationEntryTest {
         assertTrue(Files.isReadable(path), "File is not readable: " + filePath);
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(allowZeroInvocations = true)
     @EnumSource(DocumentationEntry.class)
     void testAllDocumentationEntriesCanBeOpenedAsPdf(DocumentationEntry entry) {
         String fileAddress = entry.getFileAddress();
@@ -113,7 +113,7 @@ class DocumentationEntryTest {
         }
     }
 
-    @ParameterizedTest
+    @ParameterizedTest(allowZeroInvocations = true)
     @EnumSource(DocumentationEntry.class)
     void testVersionHistoryIsInOrder(DocumentationEntry entry) {
         assertFalse(entry.getVersionLastUpdated().isLowerThan(entry.getVersionAdded()),
