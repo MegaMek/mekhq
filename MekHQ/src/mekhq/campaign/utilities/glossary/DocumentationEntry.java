@@ -55,10 +55,10 @@ import mekhq.MHQConstants;
  * @since 0.50.07
  */
 public enum DocumentationEntry {
-    FORMATION_ICONS("FORMATION_ICONS", "glossaryDocs/Force Icons", "0.51.01.12", "0.51.01.12", "0.51.01.12"),
-    RANDOM_PORTRAITS("RANDOM_PORTRAITS", "glossaryDocs/Portrait Generation", "0.51.01.12", "0.51.01.12",
-          "0.51.01.12"),
-    RANKS("RANKS", "glossaryDocs/Ranks", "0.51.01.12", "0.51.01.12", "0.51.01.12");
+    FORMATION_ICONS("FORMATION_ICONS", "glossaryDocs/Force Icons", "0.49.06", "0.51.01.13", "0.51.01.13"),
+    RANDOM_PORTRAITS("RANDOM_PORTRAITS", "glossaryDocs/Portrait Generation", "0.47.04", "0.51.01.13",
+          "0.51.01.13"),
+    RANKS("RANKS", "glossaryDocs/Ranks", "0.49.00", "0.51.01.13", "0.51.01.13");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";
 

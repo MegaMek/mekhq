@@ -1,7 +1,5 @@
 # Formation Icons in MekHQ
 
-*Originally written by Windchild, 07-Nov-2021. Rewritten for MekHQ 0.51.01, 23-Nov-2026.*
-
 Force icons were renamed **formation icons** in 0.50.12. The in-game menus, the options and the code all use the
 new name; the folder on disk is still `data/images/force`.
 

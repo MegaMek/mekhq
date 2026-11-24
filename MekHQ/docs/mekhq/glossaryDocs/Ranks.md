@@ -1,7 +1,5 @@
 # Ranks in MekHQ
 
-*Originally written by Windchild, 25-Mar-2021; updated 01-Nov-2021. Rewritten for MekHQ 0.51.01, 23-Nov-2026.*
-
 A **rank system** is a named table of ranks. Each rank has a name for each of nine **professions**, whether it counts
 as an officer rank, and a pay multiplier. A character's displayed rank depends on their rank system, their rank, and
 the profession their primary role belongs to.

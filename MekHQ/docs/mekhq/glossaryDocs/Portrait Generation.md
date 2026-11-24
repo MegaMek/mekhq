@@ -1,8 +1,5 @@
 # Random Portraits in MekHQ
 
-*Originally written by Windchild, 08-Feb-2020; updated 05-Aug-2020, 01-Nov-2021 and 17-Aug-2026. Rewritten for
-MekHQ 0.51.01, 23-Nov-2026.*
-
 ## When Does MekHQ Assign a Random Portrait?
 
 MekHQ hands out a random portrait in these situations:
