@@ -82,7 +82,6 @@ import mekhq.campaign.utilities.glossary.GlossaryEntry;
 import mekhq.gui.CampaignGUI;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.dialog.glossary.GlossaryConsole;
-import mekhq.gui.dialog.glossary.GuideViewer;
 import mekhq.gui.utilities.WrapLayout;
 
 /**
@@ -738,7 +737,7 @@ public class ImmersiveDialogCore extends JDialog {
                 return;
             }
 
-            GuideViewer.showGuide(parent, documentationEntry);
+            GlossaryConsole.showDocument(parent, documentationEntry);
         } else if (commandKey.equalsIgnoreCase(PERSON_COMMAND_STRING)) {
             final UUID id = UUID.fromString(reference.split(":")[1]);
             campaignGUI.focusOnPerson(id);

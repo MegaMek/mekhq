@@ -103,7 +103,7 @@ import mekhq.gui.utilities.WrapLayout;
  * this build, or since the last core release, are tagged, and the ones the player has not yet read since they changed
  * are marked; tiles across the top count each and narrow the index to them. The reader shows the chosen entry, with
  * links to the entries it mentions and the entries that mention it, and back and forward through what the player has
- * read. The Documentation page lists the longer guides, which open in the document viewer.</p>
+ * read. The Documentation page lists the longer guides, which are read in the same reader.</p>
  *
  * <p>Any set of entries can be exported to a PDF for reading away from MekHQ.</p>
  *
@@ -215,7 +215,6 @@ public class GlossaryConsole extends JDialog {
     private final HudButton backButton;
     private final HudButton forwardButton;
     private final HudButton overviewButton;
-    private final HudButton openDocumentButton;
     private final JPanel sidePanel = Hud.transparentPanel(null);
     private final JLabel footerSummary = new JLabel();
     private final HudButton markAllReadButton;
@@ -256,7 +255,7 @@ public class GlossaryConsole extends JDialog {
     }
 
     /**
-     * Opens the glossary's Documentation page at a document, and opens the document.
+     * Opens the glossary's Documentation page at a document, and shows the document in the reader.
      *
      * @param owner    the window opening it; {@code null} for whichever window is active
      * @param document the document
@@ -266,14 +265,12 @@ public class GlossaryConsole extends JDialog {
      */
     public static void showDocument(@Nullable Window owner, DocumentationEntry document) {
         GlossaryConsole console = open(owner);
-        console.showMode(Mode.DOCUMENTATION, false);
-        console.selectDocument(document);
         console.openDocument(document);
     }
 
     /**
      * Follows a glossary or documentation hyperlink clicked anywhere in MekHQ: a glossary link opens the glossary at
-     * that entry, and a documentation link opens the document in the document viewer.
+     * that entry, and a documentation link opens the glossary's Documentation page at that document.
      *
      * @param parent         the window the link was clicked in; {@code null} for whichever window is active
      * @param hyperlinkEvent the event; only activations are followed
@@ -306,7 +303,7 @@ public class GlossaryConsole extends JDialog {
                 LOGGER.warn("Documentation entry not found: {}", entry);
                 return;
             }
-            GuideViewer.showGuide(parent, documentationEntry);
+            showDocument(parent, documentationEntry);
         }
     }
 
@@ -334,7 +331,7 @@ public class GlossaryConsole extends JDialog {
 
         modeSelector = new HudModeSelector<>(Mode.class, Mode::label, this::showMode);
         modeSelector.setSelected(Mode.GLOSSARY);
-        // Every guide has been folded into the glossary, so the Documentation page stays locked until one is added
+        // The Documentation page is locked while there are no guides to list
         modeSelector.setModeEnabled(Mode.DOCUMENTATION, DocumentationEntry.values().length > 0);
         entriesTile = new HudStatTile(getTextAt(RESOURCE_BUNDLE, "GlossaryConsole.tile.entries"), "");
         unreadTile = new HudStatTile(getTextAt(RESOURCE_BUNDLE, "GlossaryConsole.tile.unread"),
@@ -348,7 +345,6 @@ public class GlossaryConsole extends JDialog {
         backButton = new HudButton("\u2039  " + text("GlossaryConsole.reader.back"), false, true);
         forwardButton = new HudButton(text("GlossaryConsole.reader.forward") + "  \u203A", false, true);
         overviewButton = new HudButton(text("GlossaryConsole.reader.overview"), false, true);
-        openDocumentButton = new HudButton(text("GlossaryConsole.reader.openDocument"), true, true);
         markAllReadButton = new HudButton(text("GlossaryConsole.footer.markAllRead"), false);
         exportButton = new HudButton(text("GlossaryConsole.footer.export"), false);
         searchTimer = new Timer(SEARCH_DELAY_MILLIS, event -> refreshList());
@@ -570,20 +566,10 @@ public class GlossaryConsole extends JDialog {
                 onRowSelected();
             }
         });
-        list.addMouseListener(new MouseAdapter() {
-            @Override
-            public void mouseClicked(MouseEvent event) {
-                if (event.getClickCount() == 2 && list.getSelectedValue() instanceof DocumentRow row) {
-                    openDocument(row.document());
-                }
-            }
-        });
         list.addKeyListener(new KeyAdapter() {
             @Override
             public void keyPressed(KeyEvent event) {
-                if (event.getKeyCode() == KeyEvent.VK_ENTER && list.getSelectedValue() instanceof DocumentRow row) {
-                    openDocument(row.document());
-                } else if (event.getKeyCode() == KeyEvent.VK_UP && list.getSelectedIndex() <= firstSelectableRow()) {
+                if (event.getKeyCode() == KeyEvent.VK_UP && list.getSelectedIndex() <= firstSelectableRow()) {
                     searchField.requestFocusInWindow();
                     event.consume();
                 }
@@ -620,18 +606,12 @@ public class GlossaryConsole extends JDialog {
         forwardButton.addActionListener(event -> goForward());
         overviewButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "GlossaryConsole.reader.overview.toolTipText"));
         overviewButton.addActionListener(event -> showOverview());
-        openDocumentButton.addActionListener(event -> {
-            if (currentDocument != null) {
-                openDocument(currentDocument);
-            }
-        });
         navigation.add(backButton);
         navigation.add(Box.createHorizontalStrut(scaleForGUI(4)));
         navigation.add(forwardButton);
         navigation.add(Box.createHorizontalStrut(scaleForGUI(4)));
         navigation.add(overviewButton);
         navigation.add(Box.createHorizontalGlue());
-        navigation.add(openDocumentButton);
 
         readerEyebrow.setForeground(TEXT_FAINT);
         readerEyebrow.setFont(hudFont(Font.BOLD, 0.72f, 0.16f));
@@ -819,6 +799,10 @@ public class GlossaryConsole extends JDialog {
         styles.addRule("a { color: " + hex(ACCENT_BRIGHT) + "; }");
         styles.addRule("th { color: " + hex(ACCENT) + "; text-align: left; padding: 3px; }");
         styles.addRule("td { padding: 3px; }");
+        styles.addRule("table { margin-bottom: 8px; }");
+        styles.addRule("code { font-family: monospaced; color: " + hex(ACCENT) + "; }");
+        styles.addRule("pre { font-family: monospaced; color: " + hex(TEXT_MUTED) + "; margin-top: 0; "
+                             + "margin-bottom: 8px; margin-left: 10px; }");
         styles.addRule(".muted { color: " + hex(TEXT_MUTED) + "; }");
         styles.addRule(".faint { color: " + hex(TEXT_FAINT) + "; font-size: " + Math.max(8, size - 2) + "pt; }");
         styles.addRule(".build { color: " + hex(AMBER) + "; }");
@@ -1161,7 +1145,7 @@ public class GlossaryConsole extends JDialog {
         if (row instanceof EntryRow entryRow) {
             navigate(entryRow.item().entry(), true);
         } else if (row instanceof DocumentRow documentRow) {
-            showDocumentCard(documentRow.document());
+            showDocumentReader(documentRow.document());
         }
     }
 
@@ -1205,9 +1189,6 @@ public class GlossaryConsole extends JDialog {
         if (first >= 0) {
             list.setSelectedIndex(first);
             list.ensureIndexIsVisible(first);
-            if (listModel.get(first) instanceof DocumentRow row) {
-                openDocument(row.document());
-            }
         }
     }
 
@@ -1218,7 +1199,7 @@ public class GlossaryConsole extends JDialog {
 
     private void selectDocument(DocumentationEntry document) {
         currentDocument = document;
-        showDocumentCard(document);
+        showDocumentReader(document);
         selectCurrentRow();
     }
 
@@ -1339,13 +1320,22 @@ public class GlossaryConsole extends JDialog {
         selectCurrentRow();
     }
 
-    private void showDocumentCard(DocumentationEntry document) {
+    /** Shows a document in the reader, with the entries that mention it and its record beside it. */
+    private void showDocumentReader(DocumentationEntry document) {
         currentDocument = document;
         GlossaryChange change = GlossaryChange.of(document.getVersionLastUpdated());
         readerEyebrow.setText(versionLine(document.getVersionLastUpdated(), change).toUpperCase(Locale.ROOT));
         readerTitle.setText(document.getTitle().toUpperCase(Locale.ROOT));
-        setReaderText(getFormattedTextAt(RESOURCE_BUNDLE, "GlossaryConsole.documentation.card",
-              escape(document.getTitle())));
+        String html;
+        try {
+            html = GuideMarkdown.read(document);
+        } catch (IOException ex) {
+            LOGGER.error(ex, "Unable to read the document {}", document.getFileAddress());
+            html = getFormattedTextAt(RESOURCE_BUNDLE, "GlossaryConsole.documentation.unreadable",
+                  escape(GuideMarkdown.fileFor(document).getAbsolutePath()));
+        }
+        setReaderText(html);
+        highlightMatches(true);
 
         // The glossary entries that point to this document, so a player can read the summary first.
         sidePanel.removeAll();
@@ -1360,15 +1350,18 @@ public class GlossaryConsole extends JDialog {
         refreshNavigation(false);
     }
 
+    /** Shows a document in the reader, switching to the Documentation page if need be. */
     private void openDocument(DocumentationEntry document) {
-        GuideViewer.showGuide(this, document);
+        if (mode != Mode.DOCUMENTATION) {
+            showMode(Mode.DOCUMENTATION, false);
+        }
+        selectDocument(document);
     }
 
     private void refreshNavigation(boolean isGlossary) {
         backButton.setVisible(isGlossary);
         forwardButton.setVisible(isGlossary);
         overviewButton.setVisible(isGlossary);
-        openDocumentButton.setVisible(!isGlossary && currentDocument != null);
         backButton.setArmed((current == null && historyIndex >= 0) || historyIndex > 0);
         forwardButton.setArmed(current != null && historyIndex < history.size() - 1);
         overviewButton.setArmed(current != null);
@@ -1437,7 +1430,10 @@ public class GlossaryConsole extends JDialog {
         }
 
         reader.setToolTipText(null);
-        if (description.startsWith(GlossaryText.GLOSSARY_LINK_PREFIX)) {
+        if (description.startsWith("#")) {
+            // A link within a document, to one of its headings
+            reader.scrollToReference(description.substring(1));
+        } else if (description.startsWith(GlossaryText.GLOSSARY_LINK_PREFIX)) {
             GlossaryEntry entry = index.entry(description.substring(GlossaryText.GLOSSARY_LINK_PREFIX.length()));
             if (entry == null) {
                 LOGGER.warn("Glossary entry not found: {}", description);
@@ -1649,7 +1645,7 @@ public class GlossaryConsole extends JDialog {
     }
 
     /**
-     * The file dialogs want a frame, and the glossary and the guide viewer may belong to a dialog, so the frame above
+     * The file dialogs want a frame, and the glossary may belong to a dialog, so the frame above
      * a window is found; failing that, any frame MekHQ is showing.
      *
      * @param window the window

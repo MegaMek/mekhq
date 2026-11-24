@@ -292,6 +292,7 @@ dependencies {
     implementation 'org.apache.pdfbox:pdfbox:3.0.7'
 
     implementation 'org.commonmark:commonmark:0.28.0'
+    implementation 'org.commonmark:commonmark-ext-gfm-tables:0.28.0'
 
     implementation 'org.jfree:jfreechart:1.5.6'
 

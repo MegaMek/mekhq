@@ -35,25 +35,21 @@ package mekhq.campaign.utilities.glossary;
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
-import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.junit.jupiter.api.Assertions.fail;
 
-import java.io.File;
 import java.io.IOException;
+import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 import java.util.Objects;
 
-import org.apache.pdfbox.Loader;
-import org.apache.pdfbox.pdmodel.PDDocument;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.EnumSource;
 
 class DocumentationEntryTest {
-    @ParameterizedTest(allowZeroInvocations = true)
+    @ParameterizedTest
     @EnumSource(DocumentationEntry.class)
     void testAllEntriesHaveValidTitle(DocumentationEntry entry) {
         String title = entry.getTitle();
@@ -87,7 +83,7 @@ class DocumentationEntryTest {
         assertEquals(lookUpNames.size(), uniqueTitles.size(), "Titles are not unique.");
     }
 
-    @ParameterizedTest(allowZeroInvocations = true)
+    @ParameterizedTest
     @EnumSource(DocumentationEntry.class)
     void testGetFileAddressReturnsExistingFile(DocumentationEntry documentationEntry) {
         String filePath = documentationEntry.getFileAddress();
@@ -98,22 +94,16 @@ class DocumentationEntryTest {
         assertTrue(Files.isReadable(path), "File is not readable: " + filePath);
     }
 
-    @ParameterizedTest(allowZeroInvocations = true)
+    @ParameterizedTest
     @EnumSource(DocumentationEntry.class)
-    void testAllDocumentationEntriesCanBeOpenedAsPdf(DocumentationEntry entry) {
+    void testAllDocumentationEntriesAreMarkdownWithText(DocumentationEntry entry) throws IOException {
         String fileAddress = entry.getFileAddress();
-        File file = new File(fileAddress);
-        assertTrue(file.exists(), "File does not exist: " + fileAddress);
-
-        try (PDDocument pdf = Loader.loadPDF(file)) {
-            assertNotNull(pdf, "Could not load PDF document: " + fileAddress);
-            assertTrue(pdf.getNumberOfPages() > 0, "PDF has no pages: " + fileAddress);
-        } catch (IOException e) {
-            fail("File '" + fileAddress + "' could not be opened as a PDF. Exception: " + e.getMessage());
-        }
+        assertTrue(fileAddress.endsWith(".md"), "Not a Markdown file: " + fileAddress);
+        String text = Files.readString(Path.of(fileAddress), StandardCharsets.UTF_8);
+        assertFalse(text.isBlank(), "Document is empty: " + fileAddress);
     }
 
-    @ParameterizedTest(allowZeroInvocations = true)
+    @ParameterizedTest
     @EnumSource(DocumentationEntry.class)
     void testVersionHistoryIsInOrder(DocumentationEntry entry) {
         assertFalse(entry.getVersionLastUpdated().isLowerThan(entry.getVersionAdded()),

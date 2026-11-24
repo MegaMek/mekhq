@@ -48,19 +48,22 @@ import mekhq.MHQConstants;
  *
  * <p>This class provides methods to retrieve localized titles, sort entries, and look up entries by name.</p>
  *
- * <p>There are currently no documents: their content now lives in {@link GlossaryEntry} entries. The enum is kept so
- * that a guide can be added again without rebuilding the Glossary Console's Documentation page.</p>
+ * <p>Each document is a Markdown file under {@code docs/mekhq/}, shown in the Glossary Console's reader. The files
+ * are written in GitHub-flavored Markdown, so they read the same in the repository.</p>
  *
  * @author Illiani
  * @since 0.50.07
  */
 public enum DocumentationEntry {
-    ;
+    FORMATION_ICONS("FORMATION_ICONS", "glossaryDocs/Force Icons", "0.51.01.12", "0.51.01.12", "0.51.01.12"),
+    RANDOM_PORTRAITS("RANDOM_PORTRAITS", "glossaryDocs/Portrait Generation", "0.51.01.12", "0.51.01.12",
+          "0.51.01.12"),
+    RANKS("RANKS", "glossaryDocs/Ranks", "0.51.01.12", "0.51.01.12", "0.51.01.12");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";
 
     private final String DIRECTORY = "docs/mekhq/";
-    private final String FILE_EXTENSION = ".pdf";
+    private final String FILE_EXTENSION = ".md";
 
     private final String lookUpName;
     private final String fileAddress;
@@ -75,7 +78,7 @@ public enum DocumentationEntry {
      * as {@code 0.51.01.4}. A change not yet released takes the version of the release it will ship in.</p>
      *
      * @param lookUpName          the resource key used to look up this entry's localized strings
-     * @param fileAddress         the document address
+     * @param fileAddress         the document's path under {@code docs/mekhq/}, without its {@code .md} extension
      * @param versionAdded        the release that first listed this document in the glossary
      * @param versionLastUpdated  the release that last shipped a significant revision of the document
      * @param versionLastVerified the release in which the document was last checked against the game and found

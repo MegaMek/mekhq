@@ -69,7 +69,7 @@ import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
 import mekhq.gui.dialog.glossary.GlossaryConsole.Mode;
 
 /**
- * Builds the guide for each {@link GlossaryConsole} page, and for the {@link GuideViewer}, from the resource bundle.
+ * Builds the guide for each {@link GlossaryConsole} page from the resource bundle.
  * Each guide's steps, example lines and terms are numbered keys ({@code GlossaryGuide.glossary.step.1.title},
  * {@code .step.2.title}, ...), read until the next number is missing, so text can be added or reworded without code
  * changes.
@@ -80,8 +80,6 @@ import mekhq.gui.dialog.glossary.GlossaryConsole.Mode;
 final class GlossaryGuides {
     /** The keyboard shortcuts the Glossary page's guide lists, by the name of their resource keys. */
     private static final List<String> SHORTCUTS = List.of("search", "results", "escape", "history", "export");
-    /** The keyboard shortcuts the guide viewer's guide lists, by the name of their resource keys. */
-    private static final List<String> VIEWER_SHORTCUTS = List.of("find", "pages", "zoom", "viewerEscape");
 
     private GlossaryGuides() {}
 
@@ -93,13 +91,6 @@ final class GlossaryGuides {
     static Guide build(final Mode mode) {
         return build(guidePrefix(mode), getFormattedTextAt(RESOURCE_BUNDLE, "GlossaryGuide.eyebrow", mode.label()),
               mode == Mode.GLOSSARY ? shortcuts(SHORTCUTS) : null);
-    }
-
-    /**
-     * @return the guide viewer's guide
-     */
-    static Guide buildViewer() {
-        return build("GlossaryGuide.viewer.", text("GlossaryGuide.viewer.eyebrow"), shortcuts(VIEWER_SHORTCUTS));
     }
 
     private static Guide build(final String prefix, final String eyebrow, final @Nullable JComponent stepsExtra) {
