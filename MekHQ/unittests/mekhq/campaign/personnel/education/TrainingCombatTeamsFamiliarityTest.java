@@ -33,16 +33,21 @@
 package mekhq.campaign.personnel.education;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.Arrays;
 import java.util.List;
 
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.familiarity.FamiliarityGainType;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -66,6 +71,10 @@ class TrainingCombatTeamsFamiliarityTest {
     private static final int MARGIN_OF_SUCCESS = 5;
     private static final int EXPECTED_OWN_CHASSIS_GAIN = 20;
     private static final int EXPECTED_EDUCATOR_CHASSIS_GAIN = 10;
+
+    /** Literal fragments of the two capped-familiarity reports in {@code FamiliarityMode.properties}. */
+    private static final String MAXIMUM_FAMILIARITY_REPORT_FRAGMENT = "Maximum Familiarity";
+    private static final String TRAINING_CAP_REPORT_FRAGMENT = "can teach them about";
 
     private Campaign campaign;
     private Person educator;
@@ -99,6 +108,13 @@ class TrainingCombatTeamsFamiliarityTest {
         when(unit.getActiveCrew()).thenReturn(List.of(crew));
 
         return unit;
+    }
+
+    /** Scans every daily report tab, so the result does not depend on the unified daily report option. */
+    private boolean anyReportContains(String fragment) {
+        return Arrays.stream(DailyReportType.values())
+                     .flatMap(type -> campaign.getDailyReportLog().getLines(type).stream())
+                     .anyMatch(line -> line.contains(fragment));
     }
 
     private void trainOnce() {
@@ -164,6 +180,50 @@ class TrainingCombatTeamsFamiliarityTest {
         trainOnce();
 
         assertEquals(educatorChassisCap, trainee.getChassisFamiliarity(EDUCATOR_CHASSIS));
+    }
+
+    /**
+     * Regression (#11157): reaching the training cap on the trainee's own chassis reported "Maximum Familiarity", though
+     * the mode's real maximum is higher.
+     */
+    @Test
+    void testReachingTheOwnChassisTrainingCapReportsTheTrainingMessage() {
+        trainee.setChassisFamiliarity(TRAINEE_CHASSIS, Familiarity.NORMAL.getTrainingCap() - 5);
+
+        trainOnce();
+
+        assertTrue(anyReportContains(TRAINING_CAP_REPORT_FRAGMENT));
+        assertFalse(anyReportContains(MAXIMUM_FAMILIARITY_REPORT_FRAGMENT));
+    }
+
+    /**
+     * Regression (#11157): reaching half the training cap on the educator's chassis reported "Maximum Familiarity".
+     */
+    @Test
+    void testReachingTheEducatorChassisTrainingCapReportsTheTrainingMessage() {
+        trainee.setChassisFamiliarity(EDUCATOR_CHASSIS, (Familiarity.NORMAL.getTrainingCap() / 2) - 2);
+
+        trainOnce();
+
+        assertTrue(anyReportContains(TRAINING_CAP_REPORT_FRAGMENT));
+        assertFalse(anyReportContains(MAXIMUM_FAMILIARITY_REPORT_FRAGMENT));
+    }
+
+    @Test
+    void testReachingTheModeFamiliarityCapStillReportsMaximumFamiliarity() {
+        int familiarityCap = Familiarity.NORMAL.getFamiliarityCap();
+        trainee.setChassisFamiliarity(TRAINEE_CHASSIS, familiarityCap - 1);
+
+        Familiarity.assignFamiliarityToPerson(campaign,
+              trainee,
+              trainee.getUnit(),
+              familiarityCap,
+              FAMILIARITY_SPEED,
+              FamiliarityGainType.SINGLE);
+
+        assertEquals(familiarityCap, trainee.getChassisFamiliarity(TRAINEE_CHASSIS));
+        assertTrue(anyReportContains(MAXIMUM_FAMILIARITY_REPORT_FRAGMENT));
+        assertFalse(anyReportContains(TRAINING_CAP_REPORT_FRAGMENT));
     }
 
     @Test
