@@ -61,6 +61,7 @@ import megamek.common.equipment.MiscType;
 import megamek.common.units.Dropship;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
@@ -164,7 +165,7 @@ class SalvageOperationDraftTest {
         when(formation.getTechID()).thenReturn(toeTechId);
         when(formation.getScenarioId()).thenReturn(-1);
         when(formation.getSalvageUnitCount(any(), anyBoolean(), any())).thenReturn(salvageUnits);
-        when(formation.getAllUnitsAsUnits(any(), eq(false))).thenReturn(units);
+        when(formation.getAllUnitsAsUnits(any(LocalHangar.class), eq(false))).thenReturn(units);
         when(campaign.getPlayerForce().getFormation(id)).thenReturn(formation);
         formations.add(formation);
         return formation;

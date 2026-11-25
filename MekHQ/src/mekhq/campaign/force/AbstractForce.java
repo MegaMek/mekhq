@@ -63,6 +63,7 @@ import megamek.common.units.Entity;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -215,10 +216,22 @@ public abstract class AbstractForce {
      * @return the unit, or {@code null} if no detachment of this force holds it
      */
     public @Nullable Unit findUnit(UUID unitId) {
+        LocalHangar hangar = findHangarHolding(unitId);
+        return (hangar == null) ? null : hangar.getUnit(unitId);
+    }
+
+    /**
+     * Finds the hangar of the {@link Detachment} of this force that holds a unit. Multi-detachment-safe.
+     *
+     * @param unitId the unit's id
+     *
+     * @return the holding detachment's hangar, or {@code null} if no detachment of this force holds the unit
+     */
+    public @Nullable LocalHangar findHangarHolding(UUID unitId) {
         for (Detachment detachment : getDetachments()) {
-            Unit unit = detachment.getHangar().getUnit(unitId);
-            if (unit != null) {
-                return unit;
+            LocalHangar hangar = detachment.getHangar();
+            if (hangar.getUnit(unitId) != null) {
+                return hangar;
             }
         }
         return null;

@@ -263,7 +263,8 @@ public class CampaignSummary {
         }
 
         cargoCapacity = cargoCapacity * tetrisMasterMultiplier;
-        // Unit bays not needed for our units can carry cargo instead
+        // Unit bays not needed for our units can carry cargo instead. Cargo rides where the units are, so like the
+        // cargo statistics above this counts only the main force's units.
         cargoCapacity += calculateSpareBayCargoCapacity(campaign.getPlayerForce().getHangar().getUnits());
 
         cargoTons = cargoStats.getCargoTonnage(false);

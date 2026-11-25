@@ -143,7 +143,7 @@ public class AverageExperienceRating {
                 continue;
             }
 
-            for (Unit unit : formation.getAllForceUnitsAsUnits(playerForce, true)) {
+            for (Unit unit : formation.getAllUnitsAsUnits(playerForce, true)) {
                 // Support carriers are not combat units; their occupants are support personnel
                 if (unit.isCarrier()) {
                     continue;

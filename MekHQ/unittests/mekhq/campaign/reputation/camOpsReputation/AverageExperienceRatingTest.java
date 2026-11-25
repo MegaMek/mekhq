@@ -108,7 +108,7 @@ class AverageExperienceRatingTest {
 
         Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
         when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-        when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
+        when(formation.getAllUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
         CombatTeam team = mock(CombatTeam.class);
         when(team.getFormation(campaign)).thenReturn(formation);
@@ -128,7 +128,7 @@ class AverageExperienceRatingTest {
 
         Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
         when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-        when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
+        when(formation.getAllUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
         CombatTeam team = mock(CombatTeam.class);
         when(team.getFormation(campaign)).thenReturn(formation);
@@ -153,7 +153,7 @@ class AverageExperienceRatingTest {
 
         Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
         when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-        when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(supportCarrier));
+        when(formation.getAllUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(supportCarrier));
 
         CombatTeam team = mock(CombatTeam.class);
         when(team.getFormation(campaign)).thenReturn(formation);
@@ -193,7 +193,7 @@ class AverageExperienceRatingTest {
 
             Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
             when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
+            when(formation.getAllUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
             when(team.getFormation(campaign)).thenReturn(formation);
@@ -251,7 +251,7 @@ class AverageExperienceRatingTest {
 
             Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
             when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unitA, unitB));
+            when(formation.getAllUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unitA, unitB));
 
             CombatTeam team = mock(CombatTeam.class);
             when(team.getFormation(campaign)).thenReturn(formation);
@@ -293,7 +293,7 @@ class AverageExperienceRatingTest {
 
             Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
             when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
+            when(formation.getAllUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
             when(team.getFormation(campaign)).thenReturn(formation);
@@ -352,7 +352,7 @@ class AverageExperienceRatingTest {
 
             Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
             when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
+            when(formation.getAllUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
             when(team.getFormation(campaign)).thenReturn(formation);
@@ -397,7 +397,7 @@ class AverageExperienceRatingTest {
 
             Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
             when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
+            when(formation.getAllUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
             when(team.getFormation(campaign)).thenReturn(formation);
@@ -435,7 +435,7 @@ class AverageExperienceRatingTest {
 
             Formation formation = mock(Formation.class, RETURNS_DEEP_STUBS);
             when(formation.getCombatRoleInMemory().isTraining()).thenReturn(false);
-            when(formation.getAllForceUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
+            when(formation.getAllUnitsAsUnits(campaign.getPlayerForce(), true)).thenReturn(List.of(unit));
 
             CombatTeam team = mock(CombatTeam.class);
             when(team.getFormation(campaign)).thenReturn(formation);

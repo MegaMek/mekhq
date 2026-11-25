@@ -1144,7 +1144,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         return travelLocation.isInTransit();
     }
 
-    /** Searches campaign hangar then all base hangars for a unit by UUID. */
+    /** Searches every detachment's hangar, then all base hangars, for a unit by UUID. */
     private static @Nullable Unit findUnitAnywhere(Campaign campaign, UUID unitId) {
         Unit unit = campaign.getPlayerForce().findUnit(unitId);
         if (unit != null) {

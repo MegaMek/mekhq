@@ -607,7 +607,7 @@ public class Formation {
      *
      * @return the resolved units of this formation and its sub-formations
      */
-    public List<Unit> getAllForceUnitsAsUnits(AbstractForce force, boolean standardFormationsOnly) {
+    public List<Unit> getAllUnitsAsUnits(AbstractForce force, boolean standardFormationsOnly) {
         List<Unit> allUnits = new ArrayList<>();
 
         for (UUID unitId : getAllUnits(standardFormationsOnly)) {

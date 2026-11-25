@@ -144,6 +144,9 @@ class PlayerForceTest {
         assertSame(secondUnit, playerForce.findUnit(secondUnit.getId()));
         assertNull(playerForce.findUnit(UUID.randomUUID()));
         assertEquals(List.of(first.getWarehouse(), second.getWarehouse()), playerForce.allWarehouses());
+        assertSame(first.getHangar(), playerForce.findHangarHolding(firstUnit.getId()));
+        assertSame(second.getHangar(), playerForce.findHangarHolding(secondUnit.getId()));
+        assertNull(playerForce.findHangarHolding(UUID.randomUUID()));
     }
 
     @Test
@@ -155,5 +158,6 @@ class PlayerForceTest {
         assertEquals(List.of(unit), List.copyOf(playerForce.allUnits()));
         assertSame(unit, playerForce.findUnit(unit.getId()));
         assertEquals(List.of(playerForce.getWarehouse()), playerForce.allWarehouses());
+        assertSame(playerForce.getHangar(), playerForce.findHangarHolding(unit.getId()));
     }
 }
