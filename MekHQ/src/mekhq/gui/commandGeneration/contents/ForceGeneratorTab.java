@@ -254,6 +254,27 @@ public class ForceGeneratorTab {
     }
 
     /**
+     * Swaps one unit of the roll for another drawn for the same slot, keeping its pilot and the rest of its
+     * formation. MegaMek's view does the reroll and tells the player when nothing else fits; this only passes the
+     * change on to the board.
+     *
+     * @param slot the unit to replace
+     *
+     * @return {@code true} when a new unit took its place
+     */
+    public boolean rerollUnit(ForceDescriptor slot) {
+        if (viewUi == null) {
+            LOGGER.debug("[ForceGen][RerollUnit] no force generator view yet; nothing rerolled");
+            return false;
+        }
+        boolean rerolled = viewUi.rerollUnit(slot) != null;
+        if (rerolled) {
+            modelChanged();
+        }
+        return rerolled;
+    }
+
+    /**
      * Gives a freshly rolled Clan force its share of Bloodnames, on the crews the board shows. The award has to land
      * on the descriptor's crews before the build, so the board can show them and the build can see them.
      */
