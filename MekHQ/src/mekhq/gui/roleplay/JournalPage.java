@@ -33,11 +33,11 @@
 package mekhq.gui.roleplay;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.baseComponents.hud.Hud.column;
+import static mekhq.gui.baseComponents.hud.Hud.escape;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
-import static mekhq.gui.roleplay.AskPage.column;
 import static mekhq.gui.roleplay.AskPage.rightButtonRow;
 import static mekhq.gui.roleplay.OracleConsole.RESOURCE_BUNDLE;
-import static mekhq.gui.roleplay.OracleConsole.escape;
 import static mekhq.gui.roleplay.OracleConsole.formatDate;
 import static mekhq.gui.roleplay.ThreadsPage.onChange;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -166,6 +166,8 @@ class JournalPage implements ConsoleSection {
     private final JLabel empty = Hud.notice("");
     /** The entry in the reader, or {@code null} if none. */
     private JournalEntry shown;
+    /** The note most recently started in this console, until the player moves off it. */
+    private @Nullable JournalEntry newestNote;
     /** Saves a note shortly after typing pauses, rather than serialising the whole note on every keystroke. */
     private final Timer saveTimer = new Timer(SAVE_DELAY_MILLISECONDS, event -> saveEditor());
 
@@ -618,7 +620,12 @@ class JournalPage implements ConsoleSection {
             return;
         }
         flushEditor();
+        JournalEntry left = shown;
         shown = entry;
+        if (discardIfUnwritten(left)) {
+            // The list is still drawn with the discarded note, so redraw it once this selection change is done.
+            SwingUtilities.invokeLater(console::changed);
+        }
         delete.reset();
         reader.setVisible(entry != null);
         empty.setVisible(entry == null);
@@ -718,7 +725,9 @@ class JournalPage implements ConsoleSection {
         if (!currentFilter().matches(note)) {
             clearFilters();
         }
+        // Moving to the new note discards the previous newest note if it was left empty, so mark this one afterwards.
         refreshList(note);
+        newestNote = note;
         console.changed();
         editor.getEditorPane().requestFocusInWindow();
     }
@@ -834,8 +843,41 @@ class JournalPage implements ConsoleSection {
         return box;
     }
 
+    /**
+     * Removes the note the player started most recently if it was left without anything written in it, so a note
+     * started by mistake (for example, by pressing Journal Note after finishing a note, expecting it to save) does not
+     * linger as an empty entry. Notes that were not started in this console, such as ones loaded with the campaign,
+     * are never removed.
+     *
+     * @param entry the entry being left, or {@code null}
+     *
+     * @return {@code true} if the entry was removed
+     */
+    private boolean discardIfUnwritten(final @Nullable JournalEntry entry) {
+        if (entry == null || entry != newestNote) {
+            return false;
+        }
+        newestNote = null;
+        if (!entry.getPlainText().isBlank()) {
+            return false;
+        }
+        console.roleplay().deleteEntry(entry);
+        return true;
+    }
+
+    /**
+     * Saves any unsaved typing and removes the newest note if it was left empty. Called when the console closes.
+     */
+    void closing() {
+        flushEditor();
+        discardIfUnwritten(newestNote);
+    }
+
     private void deleteShown() {
         saveTimer.stop();
+        if (shown == newestNote) {
+            newestNote = null;
+        }
         if (shown != null) {
             console.roleplay().deleteEntry(shown);
             shown = null;

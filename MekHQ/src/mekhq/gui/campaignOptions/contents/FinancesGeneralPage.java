@@ -34,7 +34,6 @@ package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -82,9 +81,10 @@ class FinancesGeneralPage {
     private JPanel pnlGeneralOptions;
     private JCheckBox useLoanLimitsBox;
     private JCheckBox usePercentageMaintenanceBox;
-    private JCheckBox useExtendedPartsModifierBox;
-    private JCheckBox usePeacetimeCostBox;
     private JCheckBox showPeacetimeCostBox;
+    private JCheckBox payForPeacetimeSparePartsBox;
+    private JCheckBox payForTrainingMunitionsBox;
+    private JCheckBox payForPeacetimeFuelBox;
     private JLabel lblFinancialYearDuration;
     private MMComboBox<FinancialYearDuration> comboFinancialYearDuration;
     private JCheckBox newFinancialYearFinancesToCSVExportBox;
@@ -204,7 +204,7 @@ class FinancesGeneralPage {
                 .section("lblRentedFacilitiesPanel.text",
                         "lblRentedFacilitiesPanel.summary",
                         pnlRentedFacilities,
-                        getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM))
+                        getMetadata(new Version("0.50.10"), CampaignOptionFlag.CUSTOM_SYSTEM))
                 .build();
 
         created = true;
@@ -227,7 +227,7 @@ class FinancesGeneralPage {
         // Contents
         payForPartsBox = new CampaignOptionsCheckBox("PayForPartsBox");
         payForPartsBox.addMouseListener(createTipPanelUpdater("PayForPartsBox"));
-        payForRepairsBox = new CampaignOptionsCheckBox("PayForRepairsBox");
+        payForRepairsBox = new CampaignOptionsCheckBox("PayForRepairsBox", getMetadata(new Version("0.45.00")));
         payForRepairsBox.addMouseListener(createTipPanelUpdater("PayForRepairsBox"));
         payForUnitsBox = new CampaignOptionsCheckBox("PayForUnitsBox");
         payForUnitsBox.addMouseListener(createTipPanelUpdater("PayForUnitsBox"));
@@ -238,11 +238,11 @@ class FinancesGeneralPage {
         payForMaintainBox = new CampaignOptionsCheckBox("PayForMaintainBox");
         payForMaintainBox.addMouseListener(createTipPanelUpdater("PayForMaintainBox"));
         payForHotSpotsUpkeepBox = new CampaignOptionsCheckBox("PayForHotSpotsUpkeepBox",
-                getMetadata(new Version(0, 51, 1)));
+                getMetadata(new Version("0.51.01.1")));
         payForHotSpotsUpkeepBox.addMouseListener(createTipPanelUpdater("PayForHotSpotsUpkeepBox"));
         payForHotSpotsUpkeepBox.addItemListener(event -> updateHotSpotsUpkeepExclusions());
         escalatingHotSpotsUpkeepBox = new CampaignOptionsCheckBox("EscalatingHotSpotsUpkeepBox",
-                getMetadata(new Version(0, 51, 1)));
+                getMetadata(new Version("0.51.01.1")));
         escalatingHotSpotsUpkeepBox.addMouseListener(createTipPanelUpdater("EscalatingHotSpotsUpkeepBox"));
         payForTransportBox = new CampaignOptionsCheckBox("PayForTransportBox");
         payForTransportBox.addMouseListener(createTipPanelUpdater("PayForTransportBox"));
@@ -250,13 +250,13 @@ class FinancesGeneralPage {
         payForRecruitmentBox
                 .addMouseListener(createTipPanelUpdater("PayForRecruitmentBox"));
         payForFoodBox = new CampaignOptionsCheckBox("PayForFoodBox",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.07"), CampaignOptionFlag.IMPORTANT));
         payForFoodBox.addMouseListener(createTipPanelUpdater("PayForFoodBox"));
         payForHousingBox = new CampaignOptionsCheckBox("PayForHousingBox",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.07"), CampaignOptionFlag.IMPORTANT));
         payForHousingBox.addMouseListener(createTipPanelUpdater("PayForHousingBox"));
         lblRecruitmentTrainingCostMultiplier = new CampaignOptionsLabel("RecruitmentTrainingCostMultiplier",
-                getMetadata(new Version(0, 51, 1)));
+                getMetadata(new Version("0.51.01.1")));
         lblRecruitmentTrainingCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentTrainingCostMultiplier"));
         spnRecruitmentTrainingCostMultiplier = new CampaignOptionsSpinner("RecruitmentTrainingCostMultiplier",
@@ -265,7 +265,7 @@ class FinancesGeneralPage {
               .addMouseListener(createTipPanelUpdater("RecruitmentTrainingCostMultiplier"));
         lblRecruitmentProfessionSkillCostMultiplier =
               new CampaignOptionsLabel("RecruitmentProfessionSkillCostMultiplier",
-                    getMetadata(new Version(0, 51, 1)));
+                    getMetadata(new Version("0.51.01.1")));
         lblRecruitmentProfessionSkillCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentProfessionSkillCostMultiplier"));
         spnRecruitmentProfessionSkillCostMultiplier =
@@ -274,7 +274,7 @@ class FinancesGeneralPage {
         spnRecruitmentProfessionSkillCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentProfessionSkillCostMultiplier"));
         lblRecruitmentUtilitySkillCostMultiplier = new CampaignOptionsLabel("RecruitmentUtilitySkillCostMultiplier",
-                getMetadata(new Version(0, 51, 1)));
+                getMetadata(new Version("0.51.01.1")));
         lblRecruitmentUtilitySkillCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentUtilitySkillCostMultiplier"));
         spnRecruitmentUtilitySkillCostMultiplier = new CampaignOptionsSpinner("RecruitmentUtilitySkillCostMultiplier",
@@ -282,7 +282,7 @@ class FinancesGeneralPage {
         spnRecruitmentUtilitySkillCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentUtilitySkillCostMultiplier"));
         lblRecruitmentRoleplaySkillCostMultiplier = new CampaignOptionsLabel("RecruitmentRoleplaySkillCostMultiplier",
-                getMetadata(new Version(0, 51, 1)));
+                getMetadata(new Version("0.51.01.1")));
         lblRecruitmentRoleplaySkillCostMultiplier
               .addMouseListener(createTipPanelUpdater("RecruitmentRoleplaySkillCostMultiplier"));
         spnRecruitmentRoleplaySkillCostMultiplier =
@@ -334,43 +334,48 @@ class FinancesGeneralPage {
         usePercentageMaintenanceBox = new CampaignOptionsCheckBox("UsePercentageMaintenanceBox",
                 getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         usePercentageMaintenanceBox.addMouseListener(createTipPanelUpdater("UsePercentageMaintenanceBox"));
-        useExtendedPartsModifierBox = new CampaignOptionsCheckBox("UseExtendedPartsModifierBox");
-        useExtendedPartsModifierBox.addMouseListener(createTipPanelUpdater("UseExtendedPartsModifierBox"));
-        usePeacetimeCostBox = new CampaignOptionsCheckBox("UsePeacetimeCostBox");
-        usePeacetimeCostBox.addMouseListener(createTipPanelUpdater("UsePeacetimeCostBox"));
-        showPeacetimeCostBox = new CampaignOptionsCheckBox("ShowPeacetimeCostBox");
+        showPeacetimeCostBox = new CampaignOptionsCheckBox("ShowPeacetimeCostBox", getMetadata(new Version("0.43.04")));
         showPeacetimeCostBox
                 .addMouseListener(createTipPanelUpdater("ShowPeacetimeCostBox"));
+        payForPeacetimeSparePartsBox = new CampaignOptionsCheckBox("PayForPeacetimeSparePartsBox",
+              getMetadata(new Version("0.51.01.7")));
+        payForPeacetimeSparePartsBox.addMouseListener(createTipPanelUpdater("PayForPeacetimeSparePartsBox"));
+        payForTrainingMunitionsBox = new CampaignOptionsCheckBox("PayForTrainingMunitionsBox",
+              getMetadata(new Version("0.51.01.7")));
+        payForTrainingMunitionsBox.addMouseListener(createTipPanelUpdater("PayForTrainingMunitionsBox"));
+        payForPeacetimeFuelBox = new CampaignOptionsCheckBox("PayForPeacetimeFuelBox",
+              getMetadata(new Version("0.51.01.7")));
+        payForPeacetimeFuelBox.addMouseListener(createTipPanelUpdater("PayForPeacetimeFuelBox"));
 
         lblFinancialYearDuration = new CampaignOptionsLabel("FinancialYearDuration",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.47.06"), CampaignOptionFlag.IMPORTANT));
         lblFinancialYearDuration.addMouseListener(createTipPanelUpdater("FinancialYearDuration"));
         comboFinancialYearDuration.addMouseListener(createTipPanelUpdater("FinancialYearDuration"));
 
         newFinancialYearFinancesToCSVExportBox = new CampaignOptionsCheckBox(
-                "NewFinancialYearFinancesToCSVExportBox");
+                "NewFinancialYearFinancesToCSVExportBox", getMetadata(new Version("0.47.06")));
         newFinancialYearFinancesToCSVExportBox.addMouseListener(createTipPanelUpdater("NewFinancialYearFinancesToCSVExportBox"));
 
-        chkSimulateGrayMonday = new CampaignOptionsCheckBox("SimulateGrayMonday");
+        chkSimulateGrayMonday = new CampaignOptionsCheckBox("SimulateGrayMonday", getMetadata(new Version("0.50.04")));
         chkSimulateGrayMonday.addMouseListener(createTipPanelUpdater("SimulateGrayMonday"));
 
         chkUsePlanetaryCostReductions = new CampaignOptionsCheckBox("UsePlanetaryCostReductions",
-                getMetadata(new Version(0, 51, 1)));
+                getMetadata(new Version("0.51.01.1")));
         chkUsePlanetaryCostReductions.addMouseListener(createTipPanelUpdater("UsePlanetaryCostReductions"));
         chkUsePlanetaryCostReductions.addItemListener(event -> updatePlanetaryCostReductionDependents());
         chkPlanetaryCostReductionsOnContract = new CampaignOptionsCheckBox("PlanetaryCostReductionsOnContract",
-                getMetadata(new Version(0, 51, 1)));
+                getMetadata(new Version("0.51.01.1")));
         chkPlanetaryCostReductionsOnContract.addMouseListener(
               createTipPanelUpdater("PlanetaryCostReductionsOnContract"));
         chkPlanetaryCostReductionsForMaintenance = new CampaignOptionsCheckBox("PlanetaryCostReductionsForMaintenance",
-                getMetadata(new Version(0, 51, 1)));
+                getMetadata(new Version("0.51.01.1")));
         chkPlanetaryCostReductionsForMaintenance.addMouseListener(
               createTipPanelUpdater("PlanetaryCostReductionsForMaintenance"));
         chkIncreaseClanRepairCosts = new CampaignOptionsCheckBox("IncreaseClanRepairCosts",
-                getMetadata(new Version(0, 51, 1)));
+                getMetadata(new Version("0.51.01.1")));
         chkIncreaseClanRepairCosts.addMouseListener(createTipPanelUpdater("IncreaseClanRepairCosts"));
         lblUnitCostModel = new CampaignOptionsLabel("UnitCostModel",
-                getMetadata(new Version(0, 51, 1), CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.IMPORTANT));
         lblUnitCostModel.addMouseListener(createTipPanelUpdater("UnitCostModel"));
         comboUnitCostModel = new MMComboBox<>("comboUnitCostModel", UnitCostModel.values());
         comboUnitCostModel.setRenderer(new DefaultListCellRenderer() {
@@ -393,9 +398,10 @@ class FinancesGeneralPage {
         panel.addCheckBoxGrid(2,
                 useLoanLimitsBox,
                 usePercentageMaintenanceBox,
-                useExtendedPartsModifierBox,
-                usePeacetimeCostBox,
                 showPeacetimeCostBox,
+                payForPeacetimeSparePartsBox,
+                payForTrainingMunitionsBox,
+                payForPeacetimeFuelBox,
                 newFinancialYearFinancesToCSVExportBox,
                 chkSimulateGrayMonday,
                 chkUsePlanetaryCostReductions,
@@ -443,10 +449,10 @@ class FinancesGeneralPage {
      */
     private @Nonnull JPanel createTaxesPanel() {
         // Contents
-        chkUseTaxes = new CampaignOptionsCheckBox("UseTaxesBox");
+        chkUseTaxes = new CampaignOptionsCheckBox("UseTaxesBox", getMetadata(new Version("0.49.20")));
         chkUseTaxes.addMouseListener(createTipPanelUpdater("UseTaxesBox"));
 
-        lblTaxesPercentage = new CampaignOptionsLabel("TaxesPercentage");
+        lblTaxesPercentage = new CampaignOptionsLabel("TaxesPercentage", getMetadata(new Version("0.49.20")));
         lblTaxesPercentage.addMouseListener(createTipPanelUpdater("TaxesPercentage"));
         spnTaxesPercentage = new CampaignOptionsSpinner("TaxesPercentage", 30, 1, 100, 1);
         spnTaxesPercentage.addMouseListener(createTipPanelUpdater("TaxesPercentage"));
@@ -495,13 +501,14 @@ class FinancesGeneralPage {
      */
     private @Nonnull JPanel createATimeOfWarIncomePanel() {
         // Contents
-        chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment");
+        chkAllowMonthlyReinvestment = new CampaignOptionsCheckBox("AllowMonthlyReinvestment",
+              getMetadata(new Version("0.50.05")));
         chkAllowMonthlyReinvestment.addMouseListener(createTipPanelUpdater("AllowMonthlyReinvestment"));
         chkAllowMonthlyConnections = new CampaignOptionsCheckBox("AllowMonthlyConnections",
-                getMetadata(MILESTONE_BEFORE_METADATA));
+                getMetadata(new Version("0.50.07")));
         chkAllowMonthlyConnections.addMouseListener(createTipPanelUpdater("AllowMonthlyConnections"));
         chkUseBetterExtraIncome = new CampaignOptionsCheckBox("UseBetterExtraIncome",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(new Version("0.50.10"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseBetterExtraIncome.addMouseListener(createTipPanelUpdater("UseBetterExtraIncome"));
 
         // Layout the Panel
@@ -519,28 +526,28 @@ class FinancesGeneralPage {
     private @Nonnull JPanel createRentedFacilitiesPanel() {
         // Contents
         lblRentedFacilitiesCostHospitalBeds = new CampaignOptionsLabel("RentedFacilitiesCostHospitalBeds",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.10"), CampaignOptionFlag.IMPORTANT));
         lblRentedFacilitiesCostHospitalBeds.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostHospitalBeds"));
         spnRentedFacilitiesCostHospitalBeds = new CampaignOptionsSpinner("RentedFacilitiesCostHospitalBeds",
                 4100, 0, 1000000, 1);
         spnRentedFacilitiesCostHospitalBeds.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostHospitalBeds"));
 
         lblRentedFacilitiesCostKitchens = new CampaignOptionsLabel("RentedFacilitiesCostKitchens",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.10"), CampaignOptionFlag.IMPORTANT));
         lblRentedFacilitiesCostKitchens.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostKitchens"));
         spnRentedFacilitiesCostKitchens = new CampaignOptionsSpinner("RentedFacilitiesCostKitchens",
                 3700, 0, 1000000, 1);
         spnRentedFacilitiesCostKitchens.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostKitchens"));
 
         lblRentedFacilitiesCostHoldingCells = new CampaignOptionsLabel("RentedFacilitiesCostHoldingCells",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.10"), CampaignOptionFlag.IMPORTANT));
         lblRentedFacilitiesCostHoldingCells.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostHoldingCells"));
         spnRentedFacilitiesCostHoldingCells = new CampaignOptionsSpinner("RentedFacilitiesCostHoldingCells",
                 6400, 0, 1000000, 1);
         spnRentedFacilitiesCostHoldingCells.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostHoldingCells"));
 
         lblRentedFacilitiesCostRepairBays = new CampaignOptionsLabel("RentedFacilitiesCostRepairBays",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.10"), CampaignOptionFlag.IMPORTANT));
         lblRentedFacilitiesCostRepairBays.addMouseListener(createTipPanelUpdater("RentedFacilitiesCostRepairBays"));
         spnRentedFacilitiesCostRepairBays = new CampaignOptionsSpinner("RentedFacilitiesCostRepairBays",
                 25000, 0, 1000000, 1);
@@ -571,9 +578,10 @@ class FinancesGeneralPage {
 
         useLoanLimitsBox.setSelected(model.useLoanLimits);
         usePercentageMaintenanceBox.setSelected(model.usePercentageMaintenance);
-        useExtendedPartsModifierBox.setSelected(model.useExtendedPartsModifier);
-        usePeacetimeCostBox.setSelected(model.usePeacetimeCost);
         showPeacetimeCostBox.setSelected(model.showPeacetimeCost);
+        payForPeacetimeSparePartsBox.setSelected(model.payForPeacetimeSpareParts);
+        payForTrainingMunitionsBox.setSelected(model.payForTrainingMunitions);
+        payForPeacetimeFuelBox.setSelected(model.payForPeacetimeFuel);
         comboFinancialYearDuration.setSelectedItem(model.financialYearDuration);
         newFinancialYearFinancesToCSVExportBox.setSelected(model.newFinancialYearFinancesToCSVExport);
         chkSimulateGrayMonday.setSelected(model.simulateGrayMonday);
@@ -638,8 +646,8 @@ class FinancesGeneralPage {
      */
     private void updateHotSpotsUpkeepExclusions() {
         boolean isPayForHotSpotsUpkeep = payForHotSpotsUpkeepBox.isSelected();
-        JCheckBox[] excludedBoxes = { payForMaintainBox, payForOverheadBox, usePeacetimeCostBox,
-                                      showPeacetimeCostBox };
+        JCheckBox[] excludedBoxes = { payForMaintainBox, payForOverheadBox, payForPeacetimeSparePartsBox,
+                                      payForTrainingMunitionsBox, payForPeacetimeFuelBox, showPeacetimeCostBox };
 
         for (JCheckBox excludedBox : excludedBoxes) {
             if (isPayForHotSpotsUpkeep) {
@@ -664,9 +672,10 @@ class FinancesGeneralPage {
 
         model.useLoanLimits = useLoanLimitsBox.isSelected();
         model.usePercentageMaintenance = usePercentageMaintenanceBox.isSelected();
-        model.useExtendedPartsModifier = useExtendedPartsModifierBox.isSelected();
-        model.usePeacetimeCost = usePeacetimeCostBox.isSelected();
         model.showPeacetimeCost = showPeacetimeCostBox.isSelected();
+        model.payForPeacetimeSpareParts = payForPeacetimeSparePartsBox.isSelected();
+        model.payForTrainingMunitions = payForTrainingMunitionsBox.isSelected();
+        model.payForPeacetimeFuel = payForPeacetimeFuelBox.isSelected();
         model.financialYearDuration = comboFinancialYearDuration.getSelectedItem();
         model.newFinancialYearFinancesToCSVExport = newFinancialYearFinancesToCSVExportBox.isSelected();
         model.simulateGrayMonday = chkSimulateGrayMonday.isSelected();

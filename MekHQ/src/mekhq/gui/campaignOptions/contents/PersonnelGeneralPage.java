@@ -35,7 +35,6 @@ package mekhq.gui.campaignOptions.contents;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.skills.Attributes.MAXIMUM_ATTRIBUTE_SCORE;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -165,15 +164,15 @@ class PersonnelGeneralPage {
                              .section("lblSupportTeamsPanel.text",
                                    "lblSupportTeamsPanel.summary",
                                    pnlSupportTeams,
-                                   getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM))
+                                   getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM))
                              .section("lblBlobCrewPanel.text",
                                    "lblBlobCrewPanel.summary",
                                    pnlBlobCrew,
-                                   getMetadata(new Version(0, 50, 12)))
+                                   getMetadata(new Version("0.50.12")))
                              .section("lblChassisFamiliarityPanel.text",
                                    "lblChassisFamiliarityPanel.summary",
                                    familiarityPanel,
-                                   getMetadata(new Version(0, 51, 1),
+                                   getMetadata(new Version("0.51.01.1"),
                                          CampaignOptionFlag.CUSTOM_SYSTEM,
                                          CampaignOptionFlag.DOCUMENTED))
                              .build();
@@ -186,7 +185,7 @@ class PersonnelGeneralPage {
 
     private JPanel createChassisFamiliarityPanel() {
         lblChassisFamiliarityMode = new CampaignOptionsLabel("ChassisFamiliarityMode",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.DOCUMENTED));
         lblChassisFamiliarityMode.addMouseListener(createTipPanelUpdater("ChassisFamiliarityMode"));
         comboChassisFamiliarityMode = new MMComboBox<>("comboChassisFamiliarityMode", Familiarity.values());
         comboChassisFamiliarityMode.setRenderer(new DefaultListCellRenderer() {
@@ -203,7 +202,7 @@ class PersonnelGeneralPage {
         comboChassisFamiliarityMode.addMouseListener(createTipPanelUpdater("ChassisFamiliarityMode"));
 
         lblchassisFamiliaritySpeed = new CampaignOptionsLabel("chassisFamiliaritySpeed",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.RECOMMENDED));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM, CampaignOptionFlag.RECOMMENDED));
         lblchassisFamiliaritySpeed.addMouseListener(createTipPanelUpdater("chassisFamiliaritySpeed"));
         spnchassisFamiliaritySpeed = new CampaignOptionsSpinner("chassisFamiliaritySpeed",
               1, 0, 20, 1);
@@ -229,34 +228,34 @@ class PersonnelGeneralPage {
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
         chkUseTactics.addMouseListener(createTipPanelUpdater("UseTactics"));
         chkUseInitiativeBonus = new CampaignOptionsCheckBox("UseInitiativeBonus",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+              getMetadata(new Version("0.49.00"), CampaignOptionFlag.IMPORTANT));
         chkUseInitiativeBonus.addMouseListener(createTipPanelUpdater("UseInitiativeBonus"));
         chkUseSensibleTactics = new CampaignOptionsCheckBox("UseSensibleTactics",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseSensibleTactics.addMouseListener(createTipPanelUpdater("UseSensibleTactics"));
         chkUseToughness = new CampaignOptionsCheckBox("UseToughness",
               getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseToughness.addMouseListener(createTipPanelUpdater("UseToughness"));
         chkUseRandomToughness = new CampaignOptionsCheckBox("UseRandomToughness",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.50.00"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseRandomToughness.addMouseListener(createTipPanelUpdater("UseRandomToughness"));
         chkUseArtillery = new CampaignOptionsCheckBox("UseArtillery");
         chkUseArtillery.addMouseListener(createTipPanelUpdater("UseArtillery"));
         chkUseAbilities = new CampaignOptionsCheckBox("UseAbilities");
         chkUseAbilities.addMouseListener(createTipPanelUpdater("UseAbilities"));
         chkUseSpaTrainingCosts = new CampaignOptionsCheckBox("UseSpaTrainingCosts",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkUseSpaTrainingCosts.addMouseListener(createTipPanelUpdater("UseSpaTrainingCosts"));
         chkCapTotalSpas = new CampaignOptionsCheckBox("CapTotalSpas",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkCapTotalSpas.addMouseListener(createTipPanelUpdater("CapTotalSpas"));
         chkSkillImprovementsCostCBills = new CampaignOptionsCheckBox("SkillImprovementsCostCBills",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkSkillImprovementsCostCBills.addMouseListener(createTipPanelUpdater("SkillImprovementsCostCBills"));
 
         JLabel lblProfessionSkillTrainingCostMultiplier =
               new CampaignOptionsLabel("ProfessionSkillTrainingCostMultiplier",
-                    getMetadata(new Version(0, 51, 1)));
+                    getMetadata(new Version("0.51.01.1")));
         lblProfessionSkillTrainingCostMultiplier
               .addMouseListener(createTipPanelUpdater("ProfessionSkillTrainingCostMultiplier"));
         spnProfessionSkillTrainingCostMultiplier = new CampaignOptionsSpinner("ProfessionSkillTrainingCostMultiplier",
@@ -265,7 +264,7 @@ class PersonnelGeneralPage {
               .addMouseListener(createTipPanelUpdater("ProfessionSkillTrainingCostMultiplier"));
 
         JLabel lblUtilitySkillTrainingCostMultiplier = new CampaignOptionsLabel("UtilitySkillTrainingCostMultiplier",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         lblUtilitySkillTrainingCostMultiplier
               .addMouseListener(createTipPanelUpdater("UtilitySkillTrainingCostMultiplier"));
         spnUtilitySkillTrainingCostMultiplier = new CampaignOptionsSpinner("UtilitySkillTrainingCostMultiplier",
@@ -275,7 +274,7 @@ class PersonnelGeneralPage {
 
         JLabel lblRoleplaySkillTrainingCostMultiplier =
               new CampaignOptionsLabel("RoleplaySkillTrainingCostMultiplier",
-                    getMetadata(new Version(0, 51, 1)));
+                    getMetadata(new Version("0.51.01.1")));
         lblRoleplaySkillTrainingCostMultiplier
               .addMouseListener(createTipPanelUpdater("RoleplaySkillTrainingCostMultiplier"));
         spnRoleplaySkillTrainingCostMultiplier = new CampaignOptionsSpinner("RoleplaySkillTrainingCostMultiplier",
@@ -284,30 +283,31 @@ class PersonnelGeneralPage {
               .addMouseListener(createTipPanelUpdater("RoleplaySkillTrainingCostMultiplier"));
 
         chkOnlyCommandersMatterVehicles = new CampaignOptionsCheckBox("OnlyCommandersMatterVehicles",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         chkOnlyCommandersMatterVehicles.addMouseListener(createTipPanelUpdater("OnlyCommandersMatterVehicles"));
         chkOnlyCommandersMatterInfantry = new CampaignOptionsCheckBox("OnlyCommandersMatterInfantry",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         chkOnlyCommandersMatterInfantry.addMouseListener(createTipPanelUpdater("OnlyCommandersMatterInfantry"));
         chkOnlyCommandersMatterBattleArmor = new CampaignOptionsCheckBox("OnlyCommandersMatterBattleArmor",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         chkOnlyCommandersMatterBattleArmor.addMouseListener(createTipPanelUpdater("OnlyCommandersMatterBattleArmor"));
         chkUseEdge = new CampaignOptionsCheckBox("UseEdge");
         chkUseEdge.addMouseListener(createTipPanelUpdater("UseEdge"));
         chkUseTwistOfFateSurvival = new CampaignOptionsCheckBox("UseTwistOfFateSurvival",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkUseTwistOfFateSurvival.addMouseListener(createTipPanelUpdater("UseTwistOfFateSurvival"));
         chkUseFoundersHavePlotArmor = new CampaignOptionsCheckBox("UseFoundersHavePlotArmor",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkUseFoundersHavePlotArmor.addMouseListener(createTipPanelUpdater("UseFoundersHavePlotArmor"));
 
-        JLabel lblMaximumEdge = new CampaignOptionsLabel("MaximumEdge", getMetadata(new Version(0, 51, 1)));
+        JLabel lblMaximumEdge = new CampaignOptionsLabel("MaximumEdge", getMetadata(new Version("0.51.01.1")));
         lblMaximumEdge.addMouseListener(createTipPanelUpdater("MaximumEdge"));
         spnMaximumEdge = new CampaignOptionsSpinner("MaximumEdge",
               CampaignOption.MAXIMUM_EDGE.defaultValue(), 0, MAXIMUM_ATTRIBUTE_SCORE, 1);
         spnMaximumEdge.addMouseListener(createTipPanelUpdater("MaximumEdge"));
 
-        JLabel lblEdgeRefreshPeriod = new CampaignOptionsLabel("EdgeRefreshPeriod", getMetadata(new Version(0, 51, 0)));
+        JLabel lblEdgeRefreshPeriod = new CampaignOptionsLabel("EdgeRefreshPeriod",
+              getMetadata(new Version("0.51.00")));
         lblEdgeRefreshPeriod.addMouseListener(createTipPanelUpdater("EdgeRefreshPeriod"));
         comboEdgeRefreshPeriod.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -322,14 +322,14 @@ class PersonnelGeneralPage {
         });
         comboEdgeRefreshPeriod.addMouseListener(createTipPanelUpdater("EdgeRefreshPeriod"));
 
-        JLabel lblEdgeRefreshCost = new CampaignOptionsLabel("EdgeRefreshCost", getMetadata(new Version(0, 51, 0)));
+        JLabel lblEdgeRefreshCost = new CampaignOptionsLabel("EdgeRefreshCost", getMetadata(new Version("0.51.00")));
         lblEdgeRefreshCost.addMouseListener(createTipPanelUpdater("EdgeRefreshCost"));
         spnEdgeRefreshCost = new CampaignOptionsSpinner("EdgeRefreshCost", 20, 0, 100, 1);
         spnEdgeRefreshCost.addMouseListener(createTipPanelUpdater("EdgeRefreshCost"));
         chkUseImplants = new CampaignOptionsCheckBox("UseImplants");
         chkUseImplants.addMouseListener(createTipPanelUpdater("UseImplants"));
         chkUseAlternativeQualityAveraging = new CampaignOptionsCheckBox("UseAlternativeQualityAveraging",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.49.00"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseAlternativeQualityAveraging.addMouseListener(createTipPanelUpdater("UseAlternativeQualityAveraging"));
 
         // Layout the Panel
@@ -372,10 +372,12 @@ class PersonnelGeneralPage {
      */
     private @Nonnull JPanel createAdministratorsPanel() {
         // Contents
-        chkAdminsHaveNegotiation = new CampaignOptionsCheckBox("AdminsHaveNegotiation");
+        chkAdminsHaveNegotiation = new CampaignOptionsCheckBox("AdminsHaveNegotiation",
+              getMetadata(new Version("0.49.20")));
         chkAdminsHaveNegotiation.addMouseListener(createTipPanelUpdater("AdminsHaveNegotiation"));
         chkAdminExperienceLevelIncludeNegotiation =
-              new CampaignOptionsCheckBox("AdminExperienceLevelIncludeNegotiation");
+              new CampaignOptionsCheckBox("AdminExperienceLevelIncludeNegotiation",
+                    getMetadata(new Version("0.49.20")));
         chkAdminExperienceLevelIncludeNegotiation
               .addMouseListener(createTipPanelUpdater("AdminExperienceLevelIncludeNegotiation"));
 
@@ -397,12 +399,15 @@ class PersonnelGeneralPage {
      */
     private @Nonnull JPanel createPersonnelCleanUpPanel() {
         // Contents
-        chkUsePersonnelRemoval = new CampaignOptionsCheckBox("UsePersonnelRemoval");
+        chkUsePersonnelRemoval = new CampaignOptionsCheckBox("UsePersonnelRemoval",
+              getMetadata(new Version("0.50.00")));
         chkUsePersonnelRemoval.addMouseListener(createTipPanelUpdater("UsePersonnelRemoval"));
-        chkUseRemovalExemptCemetery = new CampaignOptionsCheckBox("UseRemovalExemptCemetery");
+        chkUseRemovalExemptCemetery = new CampaignOptionsCheckBox("UseRemovalExemptCemetery",
+              getMetadata(new Version("0.50.00")));
         chkUseRemovalExemptCemetery
               .addMouseListener(createTipPanelUpdater("UseRemovalExemptCemetery"));
-        chkUseRemovalExemptRetirees = new CampaignOptionsCheckBox("UseRemovalExemptRetirees");
+        chkUseRemovalExemptRetirees = new CampaignOptionsCheckBox("UseRemovalExemptRetirees",
+              getMetadata(new Version("0.50.00")));
         chkUseRemovalExemptRetirees
               .addMouseListener(createTipPanelUpdater("UseRemovalExemptRetirees"));
 
@@ -419,16 +424,11 @@ class PersonnelGeneralPage {
     }
 
     /**
-     * Creates the panel for blob crew settings in the General Page.
-     *
-     * @return a {@link JPanel} containing settings related to blob crews (temporary personnel pools)
-     */
-    /**
      * Builds the Support Teams section: whether support staff are organized into support carriers in the TOE.
      */
     private @Nonnull JPanel createSupportTeamsPanel() {
         chkUseSupportTeams = new CampaignOptionsCheckBox("UseSupportTeams",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseSupportTeams.addMouseListener(createTipPanelUpdater("UseSupportTeams"));
 
         final SettingsFormPanel panel = new SettingsFormPanel("SupportTeamsPanel",
@@ -439,32 +439,37 @@ class PersonnelGeneralPage {
         return panel;
     }
 
+    /**
+     * Creates the panel for blob crew settings in the General Page.
+     *
+     * @return a {@link JPanel} containing settings related to blob crews (temporary personnel pools)
+     */
     private @Nonnull JPanel createBlobCrewPanel() {
         // Contents
-        chkUseBlobInfantry = new CampaignOptionsCheckBox("UseBlobInfantry", getMetadata(new Version(0, 50, 12)));
+        chkUseBlobInfantry = new CampaignOptionsCheckBox("UseBlobInfantry", getMetadata(new Version("0.50.12")));
         chkUseBlobInfantry.addMouseListener(createTipPanelUpdater("UseBlobInfantry"));
         chkUseBlobBattleArmor = new CampaignOptionsCheckBox("UseBlobBattleArmor",
-              getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version("0.50.12")));
         chkUseBlobBattleArmor.addMouseListener(createTipPanelUpdater("UseBlobBattleArmor"));
         chkUseBlobVehicleCrewGround = new CampaignOptionsCheckBox("UseBlobVehicleCrewGround",
-              getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version("0.50.12")));
         chkUseBlobVehicleCrewGround
               .addMouseListener(createTipPanelUpdater("UseBlobVehicleCrewGround"));
         chkUseBlobVehicleCrewVTOL = new CampaignOptionsCheckBox("UseBlobVehicleCrewVTOL",
-              getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version("0.50.12")));
         chkUseBlobVehicleCrewVTOL.addMouseListener(createTipPanelUpdater("UseBlobVehicleCrewVTOL"));
         chkUseBlobVehicleCrewNaval = new CampaignOptionsCheckBox("UseBlobVehicleCrewNaval",
-              getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version("0.50.12")));
         chkUseBlobVehicleCrewNaval
               .addMouseListener(createTipPanelUpdater("UseBlobVehicleCrewNaval"));
         chkUseBlobVesselPilot = new CampaignOptionsCheckBox("UseBlobVesselPilot",
-              getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version("0.50.12")));
         chkUseBlobVesselPilot.addMouseListener(createTipPanelUpdater("UseBlobVesselPilot"));
         chkUseBlobVesselGunner = new CampaignOptionsCheckBox("UseBlobVesselGunner",
-              getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version("0.50.12")));
         chkUseBlobVesselGunner.addMouseListener(createTipPanelUpdater("UseBlobVesselGunner"));
         chkUseBlobVesselCrew = new CampaignOptionsCheckBox("UseBlobVesselCrew",
-              getMetadata(new Version(0, 50, 12)));
+              getMetadata(new Version("0.50.12")));
         chkUseBlobVesselCrew.addMouseListener(createTipPanelUpdater("UseBlobVesselCrew"));
 
         // Layout the Panel

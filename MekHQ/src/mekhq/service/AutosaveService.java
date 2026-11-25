@@ -94,6 +94,15 @@ public class AutosaveService implements IAutosaveService {
     }
 
     @Override
+    public void requestAfterScenarioAutosave(final Campaign campaign) {
+        Objects.requireNonNull(campaign);
+
+        if (MekHQ.getMHQOptions().getAutosaveAfterScenariosValue()) {
+            performAutosave(campaign);
+        }
+    }
+
+    @Override
     public void requestBeforeMissionEndAutosave(final Campaign campaign) {
         Objects.requireNonNull(campaign);
 

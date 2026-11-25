@@ -84,7 +84,6 @@ class RulesetsOptionsModel {
     boolean contractsUseSpecialMechanics;
     boolean useEmployerLostPlanetReactions;
     boolean useFacilityOperations;
-    double enemyFacilityActivity;
     boolean useSupplyLines;
     double facilityDensity;
     boolean noSeedForces;
@@ -137,7 +136,6 @@ class RulesetsOptionsModel {
         contractsUseSpecialMechanics = options.get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS);
         useEmployerLostPlanetReactions = options.get(CampaignOption.USE_EMPLOYER_LOST_PLANET_REACTIONS);
         useFacilityOperations = options.get(CampaignOption.USE_FACILITY_OPERATIONS);
-        enemyFacilityActivity = options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY);
         useSupplyLines = options.get(CampaignOption.USE_SUPPLY_LINES);
         facilityDensity = options.get(CampaignOption.FACILITY_DENSITY);
         noSeedForces = options.get(CampaignOption.NO_SEED_FORCES);
@@ -191,7 +189,6 @@ class RulesetsOptionsModel {
         options.set(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS, contractsUseSpecialMechanics);
         options.set(CampaignOption.USE_EMPLOYER_LOST_PLANET_REACTIONS, useEmployerLostPlanetReactions);
         options.set(CampaignOption.USE_FACILITY_OPERATIONS, useFacilityOperations);
-        options.set(CampaignOption.ENEMY_FACILITY_ACTIVITY, enemyFacilityActivity);
         options.set(CampaignOption.USE_SUPPLY_LINES, useSupplyLines);
         options.set(CampaignOption.FACILITY_DENSITY, facilityDensity);
         options.set(CampaignOption.NO_SEED_FORCES, noSeedForces);

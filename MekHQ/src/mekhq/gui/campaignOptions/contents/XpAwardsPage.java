@@ -44,6 +44,7 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.settings.SettingsFormPanel;
 import megamek.client.ui.settings.SettingsPairedFieldGridPanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
@@ -108,6 +109,8 @@ class XpAwardsPage {
     private JSpinner spnVocationalXPFrequency;
     private JLabel lblVocationalXPTargetNumber;
     private JSpinner spnVocationalXPTargetNumber;
+
+    private JPanel pnlContractOutcomes;
     private JLabel lblMissionXpFail;
     private JSpinner spnMissionXpFail;
     private JLabel lblMissionXpSuccess;
@@ -144,6 +147,7 @@ class XpAwardsPage {
         pnlTasks = createTasksPanel();
         pnlScenarios = createScenariosPanel();
         pnlMissions = createMissionsPanel();
+        pnlContractOutcomes = createContractOutcomesPanel();
         pnlAdministrators = createAdministratorsPanel();
 
         JPanel panel = CampaignOptionsPagePanel.builder("XpAwardsPage", "XpAwardsPage", imageAddress)
@@ -161,6 +165,9 @@ class XpAwardsPage {
                 .section("lblMissionsPanel.text",
                         "lblMissionsPanel.summary",
                         pnlMissions)
+                .section("lblContractOutcomesPanel.text",
+                        "lblContractOutcomesPanel.summary",
+                        pnlContractOutcomes)
                 .section("lblAdministratorsXpPanel.text",
                         "lblAdministratorsXpPanel.summary",
                         pnlAdministrators,
@@ -176,7 +183,7 @@ class XpAwardsPage {
 
     private @Nonnull JPanel createXpAwardOptionsPanel() {
         lblXpCostMultiplier = new CampaignOptionsLabel("XpCostMultiplier",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.00"), CampaignOptionFlag.IMPORTANT));
         lblXpCostMultiplier.addMouseListener(createTipPanelUpdater("XpCostMultiplier"));
         spnXpCostMultiplier = new CampaignOptionsSpinner("XpCostMultiplier", 1, 0, 5, 0.05);
         spnXpCostMultiplier.addMouseListener(createTipPanelUpdater("XpCostMultiplier"));
@@ -199,6 +206,21 @@ class XpAwardsPage {
         panel.addPairs(labels, controls);
 
         return panel;
+    }
+
+    /**
+     * Creates an invisible placeholder control for a paired grid cell that should stay empty, so the next pair starts
+     * on a new row.
+     *
+     * @return a transparent, empty component
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nonnull JComponent createEmptyGridCell() {
+        JPanel emptyCell = new JPanel();
+        emptyCell.setOpaque(false);
+        return emptyCell;
     }
 
     /**
@@ -272,8 +294,10 @@ class XpAwardsPage {
         spnKills = new CampaignOptionsSpinner("Kills", 0, 0, 100, 1);
         spnKills.addMouseListener(createTipPanelUpdater("Kills"));
 
-        JComponent[] labels = { lblScenarioXP, lblKillXP, lblKills };
-        JComponent[] controls = { spnScenarioXP, spnKillXP, spnKills };
+        // The empty cell gives the kill award pair ("XP per" ... "Kills") its own row, so the two halves of the
+        // sentence read together instead of wrapping across rows.
+        JComponent[] labels = { lblScenarioXP, new JLabel(), lblKillXP, lblKills };
+        JComponent[] controls = { spnScenarioXP, createEmptyGridCell(), spnKillXP, spnKills };
 
         return createAdvancementPairedGrid("ScenariosPanel", labels, controls);
     }
@@ -289,40 +313,57 @@ class XpAwardsPage {
     private @Nonnull JPanel createMissionsPanel() {
         // Contents
         lblVocationalXP = new CampaignOptionsLabel("VocationalXP",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.03"), CampaignOptionFlag.IMPORTANT));
         lblVocationalXP.addMouseListener(createTipPanelUpdater("VocationalXP"));
         spnVocationalXP = new CampaignOptionsSpinner("VocationalXP", 0, 0, 20, 1);
         spnVocationalXP.addMouseListener(createTipPanelUpdater("VocationalXP"));
-        lblVocationalXPFrequency = new CampaignOptionsLabel("VocationalXPFrequency");
+        lblVocationalXPFrequency = new CampaignOptionsLabel("VocationalXPFrequency",
+              getMetadata(new Version("0.50.03")));
         lblVocationalXPFrequency.addMouseListener(createTipPanelUpdater("VocationalXPFrequency"));
         spnVocationalXPFrequency = new CampaignOptionsSpinner("VocationalXPFrequency", 0, 0, 12, 1);
         spnVocationalXPFrequency.addMouseListener(createTipPanelUpdater("VocationalXPFrequency"));
-        lblVocationalXPTargetNumber = new CampaignOptionsLabel("VocationalXPTargetNumber");
+        lblVocationalXPTargetNumber = new CampaignOptionsLabel("VocationalXPTargetNumber",
+              getMetadata(new Version("0.50.03")));
         lblVocationalXPTargetNumber.addMouseListener(createTipPanelUpdater("VocationalXPTargetNumber"));
         spnVocationalXPTargetNumber = new CampaignOptionsSpinner("VocationalXPTargetNumber", 2, 0, 12, 1);
         spnVocationalXPTargetNumber.addMouseListener(createTipPanelUpdater("VocationalXPTargetNumber"));
 
-        lblMissionXpFail = new CampaignOptionsLabel("MissionXpFail");
+        JComponent[] labels = { lblVocationalXP, lblVocationalXPFrequency, lblVocationalXPTargetNumber };
+        JComponent[] controls = { spnVocationalXP, spnVocationalXPFrequency, spnVocationalXPTargetNumber };
+
+        return createAdvancementPairedGrid("MissionsPanel", labels, controls);
+    }
+
+    /**
+     * Creates and returns the Contract Outcomes panel, which holds the XP awarded to all active personnel when a
+     * contract ends in failure, success, or outstanding success (StratCon).
+     *
+     * @return A {@code JPanel} containing configuration options for contract outcome experience awards.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private @Nonnull JPanel createContractOutcomesPanel() {
+        lblMissionXpFail = new CampaignOptionsLabel("MissionXpFail", getMetadata(new Version("0.50.00")));
         lblMissionXpFail.addMouseListener(createTipPanelUpdater("MissionXpFail"));
         spnMissionXpFail = new CampaignOptionsSpinner("MissionXpFail", 1, 0, 20, 1);
         spnMissionXpFail.addMouseListener(createTipPanelUpdater("MissionXpFail"));
 
-        lblMissionXpSuccess = new CampaignOptionsLabel("MissionXpSuccess");
+        lblMissionXpSuccess = new CampaignOptionsLabel("MissionXpSuccess", getMetadata(new Version("0.50.00")));
         lblMissionXpSuccess.addMouseListener(createTipPanelUpdater("MissionXpSuccess"));
         spnMissionXpSuccess = new CampaignOptionsSpinner("MissionXpSuccess", 1, 0, 20, 1);
         spnMissionXpSuccess.addMouseListener(createTipPanelUpdater("MissionXpSuccess"));
 
-        lblMissionXpOutstandingSuccess = new CampaignOptionsLabel("MissionXpOutstandingSuccess");
+        lblMissionXpOutstandingSuccess = new CampaignOptionsLabel("MissionXpOutstandingSuccess",
+              getMetadata(new Version("0.50.00")));
         lblMissionXpOutstandingSuccess.addMouseListener(createTipPanelUpdater("MissionXpOutstandingSuccess"));
         spnMissionXpOutstandingSuccess = new CampaignOptionsSpinner("MissionXpOutstandingSuccess", 1, 0, 20, 1);
         spnMissionXpOutstandingSuccess.addMouseListener(createTipPanelUpdater("MissionXpOutstandingSuccess"));
 
-        JComponent[] labels = { lblVocationalXP, lblVocationalXPFrequency, lblVocationalXPTargetNumber,
-                lblMissionXpFail, lblMissionXpSuccess, lblMissionXpOutstandingSuccess };
-        JComponent[] controls = { spnVocationalXP, spnVocationalXPFrequency, spnVocationalXPTargetNumber,
-                spnMissionXpFail, spnMissionXpSuccess, spnMissionXpOutstandingSuccess };
+        JComponent[] labels = { lblMissionXpFail, lblMissionXpSuccess, lblMissionXpOutstandingSuccess };
+        JComponent[] controls = { spnMissionXpFail, spnMissionXpSuccess, spnMissionXpOutstandingSuccess };
 
-        return createAdvancementPairedGrid("MissionsPanel", labels, controls);
+        return createAdvancementPairedGrid("ContractOutcomesPanel", labels, controls);
     }
 
     /**
@@ -340,7 +381,7 @@ class XpAwardsPage {
         spnAdminWeeklyXP = new CampaignOptionsSpinner("AdminWeeklyXP", 0, 0, 20, 1);
         spnAdminWeeklyXP.addMouseListener(createTipPanelUpdater("AdminWeeklyXP"));
         lblAdminWeeklyXPPeriod = new CampaignOptionsLabel("AdminWeeklyXPPeriod",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(new Version("0.03.28"), CampaignOptionFlag.IMPORTANT, CampaignOptionFlag.RECOMMENDED));
         lblAdminWeeklyXPPeriod.addMouseListener(createTipPanelUpdater("AdminWeeklyXPPeriod"));
         spnAdminWeeklyXPPeriod = new CampaignOptionsSpinner("AdminWeeklyXPPeriod", 1, 1, 52, 1);
         spnAdminWeeklyXPPeriod.addMouseListener(createTipPanelUpdater("AdminWeeklyXPPeriod"));

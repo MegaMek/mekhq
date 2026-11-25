@@ -408,20 +408,19 @@ public class Faction {
     }
 
     /**
+     * The mercenary organizations, newest first: the Mercenary Bonding Authority, the Mercenary Review and Bonding
+     * Commission, the Mercenary Review Board, and the Mercenary Guild.
+     *
+     * <p>Each organization's founding year is also the last year of its predecessor. Ordering newest first means
+     * that year belongs to the newly founded organization, matching the new year's introduction of it.</p>
+     */
+    public static final List<String> MERCENARY_ORGANIZATION_CODES = List.of("MBA", "MRBC", "MRB", "MG");
+
+    /**
      * Returns the currently active mercenary organization for the given game year.
      *
-     * <p>This method checks a prioritized list of known mercenary organizations and returns the first one found to
-     * be valid for the specified year. The search order is:</p>
-     *
-     * <ol>
-     *     <li>Mercenary Guild</li>
-     *     <li>Mercenary Review Board</li>
-     *     <li>Mercenary Review and Bonding Commission</li>
-     *     <li>Mercenary Bondy Authority</li>
-     * </ol>
-     *
-     * <p>If none of the organizations other than the Mercenary Guild are valid in the given year, the Mercenary
-     * Guild is returned by default.</p>
+     * <p>This method checks {@link #MERCENARY_ORGANIZATION_CODES} newest first and returns the first organization
+     * valid in the specified year. If none is valid, the Mercenary Guild is returned by default.</p>
      *
      * @param gameYear the year to check for an active organization
      *
@@ -432,27 +431,14 @@ public class Faction {
      */
     public static Faction getActiveMercenaryOrganization(int gameYear) {
         final Factions factions = Factions.getInstance();
-        final Faction MERCENARY_GUILD = factions.getFaction("MG");
-        if (MERCENARY_GUILD.validIn(gameYear)) {
-            return MERCENARY_GUILD;
+        for (String code : MERCENARY_ORGANIZATION_CODES) {
+            Faction organization = factions.getFaction(code);
+            if ((organization != null) && organization.validIn(gameYear)) {
+                return organization;
+            }
         }
 
-        final Faction MERCENARY_REVIEW_BOARD = factions.getFaction("MRB");
-        if (MERCENARY_REVIEW_BOARD.validIn(gameYear)) {
-            return MERCENARY_REVIEW_BOARD;
-        }
-
-        final Faction MERCENARY_REVIEW_BONDING_COMMISSION = factions.getFaction("MRBC");
-        if (MERCENARY_REVIEW_BONDING_COMMISSION.validIn(gameYear)) {
-            return MERCENARY_REVIEW_BONDING_COMMISSION;
-        }
-
-        final Faction MERCENARY_BONDY_AUTHORITY = factions.getFaction("MBA");
-        if (MERCENARY_BONDY_AUTHORITY.validIn(gameYear)) {
-            return MERCENARY_BONDY_AUTHORITY;
-        }
-
-        return MERCENARY_GUILD;
+        return factions.getFaction("MG");
     }
 
     public boolean isPirate() {
@@ -465,6 +451,50 @@ public class Faction {
 
     public boolean isRebelOrPirate() {
         return isRebel() || isPirate();
+    }
+
+    /**
+     * Returns whether the given faction code is the generic pirate faction ({@link #PIRATE_FACTION_CODE}) or its Clan
+     * counterpart, the Bandit Caste ({@link #BANDIT_CASTE_FACTION_CODE}).
+     *
+     * <p>The Bandit Caste is simply a Clan flavor of the pirates, so anything that special-cases "the pirates" by
+     * faction code should use this method rather than comparing against {@code PIR} alone.</p>
+     *
+     * @param factionCode the faction code to test (may be {@code null})
+     *
+     * @return {@code true} if the code is {@code PIR} or {@code BAN}
+     */
+    public static boolean isPirateOrBanditCaste(final @Nullable String factionCode) {
+        return PIRATE_FACTION_CODE.equals(factionCode) || BANDIT_CASTE_FACTION_CODE.equals(factionCode);
+    }
+
+    /**
+     * @return {@code true} if this faction is the generic pirate faction or the Bandit Caste
+     *
+     * @see #isPirateOrBanditCaste(String)
+     */
+    public boolean isPirateOrBanditCaste() {
+        return isPirateOrBanditCaste(shortName);
+    }
+
+    /**
+     * @return {@code true} if this faction is the Bandit Caste ({@link #BANDIT_CASTE_FACTION_CODE})
+     */
+    public boolean isBanditCaste() {
+        return BANDIT_CASTE_FACTION_CODE.equals(shortName);
+    }
+
+    /**
+     * Returns the faction code of the pirates appropriate to the given campaign faction: the Bandit Caste for a Clan
+     * campaign faction, otherwise the generic pirates.
+     *
+     * @param campaignFaction the faction of the campaign (may be {@code null})
+     *
+     * @return {@link #BANDIT_CASTE_FACTION_CODE} if the faction is a Clan, otherwise {@link #PIRATE_FACTION_CODE}
+     */
+    public static String getPirateFactionCodeFor(final @Nullable Faction campaignFaction) {
+        return (campaignFaction != null && campaignFaction.isClan()) ? BANDIT_CASTE_FACTION_CODE
+                     : PIRATE_FACTION_CODE;
     }
 
     /**

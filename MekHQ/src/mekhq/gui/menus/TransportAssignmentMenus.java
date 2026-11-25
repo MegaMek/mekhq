@@ -82,12 +82,16 @@ public final class TransportAssignmentMenus {
      * type to the given popup, plus the Connect Train item for a multi-selected tractor and its
      * trailers. Menus that do not apply to the selection are omitted.
      *
-     * @param frame    parent frame for dialogs opened by menu actions
-     * @param popup    popup menu being built
-     * @param campaign current campaign
-     * @param units    selected units
+     * @param frame             parent frame for dialogs opened by menu actions
+     * @param popup             popup menu being built
+     * @param campaign          current campaign
+     * @param units             selected units, or every unit in the selected formations
+     * @param formationSelected true when the menu is for selected TO&amp;E formations, so the unassign
+     *                          items say they act on the formation; false when units were selected
+     *                          directly
      */
-    public static void addTransportMenus(JFrame frame, JPopupMenu popup, Campaign campaign, List<Unit> units) {
+    public static void addTransportMenus(JFrame frame, JPopupMenu popup, Campaign campaign, List<Unit> units,
+          boolean formationSelected) {
         Set<Unit> unitSet = new HashSet<>(units);
         for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
             JMenu assignMenu = switch (campaignTransportType) {
@@ -95,8 +99,13 @@ public final class TransportAssignmentMenus {
                 case TACTICAL_TRANSPORT -> new AssignForceToTacticalTransportMenu(campaign, unitSet);
                 case TOW_TRANSPORT -> new AssignForceToTowTransportMenu(campaign, unitSet);
             };
+
+            if (!formationSelected && (assignMenu.getItemCount() > 0)) {
+                assignMenu.setText(MHQInternationalization.getTextAt(RESOURCE_BUNDLE,
+                      "AssignForceToTransportMenu.unit." + campaignTransportType.name() + ".text"));
+            }
             addMenuIfNonEmpty(popup, assignMenu);
-            addUnassignSelfMenuItem(popup, campaign, units, campaignTransportType);
+            addUnassignSelfMenuItem(popup, campaign, units, campaignTransportType, formationSelected);
             addUnassignTransportedMenuItem(popup, campaign, units, campaignTransportType);
         }
         addConnectTrainMenuItem(frame, popup, campaign, units);
@@ -401,10 +410,11 @@ public final class TransportAssignmentMenus {
 
     /**
      * Menu item shown when every selected unit is itself assigned to a transport of this type:
-     * unassigns the selected units from their transports.
+     * unassigns the selected units from their transports. The label names the formation only when
+     * the menu was opened on formations; a direct unit selection gets a unit label.
      */
     private static void addUnassignSelfMenuItem(JPopupMenu popup, Campaign campaign, List<Unit> units,
-          CampaignTransportType campaignTransportType) {
+          CampaignTransportType campaignTransportType, boolean formationSelected) {
         if (anyDeployed(units)) {
             return;
         }
@@ -413,7 +423,8 @@ public final class TransportAssignmentMenus {
                 return;
             }
         }
-        String menuTextKey = "TOEMouseAdapter.unassign." + campaignTransportType.name() + ".text";
+        String menuTextPrefix = formationSelected ? "TOEMouseAdapter.unassign." : "TOEMouseAdapter.unassignUnit.";
+        String menuTextKey = menuTextPrefix + campaignTransportType.name() + ".text";
         JMenuItem menuItem = new JMenuItem(MHQInternationalization.getTextAt(RESOURCE_BUNDLE, menuTextKey));
         menuItem.addActionListener(evt -> unassignFromTransport(campaign, campaignTransportType, units));
         popup.add(menuItem);

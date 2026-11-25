@@ -42,7 +42,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.anyDouble;
 import static org.mockito.ArgumentMatchers.anyInt;
+import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -70,6 +74,7 @@ import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.factionStanding.FactionStandings;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.mockito.MockedStatic;
@@ -1104,6 +1109,47 @@ public class PrisonerEventManagerTest {
             }
 
             verify(playerForce, never()).changeCrimeRating(anyInt());
+        }
+    }
+
+    /**
+     * Tests for {@link PrisonerEventManager#processExecutions(int, List)}: only the prisoners actually executed may cost
+     * Regard, not everyone being held.
+     */
+    @Nested
+    class ProcessExecutions {
+        @Test
+        void onlyExecutedPrisonersCostRegard() {
+            Campaign campaign = mockCampaign();
+            when(campaign.getLocalDate()).thenReturn(LocalDate.of(3151, 1, 3));
+            CampaignOptions campaignOptions = new CampaignOptions();
+            campaignOptions.set(CampaignOption.PRISONER_CAPTURE_STYLE, PrisonerCaptureStyle.NONE);
+            campaignOptions.set(CampaignOption.TRACK_FACTION_STANDING, true);
+            campaignOptions.set(CampaignOption.USE_CHAOS_REPUTATION, false);
+            when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
+
+            PlayerForce playerForce = campaign.getPlayerForce();
+            when(playerForce.getFaction().getShortName()).thenReturn("MERC");
+            FactionStandings factionStandings = mock(FactionStandings.class);
+            when(factionStandings.executePrisonersOfWar(any(), anyList(), anyInt(), anyDouble())).thenReturn(List.of());
+            when(playerForce.getFactionStandings()).thenReturn(factionStandings);
+
+            List<Person> prisoners = new ArrayList<>();
+            for (int i = 0; i < 10; i++) {
+                prisoners.add(mock(Person.class));
+            }
+
+            PrisonerEventManager eventManager = new PrisonerEventManager(campaign);
+
+            try (MockedStatic<Compute> compute = mockStatic(Compute.class)) {
+                compute.when(() -> Compute.d6(1)).thenReturn(2);
+                compute.when(() -> Compute.randomInt(100)).thenReturn(99);
+
+                eventManager.processExecutions(1, prisoners);
+            }
+
+            verify(factionStandings).executePrisonersOfWar(eq("MERC"), eq(List.of(prisoners.getFirst())), anyInt(),
+                  anyDouble());
         }
     }
 

@@ -35,7 +35,6 @@ package mekhq.gui.campaignOptions.contents;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.FlatLafStyleBuilder.setFontScaling;
 import static megamek.common.options.OptionsConstants.ALLOWED_YEAR;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.campaignOptionsLegendEntries;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.formatBadges;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -225,7 +224,7 @@ public class GeneralPage {
         comboFaction.setToolTipText(wordWrap(getTextAt(getCampaignOptionsResourceBundle(), "lblFaction.tooltip")));
 
         // Randomize faction
-        btnRandomFaction = createButton("RandomFaction", getMetadata(MILESTONE_BEFORE_METADATA));
+        btnRandomFaction = createButton("RandomFaction", getMetadata(new Version("0.50.07")));
         btnRandomFaction.addActionListener(event -> {
             FactionDisplay randomFaction = pickRandomFaction();
             if (randomFaction != null) {
@@ -240,7 +239,7 @@ public class GeneralPage {
         btnDate.addActionListener(this::btnDateActionPerformed);
 
         // Randomize starting date
-        btnRandomDate = createButton("RandomDate", getMetadata(MILESTONE_BEFORE_METADATA));
+        btnRandomDate = createButton("RandomDate", getMetadata(new Version("0.50.07")));
         btnRandomDate.addActionListener(event -> {
             LocalDate randomDate = DateUtilities.getRandomDateBetween(RANDOM_DATE_EARLIEST, RANDOM_DATE_LATEST);
             setDate(randomDate);
@@ -254,11 +253,11 @@ public class GeneralPage {
 
         // Starting location
         lblStartingLocation = new CampaignOptionsLabel("StartingLocation",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         lblStartingLocationFaction = new CampaignOptionsLabel("StartingLocationFaction",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         lblStartingWorld = new CampaignOptionsLabel("StartingWorld",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         comboStartingLocation.setRenderer(new DefaultListCellRenderer() {
             @Override
             public Component getListCellRendererComponent(JList<?> list, Object value, int index,
@@ -434,7 +433,7 @@ public class GeneralPage {
               new String[] { getTextAt(getCampaignOptionsResourceBundle(), "startingWorld.factionCapital"),
                              getTextAt(getCampaignOptionsResourceBundle(), "startingWorld.randomHiringHall") });
         chkIncludeDeepPeriphery = new CampaignOptionsCheckBox("IncludeDeepPeriphery",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
     }
 
     /**
@@ -706,7 +705,9 @@ public class GeneralPage {
         boolean isStartUp = (mode == CampaignOptionsDialogMode.STARTUP)
                                   || (mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED);
         Faction selectedFaction = getFaction();
-        boolean isMercenaryOrPirate = selectedFaction.isMercenary() || selectedFaction.isPirate();
+        // The Bandit Caste always starts at its capital, so the mercenary/pirate starting-location controls don't apply
+        boolean isBanditCaste = selectedFaction.isBanditCaste();
+        boolean isMercenaryOrPirate = selectedFaction.isMercenary() || (selectedFaction.isPirate() && !isBanditCaste);
 
         // The capital-vs-hiring-hall choice applies to every campaign
         lblStartingWorld.setVisible(isStartUp);

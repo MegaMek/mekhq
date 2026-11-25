@@ -122,6 +122,7 @@ import mekhq.Utilities;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ExtraData;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
@@ -136,6 +137,7 @@ import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.LogEntryFactory;
 import mekhq.campaign.log.LogEntryType;
@@ -187,6 +189,7 @@ import mekhq.campaign.randomEvents.personalities.Reasoning;
 import mekhq.campaign.randomEvents.personalities.Social;
 import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
+import mekhq.campaign.unit.enums.CrewSeat;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.Planet;
@@ -334,6 +337,8 @@ public class Person implements ILocatable {
 
     // assignments
     private Unit unit;
+    private UUID lastAssignedUnitId;
+    private CrewSeat lastAssignedCrewSeat;
     private UUID doctorId;
     private List<Unit> techUnits;
 
@@ -594,6 +599,8 @@ public class Person implements ILocatable {
         setManeiDominiRankDirect(ManeiDominiRank.NONE);
         nTasks = 0;
         doctorId = null;
+        lastAssignedUnitId = null;
+        lastAssignedCrewSeat = null;
         salary = Money.of(-1);
         totalEarnings = Money.of(0);
         status = PersonnelStatus.ACTIVE;
@@ -758,9 +765,6 @@ public class Person implements ILocatable {
     }
 
     /**
-     * @return {@code true} if this person descends from a recorded Bloodname House
-     */
-    /**
      * @return how this warrior's legacy is used in the breeding program; never {@code null}
      */
     public GeneticLegacyRole getGeneticLegacyRole() {
@@ -775,6 +779,9 @@ public class Person implements ILocatable {
         this.geneticLegacyRole = (geneticLegacyRole == null) ? GeneticLegacyRole.NONE : geneticLegacyRole;
     }
 
+    /**
+     * @return {@code true} if this person descends from a recorded Bloodname House
+     */
     public boolean hasBloodhouse() {
         return (bloodhouse != null) && !bloodhouse.isBlank();
     }
@@ -1191,26 +1198,33 @@ public class Person implements ILocatable {
      */
     public ImageIcon getPortraitImageIconWithFallback(boolean useOriginFactionBackup,
           @Nullable Integer targetPixelWidth) {
-        final boolean isPortraitNull = portrait == null;
-        final String portraitFileName = isPortraitNull ? NO_PORTRAIT_NAME : portrait.getFilename();
-
-        final boolean isDefaultPortrait = isPortraitNull ||
-                                                portraitFileName.equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME) ||
-                                                portraitFileName.equalsIgnoreCase(NO_PORTRAIT_NAME);
-
-        if (isDefaultPortrait && useOriginFactionBackup) {
+        if (hasDefaultPortrait() && useOriginFactionBackup) {
             return targetPixelWidth == null ?
                          getFallbackPortrait(DEFAULT_IMAGE_WIDTH) :
                          getFallbackPortrait(targetPixelWidth);
         }
 
-        if (isPortraitNull) {
+        if (portrait == null) {
             return new ImageIcon();
         }
 
         return targetPixelWidth == null ?
                      portrait.getImageIcon(DEFAULT_IMAGE_WIDTH) :
                      portrait.getImageIcon(targetPixelWidth);
+    }
+
+    /**
+     * @return {@code true} when this person has no portrait of their own (none, or a default/placeholder one), so
+     *       {@link #getPortraitImageIconWithFallback(boolean)} would show their origin faction's logo instead
+     */
+    public boolean hasDefaultPortrait() {
+        if (portrait == null) {
+            return true;
+        }
+        String portraitFileName = portrait.getFilename();
+        return portraitFileName == null
+                     || portraitFileName.equalsIgnoreCase(DEFAULT_PORTRAIT_FILENAME)
+                     || portraitFileName.equalsIgnoreCase(NO_PORTRAIT_NAME);
     }
 
     private ImageIcon getFallbackPortrait(int targetPixelWidth) {
@@ -1246,6 +1260,9 @@ public class Person implements ILocatable {
 
         // Finally, we can set the primary role
         setPrimaryRoleDirect(primaryRole);
+
+        // A retrained character no longer fits the seat they left
+        clearLastAssignedUnit();
 
         // and trigger the update event
         MekHQ.triggerEvent(new PersonChangedEvent(this));
@@ -1283,6 +1300,9 @@ public class Person implements ILocatable {
 
         // Finally, we can set the primary role
         setPrimaryRoleDirect(primaryRole);
+
+        // A retrained character no longer fits the seat they left
+        clearLastAssignedUnit();
 
         // and trigger the update event
         MekHQ.triggerEvent(new PersonChangedEvent(this));
@@ -1338,9 +1358,32 @@ public class Person implements ILocatable {
     }
 
     public String getRoleDesc() {
+        return getRoleDesc("");
+    }
+
+    /**
+     * Builds the primary and secondary role description, placing a tech specialization suffix next to the profession it
+     * belongs to rather than at the end, so a Mek Tech with a secondary profession reads
+     * {@code Mek Tech (Myomer)/Medic}.
+     *
+     * @param specializationSuffix the specialization, already formatted with its brackets and leading space, or an empty
+     *                             string if there is none
+     *
+     * @return the role description with the suffix following the technician profession
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public String getRoleDesc(String specializationSuffix) {
         String role = getPrimaryRoleDesc();
+        if (getPrimaryRole().isTech()) {
+            role += specializationSuffix;
+        }
         if (!getSecondaryRole().isNone()) {
             role += '/' + getSecondaryRoleDesc();
+            if (!getPrimaryRole().isTech() && getSecondaryRole().isTech()) {
+                role += specializationSuffix;
+            }
         }
         return role;
     }
@@ -1455,6 +1498,23 @@ public class Person implements ILocatable {
      * @since 0.50.06
      */
     public String getFormatedRoleDescriptions(LocalDate today) {
+        return getFormatedRoleDescriptions(today, "");
+    }
+
+    /**
+     * As {@link #getFormatedRoleDescriptions(LocalDate)}, with a tech specialization suffix placed directly after the
+     * technician profession it applies to - the primary role if that is a tech role, otherwise the secondary role.
+     *
+     * @param today                the current in-campaign date
+     * @param specializationSuffix the specialization, already formatted with its brackets and leading space, or an empty
+     *                             string if there is none
+     *
+     * @return the formatted role description
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public String getFormatedRoleDescriptions(LocalDate today, String specializationSuffix) {
         StringBuilder description = new StringBuilder();
 
         // Add dot prefix if unemployed
@@ -1487,10 +1547,18 @@ public class Person implements ILocatable {
             description.append(primaryDesc);
         }
 
+        boolean specializationOnPrimary = primaryRole.isTech();
+        if (specializationOnPrimary) {
+            description.append(specializationSuffix);
+        }
+
         // Handle secondary role
         if (!secondaryRole.isNone()) {
             description.append(" / ");
             description.append(getSecondaryRoleDesc());
+            if (!specializationOnPrimary && secondaryRole.isTech()) {
+                description.append(specializationSuffix);
+            }
         }
 
         return description.toString();
@@ -1869,14 +1937,22 @@ public class Person implements ILocatable {
             if (isPregnant() && getDueDate().isBefore(today)) {
                 campaign.getPlayerForce().getHumanResources().getProcreation().birth(campaign, getDueDate(), this);
             }
+
+            // Runs before the status change event below, so the Support Teams reconciler sees this person already
+            // seated and does not move them into a support squad instead
+            if (status.isActive()) {
+                returnToLastAssignedUnit(campaign);
+            }
         } else {
             if (!status.isInfirmaryEligible()) {
                 setDoctorId(null, campaign.getCampaignOptions().get(CampaignOption.NATURAL_HEALING_WAITING_PERIOD));
             }
 
-            // If we're assigned to a unit, remove us from it
-            if (getUnit() != null) {
-                getUnit().remove(this, true);
+            // If we're assigned to a unit, remove us from it, remembering where we were so we can return later
+            Unit currentUnit = getUnit();
+            if (currentUnit != null) {
+                rememberLastAssignedUnit(currentUnit);
+                currentUnit.remove(this, true);
             }
 
             // Clear Tech Setup
@@ -1947,6 +2023,48 @@ public class Person implements ILocatable {
         this.setEduTagAlongs(new ArrayList<>());
 
         MekHQ.triggerEvent(new PersonStatusChangedEvent(this));
+
+        // Deliberately the last step, so everything that reacts to the death still finds the prisoner on the roster
+        removeFromRosterIfDeadPrisoner(campaign);
+    }
+
+    /**
+     * Determines whether this person died while being held prisoner by the campaign. Bondsmen, and those becoming
+     * bondsmen, are not considered to be prisoners.
+     *
+     * @return {@code true} if this person is a prisoner, and is dead
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isDeadPrisoner() {
+        return getStatus().isDead() && getPrisonerStatus().isCurrentPrisoner();
+    }
+
+    /**
+     * Removes this person from the campaign roster if they are a prisoner who has died.
+     *
+     * <p>Dead prisoners have no further part to play in the campaign. Were they left on the roster, the player could
+     * still free, execute, or ransom them.</p>
+     *
+     * <p>Does nothing if this person isn't on the roster, which avoids processing the removal again should their cause
+     * of death be changed after they have already been removed.</p>
+     *
+     * @param campaign the campaign holding this person prisoner
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void removeFromRosterIfDeadPrisoner(Campaign campaign) {
+        if (!isDeadPrisoner()) {
+            return;
+        }
+
+        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+        if (humanResources.getPerson(getId()) == this) {
+            // The death itself has already been reported
+            humanResources.removePerson(campaign, this, false);
+        }
     }
 
     /**
@@ -3917,6 +4035,11 @@ public class Person implements ILocatable {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "unitId", getUnit().getId());
             }
 
+            if ((lastAssignedUnitId != null) && (lastAssignedCrewSeat != null)) {
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastAssignedUnitId", lastAssignedUnitId);
+                MHQXMLUtility.writeSimpleXMLTag(pw, indent, "lastAssignedCrewSeat", lastAssignedCrewSeat.name());
+            }
+
             if (!salary.equals(Money.of(-1))) {
                 MHQXMLUtility.writeSimpleXMLTag(pw, indent, "salary", salary);
             }
@@ -4554,6 +4677,10 @@ public class Person implements ILocatable {
                     if (!wn2.getTextContent().equals("null")) {
                         person.unit = new PersonUnitRef(UUID.fromString(wn2.getTextContent().trim()));
                     }
+                } else if (nodeName.equalsIgnoreCase("lastAssignedUnitId")) {
+                    person.lastAssignedUnitId = UUID.fromString(wn2.getTextContent().trim());
+                } else if (nodeName.equalsIgnoreCase("lastAssignedCrewSeat")) {
+                    person.lastAssignedCrewSeat = CrewSeat.parseFromString(wn2.getTextContent().trim());
                 } else if (nodeName.equalsIgnoreCase("status")) {
                     person.setStatus(PersonnelStatus.fromString(wn2.getTextContent().trim()));
                 } else if (nodeName.equalsIgnoreCase("prisonerStatus")) {
@@ -5722,6 +5849,7 @@ public class Person implements ILocatable {
             setLastRankChangeDate(null);
         }
 
+        campaign.getPlayerForce().getHumanResources().assignRandomPortraitOnRankChange(campaign, this);
         campaign.getPlayerForce().getHumanResources().personUpdated(campaign, this);
 
         if (report) {
@@ -6806,9 +6934,6 @@ public class Person implements ILocatable {
     }
 
     /**
-     * Returns a string of all the option "codes" for this pilot, for a given group, using sep as the separator
-     */
-    /**
      * Every implant this person carries, across the groups that hold them.
      *
      * <p>The Manei Domini implants and enhanced imaging sit in separate option groups but are one
@@ -6836,6 +6961,9 @@ public class Person implements ILocatable {
         return countOptions(PersonnelOptions.MD_ADVANTAGES) + countOptions(PilotOptions.EI_ADVANTAGES);
     }
 
+    /**
+     * Returns a string of all the option "codes" for this pilot, for a given group, using sep as the separator
+     */
     public String getOptionList(@Nullable String sep, final String groupKey) {
         final StringBuilder adv = new StringBuilder();
 
@@ -7351,6 +7479,122 @@ public class Person implements ILocatable {
 
     public void setUnit(final @Nullable Unit unit) {
         this.unit = unit;
+    }
+
+    /**
+     * @return the id of the unit this person was crewing when they went off active duty, or {@code null} if there
+     *       is none to return to
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable UUID getLastAssignedUnitId() {
+        return lastAssignedUnitId;
+    }
+
+    /**
+     * @return the crew seat this person held in their last assigned unit, or {@code null} if there is none to return
+     *       to
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable CrewSeat getLastAssignedCrewSeat() {
+        return lastAssignedCrewSeat;
+    }
+
+    /**
+     * Sets the unit and crew seat this person will try to return to when they next come back to active duty.
+     *
+     * @param lastAssignedUnitId   the id of the unit, or {@code null} to forget it
+     * @param lastAssignedCrewSeat the seat they held in it, or {@code null} to forget it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setLastAssignedUnit(final @Nullable UUID lastAssignedUnitId,
+          final @Nullable CrewSeat lastAssignedCrewSeat) {
+        this.lastAssignedUnitId = lastAssignedUnitId;
+        this.lastAssignedCrewSeat = lastAssignedCrewSeat;
+    }
+
+    /**
+     * Forgets the unit this person would return to when they next come back to active duty.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void clearLastAssignedUnit() {
+        setLastAssignedUnit(null, null);
+    }
+
+    /**
+     * Remembers the unit and seat this person is crewing, so they can return to it when they come back to active
+     * duty.
+     *
+     * @param currentUnit the unit this person is about to be removed from
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void rememberLastAssignedUnit(final Unit currentUnit) {
+        CrewSeat crewSeat = currentUnit.getCrewSeat(this);
+        if (crewSeat == null) {
+            return;
+        }
+
+        setLastAssignedUnit(currentUnit.getId(), crewSeat);
+    }
+
+    /**
+     * Returns this person to the unit and seat they held before they went off active duty, if they still can.
+     *
+     * <p>The return fails if the unit has left the campaign, is deployed, mothballed or elsewhere, or if someone
+     * else has taken the seat. The remembered unit is forgotten either way, so a failed return is never retried
+     * later.</p>
+     *
+     * @param campaign the campaign this person belongs to
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void returnToLastAssignedUnit(final Campaign campaign) {
+        final UUID unitId = lastAssignedUnitId;
+        final CrewSeat crewSeat = lastAssignedCrewSeat;
+        clearLastAssignedUnit();
+
+        if ((unitId == null) || (crewSeat == null) || (getUnit() != null)) {
+            return;
+        }
+
+        if (!getPrisonerStatus().isFreeOrBondsman()) {
+            return;
+        }
+
+        final Unit lastUnit = campaign.getUnit(unitId);
+        if (lastUnit == null) {
+            LOGGER.info("{} cannot return to their last unit {}: it is no longer in the campaign", getFullName(),
+                  unitId);
+            return;
+        }
+
+        // A refitting unit keeps its crew, so returning to one is fine; deployed, mothballed and absent units are not
+        final boolean canReturn = lastUnit.isAvailable(true)
+                                        && lastUnit.hasOpenCrewSeat(crewSeat)
+                                        && LocationUtils.areSameEffectiveLocation(lastUnit, this);
+        if (canReturn) {
+            lastUnit.addToCrewSeat(this, crewSeat);
+        }
+
+        if (lastUnit.equals(getUnit())) {
+            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "returnedToLastUnit.report",
+                  getHyperlinkedFullTitle(), lastUnit.getHyperlinkedName()));
+        } else {
+            LOGGER.info("{} cannot return to their last unit {}: it is unavailable or the {} seat is taken",
+                  getFullName(), lastUnit.getName(), crewSeat);
+            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "cannotReturnToLastUnit.report",
+                  getHyperlinkedFullTitle(), lastUnit.getHyperlinkedName()));
+        }
     }
 
     public void removeTechUnit(final Unit unit) {

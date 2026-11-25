@@ -209,6 +209,35 @@ final class ConsoleWidgets {
         return panel;
     }
 
+    /**
+     * A column washed with a see-through tint. Swing assumes an opaque component covers every pixel it owns, so a
+     * see-through background on one leaves whatever was last drawn there showing through, such as a button from
+     * elsewhere in the dialog. This column stays non-opaque, letting its parents paint first, and lays the tint over
+     * them itself.
+     *
+     * @param tint the see-through color to wash the column with
+     *
+     * @return the column
+     */
+    static JPanel tintedColumn(Color tint) {
+        JPanel panel = new JPanel() {
+            @Override
+            protected void paintComponent(Graphics graphics) {
+                super.paintComponent(graphics);
+                Graphics2D graphics2D = (Graphics2D) graphics.create();
+                try {
+                    graphics2D.setColor(tint);
+                    graphics2D.fillRect(0, 0, getWidth(), getHeight());
+                } finally {
+                    graphics2D.dispose();
+                }
+            }
+        };
+        panel.setOpaque(false);
+        panel.setLayout(new BoxLayout(panel, BoxLayout.Y_AXIS));
+        return panel;
+    }
+
     static JPanel row(int gap) {
         JPanel panel = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(gap), scaleForGUI(3)));
         panel.setAlignmentX(Component.LEFT_ALIGNMENT);
@@ -293,9 +322,7 @@ final class ConsoleWidgets {
 
     /** @return a lightly tinted, outlined column for a preview of what a button will stage */
     static JPanel previewBox() {
-        JPanel box = column();
-        box.setOpaque(true);
-        box.setBackground(new Color(ACCENT.getRed(), ACCENT.getGreen(), ACCENT.getBlue(), 14));
+        JPanel box = tintedColumn(new Color(ACCENT.getRed(), ACCENT.getGreen(), ACCENT.getBlue(), 14));
         box.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createLineBorder(new Color(ACCENT.getRed(), ACCENT.getGreen(), ACCENT.getBlue(), 90),
                     scaleForGUI(1)),
@@ -586,9 +613,7 @@ final class ConsoleWidgets {
 
     /** @return a colored box of fee lines, such as how many people reach Regular and what each pays */
     static JComponent feeBox(String title, String total, List<String[]> lines, @Nullable String warning) {
-        JPanel box = column();
-        box.setOpaque(true);
-        box.setBackground(new Color(AMBER.getRed(), AMBER.getGreen(), AMBER.getBlue(), 18));
+        JPanel box = tintedColumn(new Color(AMBER.getRed(), AMBER.getGreen(), AMBER.getBlue(), 18));
         box.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createLineBorder(new Color(AMBER.getRed(), AMBER.getGreen(), AMBER.getBlue(), 90),
                     scaleForGUI(1)),

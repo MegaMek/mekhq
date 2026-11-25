@@ -66,7 +66,7 @@ import org.mockito.ArgumentCaptor;
  * auto-resolve bot.
  *
  * @see AtBGameThread#orderedTrainTrailerIds
- * @see AtBGameThread#handOverPlayerUnitsToBot
+ * @see GameThread#handOverPlayerUnitsToBot
  */
 public class AtBGameThreadTest {
 
@@ -200,7 +200,7 @@ public class AtBGameThreadTest {
         Client client = playerClient(player, playerUnit, secondPlayerUnit);
         BotClient botClient = botClient(BOT_ID);
 
-        AtBGameThread.handOverPlayerUnitsToBot(client, botClient);
+        GameThread.handOverPlayerUnitsToBot(client, botClient);
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<Entity>> handedOver = ArgumentCaptor.forClass(List.class);
@@ -217,7 +217,7 @@ public class AtBGameThreadTest {
         Client client = playerClient(player, enemyUnit, playerUnit);
         BotClient botClient = botClient(BOT_ID);
 
-        AtBGameThread.handOverPlayerUnitsToBot(client, botClient);
+        GameThread.handOverPlayerUnitsToBot(client, botClient);
 
         @SuppressWarnings("unchecked")
         ArgumentCaptor<List<Entity>> handedOver = ArgumentCaptor.forClass(List.class);
@@ -231,7 +231,7 @@ public class AtBGameThreadTest {
         Client client = playerClient(player, unitOwnedBy(ENEMY_ID));
         BotClient botClient = botClient(BOT_ID);
 
-        AtBGameThread.handOverPlayerUnitsToBot(client, botClient);
+        GameThread.handOverPlayerUnitsToBot(client, botClient);
 
         verify(client, never()).sendChangeOwner(anyCollection(), anyInt());
     }

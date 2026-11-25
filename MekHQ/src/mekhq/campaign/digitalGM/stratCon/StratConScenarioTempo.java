@@ -32,41 +32,41 @@
  */
 package mekhq.campaign.digitalGM.stratCon;
 
-import static java.lang.Math.max;
 import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDeploymentOrderBehavior.isDeploymentOrder;
 
+import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
+import java.time.temporal.TemporalAdjusters;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Function;
 
-import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConContractDefinition.StrategicObjectiveType;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConEnemyFacilityActivity;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityAttacks;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConScheduledPointOfInterest;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractGeneration.AbstractContractGeneration;
-import mekhq.campaign.mission.contract.contractGeneration.TrackIntensityTable;
 
 /**
- * Schedules a StratCon contract's ordinary scenarios, and rolls the contract's whole pre-rolled schedule again when the
- * contract is edited.
+ * Rolls a StratCon contract's normal scenarios each week, and lays the contract's pre-rolled schedules out again when
+ * the contract is edited or extended.
  *
- * <p>Ordinary scenarios are scheduled the way Essential scenarios are: up front, by rolling the Track Intensity Tables
- * for the contract's track count (see {@link TrackIntensityTable#rollSchedule}). The table is rolled once per point of
- * scale when "Multiply Track Intensity by Scale" is on and once otherwise, and three times as often when battlefield
- * support points are factored into scale, since that makes for smaller scales. The "Scenario Tempo Multiplier" option
- * then multiplies the rolls. As for Essential scenarios, the
- * table's columns are read as months; unlike them, the table is rolled afresh for however many months it falls short of
- * the contract, so no month of a long contract is left without scenarios.</p>
+ * <p>Each Monday, the contract rolls {@value StratConSpawnRates#NORMAL_SCENARIO_ROLLS_PER_SCALE} time per point of
+ * Scale (rounded normally, never below once). Each roll picks a random sector and rolls against that sector's threat
+ * (see {@link StratConRulesManager#calculateScenarioOdds}); a hit brings a normal scenario to that sector on a random day
+ * of the week (see {@link #rollWeeklyScenarios}). A peaceful contract's threat is nothing, so it rolls no scenarios.</p>
  *
- * <p>Single Drop play keeps its own pace of one scenario a week, and schedules nothing here.</p>
+ * <p>Single Drop play keeps its own pace of one scenario a week. A contract accepted before normal scenarios were
+ * rolled each week keeps the schedule it was given up front until it is edited or extended.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -74,184 +74,228 @@ import mekhq.campaign.mission.contract.contractGeneration.TrackIntensityTable;
 public final class StratConScenarioTempo {
     private static final MMLogger LOGGER = MMLogger.create(StratConScenarioTempo.class);
 
-    /** How much more often the table is rolled when battlefield support points are factored into scale. */
-    static final int SUPPORT_POINT_SCALE_ROLL_MULTIPLIER = 3;
+    /** The day each week's normal scenario roll is due. */
+    static final DayOfWeek WEEK_START = DayOfWeek.MONDAY;
+
+    /**
+     * How many days late a scheduled date - a normal scenario's, an enemy engineer party's, or a facility attack's -
+     * may be and still bring what it is for. Older dates are discarded, so a long backlog (from an older save, or a
+     * date jumped forward) does not arrive all at once.
+     */
+    static final int MAXIMUM_SCENARIO_CATCH_UP_DAYS = 7;
 
     private StratConScenarioTempo() {}
 
     /**
-     * Works out how many times the Track Intensity Tables are rolled for a contract's ordinary scenarios.
+     * Takes every date on or before today off a schedule and counts how many are now due.
      *
-     * @param isMultiplyTrackIntensityByScale whether the "Multiply Track Intensity by Scale" option is on
-     * @param isFactorSupportPointsIntoScale  whether battlefield support points are factored into scale
-     * @param scale                           the contract's scale; a scale below one still rolls as one
-     * @param scenarioTempoMultiplier         the "Scenario Tempo Multiplier" option, applied last and rounded to the
-     *                                        nearest whole roll, never below one
+     * <p>A date is due if it falls today, or at most {@link #MAXIMUM_SCENARIO_CATCH_UP_DAYS} days before. That way a
+     * date set for a day the new day has already processed - by editing or extending the contract - still brings what
+     * it is for the next day, instead of sitting on the schedule forever. Older dates are discarded.</p>
      *
-     * @return the number of rolls
+     * <p>Used for ordinary scenario dates, enemy engineers, and facility attacks alike.</p>
+     *
+     * @param scheduledDates the schedule; due and stale dates are removed from it
+     * @param today          the current campaign date
+     *
+     * @return how many are due today
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static int getRollCount(boolean isMultiplyTrackIntensityByScale, boolean isFactorSupportPointsIntoScale,
-          int scale, double scenarioTempoMultiplier) {
-        int rollCount = isMultiplyTrackIntensityByScale ? max(1, scale) : 1;
-        if (isFactorSupportPointsIntoScale) {
-            rollCount *= SUPPORT_POINT_SCALE_ROLL_MULTIPLIER;
-        }
-        return max(1, (int) Math.round(rollCount * scenarioTempoMultiplier));
+    public static int takeDueScenarioDates(List<LocalDate> scheduledDates, LocalDate today) {
+        return takeDue(scheduledDates, date -> date, today).size();
     }
 
     /**
-     * Rolls the days on which a contract's ordinary scenarios appear over its whole run.
+     * Takes every scheduled normal scenario due on or before today off the schedule, as
+     * {@link #takeDueScenarioDates} does for dates alone.
      *
-     * <p>The table for the contract's length is rolled, its columns read as months, and rolled afresh for however many
-     * months the table falls short of the contract. Each scenario gets a random day within its month, cut off at the
-     * contract's end.</p>
+     * @param scheduledScenarios the contract's scheduled normal scenarios; due and stale ones are removed from it
+     * @param today              the current campaign date
      *
-     * @param startDate      the contract's start date
-     * @param endDate        the contract's end date
-     * @param lengthInMonths the contract's length in months, choosing which table applies
-     * @param trackCount     the contract's track count, choosing the table column
-     * @param rollCount      how many times to roll the table for each block (see {@link #getRollCount})
-     *
-     * @return one day per scenario, in calendar order of their months
+     * @return the scenarios due today, at most {@link #MAXIMUM_SCENARIO_CATCH_UP_DAYS} days late
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static List<LocalDate> rollScenarioDates(LocalDate startDate, LocalDate endDate, int lengthInMonths,
-          int trackCount, int rollCount) {
-        return rollScenarioDates(startDate, endDate, lengthInMonths, trackCount, rollCount, false, false);
+    public static List<StratConScheduledScenario> takeDueScheduledScenarios(
+          List<StratConScheduledScenario> scheduledScenarios, LocalDate today) {
+        return takeDue(scheduledScenarios, StratConScheduledScenario::getDate, today);
     }
 
     /**
-     * As {@link #rollScenarioDates(LocalDate, LocalDate, int, int, int)}, honoring the two Track Intensity Table
-     * options. With "Minimum of 1 Hot Spots Track per Roll", a contract with no tracks is rolled as if it had one. With
-     * "Roll Hot Spots Tracks Weekly, Not Monthly", the table's columns are read as weeks rather than months, and the
-     * table is rolled afresh for every block of weeks it falls short of the contract.
+     * Takes everything on a schedule dated on or before today off it, and returns those at most
+     * {@link #MAXIMUM_SCENARIO_CATCH_UP_DAYS} days late. Anything older, or with no date, is discarded and logged.
      *
-     * @param isMinimumOneTrack whether a contract with no tracks is rolled as if it had one
-     * @param isWeekly          whether the table's columns are read as weeks
+     * @param schedule the schedule; due and stale entries are removed from it
+     * @param dateOf   reads an entry's date
+     * @param today    the current campaign date
+     *
+     * @return the entries due today, in schedule order
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static List<LocalDate> rollScenarioDates(LocalDate startDate, LocalDate endDate, int lengthInMonths,
-          int trackCount, int rollCount, boolean isMinimumOneTrack, boolean isWeekly) {
-        List<LocalDate> scenarioDates = new ArrayList<>();
-        if (!endDate.isAfter(startDate)) {
-            return scenarioDates;
-        }
-
-        int effectiveTrackCount = TrackIntensityTable.getEffectiveTrackCount(trackCount, isMinimumOneTrack);
-        int periodCount = isWeekly ?
-                                max(1, (int) ChronoUnit.WEEKS.between(startDate, endDate.minusDays(1)) + 1) :
-                                max(1, lengthInMonths);
-        int period = 0;
-        while (period < periodCount) {
-            List<Integer> schedule = TrackIntensityTable.rollSchedule(lengthInMonths, effectiveTrackCount, rollCount);
-            if (schedule.isEmpty()) {
-                break;
+    private static <T> List<T> takeDue(List<T> schedule, Function<T, LocalDate> dateOf, LocalDate today) {
+        LocalDate oldestDueDate = today.minusDays(MAXIMUM_SCENARIO_CATCH_UP_DAYS);
+        List<T> dueEntries = new ArrayList<>();
+        int staleCount = 0;
+        Iterator<T> entries = schedule.iterator();
+        while (entries.hasNext()) {
+            T entry = entries.next();
+            LocalDate date = dateOf.apply(entry);
+            if ((date != null) && date.isAfter(today)) {
+                continue;
             }
 
-            for (int scenarioCount : schedule) {
-                if (period >= periodCount) {
-                    break;
-                }
-
-                LocalDate periodStart = isWeekly ? startDate.plusWeeks(period) : startDate.plusMonths(period);
-                LocalDate periodEnd = isWeekly ? startDate.plusWeeks(period + 1L) : startDate.plusMonths(period + 1L);
-                if (periodEnd.isAfter(endDate)) {
-                    periodEnd = endDate;
-                }
-                int periodDays = max(1, (int) ChronoUnit.DAYS.between(periodStart, periodEnd));
-
-                for (int scenario = 0; scenario < scenarioCount; scenario++) {
-                    scenarioDates.add(periodStart.plusDays(Compute.randomInt(periodDays)));
-                }
-                period++;
+            if ((date == null) || date.isBefore(oldestDueDate)) {
+                staleCount++;
+            } else {
+                dueEntries.add(entry);
             }
+            entries.remove();
         }
 
-        return scenarioDates;
+        if (staleCount > 0) {
+            LOGGER.info("Discarded {} StratCon scheduled date(s) more than {} days overdue.",
+                  staleCount,
+                  MAXIMUM_SCENARIO_CATCH_UP_DAYS);
+        }
+
+        return dueEntries;
     }
 
     /**
-     * Schedules a contract's ordinary scenarios from the given day to the contract's end, replacing any scheduled from
-     * that day on. The days are stored on the campaign state, where the daily StratCon lifecycle generates the
-     * scenarios due each day. Does nothing without a settled start date.
+     * Decides whether a contract's weekly scenario roll is due: it has not been made yet this week, Monday to Sunday.
+     * Ordinarily that is on Monday; but a contract that starts midweek, or a week whose Monday was skipped, still
+     * rolls on the first day of the week that is processed.
      *
-     * @param campaign      the current campaign
+     * @param campaignState the contract's StratCon campaign state
+     * @param today         the current campaign date
+     *
+     * @return {@code true} if this week's roll is still to be made
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isWeeklyRollDue(StratConCampaignState campaignState, LocalDate today) {
+        LocalDate lastWeeklyRollDate = campaignState.getLastWeeklyRollDate();
+        return (lastWeeklyRollDate == null) || lastWeeklyRollDate.isBefore(getWeekStart(today));
+    }
+
+    /**
+     * @param date a day
+     *
+     * @return the Monday of the day's week; the day itself if it is a Monday
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static LocalDate getWeekStart(LocalDate date) {
+        return date.with(TemporalAdjusters.previousOrSame(WEEK_START));
+    }
+
+    /**
+     * @param date a day
+     *
+     * @return how many days are left in the day's week, counting the day itself: 7 on a Monday, 1 on a Sunday
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getDaysLeftInWeek(LocalDate date) {
+        return (int) ChronoUnit.DAYS.between(date, getWeekStart(date).plusWeeks(1));
+    }
+
+    /**
+     * Makes the week's normal scenario rolls for a contract: {@value StratConSpawnRates#NORMAL_SCENARIO_ROLLS_PER_SCALE}
+     * per point of Scale, rounded normally, never below one. Each roll picks a random sector and rolls d100 against its
+     * threat - the chance shown on the sector's threat bar (see {@link StratConRulesManager#calculateScenarioOdds}). A
+     * hit schedules a normal scenario in that sector on a random day of what is left of the week, today included. One
+     * that would fall on or after the contract's last day is not scheduled.
+     *
      * @param contract      the contract
      * @param campaignState the contract's StratCon campaign state
-     * @param fromDate      the first day to schedule on; the contract's start date when it is accepted
+     * @param today         the day of the rolls: ordinarily a Monday (see {@link #isWeeklyRollDue})
+     *
+     * @return how many normal scenarios were scheduled
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static void scheduleNormalScenarios(Campaign campaign, AbstractContract contract,
-          StratConCampaignState campaignState, @Nullable LocalDate fromDate) {
-        LocalDate startDate = contract.getStartDate();
-        if (startDate == null) {
-            LOGGER.warn("Contract {} has no start date, so its scenarios cannot be scheduled.", contract.getName());
-            return;
+    public static int rollWeeklyScenarios(AbstractContract contract, StratConCampaignState campaignState,
+          LocalDate today) {
+        List<StratConTrackState> tracks = campaignState.getTracks();
+        if (tracks.isEmpty()) {
+            return 0;
         }
 
-        LocalDate endDate = contract.getEndingDate();
-        if (endDate == null) {
-            endDate = startDate.plusMonths(max(1, contract.getLengthInMonths()));
-        }
-        LocalDate firstDate = ((fromDate == null) || fromDate.isBefore(startDate)) ? startDate : fromDate;
-
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        int rollCount = getRollCount(campaignOptions.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE),
-              campaignOptions.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
-              contract.getScale(),
-              campaignOptions.get(CampaignOption.SCENARIO_TEMPO_MULTIPLIER));
-        List<LocalDate> scenarioDates = rollScenarioDates(startDate, endDate, contract.getLengthInMonths(),
-              contract.getTrackCount(), rollCount, campaignState.isMinimumOneTrackPerRoll(),
-              campaignState.isRollTracksWeekly());
-
-        List<LocalDate> scheduledDates = campaignState.getScheduledScenarioDates();
-        scheduledDates.removeIf(scenarioDate -> !scenarioDate.isBefore(firstDate));
+        LocalDate contractEnd = contract.getEndingDate();
+        int rollCount = StratConSpawnRates.getCount(contract,
+              StratConSpawnRates.isFactorSupportPointsIntoScale(campaignState),
+              StratConSpawnRates.NORMAL_SCENARIO_ROLLS_PER_SCALE);
         int scheduledCount = 0;
-        for (LocalDate scenarioDate : scenarioDates) {
-            if (!scenarioDate.isBefore(firstDate)) {
-                campaignState.addScheduledScenarioDate(scenarioDate);
-                scheduledCount++;
+        for (int roll = 0; roll < rollCount; roll++) {
+            int sectorIndex = Compute.randomInt(tracks.size());
+            int threat = StratConRulesManager.calculateScenarioOdds(tracks.get(sectorIndex), contract, true);
+            if (!isThreatRollHit(Compute.randomInt(100), threat)) {
+                continue;
             }
-        }
-        campaignState.setNormalTempoScheduled(true);
 
-        LOGGER.info("Scheduled {} StratCon scenarios on contract {} from {} ({} rolls per block of months).",
-              scheduledCount,
-              contract.getName(),
-              firstDate,
-              rollCount);
+            LocalDate date = today.plusDays(Compute.randomInt(getDaysLeftInWeek(today)));
+            if ((contractEnd != null) && !date.isBefore(contractEnd)) {
+                continue;
+            }
+
+            campaignState.addScheduledScenario(new StratConScheduledScenario(date, sectorIndex));
+            scheduledCount++;
+        }
+
+        if (scheduledCount > 0) {
+            LOGGER.info("Weekly rolls scheduled {} StratCon scenario(s) on contract {}.", scheduledCount,
+                  contract.getName());
+        }
+        return scheduledCount;
     }
 
     /**
-     * Rolls a contract's pre-rolled schedule again from today, after an edit to something it was rolled from - the
-     * contract's scale, track count, or dates. Everything scheduled from today on is replaced; what has already
-     * happened, and anything already overdue, is left alone. The Track Intensity Table options are taken as they stand
-     * now, so an edit also brings a running contract in line with them.
+     * @param percentile a d100 roll, from 0 to 99
+     * @param threat     the sector's threat, as a percentage; below zero (a peaceful contract) never hits
+     *
+     * @return {@code true} if the roll brings a scenario: exactly {@code threat} in 100 of them do
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isThreatRollHit(int percentile, int threat) {
+        return percentile < threat;
+    }
+
+    /**
+     * Lays a contract's pre-rolled schedules out again from today, after an edit to something they were laid out from -
+     * the contract's Scale, length, or dates - or an emergency extension. Everything scheduled from today on is
+     * replaced; what has already happened, and anything already overdue, is left alone.
      *
      * <ul>
-     *     <li>Ordinary scenarios are scheduled again (see {@link #scheduleNormalScenarios}), except in Single Drop
-     *     play, which keeps its own weekly pace.</li>
-     *     <li>The contract's Essential scenario schedule is rolled again, as when the contract was generated (see
-     *     {@link AbstractContractGeneration#rollScenarioSchedule}), unless the contract's special points of interest
-     *     replace its Essential scenarios.</li>
+     *     <li>A contract still on the up-front schedule of normal scenarios it was given before they were rolled each
+     *     week drops what remains of it and moves onto the weekly rolls (see {@link #rollWeeklyScenarios}), except in
+     *     Single Drop play, which keeps its own weekly pace.</li>
+     *     <li>The contract's Essential scenarios are laid out again (see
+     *     {@link AbstractContractGeneration#rollScenarioSchedule}), if it fights any (see
+     *     {@link StratConContractInitializer#usesEssentialScenarios}).</li>
      *     <li>Points of interest are scheduled again (see
      *     {@link StratConContractInitializer#schedulePointsOfInterest(AbstractContract, StratConContractDefinition,
-     *     StratConCampaignState, boolean, boolean, LocalDate, int, Map)}). Those already placed, or due and waiting
-     *     for room, count against the contract's share, as do the marks they carry (see
+     *     StratConCampaignState, boolean, LocalDate, int, Map)}). Those already placed, or due and waiting for room,
+     *     count against the contract's share, as do the marks they carry (see
      *     {@link StratConCampaignState#recordPlacedPointOfInterest}).</li>
+     *     <li>Outside Single Drop play, enemy engineers and facility attacks are scheduled again (see
+     *     {@link StratConEnemyFacilityActivity#scheduleEnemyEngineers} and
+     *     {@link StratConFacilityAttacks#scheduleFacilityAttacks}).</li>
      * </ul>
      *
-     * <p>Mapless play has no Essential scenarios or points of interest, so only its ordinary scenarios are rolled
-     * again.</p>
+     * <p>Mapless play has no Essential scenarios, points of interest, or facilities, so only its normal scenarios are
+     * affected.</p>
      *
      * @param campaign      the current campaign
      * @param contract      the edited contract
@@ -264,13 +308,20 @@ public final class StratConScenarioTempo {
           StratConCampaignState campaignState) {
         LocalDate today = campaign.getLocalDate();
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        StratConSpawnRates.recordSupportPointsFactoredIntoScale(campaignOptions, campaignState);
 
-        // An edit rolls the schedules again under the options as they stand now.
-        campaignState.setMinimumOneTrackPerRoll(campaignOptions.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL));
-        campaignState.setRollTracksWeekly(campaignOptions.get(CampaignOption.ROLL_TRACKS_WEEKLY));
+        if (!campaignOptions.isUseStratConSinglesMode() && campaignState.isNormalTempoScheduled()) {
+            campaignState.getScheduledScenarioDates().removeIf(scenarioDate -> !scenarioDate.isBefore(today));
+            campaignState.setNormalTempoScheduled(false);
+        }
 
-        if (!campaignOptions.isUseStratConSinglesMode()) {
-            scheduleNormalScenarios(campaign, contract, campaignState, today);
+        // Weekly rolls already made stand, unless the contract now ends before them.
+        LocalDate contractEnd = contract.getEndingDate();
+        if (contractEnd != null) {
+            campaignState.getScheduledScenarios().removeIf(scheduledScenario ->
+                                                                 (scheduledScenario.getDate() != null)
+                                                                       && !scheduledScenario.getDate()
+                                                                                 .isBefore(contractEnd));
         }
 
         if (campaignOptions.isUseStratConMaplessMode()) {
@@ -278,7 +329,7 @@ public final class StratConScenarioTempo {
         }
 
         boolean isContractsUseSpecialMechanics = campaignState.isContractsUseSpecialMechanics();
-        if (!StratConContractInitializer.isReplacingEssentialScenarios(contract, isContractsUseSpecialMechanics)) {
+        if (StratConContractInitializer.usesEssentialScenarios(contract, isContractsUseSpecialMechanics)) {
             contract.setScenarioSchedule(AbstractContractGeneration.rollScenarioSchedule(campaign,
                   contract,
                   contract.getLengthInMonths()));
@@ -287,6 +338,12 @@ public final class StratConScenarioTempo {
         }
 
         regeneratePointsOfInterest(campaign, contract, campaignState, today);
+
+        // Single Drop play has no enemy facility activity (see StratConContractInitializer#seedCampaignState)
+        if (!campaignOptions.isUseStratConSinglesMode()) {
+            StratConEnemyFacilityActivity.scheduleEnemyEngineers(contract, campaignState, today);
+            StratConFacilityAttacks.scheduleFacilityAttacks(contract, campaignState, today);
+        }
     }
 
     /**
@@ -336,7 +393,6 @@ public final class StratConScenarioTempo {
         StratConContractInitializer.schedulePointsOfInterest(contract,
               contractDefinition,
               campaignState,
-              campaign.getCampaignOptions().get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE),
               campaignState.isContractsUseSpecialMechanics(),
               today,
               committedObjectiveCount,

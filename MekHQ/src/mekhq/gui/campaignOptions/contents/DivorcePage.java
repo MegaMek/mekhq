@@ -35,6 +35,7 @@ package mekhq.gui.campaignOptions.contents;
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
+import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
 
 import java.awt.Component;
 import javax.swing.DefaultListCellRenderer;
@@ -46,6 +47,7 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.personnel.enums.RandomDivorceMethod;
@@ -121,12 +123,13 @@ class DivorcePage {
 
     private @Nonnull JPanel createDivorceGeneralOptionsPanel() {
         // Contents
-        chkUseManualDivorce = new CampaignOptionsCheckBox("UseManualDivorce");
+        chkUseManualDivorce = new CampaignOptionsCheckBox("UseManualDivorce", getMetadata(new Version("0.49.06")));
         chkUseManualDivorce.addMouseListener(createTipPanelUpdater("UseManualDivorce"));
-        chkUseClanPersonnelDivorce = new CampaignOptionsCheckBox("UseClanPersonnelDivorce");
+        chkUseClanPersonnelDivorce = new CampaignOptionsCheckBox("UseClanPersonnelDivorce",
+              getMetadata(new Version("0.49.12")));
         chkUseClanPersonnelDivorce
                 .addMouseListener(createTipPanelUpdater("UseClanPersonnelDivorce"));
-        chkUsePrisonerDivorce = new CampaignOptionsCheckBox("UsePrisonerDivorce");
+        chkUsePrisonerDivorce = new CampaignOptionsCheckBox("UsePrisonerDivorce", getMetadata(new Version("0.49.06")));
         chkUsePrisonerDivorce.addMouseListener(createTipPanelUpdater("UsePrisonerDivorce"));
 
         // Layout the Panel
@@ -150,7 +153,7 @@ class DivorcePage {
      */
     private @Nonnull JPanel createRandomDivorcePanel() {
         // Contents
-        lblRandomDivorceMethod = new CampaignOptionsLabel("RandomDivorceMethod");
+        lblRandomDivorceMethod = new CampaignOptionsLabel("RandomDivorceMethod", getMetadata(new Version("0.49.06")));
         lblRandomDivorceMethod.addMouseListener(createTipPanelUpdater("RandomDivorceMethod"));
         comboRandomDivorceMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -166,18 +169,23 @@ class DivorcePage {
         });
         comboRandomDivorceMethod.addMouseListener(createTipPanelUpdater("RandomDivorceMethod"));
 
-        chkUseRandomOppositeSexDivorce = new CampaignOptionsCheckBox("UseRandomOppositeSexDivorce");
+        chkUseRandomOppositeSexDivorce = new CampaignOptionsCheckBox("UseRandomOppositeSexDivorce",
+              getMetadata(new Version("0.49.06")));
         chkUseRandomOppositeSexDivorce.addMouseListener(createTipPanelUpdater("UseRandomOppositeSexDivorce"));
-        chkUseRandomSameSexDivorce = new CampaignOptionsCheckBox("UseRandomSameSexDivorce");
+        chkUseRandomSameSexDivorce = new CampaignOptionsCheckBox("UseRandomSameSexDivorce",
+              getMetadata(new Version("0.49.06")));
         chkUseRandomSameSexDivorce
                 .addMouseListener(createTipPanelUpdater("UseRandomSameSexDivorce"));
-        chkUseRandomClanPersonnelDivorce = new CampaignOptionsCheckBox("UseRandomClanPersonnelDivorce");
+        chkUseRandomClanPersonnelDivorce = new CampaignOptionsCheckBox("UseRandomClanPersonnelDivorce",
+              getMetadata(new Version("0.49.12")));
         chkUseRandomClanPersonnelDivorce.addMouseListener(createTipPanelUpdater("UseRandomClanPersonnelDivorce"));
-        chkUseRandomPrisonerDivorce = new CampaignOptionsCheckBox("UseRandomPrisonerDivorce");
+        chkUseRandomPrisonerDivorce = new CampaignOptionsCheckBox("UseRandomPrisonerDivorce",
+              getMetadata(new Version("0.49.06")));
         chkUseRandomPrisonerDivorce
                 .addMouseListener(createTipPanelUpdater("UseRandomPrisonerDivorce"));
 
-        lblRandomDivorceDiceSize = new CampaignOptionsLabel("RandomDivorceDiceSize");
+        lblRandomDivorceDiceSize = new CampaignOptionsLabel("RandomDivorceDiceSize",
+              getMetadata(new Version("0.50.01")));
         lblRandomDivorceDiceSize.addMouseListener(createTipPanelUpdater("RandomDivorceDiceSize"));
         spnRandomDivorceDiceSize = new CampaignOptionsSpinner("RandomDivorceDiceSize",
                 900, 0, 100000, 1);

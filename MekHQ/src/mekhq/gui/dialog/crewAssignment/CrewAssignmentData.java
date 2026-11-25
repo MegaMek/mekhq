@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog.crewAssignment;
 
+import static mekhq.utilities.MHQInternationalization.getTextAt;
+
 import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -59,20 +61,25 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.familiarity.Familiarity;
+import mekhq.campaign.personnel.skills.Skill;
+import mekhq.campaign.personnel.skills.SkillModifierData;
+import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.turnoverAndRetention.Fatigue;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan;
 import mekhq.campaign.unit.crewAssignment.AutoFill;
 import mekhq.campaign.unit.crewAssignment.CrewSeatLayout;
 import mekhq.campaign.unit.crewAssignment.SeatEligibility;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SkillGroup;
 import mekhq.gui.model.LocationFilterItem;
 
 /**
  * Everything the {@link CrewAssignmentDialog} shows for one location, read once when the dialog opens: the units that
  * can be crewed there, the people who could crew them, and the staged plan.
  *
- * <p>Each person's experience level, special abilities and search text are worked out here once, so filtering and
- * sorting thousands of people as the player types never asks the campaign again.</p>
+ * <p>Each person's experience level, special abilities, skills and search text are worked out here once, so filtering
+ * and sorting thousands of people as the player types never asks the campaign again.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -91,13 +98,47 @@ final class CrewAssignmentData {
     record AbilityEntry(String name, String description) {}
 
     /**
+     * One of a person's skills, as the dialog shows and sorts it.
+     *
+     * @param name  the skill's name, as {@link SkillType} names it
+     * @param value the skill's final value, as the Personnel tab's skill columns show it
+     * @param level the skill's total level, higher being better whichever way the skill counts, for sorting
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    record SkillEntry(String name, int value, int level) {}
+
+    /**
+     * The chassis a person is most familiar with. Only the few most familiar are kept, as a person can be familiar
+     * with any number of chassis.
+     *
+     * @param top   at most {@link #MAX_FAMILIAR_CHASSIS} chassis and the person's familiarity with each, most familiar
+     *              first
+     * @param count how many chassis the person has any familiarity with
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    record FamiliarityEntry(List<Map.Entry<String, Integer>> top, int count) {
+        static final FamiliarityEntry NONE = new FamiliarityEntry(List.of(), 0);
+    }
+
+    /** How many chassis a person row names when listing what the person is familiar with. */
+    static final int MAX_FAMILIAR_CHASSIS = 5;
+
+    /**
      * A person and what the dialog shows about them.
      *
-     * @param hits    the person's hits, counting advanced medical injuries
-     * @param fatigue the person's effective fatigue, or {@code null} when the campaign does not use fatigue
+     * @param skills      the person's skills, by name
+     * @param hits        the person's hits, counting advanced medical injuries
+     * @param fatigue     the person's effective fatigue, or {@code null} when the campaign does not use fatigue
+     * @param familiarity the chassis the person is most familiar with; {@link FamiliarityEntry#NONE} while the
+     *                    campaign does not use chassis familiarity
      */
-    record PersonEntry(Person person, SkillLevel skillLevel, List<AbilityEntry> abilities, int hits,
-          @Nullable Integer fatigue, String searchText) {}
+    record PersonEntry(Person person, SkillLevel skillLevel, List<AbilityEntry> abilities,
+          Map<String, SkillEntry> skills, int hits, @Nullable Integer fatigue, String searchText,
+          FamiliarityEntry familiarity) {}
 
     private final Map<UUID, UnitEntry> units = new LinkedHashMap<>();
     private final Map<UUID, PersonEntry> people = new LinkedHashMap<>();
@@ -105,6 +146,7 @@ final class CrewAssignmentData {
     private final ToIntFunction<PersonnelRole> tempCrewPool;
     private final Comparator<Person> ranking;
     private final boolean useTransfers;
+    private final Familiarity familiarityMode;
     private final LocalDate today;
     private final String locationName;
 
@@ -116,6 +158,7 @@ final class CrewAssignmentData {
         CampaignOptions options = campaign.getCampaignOptions();
         today = campaign.getLocalDate();
         useTransfers = options.get(CampaignOption.USE_TRANSFERS);
+        familiarityMode = options.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         locationName = location.toString();
         plan = new AssignmentPlan(options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL),
               options.get(CampaignOption.USE_IMPLANTS), options.get(CampaignOption.TECHS_USE_ADMINISTRATION));
@@ -141,7 +184,7 @@ final class CrewAssignmentData {
         levels.keySet().stream()
               .sorted(ranking)
               .forEach(person -> people.put(person.getId(), describe(campaign, person, levels.get(person),
-                    useFatigue)));
+                    useFatigue, familiarityMode.isEnabled())));
 
         List<UnitEntry> unitEntries = new ArrayList<>();
         for (Unit unit : location.selectUnits(campaign)) {
@@ -153,13 +196,46 @@ final class CrewAssignmentData {
         unitEntries.forEach(entry -> units.put(entry.unit().getId(), entry));
     }
 
-    /** Someone is listed if they are active and either have a combat role or are a tech; other support staff are not. */
-    private static boolean isShown(Person person) {
+    /**
+     * Whether someone is listed in the dialog's list of people. They must be active and employed by the campaign, so
+     * camp followers are never listed, and have a combat role, be a tech, or have a profession that can take a
+     * vehicle's crew seat. Other support staff are not listed.
+     *
+     * @param person a person
+     *
+     * @return {@code true} if the person is listed
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isShown(Person person) {
         return person.getStatus().isActive()
-                     && (person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat() || person.isTech());
+                     && person.isEmployed()
+                     && (isListedRole(person.getPrimaryRole()) || isListedRole(person.getSecondaryRole())
+                               || person.isTech());
     }
 
-    private static PersonEntry describe(Campaign campaign, Person person, SkillLevel level, boolean useFatigue) {
+    private static boolean isListedRole(PersonnelRole role) {
+        return role.isCombat() || role.isVehicleCrewExtended();
+    }
+
+    /**
+     * Whether auto-fill may choose someone. Only combat personnel and techs are chosen, so auto-fill never takes a
+     * doctor, administrator or other staff member away from their duties; the player places them by hand.
+     *
+     * @param person a listed person
+     *
+     * @return {@code true} if auto-fill may choose the person
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean isAutoFillCandidate(Person person) {
+        return person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat() || person.isTech();
+    }
+
+    private static PersonEntry describe(Campaign campaign, Person person, SkillLevel level, boolean useFatigue,
+          boolean useFamiliarity) {
         List<AbilityEntry> abilities = new ArrayList<>();
         for (Enumeration<IOption> options = person.getOptions(PersonnelOptions.LVL3_ADVANTAGES);
               options.hasMoreElements(); ) {
@@ -168,15 +244,49 @@ final class CrewAssignmentData {
                 abilities.add(new AbilityEntry(Utilities.getOptionDisplayName(option), option.getDescription()));
             }
         }
+        Map<String, SkillEntry> skills = describeSkills(campaign, person);
         StringBuilder search = new StringBuilder(person.getFullTitle()).append(' ')
                                      .append(person.getPrimaryRole().getLabel(false)).append(' ')
                                      .append(person.getSecondaryRole().getLabel(false));
         for (AbilityEntry ability : abilities) {
             search.append(' ').append(ability.name());
         }
+        // Skills by name, such as Sensor Operations, and by the group the Skills filter offers, such as Scouting
+        for (String skill : skills.keySet()) {
+            search.append(' ').append(skill);
+        }
+        for (SkillGroup group : SkillGroup.values()) {
+            if (CrewAssignmentState.best(skills, group) != null) {
+                search.append(' ')
+                      .append(getTextAt(CrewAssignmentDialog.RESOURCE_BUNDLE, "SkillGroup." + group.name()));
+            }
+        }
         Integer fatigue = useFatigue ? Fatigue.getEffectiveFatigue(person, campaign) : null;
-        return new PersonEntry(person, level, List.copyOf(abilities), person.getTotalInjurySeverity(), fatigue,
-              search.toString().toLowerCase(Locale.ROOT));
+        FamiliarityEntry familiarity = useFamiliarity ?
+                                             CrewAssignmentState.familiarChassis(person, MAX_FAMILIAR_CHASSIS) :
+                                             FamiliarityEntry.NONE;
+        return new PersonEntry(person, level, List.copyOf(abilities), skills, person.getTotalInjurySeverity(),
+              fatigue, search.toString().toLowerCase(Locale.ROOT), familiarity);
+    }
+
+    /**
+     * Reads a person's skills with the modifiers the Personnel tab's skill columns use, so the values the dialog shows
+     * match those columns.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static Map<String, SkillEntry> describeSkills(Campaign campaign, Person person) {
+        SkillModifierData modifiers = person.getSkillModifierData(
+              campaign.getCampaignOptions().get(CampaignOption.USE_AGE_EFFECTS),
+              campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(), true);
+        Map<String, SkillEntry> skills = new LinkedHashMap<>();
+        for (Skill skill : person.getSkills().getSkills()) {
+            String name = skill.getType().getName();
+            skills.put(name, new SkillEntry(name, skill.getFinalSkillValue(modifiers),
+                  skill.getTotalSkillLevel(modifiers)));
+        }
+        return Map.copyOf(skills);
     }
 
     private static UnitEntry describe(Campaign campaign, Unit unit) {
@@ -224,6 +334,16 @@ final class CrewAssignmentData {
 
     boolean isUseTransfers() {
         return useTransfers;
+    }
+
+    /**
+     * @return the campaign's chassis familiarity mode; the familiarity filter is only offered while it is enabled
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    Familiarity familiarityMode() {
+        return familiarityMode;
     }
 
     LocalDate today() {

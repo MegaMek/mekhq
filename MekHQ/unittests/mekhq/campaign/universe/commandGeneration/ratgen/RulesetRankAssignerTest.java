@@ -34,11 +34,15 @@ package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import megamek.common.units.UnitType;
 import mekhq.campaign.force.FormationLevel;
+import mekhq.campaign.personnel.enums.RankSystemType;
 import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
+import mekhq.campaign.universe.commandGeneration.ratgen.RulesetRankAssigner.RankFamily;
 import org.junit.jupiter.api.Test;
 
 /**
@@ -182,6 +186,58 @@ class RulesetRankAssignerTest {
     @Test
     void rankIndex_levelVI_isPrecentorMartialSlot() {
         assertEquals(Rank.RWO_MAX + 12, RulesetRankAssigner.rankIndexForLevel(FormationLevel.LEVEL_VI));
+    }
+
+    // ===== Rank system families =====
+
+    private static RankSystem rankSystem(String code, boolean usesROMDesignation) {
+        RankSystem rankSystem = new RankSystem(code, code, "", RankSystemType.DEFAULT);
+        rankSystem.setUseROMDesignation(usesROMDesignation);
+        return rankSystem;
+    }
+
+    @Test
+    void rankFamily_isReadFromTheRankSystemNotTheFaction() {
+        assertEquals(RankFamily.CLAN, RankFamily.of(rankSystem("CLAN", false)));
+        assertEquals(RankFamily.COMSTAR, RankFamily.of(rankSystem("CG", true)));
+        assertEquals(RankFamily.COMSTAR, RankFamily.of(rankSystem("WOBM", true)));
+        assertEquals(RankFamily.INNER_SPHERE, RankFamily.of(rankSystem("AFFS", false)));
+        assertEquals(RankFamily.INNER_SPHERE, RankFamily.of(rankSystem("MyCustomRanks", false)),
+              "a custom rank system follows the Inner Sphere layout");
+        assertEquals(RankFamily.INNER_SPHERE, RankFamily.of(null));
+    }
+
+    @Test
+    void levelInFamily_keepsALevelOfTheSameFamily() {
+        assertEquals(FormationLevel.LANCE, RulesetRankAssigner.levelInFamily(FormationLevel.LANCE,
+              RankFamily.INNER_SPHERE));
+        assertEquals(FormationLevel.CLUSTER, RulesetRankAssigner.levelInFamily(FormationLevel.CLUSTER,
+              RankFamily.CLAN));
+    }
+
+    @Test
+    void levelInFamily_ranksAClanCommandUnderAnInnerSphereRankSystem() {
+        assertEquals(FormationLevel.LANCE, RulesetRankAssigner.levelInFamily(FormationLevel.STAR_OR_NOVA,
+              RankFamily.INNER_SPHERE));
+        assertEquals(FormationLevel.COMPANY, RulesetRankAssigner.levelInFamily(FormationLevel.BINARY_OR_TRINARY,
+              RankFamily.INNER_SPHERE));
+        assertEquals(FormationLevel.REGIMENT, RulesetRankAssigner.levelInFamily(FormationLevel.CLUSTER,
+              RankFamily.INNER_SPHERE));
+    }
+
+    @Test
+    void levelInFamily_fallsToTheLargestSmallerFormationWhenTheFamilyHasNoMatch() {
+        assertEquals(FormationLevel.BINARY_OR_TRINARY, RulesetRankAssigner.levelInFamily(FormationLevel.BATTALION,
+              RankFamily.CLAN), "the Clans have no Battalion, so its commander ranks as a Binary's");
+        assertEquals(FormationLevel.LEVEL_IV, RulesetRankAssigner.levelInFamily(FormationLevel.REGIMENT,
+              RankFamily.COMSTAR));
+    }
+
+    @Test
+    void levelInFamily_leavesLevelsWithNoOfficerAlone() {
+        assertEquals(FormationLevel.TEAM, RulesetRankAssigner.levelInFamily(FormationLevel.TEAM,
+              RankFamily.INNER_SPHERE));
+        assertNull(RulesetRankAssigner.levelInFamily(null, RankFamily.CLAN));
     }
 
     // ===== Defensive =====

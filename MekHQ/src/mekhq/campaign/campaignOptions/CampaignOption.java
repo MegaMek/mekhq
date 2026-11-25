@@ -269,6 +269,8 @@ public final class CampaignOption<T> {
           of(Integer.class, CampaignOptions.TRANSIT_UNIT_MONTH, "unitTransitTime");
     public static final CampaignOption<Boolean> NO_DELIVERIES_IN_TRANSIT =
           of(Boolean.class, false, "noDeliveriesInTransit");
+    public static final CampaignOption<Boolean> USE_MARGIN_OF_SUCCESS_DELIVERY =
+          of(Boolean.class, false, "useMarginOfSuccessDelivery");
     public static final CampaignOption<Boolean> USE_PLANETARY_ACQUISITION =
           of(Boolean.class, false, "usePlanetaryAcquisition");
     public static final CampaignOption<Integer> MAX_JUMPS_PLANETARY_ACQUISITION =
@@ -650,6 +652,14 @@ public final class CampaignOption<T> {
           of(Integer.class, 150, "randomProcreationRelationshipDiceSize");
     public static final CampaignOption<Integer> RANDOM_PROCREATION_RELATIONSHIPLESS_DICE_SIZE =
           of(Integer.class, 2000, "randomProcreationRelationshiplessDiceSize");
+    public static final CampaignOption<Boolean> USE_RANDOM_PATERNITY =
+          of(Boolean.class, false, "useRandomPaternity");
+    public static final CampaignOption<Integer> RANDOM_PATERNITY_MAXIMUM_CHILD_AGE =
+          of(Integer.class, 5, "randomPaternityMaximumChildAge");
+    public static final CampaignOption<Boolean> USE_RANDOM_SAME_SEX_ADOPTION =
+          of(Boolean.class, false, "useRandomSameSexAdoption");
+    public static final CampaignOption<Integer> RANDOM_ADOPTION_MAXIMUM_CHILD_AGE =
+          of(Integer.class, 10, "randomAdoptionMaximumChildAge");
     public static final CampaignOption<Integer> NO_INTEREST_IN_RELATIONSHIPS_DICE_SIZE =
           of(Integer.class, 100, "noInterestInMarriageDiceSize");
     public static final CampaignOption<Integer> INTERESTED_IN_BOTH_SEXES_DICE_SIZE =
@@ -824,12 +834,14 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "payForHousing");
     public static final CampaignOption<Boolean> USE_LOAN_LIMITS =
           of(Boolean.class, false, "useLoanLimits");
-    public static final CampaignOption<Boolean> USE_PEACETIME_COST =
-          of(Boolean.class, false, "usePeacetimeCost");
-    public static final CampaignOption<Boolean> USE_EXTENDED_PARTS_MODIFIER =
-          of(Boolean.class, false, "useExtendedPartsModifier");
     public static final CampaignOption<Boolean> SHOW_PEACETIME_COST =
           of(Boolean.class, false, "showPeacetimeCost");
+    public static final CampaignOption<Boolean> PAY_FOR_PEACETIME_SPARE_PARTS =
+          of(Boolean.class, false, "payForPeacetimeSpareParts");
+    public static final CampaignOption<Boolean> PAY_FOR_TRAINING_MUNITIONS =
+          of(Boolean.class, false, "payForTrainingMunitions");
+    public static final CampaignOption<Boolean> PAY_FOR_PEACETIME_FUEL =
+          of(Boolean.class, false, "payForPeacetimeFuel");
     public static final CampaignOption<FinancialYearDuration> FINANCIAL_YEAR_DURATION =
           of(FinancialYearDuration.class, FinancialYearDuration.ANNUAL, "financialYearDuration");
     public static final CampaignOption<Boolean> NEW_FINANCIAL_YEAR_FINANCES_TO_CSV_EXPORT =
@@ -858,6 +870,19 @@ public final class CampaignOption<T> {
           of(Double.class, 1.0, "clanPartPriceMultiplier");
     public static final CampaignOption<Double> MIXED_TECH_UNIT_PRICE_MULTIPLIER =
           of(Double.class, 1.0, "mixedTechUnitPriceMultiplier");
+    public static final CampaignOption<Double> CLAN_TECH_INVASION_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "clanTechInvasionPriceMultiplier");
+    public static final CampaignOption<Double> CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "clanTechPostInvasionPriceMultiplier");
+    public static final CampaignOption<Double> SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "successionWarsAdvancedTechPriceMultiplier");
+    public static final CampaignOption<Double> TECH_RATING_E_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "techRatingEPriceMultiplier");
+    public static final CampaignOption<Double> TECH_RATING_F_PRICE_MULTIPLIER =
+          of(Double.class, 1.0, "techRatingFPriceMultiplier");
+    /** Unofficial: the acquisition multipliers also apply when buying and selling parts, not only units. */
+    public static final CampaignOption<Boolean> APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS =
+          of(Boolean.class, false, "applyAcquisitionMultipliersToParts");
     public static final CampaignOption<Double> DAMAGED_PARTS_VALUE_MULTIPLIER =
           of(Double.class, 0.33, "damagedPartsValueMultiplier");
     public static final CampaignOption<Double> UNREPAIRABLE_PARTS_VALUE_MULTIPLIER =
@@ -894,12 +919,6 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useChaosSupportPointConversion");
     public static final CampaignOption<Boolean> USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION =
           of(Boolean.class, true, "useChaosScaleSupportPointConversion");
-    public static final CampaignOption<Boolean> MULTIPLY_TRACK_INTENSITY_BY_SCALE =
-          of(Boolean.class, true, "multiplyTrackIntensityByScale");
-    public static final CampaignOption<Boolean> MINIMUM_ONE_TRACK_PER_ROLL =
-          of(Boolean.class, false, "minimumOneTrackPerRoll");
-    public static final CampaignOption<Boolean> ROLL_TRACKS_WEEKLY =
-          of(Boolean.class, false, "rollTracksWeekly");
     public static final CampaignOption<Boolean> USE_CONTRACT_FACTION_MODIFIERS =
           of(Boolean.class, true, "useContractFactionModifiers");
     public static final CampaignOption<Boolean> USE_INTEL_OBFUSCATION =
@@ -924,8 +943,6 @@ public final class CampaignOption<T> {
           of(Double.class, 1.0, "contractTransportMultiplier");
     public static final CampaignOption<Double> CONTRACT_SALVAGE_MULTIPLIER =
           of(Double.class, 1.0, "contractSalvageMultiplier");
-    public static final CampaignOption<Double> SCENARIO_TEMPO_MULTIPLIER =
-          of(Double.class, 1.0, "scenarioTempoMultiplier");
     public static final CampaignOption<Boolean> USE_LEGACY_CONTRACT_PAY =
           of(Boolean.class, false, "useLegacyContractPay");
     public static final CampaignOption<Boolean> USE_ALTERNATE_PAYMENT_MODE =
@@ -990,6 +1007,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "useGenderedPortraitsOnly");
     public static final CampaignOption<Boolean> NO_RANDOM_PORTRAITS_FOR_CHILDREN =
           of(Boolean.class, true, "noRandomPortraitsForChildren");
+    public static final CampaignOption<Boolean> RANDOM_PORTRAITS_FOR_OFFICERS_ONLY =
+          of(Boolean.class, false, "randomPortraitsForOfficersOnly");
     public static final CampaignOption<Boolean> CHILD_PORTRAITS_WHEN_COMING_OF_AGE =
           of(Boolean.class, true, "childPortraitsWhenComingOfAge");
     public static final CampaignOption<PersonnelMarketStyle> PERSONNEL_MARKET_STYLE =
@@ -1048,6 +1067,8 @@ public final class CampaignOption<T> {
           of(Boolean.class, false, "isUseRiskySalvage");
     public static final CampaignOption<Boolean> IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE =
           of(Boolean.class, false, "isKeepEnemyCamouflageOnSalvage");
+    public static final CampaignOption<Boolean> IS_REDUCE_SALVAGE_QUALITY =
+          of(Boolean.class, false, "isReduceSalvageQuality");
     public static final CampaignOption<Boolean> IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT =
           of(Boolean.class, true, "isEnableSalvageFlagByDefault");
     public static final CampaignOption<Boolean> USE_CLAN_SALVAGE_CLAUSE =
@@ -1066,8 +1087,6 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "useEmployerLostPlanetReactions");
     public static final CampaignOption<Boolean> USE_FACILITY_OPERATIONS =
           of(Boolean.class, true, "useFacilityOperations");
-    public static final CampaignOption<Double> ENEMY_FACILITY_ACTIVITY =
-          of(Double.class, 1.0, "enemyFacilityActivity");
     public static final CampaignOption<Boolean> USE_SUPPLY_LINES =
           of(Boolean.class, true, "useSupplyLines");
     public static final CampaignOption<Double> FACILITY_DENSITY =
@@ -1089,9 +1108,9 @@ public final class CampaignOption<T> {
     public static final CampaignOption<BoardScalingType> BOARD_SCALING_TYPE =
           of(BoardScalingType.class, BoardScalingType.NORMAL, "boardScalingType");
     public static final CampaignOption<Integer> MORALE_VICTORY_EFFECT =
-          of(Integer.class, 1, "moraleVictoryEffect");
+          of(Integer.class, 2, "moraleVictoryEffect");
     public static final CampaignOption<Integer> MORALE_DECISIVE_VICTORY_EFFECT =
-          of(Integer.class, 2, "moraleDecisiveVictoryEffect");
+          of(Integer.class, 3, "moraleDecisiveVictoryEffect");
     public static final CampaignOption<Integer> MORALE_DEFEAT_EFFECT =
           of(Integer.class, -2, "moraleDefeatEffect");
     public static final CampaignOption<Integer> MORALE_DECISIVE_DEFEAT_EFFECT =

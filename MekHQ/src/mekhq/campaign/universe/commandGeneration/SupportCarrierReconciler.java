@@ -302,21 +302,6 @@ public final class SupportCarrierReconciler {
     }
 
     /**
-     * Marks carriers in campaigns saved before the carrier flag existed.
-     *
-     * <p>A unit qualifies only if it uses a carrier chassis <em>and</em> carries at least one support character, so a
-     * support squad a player bought and crewed themselves is not mistaken for a generated carrier.</p>
-     */
-    /**
-     * Recovers the Support Command formation id for a campaign saved before it was persisted.
-     *
-     * <p>The id is only written by generation. An older save has carriers but no id, and without this the reconciler
-     * would treat it as a campaign that never opted in. Support Command is found as the lowest common ancestor of
-     * every carrier's formation - the one formation that sits above all of Maintenance, Medical and Command - which
-     * needs no name matching and holds for any layout the generator produces. A campaign whose carriers all sit in
-     * one section resolves to that section instead, which files any later profession under it; acceptable, and rare.</p>
-     */
-    /**
      * Whether support teams are switched on for this campaign.
      *
      * @param campaign the campaign
@@ -425,6 +410,15 @@ public final class SupportCarrierReconciler {
         return ids;
     }
 
+    /**
+     * Recovers the Support Command formation id for a campaign saved before it was persisted.
+     *
+     * <p>The id is only written by generation. An older save has carriers but no id, and without this the reconciler
+     * would treat it as a campaign that never opted in. Support Command is found as the lowest common ancestor of
+     * every carrier's formation - the one formation that sits above all of Maintenance, Medical and Command - which
+     * needs no name matching and holds for any layout the generator produces. A campaign whose carriers all sit in
+     * one section resolves to that section instead, which files any later profession under it; acceptable, and rare.</p>
+     */
     private static void recoverSupportCommandId(Campaign campaign) {
         if (campaign.getPlayerForce().getSupportCommandFormationId() != Formation.FORMATION_NONE) {
             return;
@@ -481,6 +475,13 @@ public final class SupportCarrierReconciler {
                           + " persisted id", supportCommand.getName(), common, chains.size());
     }
 
+    /**
+     * Marks carriers in campaigns saved before the carrier flag existed.
+     *
+     * <p>A unit qualifies only if it uses a carrier chassis <em>and</em> either carries at least one support character
+     * or bears the profession label generation stamps on every carrier, so a support squad a player bought and crewed
+     * themselves is not mistaken for a generated carrier.</p>
+     */
     private static void markLegacyCarriers(Campaign campaign) {
         int marked = 0;
         for (Unit unit : new ArrayList<>(campaign.getUnits())) {

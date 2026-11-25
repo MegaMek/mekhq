@@ -32,6 +32,8 @@
  */
 package mekhq.gui.dialog;
 
+import static megamek.client.ui.util.UIUtil.scaleForGUI;
+
 import java.awt.BorderLayout;
 import java.awt.EventQueue;
 import java.awt.GridLayout;
@@ -40,16 +42,10 @@ import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowListener;
 import java.util.ResourceBundle;
-import javax.swing.JButton;
-import javax.swing.JDialog;
-import javax.swing.JFormattedTextField;
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-import javax.swing.JSpinner;
-import javax.swing.SpinnerNumberModel;
-import javax.swing.WindowConstants;
+import javax.swing.*;
 import javax.swing.text.DefaultFormatter;
 
+import jakarta.annotation.Nullable;
 import mekhq.MekHQ;
 
 /**
@@ -61,6 +57,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
     private JSpinner value;
     private boolean wasCanceled = false;
     private final SpinnerNumberModel model;
+    private final @Nullable String instructions;
 
     public boolean wasCanceled() {
         return wasCanceled;
@@ -76,6 +73,7 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
           final int current, final int min) {
         super(frame, modal);
         model = new SpinnerNumberModel(current, min, null, 1);
+        instructions = null;
         setTitle(title);
         initComponents();
         setLocationRelativeTo(frame);
@@ -85,8 +83,20 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
 
     public PopupValueChoiceDialog(final JFrame parent, final boolean modal, final String title,
           final int current, final int min, final int max) {
+        this(parent, modal, title, null, current, min, max);
+    }
+
+    /**
+     * Creates a value dialog with a short instruction shown above the spinner, so the window title can stay a plain
+     * name for the action.
+     *
+     * @param instructions text shown above the spinner, or {@code null} for none
+     */
+    public PopupValueChoiceDialog(final JFrame parent, final boolean modal, final String title,
+          final @Nullable String instructions, final int current, final int min, final int max) {
         super(parent, modal);
         model = new SpinnerNumberModel(current, min, max, 1);
+        this.instructions = instructions;
         setTitle(title);
         initComponents();
         setLocationRelativeTo(parent);
@@ -125,6 +135,12 @@ public class PopupValueChoiceDialog extends JDialog implements WindowListener {
 
         getContentPane().setLayout(new BorderLayout());
 
+        if (instructions != null) {
+            JLabel lblInstructions = new JLabel(instructions);
+            lblInstructions.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(5), scaleForGUI(5), scaleForGUI(5),
+                  scaleForGUI(5)));
+            getContentPane().add(lblInstructions, BorderLayout.PAGE_START);
+        }
         getContentPane().add(value, BorderLayout.CENTER);
         getContentPane().add(pnlButton, BorderLayout.PAGE_END);
         pack();

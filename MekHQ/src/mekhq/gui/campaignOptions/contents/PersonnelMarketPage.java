@@ -32,8 +32,6 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -133,7 +131,7 @@ class PersonnelMarketPage {
     private @Nonnull JPanel createPersonnelMarketGeneralOptionsPanel() {
         // Contents
         lblPersonnelMarketStyle = new CampaignOptionsLabel("PersonnelMarketStyle",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT,
+                getMetadata(new Version("0.50.07"), CampaignOptionFlag.IMPORTANT,
                         CampaignOptionFlag.RECOMMENDED));
         lblPersonnelMarketStyle
                 .addMouseListener(createTipPanelUpdater("PersonnelMarketStyle"));
@@ -143,28 +141,28 @@ class PersonnelMarketPage {
         chkPersonnelMarketReportRefresh.addMouseListener(createTipPanelUpdater("PersonnelMarketReportRefresh"));
 
         chkUsePersonnelHireHiringHallOnly = new CampaignOptionsCheckBox("UsePersonnelHireHiringHallOnly",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(new Version("0.49.20"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUsePersonnelHireHiringHallOnly.addMouseListener(createTipPanelUpdater("UsePersonnelHireHiringHallOnly"));
 
         chkPersonnelMarketDisableShowOfInterest = new CampaignOptionsCheckBox("PersonnelMarketDisableShowOfInterest",
-                getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkPersonnelMarketDisableShowOfInterest
                 .addMouseListener(createTipPanelUpdater("PersonnelMarketDisableShowOfInterest"));
 
         chkPersonnelMarketDisableCombatManeuversRestriction = new CampaignOptionsCheckBox(
-                "PersonnelMarketDisableCombatManeuversRestriction", getMetadata(new Version(0, 51, 1),
+                "PersonnelMarketDisableCombatManeuversRestriction", getMetadata(new Version("0.51.01.1"),
               CampaignOptionFlag.CUSTOM_SYSTEM));
         chkPersonnelMarketDisableCombatManeuversRestriction
                 .addMouseListener(createTipPanelUpdater("PersonnelMarketDisableCombatManeuversRestriction"));
 
         chkPersonnelMarketDisableCivilianApplicants = new CampaignOptionsCheckBox(
-                "PersonnelMarketDisableCivilianApplicants", getMetadata(new Version(0, 51, 1),
+                "PersonnelMarketDisableCivilianApplicants", getMetadata(new Version("0.51.01.1"),
               CampaignOptionFlag.CUSTOM_SYSTEM));
         chkPersonnelMarketDisableCivilianApplicants
                 .addMouseListener(createTipPanelUpdater("PersonnelMarketDisableCivilianApplicants"));
 
         lblPersonnelMarketApplicantMultiplier = new CampaignOptionsLabel("PersonnelMarketApplicantMultiplier",
-                getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM));
+                getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM));
         lblPersonnelMarketApplicantMultiplier
                 .addMouseListener(createTipPanelUpdater("PersonnelMarketApplicantMultiplier"));
         spnPersonnelMarketApplicantMultiplier = new CampaignOptionsSpinner("PersonnelMarketApplicantMultiplier",

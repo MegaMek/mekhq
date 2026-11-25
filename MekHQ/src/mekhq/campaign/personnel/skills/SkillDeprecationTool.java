@@ -38,8 +38,8 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import java.util.List;
 
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -120,7 +120,7 @@ public class SkillDeprecationTool {
 
         final double xpCostMultiplier = campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER);
 
-        final boolean isUseReasoningMultiplier = campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
+        final boolean isUseReasoningMultiplier = campaignOptions.isUseTalentXpCostMultiplier();
         final double reasoningXpMultiplier = person.getReasoningXpCostMultiplier(isUseReasoningMultiplier);
 
         final Skills skills = person.getSkills();
@@ -128,7 +128,7 @@ public class SkillDeprecationTool {
             final String skillName = skillType.getName();
             if (skills.hasSkill(skillName)) {
                 int refundValue = getRefundValue(skills, skillType, skillName);
-                
+
                 // Reasoning cost changes should always take place before global changes
                 refundValue = (int) round(refundValue * reasoningXpMultiplier * xpCostMultiplier);
 

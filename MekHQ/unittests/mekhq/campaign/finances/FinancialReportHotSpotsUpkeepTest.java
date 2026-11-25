@@ -57,7 +57,7 @@ import org.junit.jupiter.api.Test;
  */
 class FinancialReportHotSpotsUpkeepTest {
     private static final Money UPKEEP = Money.of(15_000_000);
-    private static final Money WEEKLY_MAINTENANCE = Money.of(1_000);
+    private static final Money MONTHLY_MAINTENANCE = Money.of(1_000);
     private static final Money SALARIES = Money.of(40_000);
     private static final Money OVERHEAD = Money.of(2_000);
     private static final Money SPARE_PARTS = Money.of(300);
@@ -75,7 +75,9 @@ class FinancialReportHotSpotsUpkeepTest {
         campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, true);
         campaignOptions.set(CampaignOption.PAY_FOR_SALARIES, true);
         campaignOptions.set(CampaignOption.PAY_FOR_OVERHEAD, true);
-        campaignOptions.set(CampaignOption.USE_PEACETIME_COST, true);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS, true);
+        campaignOptions.set(CampaignOption.PAY_FOR_TRAINING_MUNITIONS, true);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_FUEL, true);
         campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, true);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
 
@@ -95,7 +97,7 @@ class FinancialReportHotSpotsUpkeepTest {
 
         accountant = mock(Accountant.class);
         when(accountant.getHotSpotsUpkeepCosts()).thenReturn(UPKEEP);
-        when(accountant.getWeeklyMaintenanceCosts()).thenReturn(WEEKLY_MAINTENANCE);
+        when(accountant.getProjectedMonthlyMaintenanceCosts()).thenReturn(MONTHLY_MAINTENANCE);
         when(accountant.getPayRoll()).thenReturn(SALARIES);
         when(accountant.getOverheadExpenses()).thenReturn(OVERHEAD);
         when(accountant.getMonthlySpareParts()).thenReturn(SPARE_PARTS);
@@ -138,11 +140,11 @@ class FinancialReportHotSpotsUpkeepTest {
         FinancialReport report = FinancialReport.calculate(campaign);
 
         assertEquals(Money.zero(), report.getHotSpotsUpkeepCosts());
-        assertEquals(WEEKLY_MAINTENANCE.multipliedBy(4), report.getMaintenance());
+        assertEquals(MONTHLY_MAINTENANCE, report.getMaintenance());
         assertEquals(OVERHEAD, report.getOverheadCosts());
         assertEquals(SPARE_PARTS, report.getMonthlySparePartCosts());
-        assertEquals(WEEKLY_MAINTENANCE.multipliedBy(4).plus(SALARIES).plus(OVERHEAD).plus(SPARE_PARTS).plus(AMMO)
-                           .plus(FUEL), report.getMonthlyExpenses());
+        assertEquals(MONTHLY_MAINTENANCE.plus(SALARIES).plus(OVERHEAD).plus(SPARE_PARTS).plus(AMMO).plus(FUEL),
+              report.getMonthlyExpenses());
     }
 
     @Test

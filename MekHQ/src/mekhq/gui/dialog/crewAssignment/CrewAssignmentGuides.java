@@ -103,7 +103,7 @@ final class CrewAssignmentGuides {
         }
 
         return new Guide(getFormattedTextAt(RESOURCE_BUNDLE, "CrewGuide.eyebrow", page.getLabel()),
-              text(prefix + "title"), steps, (page == CrewAssignmentPage.UNITS) ? ringKey() : null,
+              text(prefix + "title"), steps, (page == CrewAssignmentPage.ASSIGN) ? ringKey() : null,
               text("CrewGuide.exampleIntro"), example, terms, glossaryLinks(page, parent));
     }
 
@@ -111,10 +111,10 @@ final class CrewAssignmentGuides {
         return getTextAt(RESOURCE_BUNDLE, key);
     }
 
-    /** The key to a unit row's status ring, each state in its ring colour. */
+    /** The key to a unit card's status ring, each state in its ring colour. */
     private static JComponent ringKey() {
         JPanel key = column();
-        key.add(leftAligned(Hud.eyebrow(text("CrewGuide.units.ringKey"))));
+        key.add(leftAligned(Hud.eyebrow(text("CrewGuide.assign.ringKey"))));
         key.add(Box.createVerticalStrut(scaleForGUI(6)));
         List<Crewing> order = List.of(Crewing.FULL, Crewing.TEMP, Crewing.PARTIAL, Crewing.EMPTY);
         JPanel grid = new JPanel(new GridLayout(order.size(), 1, 0, scaleForGUI(1)));
@@ -129,7 +129,7 @@ final class CrewAssignmentGuides {
                   scaleForGUI(8)));
             HudRing ring = new HudRing();
             ring.setColor(CrewRowRenderers.crewingColor(crewing), false);
-            JLabel meaning = new JLabel(text("CrewGuide.units.ringKey." + crewing.name()));
+            JLabel meaning = new JLabel(text("CrewGuide.assign.ringKey." + crewing.name()));
             meaning.setForeground(TEXT_MUTED);
             meaning.setFont(hudFont(Font.PLAIN, 0.88f, 0.0f));
             row.add(ring);
@@ -159,9 +159,10 @@ final class CrewAssignmentGuides {
 
     private static List<GlossaryEntry> glossaryEntriesFor(final CrewAssignmentPage page) {
         return switch (page) {
-            case UNITS -> List.of(GlossaryEntry.VEHICLE_CREWS, GlossaryEntry.TEMP_CREWS, GlossaryEntry.TOE);
-            case PERSONNEL -> List.of(GlossaryEntry.PROFESSIONS, GlossaryEntry.SKILL_TYPES, GlossaryEntry.FATIGUE,
+            case ASSIGN -> List.of(GlossaryEntry.VEHICLE_CREWS, GlossaryEntry.TEMP_CREWS, GlossaryEntry.TOE,
+                  GlossaryEntry.PROFESSIONS, GlossaryEntry.SKILL_TYPES, GlossaryEntry.FATIGUE,
                   GlossaryEntry.ADVANCED_MEDICAL);
+            case TECHS -> List.of(GlossaryEntry.PROFESSIONS, GlossaryEntry.SKILL_TYPES);
             case REVIEW -> List.of(GlossaryEntry.TEMP_CREWS, GlossaryEntry.TEMP_PERSONNEL, GlossaryEntry.TOE);
         };
     }

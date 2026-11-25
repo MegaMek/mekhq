@@ -67,8 +67,10 @@ import megamek.common.units.Tank;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.finances.AcquisitionPriceMultipliers;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.RepairCosts;
 import mekhq.campaign.location.ILocatable;
@@ -200,6 +202,9 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     // temporarily mark the part used by current refit planning
     protected transient boolean usedForRefitPlanning;
 
+    // The units the salvage task names as needing this part, set when the Repair Bay refreshes its task list
+    private transient PartDemand taskDemand = PartDemand.NONE;
+
     // for delivery
     protected int daysToArrival;
 
@@ -303,6 +308,41 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     @Override
     public Money getActualValue() {
         return adjustCostsForCampaignOptions(getStickerPrice());
+    }
+
+    /**
+     * The acquisition multiplier only applies when buying or selling (see {@link #getSalePrice()}), so it never
+     * touches the part's value once owned (salvage, the parts-based unit value).
+     *
+     * @return what the campaign pays to buy this part: its {@link #getActualValue()} times its Campaign Operations
+     *       acquisition multiplier (see {@link AcquisitionPriceMultipliers})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getPurchaseCost() {
+        return getActualValue().multipliedBy(getAcquisitionMultiplier());
+    }
+
+    /**
+     * The sale side of {@link #getPurchaseCost()}. Only actual sales of spares use this.
+     *
+     * @return what the campaign receives for selling this part: its {@link #getActualValue()} times its Campaign
+     *       Operations acquisition multiplier (see {@link AcquisitionPriceMultipliers})
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getSalePrice() {
+        return getActualValue().multipliedBy(getAcquisitionMultiplier());
+    }
+
+    /**
+     * @return this part's Campaign Operations acquisition multiplier for the campaign's current faction and year
+     */
+    private double getAcquisitionMultiplier() {
+        return AcquisitionPriceMultipliers.getPartMultiplier(campaign.getCampaignOptions(),
+              campaign.getPlayerForce().getFaction(), campaign.getGameYear(), this);
     }
 
     @Override
@@ -540,49 +580,17 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
                         getSkillMin()), SkillType.getExperienceLevelName(getSkillMin()) + "+"));
         }
 
+        // Each line ends with its own break, so the task reads without a blank line between details and stock
+        toReturn.append("</b><br>");
         String details = getDetails();
-
-        if (details != null && !details.isBlank()) {
-            toReturn.append("</b><br>").append(getDetails()).append("<br>");
+        if ((details != null) && !details.isBlank()) {
+            toReturn.append(details).append("<br>");
         }
-
-        if (this.isSalvaging()) {
-            int inStock = 0;
-            if (this instanceof mekhq.campaign.parts.equipment.AmmoBin ammoBin) {
-                LocalWarehouse localWarehouse = getWarehouse();
-                if (localWarehouse != null) {
-                    megamek.common.equipment.AmmoType ammoType = ammoBin.getType();
-                    boolean useAmmoByType = campaign.getCampaignOptions().get(CampaignOption.USE_AMMO_BY_TYPE);
-                    inStock = localWarehouse.streamSpareParts()
-                                    .filter(p -> p instanceof AmmoStorage
-                                                       && p.isPresent()
-                                                       && !p.isReservedForRefit())
-                                    .mapToInt(p -> {
-                                        AmmoStorage spare = (AmmoStorage) p;
-                                        if (spare.isSameAmmoType(ammoType)) {
-                                            return spare.getShots();
-                                        } else if (useAmmoByType && spare.isCompatibleAmmo(ammoType)) {
-                                            return mekhq.campaign.ForceQuartermaster.convertShots(
-                                                  spare.getType(), spare.getShots(), ammoType);
-                                        }
-                                        return 0;
-                                    })
-                                    .sum();
-                }
-            } else if (getWarehouse() != null) {
-                inStock = getWarehouse().getSparePartsCount(this);
+        if (isSalvaging()) {
+            toReturn.append(countStock().describe()).append("<br>");
+            if (taskDemand.isNeeded()) {
+                toReturn.append(taskDemand.describe()).append("<br>");
             }
-            String inStockText = inStock == 0 ?
-                                       ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                                 .getFontColorNegativeHexColor(),
-                                             "None in stock") :
-                                       ReportingUtilities.messageSurroundedBySpanWithColor(MekHQ.getMHQOptions()
-                                                                                                 .getFontColorPositiveHexColor(),
-                                             inStock + " in stock");
-
-            toReturn.append("<br>").append(inStockText).append("<br>");
-        } else {
-            toReturn.append("<br>");
         }
 
         if (!isDamagedBeyondRepair()) {
@@ -594,6 +602,77 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         }
         toReturn.append("</html>");
         return toReturn.toString();
+    }
+
+    /**
+     * Counts the spares like this part for its Repair Bay task: those here now, and those on their way or on order.
+     * Salvaging needs none, so it is never short. Parts whose job uses something else, such as a reload's ammunition,
+     * count that instead.
+     *
+     * @return the stock this task can draw on
+     */
+    public StockCount countStock() {
+        PartInventory inventory = getPartInventory(this);
+        return new StockCount(inventory.getSupply(), 0, inventory);
+    }
+
+    /**
+     * A part's own task shows its stock only when salvaging; repairing it needs no spare.
+     */
+    @Override
+    public @Nullable StockCount getShownStock() {
+        return isSalvaging() ? countStock() : null;
+    }
+
+    /**
+     * Finds the hangar at this part's place, falling back to the force's own, as {@link #getWarehouse()} does for the
+     * warehouse. Its units draw on the same stock as this part, so they are the ones a salvaged part could repair.
+     *
+     * @return the hangar at this part's place
+     */
+    public LocalHangar findHangarAtPlace() {
+        IPlace place = getPlace();
+        LocalHangar hangar = (place != null) ? place.getHangar() : null;
+        return (hangar != null) ? hangar : campaign.getPlayerForce().getHangar();
+    }
+
+    /**
+     * Finds the other units that need a part like this one, so the player can see whether stripping it would repair
+     * something else. This goes through every unit in {@link #findHangarAtPlace()}; to check many parts, gather the
+     * gaps once with {@link PartDemand#findGaps} and use {@link #countDemand(List)}.
+     *
+     * @return the units missing a part this one could replace, or {@link PartDemand#NONE}
+     */
+    public PartDemand countDemand() {
+        return countDemand(PartDemand.findGaps(findHangarAtPlace().getUnits()));
+    }
+
+    /**
+     * Finds which of the given gaps a part like this one could fill.
+     *
+     * @param gaps the gaps waiting for a part, from {@link PartDemand#findGaps}
+     *
+     * @return the units missing a part this one could replace, or {@link PartDemand#NONE}
+     */
+    public PartDemand countDemand(List<MissingPart> gaps) {
+        return PartDemand.findFor(this, gaps);
+    }
+
+    /**
+     * Sets the units this part's salvage task names as needing it. The Repair Bay works this out when it refreshes its
+     * task list, so the check runs once per refresh rather than every time a row is drawn.
+     *
+     * @param taskDemand the units that need the part, or {@link PartDemand#NONE} to name none
+     */
+    public void setTaskDemand(PartDemand taskDemand) {
+        this.taskDemand = Objects.requireNonNull(taskDemand);
+    }
+
+    /**
+     * @return the units this part's salvage task names as needing it, as of the Repair Bay's last refresh
+     */
+    public PartDemand getTaskDemand() {
+        return taskDemand;
     }
 
     /**
@@ -1121,6 +1200,44 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
         return !(isOmniPodded() && isSalvaging());
     }
 
+    /**
+     * @return {@code true} if the Weapon Specialist ability applies to work on this part: weapons and physical
+     *       weapons
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isWeaponSpecialistWork() {
+        return (IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON) ||
+                     (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON);
+    }
+
+    /**
+     * @return {@code true} if the Armor Specialist ability applies to work on this part: any armor
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isArmorSpecialistWork() {
+        return IPartWork.findCorrectRepairType(this).isArmour();
+    }
+
+    /**
+     * @return {@code true} if the Internal Specialist ability applies to work on this part: actuators, electronics,
+     *       engines, gyros and locations
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isInternalSpecialistWork() {
+        return (IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR) ||
+                     (IPartWork.findCorrectMRMSType(this) == PartRepairType.ELECTRONICS) ||
+                     (IPartWork.findCorrectMRMSType(this) == PartRepairType.ENGINE) ||
+                     (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO) ||
+                     (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION) ||
+                     (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION);
+    }
+
     @Override
     public TargetRoll getAllMods(final @Nullable Person tech) {
         int difficulty = getDifficulty();
@@ -1175,23 +1292,17 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
         if (tech != null) {
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST) &&
-                      ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
+                      isWeaponSpecialistWork()) {
                 mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.weaponSpecialist"));
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST) &&
-                      IPartWork.findCorrectRepairType(this).isArmour()) {
+                      isArmorSpecialistWork()) {
                 mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.armorSpecialist"));
             }
 
             if (tech.getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST) &&
-                      ((IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.ELECTRONICS) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.ENGINE) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
+                      isInternalSpecialistWork()) {
                 mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.internalSpecialist"));
             }
 
@@ -1233,23 +1344,17 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
 
         if (getUnit().getTech() != null) {
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_WEAPON_SPECIALIST) &&
-                      ((IPartWork.findCorrectRepairType(this) == PartRepairType.WEAPON) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.PHYSICAL_WEAPON))) {
+                      isWeaponSpecialistWork()) {
                 mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.weaponSpecialist"));
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_ARMOR_SPECIALIST) &&
-                      IPartWork.findCorrectRepairType(this).isArmour()) {
+                      isArmorSpecialistWork()) {
                 mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.armorSpecialist"));
             }
 
             if (getUnit().getTech().getOptions().booleanOption(PersonnelOptions.TECH_INTERNAL_SPECIALIST) &&
-                      ((IPartWork.findCorrectRepairType(this) == PartRepairType.ACTUATOR) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.ELECTRONICS) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.ENGINE) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.GYRO) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.MEK_LOCATION) ||
-                             (IPartWork.findCorrectMRMSType(this) == PartRepairType.GENERAL_LOCATION))) {
+                      isInternalSpecialistWork()) {
                 mods.addModifier(-1, getTextAt(RESOURCE_BUNDLE, "Part.modifier.internalSpecialist"));
             }
 

@@ -34,7 +34,6 @@ package mekhq.gui.dialog.markets.contractMarket;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.baseComponents.hud.HudStyle.ACCENT_BRIGHT;
 import static mekhq.gui.baseComponents.hud.HudStyle.AMBER;
 import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
@@ -55,6 +54,8 @@ import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
+import java.awt.GraphicsEnvironment;
+import java.awt.Rectangle;
 import java.awt.Toolkit;
 import java.awt.datatransfer.StringSelection;
 import java.awt.event.ActionEvent;
@@ -111,7 +112,8 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     static final String RESOURCE_BUNDLE = "mekhq.resources.ChaosContractMarketDialog";
 
     private static final Dimension MINIMUM_SIZE = scaleForGUI(1040, 600);
-    private static final Dimension DEFAULT_SIZE = scaleForGUI(1180, 700);
+    /** The opening size, until the player resizes it; held to the screen's usable area on smaller screens. */
+    private static final Dimension DEFAULT_SIZE = scaleForGUI(1360, 870);
     private static final int GENERATED_OFFERS_PER_BATCH = 1;
     private static final int SHORTCUT_OFFERS = 9;
 
@@ -246,7 +248,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
 
         setMinimumSize(MINIMUM_SIZE);
         pack();
-        setSize(DEFAULT_SIZE); // Default opening size; saved preferences (below) override it on later opens
+        setSize(openingSize()); // Default opening size; saved preferences (below) override it on later opens
         setLocationRelativeTo(parent);
         setPreferences(); // Must be before setVisible
 
@@ -273,7 +275,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         String locationName = currentSystem != null
                                     ? currentSystem.getName(currentDate)
                                     : getTextAt(RESOURCE_BUNDLE, "header.contractMarket.location.unknown");
-        JPanel identity = MarketHud.column();
+        JPanel identity = Hud.column();
         identity.add(HudStyle.leftAligned(Hud.eyebrow(getFormattedTextAt(RESOURCE_BUNDLE,
               "header.contractMarket.eyebrow",
               locationName,
@@ -293,7 +295,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         int reputation = campaign.getPlayerForce().getReputationRating(useChaosReputation);
         JPanel reputationReadout = MarketHud.readout(getTextAt(RESOURCE_BUNDLE, "readout.contractMarket.reputation"),
               Integer.toString(reputation), AMBER, SURFACE_DEEP);
-        reputationReadout.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+        reputationReadout.setToolTipText(Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
               "readout.contractMarket.reputation.tooltip")));
         Money balance = campaign.getPlayerForce().getFinances().getBalance();
         JPanel fundsReadout = MarketHud.readout(getTextAt(RESOURCE_BUNDLE, "readout.contractMarket.funds"),
@@ -320,7 +322,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     private JPanel buildFooter() {
-        JPanel footer = new JPanel(new BorderLayout(scaleForGUI(16), 0));
+        JPanel footer = new JPanel(new BorderLayout(scaleForGUI(16), scaleForGUI(8)));
         footer.setOpaque(true);
         footer.setBackground(SURFACE_DEEP);
         footer.setBorder(BorderFactory.createCompoundBorder(
@@ -370,7 +372,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
                                                       .toUpperCase(Locale.ROOT), false);
         // A GM tool, like creating an offer by hand: armed only in GM mode, with a tooltip saying why when it is not.
         shellContract.setArmed(isGM());
-        shellContract.setToolTipText(MarketHud.wrapToolTip(MarketOffersPage.gmToolTip(isGM(),
+        shellContract.setToolTipText(Hud.wrapToolTip(MarketOffersPage.gmToolTip(isGM(),
               "button.contractMarket.shellContract.tooltip")));
         shellContract.addActionListener(event -> createShellContract());
 
@@ -386,8 +388,15 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
         actions.add(Box.createHorizontalStrut(scaleForGUI(8)));
         actions.add(close);
 
-        footer.add(options, BorderLayout.WEST);
-        footer.add(actions, BorderLayout.EAST);
+        // The on-accepting choices get their own row above the action buttons, so neither row is squeezed on narrow
+        // windows.
+        JPanel optionsRow = Hud.transparentPanel(new BorderLayout());
+        optionsRow.add(options, BorderLayout.WEST);
+        JPanel actionsRow = Hud.transparentPanel(new BorderLayout());
+        actionsRow.add(actions, BorderLayout.EAST);
+
+        footer.add(optionsRow, BorderLayout.NORTH);
+        footer.add(actionsRow, BorderLayout.SOUTH);
         return footer;
     }
 
@@ -475,7 +484,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     private static String pageLabel(MarketPage marketPage, int count) {
-        return "<html>" + MarketHud.escape(marketPage.label().toUpperCase(Locale.ROOT))
+        return "<html>" + Hud.escape(marketPage.label().toUpperCase(Locale.ROOT))
                      + "&nbsp;&nbsp;<span style='color:" + hex(ACCENT_BRIGHT) + "'>" + count + "</span></html>";
     }
 
@@ -923,7 +932,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
                   .append("<ul>");
             for (ContractImportPlan.Placement placement : moved) {
                 summary.append("<li>")
-                      .append(MarketHud.escape(offerName(placement.contract().getName())))
+                      .append(Hud.escape(offerName(placement.contract().getName())))
                       .append(separator)
                       .append(getFormattedTextAt(RESOURCE_BUNDLE, "import.contractMarket.moved.entry",
                             searchTypeLabel(placement.listedBoard()), searchTypeLabel(placement.board())))
@@ -938,7 +947,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
                   .append("<ul>");
             for (ContractExchange.SkippedOffer skipped : plan.skipped()) {
                 summary.append("<li>")
-                      .append(MarketHud.escape(offerName(skipped.name())))
+                      .append(Hud.escape(offerName(skipped.name())))
                       .append(separator)
                       .append(getTextAt(RESOURCE_BUNDLE, "import.contractMarket.skipped." + skipped.reason().name()))
                       .append("</li>");
@@ -1000,7 +1009,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      */
     private static ContractSearchType defaultSearchType(Campaign campaign) {
         Faction faction = campaign.getPlayerForce().getFaction();
-        if (faction.getShortName().equals(PIRATE_FACTION_CODE)) {
+        if (faction.isPirateOrBanditCaste()) {
             return ContractSearchType.PIRATE;
         }
         if (faction.isMercenary()) {
@@ -1019,7 +1028,7 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
      */
     private static List<ContractSearchType> allowedSearchTypes(Campaign campaign) {
         Faction faction = campaign.getPlayerForce().getFaction();
-        if (faction.getShortName().equals(PIRATE_FACTION_CODE)) {
+        if (faction.isPirateOrBanditCaste()) {
             return List.of(ContractSearchType.PIRATE);
         }
         if (faction.isMercenary()) {
@@ -1115,6 +1124,12 @@ public class ChaosContractMarketDialog extends JDialog implements ContractMarket
     }
 
     // endregion Departure options
+
+    /** @return the default size, made no larger than the screen's usable area (the space outside any taskbar) */
+    private static Dimension openingSize() {
+        Rectangle usable = GraphicsEnvironment.getLocalGraphicsEnvironment().getMaximumWindowBounds();
+        return new Dimension(Math.min(DEFAULT_SIZE.width, usable.width), Math.min(DEFAULT_SIZE.height, usable.height));
+    }
 
     /**
      * This override forces the preferences for this class to be tracked in MekHQ instead of MegaMek. Besides the

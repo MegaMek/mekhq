@@ -1,6 +1,6 @@
 /*
  * Copyright (c) 2009 Jay Lawson (jaylawson39 at yahoo.com). All rights reserved.
- * Copyright (C) 2013-2025 The MegaMek Team. All Rights Reserved.
+ * Copyright (C) 2013-2026 The MegaMek Team. All Rights Reserved.
  *
  * This file is part of MekHQ.
  *
@@ -110,6 +110,14 @@ public class BattleArmorAmmoBin extends AmmoBin {
         return (getFullShots() * getNumTroopers()) - shotsNeeded;
     }
 
+    /**
+     * Every trooper in the squad carries a full bin.
+     */
+    @Override
+    protected int getStandardMunitionCapacityShots() {
+        return super.getStandardMunitionCapacityShots() * getNumTroopers();
+    }
+
     @Override
     public void updateConditionFromEntity(boolean checkForDestruction) {
         Mounted<?> mounted = getMounted();
@@ -181,6 +189,13 @@ public class BattleArmorAmmoBin extends AmmoBin {
                 unload();
                 mounted.changeAmmoType(getType());
                 mounted.setShotsLeft(mounted.getBaseShotsLeft() + shotsToReload);
+            }
+
+            // A one-shot launcher stays marked as fired after a battle, so clear the mark once it has ammo again or it
+            // cannot fire in the next scenario. This override does not call super.loadBin(), which does the same.
+            Mounted<?> launcher = mounted.getLinkedBy();
+            if ((shotsToReload > 0) && (launcher != null)) {
+                launcher.setFired(false);
             }
         }
     }

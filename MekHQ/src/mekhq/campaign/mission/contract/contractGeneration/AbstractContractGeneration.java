@@ -32,7 +32,6 @@
  */
 package mekhq.campaign.mission.contract.contractGeneration;
 
-import static java.lang.Math.ceil;
 import static mekhq.campaign.mission.utilities.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
@@ -48,12 +47,13 @@ import megamek.common.enums.SkillLevel;
 import megamek.logging.MMLogger;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.chaosCampaign.ChaosScaleLimits;
 import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
+import mekhq.campaign.digitalGM.stratCon.StratConContractInitializer;
+import mekhq.campaign.digitalGM.stratCon.StratConSpawnRates;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
@@ -63,6 +63,7 @@ import mekhq.campaign.mission.contract.ChaosContract;
 import mekhq.campaign.mission.contract.contractData.*;
 import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.contract.utilities.MHQMorale;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.reputation.chaosReputation.ChaosReputation;
 import mekhq.campaign.universe.Faction;
@@ -70,8 +71,6 @@ import mekhq.campaign.universe.Planet;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
-import mekhq.campaign.universe.enums.HiringHallLevel;
-import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.campaign.universe.factionStanding.FactionStandings;
 
 public abstract class AbstractContractGeneration {
@@ -191,13 +190,10 @@ public abstract class AbstractContractGeneration {
         determineSchedule(campaign,
               useVariableContractLength,
               currentDate,
-              currentLocation.getCurrentSystem(),
-              targetPlanet,
+              currentLocation,
               factionStandings,
               overridingCommandCircuitRequirements,
               isGM,
-              targetSystem,
-              employerData.factionCode(),
               chaosObjectiveType,
               contract);
 
@@ -414,14 +410,7 @@ public abstract class AbstractContractGeneration {
         double scale = determineUncappedScale(campaign, playerForce, detachmentHangar, contract);
 
         // Hiring halls only broker jobs of the size they can support; a larger force is paid for the job, not itself
-        PlanetarySystem currentSystem = campaign.getCurrentSystem();
-        if (campaign.getCampaignOptions().get(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL)
-                  && currentSystem != null) {
-            HiringHallLevel hiringHallLevel = currentSystem.getHiringHallLevel(campaign.getLocalDate());
-            scale = Math.min(scale, ChaosScaleLimits.getMaximumContractScale(hiringHallLevel));
-        }
-
-        return scale;
+        return ChaosScaleLimits.capScaleByHiringHall(campaign, scale);
     }
 
     /**
@@ -528,7 +517,7 @@ public abstract class AbstractContractGeneration {
 
     /**
      * Determines a contract's start date from the travel time to its target, the way generation does: the player
-     * journeys from their current system to the contract's target world and the contract begins on arrival. The
+     * journeys from their current location to the contract's target world and the contract begins on arrival. The
      * computed jump path is cached on the contract as a side effect, exactly as generation does. Exposed as public so
      * the GM contract editor's "Automatic" start date follows the same rule.
      *
@@ -536,32 +525,35 @@ public abstract class AbstractContractGeneration {
      */
     public static LocalDate determineStartDate(Campaign campaign, AbstractContract contract) {
         PlayerForce playerForce = campaign.getPlayerForce();
-        return determineStartDate(campaign, campaign.getLocalDate(), campaign.getCurrentSystem(),
-              contract.getTargetSystem(), contract.getTargetPlanet(), playerForce.getFactionStandings(),
-              playerForce.isOverridingCommandCircuitRequirements(), campaign.isGM(),
-              contract.getEmployerFactionCode(), contract);
+        return determineStartDate(campaign, campaign.getLocalDate(),
+              playerForce.getForceDetachment().getCurrentLocation(), playerForce.getFactionStandings(),
+              playerForce.isOverridingCommandCircuitRequirements(), campaign.isGM(), contract);
     }
 
+    /**
+     * Determines a contract's start date as the day the force at {@code currentLocation} should reach the contract's
+     * target world. The estimate is the same one used when the contract is accepted and when its ETA is re-checked
+     * each day ({@link ContractUtilities#getTravelDays}), so the three never disagree: it starts from where the force
+     * actually is (mid-transit, or already in the target system), and judges Command Circuit access by the faction
+     * whose standing the contract answers to - for a false flag operation, the real sponsor rather than the front.
+     *
+     * <p>The contract's target and employer must already be set. A freshly plotted jump path is cached on the
+     * contract as a side effect.</p>
+     */
     private static LocalDate determineStartDate(Campaign campaign, LocalDate currentDate,
-          @Nullable PlanetarySystem currentSystem, @Nullable PlanetarySystem targetSystem,
-          @Nullable Planet targetPlanet, FactionStandings factionStandings,
-          boolean overridingCommandCircuitRequirements, boolean isGM, String employerFactionCode,
-          AbstractContract contract) {
-        if (currentSystem == null || targetSystem == null) {
+          @Nullable AbstractLocation currentLocation, FactionStandings factionStandings,
+          boolean overridingCommandCircuitRequirements, boolean isGM, AbstractContract contract) {
+        if ((currentLocation == null) || (currentLocation.getCurrentSystem() == null)
+                  || (contract.getTargetSystem() == null)) {
             // No route to measure - the contract begins immediately.
             return currentDate;
         }
 
-        // Jump Path, terminating at the specific target planet so the journey time ends at the world the contract is
-        // fought over rather than the system's primary world.
-        JumpPath jumpPath = campaign.calculateJumpPath(currentSystem, targetSystem);
-        jumpPath.setTargetPlanet(targetPlanet);
-        contract.setCachedJumpPath(jumpPath);
-
-        boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(overridingCommandCircuitRequirements,
-              isGM, factionStandings, employerFactionCode);
-        int journeyTimeInDays = (int) ceil(jumpPath.getTotalTime(currentDate, 0, isUseCommandCircuit,
-              campaign.getJumpDriveProfile()));
+        // Always plot afresh: the target may just have been chosen (generation) or changed (GM editor), and the
+        // cached path is only re-plotted when its origin or target world no longer match.
+        contract.setCachedJumpPath(null);
+        int journeyTimeInDays = ContractUtilities.getTravelDays(campaign, currentDate, contract, currentLocation,
+              overridingCommandCircuitRequirements, isGM, factionStandings);
         return currentDate.plusDays(journeyTimeInDays);
     }
 
@@ -695,13 +687,13 @@ public abstract class AbstractContractGeneration {
     }
 
     private static void determineSchedule(Campaign campaign, boolean useVariableContractLength, LocalDate currentDate,
-          PlanetarySystem currentSystem, Planet targetPlanet, FactionStandings factionStandings,
-          boolean overridingCommandCircuitRequirements, boolean isGM, PlanetarySystem targetSystem,
-          String employerFactionCode, ChaosObjectiveType objectiveType, ChaosContract contract) {
-        // Contract schedule - the player journeys from their current system to the target world, arriving on the
+          AbstractLocation currentLocation, FactionStandings factionStandings,
+          boolean overridingCommandCircuitRequirements, boolean isGM, ChaosObjectiveType objectiveType,
+          ChaosContract contract) {
+        // Contract schedule - the player journeys from their current location to the target world, arriving on the
         // start date (this also caches the jump path on the contract).
-        LocalDate startDate = determineStartDate(campaign, currentDate, currentSystem, targetSystem, targetPlanet,
-              factionStandings, overridingCommandCircuitRequirements, isGM, employerFactionCode, contract);
+        LocalDate startDate = determineStartDate(campaign, currentDate, currentLocation, factionStandings,
+              overridingCommandCircuitRequirements, isGM, contract);
 
         int monthsLength = objectiveType.calculateLength(useVariableContractLength);
         LocalDate endDate = startDate.plusMonths(monthsLength);
@@ -709,26 +701,20 @@ public abstract class AbstractContractGeneration {
         ContractScheduleData contractScheduleData = new ContractScheduleData(startDate, endDate, monthsLength);
         contract.setScheduleData(contractScheduleData);
 
-        // Scenario schedule - spread the (already determined) track count across the contract's months via the Track
-        // Intensity Tables. This schedule is consumed by StratCon to stagger strategic-objective scenario spawns over
-        // the contract's run (see StratConContractInitializer).
-        //
-        // Hot Spots Draconis Reach sizes each scenario by the contract's scale. When "Multiply Track Intensity by
-        // Scale" is set (the default MekHQ behavior), we instead roll the intensity table once per point of scale and
-        // sum the results, so the contract's combat volume grows with scale while each scenario keeps its rolled size -
-        // letting a player deploy smaller formations (e.g. lances). Otherwise, a single roll is made.
+        // Essential scenario schedule - one a month per point of the contract's Scale. StratCon gives each a random day
+        // within its month (see StratConContractInitializer).
         contract.setScenarioSchedule(rollScenarioSchedule(campaign, contract, monthsLength));
     }
 
     /**
-     * Rolls a contract's Essential scenario schedule on the Track Intensity Tables: once per point of scale when
-     * "Multiply Track Intensity by Scale" is on, and once otherwise. The "Minimum of 1 Hot Spots Track per Roll" and
-     * "Roll Hot Spots Tracks Weekly, Not Monthly" options are honored (see
-     * {@link TrackIntensityTable#rollSchedule(int, int, int, boolean, boolean)}).
+     * Lays out a contract's Essential scenario schedule: {@link StratConSpawnRates#ESSENTIAL_SCENARIOS_PER_SCALE} a
+     * month per point of the contract's Scale, rounded normally and never below one. Whether the contract fights any
+     * of them at all is up to StratCon (see {@link StratConContractInitializer#usesEssentialScenarios}).
      *
-     * @param campaign       the campaign, whose options decide the roll count
-     * @param contract       the contract, whose scale and track count are rolled for
-     * @param lengthInMonths the contract's length in months, choosing which table applies
+     * @param campaign       the campaign, for how the contract's Scale is counted (see
+     *                       {@link StratConSpawnRates#isFactorSupportPointsIntoScale(CampaignOptions, AbstractContract)})
+     * @param contract       the contract, whose Scale sets the count
+     * @param lengthInMonths the contract's length in months
      *
      * @return the scenario schedule as per-month scenario counts
      *
@@ -737,15 +723,11 @@ public abstract class AbstractContractGeneration {
      */
     public static List<Integer> rollScenarioSchedule(Campaign campaign, AbstractContract contract,
           int lengthInMonths) {
-        CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        int rollCount = campaignOptions.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)
-                              ? contract.getScale()
-                              : 1;
-        return TrackIntensityTable.rollSchedule(lengthInMonths,
-              contract.getTrackCount(),
-              rollCount,
-              campaignOptions.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL),
-              campaignOptions.get(CampaignOption.ROLL_TRACKS_WEEKLY));
+        boolean isFactorSupportPointsIntoScale = StratConSpawnRates.isFactorSupportPointsIntoScale(
+              campaign.getCampaignOptions(), contract);
+        return StratConSpawnRates.getMonthlySchedule(lengthInMonths,
+              StratConSpawnRates.getCount(contract, isFactorSupportPointsIntoScale,
+                    StratConSpawnRates.ESSENTIAL_SCENARIOS_PER_SCALE));
     }
 
     private static @Nonnull EnemyData pickEnemy(Campaign campaign, LocalDate currentDate, ILocation currentLocation,

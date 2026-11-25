@@ -94,6 +94,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityCondi
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityTier;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffectStatus.SupportRules;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply.SupplyStatus;
 import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
@@ -409,7 +410,8 @@ public class StratConPanel extends JPanel implements ActionListener {
 
     /**
      * GM tool: clears the current sector and regenerates its terrain (and cities/roads), then repaints. Scenarios,
-     * facilities, and assigned forces are left in place.
+     * facilities, and assigned forces are left in place, except those the new terrain floods and the facilities it
+     * leaves where no supply route can reach.
      */
     public void regenerateCurrentSector() {
         if ((currentTrack == null) || (campaignState == null)) {
@@ -1285,7 +1287,8 @@ public class StratConPanel extends JPanel implements ActionListener {
     /**
      * Draws the sector environment HUD (latitude, average temperature, and the generation profiles) as a translucent
      * box pinned to the top-right of the visible map area, then the sector's facility effects under it. The environment
-     * box is skipped for legacy sectors that carry no profile data.
+     * box is skipped for legacy sectors that carry no profile data. Either box can be hidden by the player (the
+     * toggles under the tab's Facilities button); a hidden environment box lets the facility effects move up.
      */
     private void drawSectorEnvironment(Graphics2D g2D) {
         if (currentTrack == null) {
@@ -1293,10 +1296,12 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
 
         int nextBoxY = getVisibleRect().y;
-        if (currentTrack.getLatitudeBand() != null) {
+        if ((currentTrack.getLatitudeBand() != null) && MekHQ.getMHQOptions().getShowStratConSectorEnvironment()) {
             nextBoxY = drawHudBox(g2D, getSectorEnvironmentLines(), nextBoxY);
         }
-        drawSectorFacilityEffects(g2D, nextBoxY);
+        if (MekHQ.getMHQOptions().getShowStratConFacilityEffects()) {
+            drawSectorFacilityEffects(g2D, nextBoxY);
+        }
     }
 
     /**
@@ -1715,11 +1720,7 @@ public class StratConPanel extends JPanel implements ActionListener {
                         g2D.drawPolygon(scenarioMarker2);
                     }
 
-                    if (currentTrack.getFacility(currentCoords) == null) {
-                        drawTextEffect(g2D, scenarioMarker, scenario.getName(), currentCoords);
-                    } else if (currentTrack.getFacility(currentCoords).isOwnerAlliedToPlayer()) {
-                        drawTextEffect(g2D, scenarioMarker, "Under Attack!", currentCoords);
-                    }
+                    drawTextEffect(g2D, scenarioMarker, scenario.getName(), currentCoords);
                 }
 
                 int[] downwardVector = getDownwardYVector();
@@ -2220,8 +2221,8 @@ public class StratConPanel extends JPanel implements ActionListener {
      * @param coords   the facility's hex
      *
      * @return the second line of the facility's map label, under its name: as much of its tier, condition and garrison
-     *       as the player knows, then whether it is cut off from its supply lines or besieged; {@code null} if there is
-     *       nothing to show
+     *       as the player knows, then whether it is cut off from its supply lines, besieged, or under an enemy attack
+     *       that has not been fought yet; {@code null} if there is nothing to show
      *
      * @author Illiani
      * @since 0.51.01
@@ -2247,6 +2248,9 @@ public class StratConPanel extends JPanel implements ActionListener {
         }
         if (StratConFacilitySiege.isBesieged(currentTrack, coords)) {
             attributes.add(getTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.besieged"));
+        }
+        if (StratConFacilityAdvisor.getCounterattack(currentTrack, coords) != null) {
+            attributes.add(getTextAt(RESOURCE_BUNDLE, "stratConTab.facility.label.underAttack"));
         }
         return attributes.isEmpty() ? null : String.join(", ", attributes);
     }
@@ -2299,10 +2303,10 @@ public class StratConPanel extends JPanel implements ActionListener {
      */
     private void appendFacilityNetworkInfo(StringBuilder infoBuilder, StratConCoords coords) {
         if (StratConFacilitySupply.isSupplyLinesActive(campaign)) {
-            infoBuilder.append(getTextAt(RESOURCE_BUNDLE,
-                  StratConFacilitySupply.isCutOff(currentTrack, coords) ?
-                        "stratConTab.hexInfo.supplyCut" :
-                        "stratConTab.hexInfo.supplyConnected"));
+            String supplyStatusKey = getSupplyStatusKey(StratConFacilitySupply.getSupplyStatus(currentTrack, coords));
+            if (supplyStatusKey != null) {
+                infoBuilder.append(getTextAt(RESOURCE_BUNDLE, supplyStatusKey));
+            }
         }
 
         int besiegerCount = StratConFacilitySiege.getSieges(currentTrack, coords).size();
@@ -2321,6 +2325,24 @@ public class StratConPanel extends JPanel implements ActionListener {
             }
             infoBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.synergy", partnerNames));
         }
+    }
+
+    /**
+     * @param supplyStatus a facility's standing on its side's supply lines
+     *
+     * @return the {@code AtBStratCon} resource key for the hex information's supply line, or {@code null} when there
+     *       is nothing to show, because the sector has no supply lines
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nullable String getSupplyStatusKey(SupplyStatus supplyStatus) {
+        return switch (supplyStatus) {
+            case NONE -> null;
+            case CUT -> "stratConTab.hexInfo.supplyCut";
+            case SOURCE -> "stratConTab.hexInfo.supplySource";
+            case CONNECTED -> "stratConTab.hexInfo.supplyConnected";
+        };
     }
 
     /**
@@ -2451,14 +2473,17 @@ public class StratConPanel extends JPanel implements ActionListener {
                             g2D.draw(forceMarker);
                         }
 
-                        Font currentFont = g2D.getFont();
-                        Font newFont = currentFont.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT,
-                              TextAttribute.WEIGHT_BOLD));
-                        g2D.setFont(newFont);
+                        // Labelled only while its hex is selected, the same as facilities.
+                        if (currentCoords.equals(boardState.getSelectedCoords())) {
+                            Font currentFont = g2D.getFont();
+                            Font newFont = currentFont.deriveFont(Collections.singletonMap(TextAttribute.WEIGHT,
+                                  TextAttribute.WEIGHT_BOLD));
+                            g2D.setFont(newFont);
 
-                        drawTextEffect(g2D, forceMarker, forceName, currentCoords);
+                            drawTextEffect(g2D, forceMarker, forceName, currentCoords);
 
-                        g2D.setFont(currentFont);
+                            g2D.setFont(currentFont);
+                        }
                     }
                 }
 
@@ -2785,10 +2810,6 @@ public class StratConPanel extends JPanel implements ActionListener {
     }
 
     /**
-     * Worker function that outputs html representing the status of a selected hex, containing info such as whether it's
-     * been revealed, assigned forces, scenarios, facilities, etc.
-     */
-    /**
      * A rough local temperature for a hex: the sector's average temperature shifted by the hex's terrain climate (see
      * {@link StratConBiomeManifest#terrainTemperatureOffset}). This is the same value a scenario spawned here uses for
      * its board temperature.
@@ -2802,6 +2823,10 @@ public class StratConPanel extends JPanel implements ActionListener {
                      StratConBiomeManifest.terrainTemperatureOffset(currentTrack.getTerrainTile(coords));
     }
 
+    /**
+     * Worker function that outputs html representing the status of a selected hex, containing info such as whether it's
+     * been revealed, assigned forces, scenarios, facilities, etc.
+     */
     private String buildSelectedHexInfo(Campaign campaign) {
         StringBuilder infoBuilder = new StringBuilder();
         // Bound the width so long content (e.g. long terrain/scenario names) wraps instead of overflowing the HUD.
@@ -2955,12 +2980,13 @@ public class StratConPanel extends JPanel implements ActionListener {
             String statusText = switch (pointOfInterest.getStatus()) {
                 case RESOLVED -> getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.pointOfInterest.resolved");
                 case EXPIRED -> getTextAt(RESOURCE_BUNDLE, "stratConTab.hexInfo.pointOfInterest.expired");
-                case ACTIVE -> (pointOfInterest.getExpiryDate() == null) ?
+                // Shown as the last day it can still be acted on: it lapses at the start of its expiry date.
+                case ACTIVE -> (pointOfInterest.getLastActiveDate() == null) ?
                                      null :
                                      getFormattedTextAt(RESOURCE_BUNDLE,
                                            "stratConTab.hexInfo.pointOfInterest.expires",
                                            MekHQ.getMHQOptions()
-                                                 .getDisplayFormattedDate(pointOfInterest.getExpiryDate()));
+                                                 .getDisplayFormattedDate(pointOfInterest.getLastActiveDate()));
             };
             if (statusText != null) {
                 infoBuilder.append("<br/>").append(statusText);

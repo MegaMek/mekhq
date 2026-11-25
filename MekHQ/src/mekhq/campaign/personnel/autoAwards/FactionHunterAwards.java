@@ -35,7 +35,6 @@ package mekhq.campaign.personnel.autoAwards;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
-import java.util.Objects;
 import java.util.UUID;
 
 import mekhq.campaign.Campaign;
@@ -55,12 +54,14 @@ public class FactionHunterAwards {
      */
     public static Map<Integer, List<Object>> FactionHunterAwardsProcessor(Campaign campaign, AbstractContract mission,
           UUID person, List<Award> awards) {
-        boolean isEligible = false;
         List<Award> eligibleAwards = new ArrayList<>();
 
         Faction missionFaction = mission.getEnemyFaction();
 
         for (Award award : awards) {
+            // Each award is judged on its own factions
+            boolean isEligible = false;
+
             if (award.canBeAwarded(campaign.getPlayerForce().getHumanResources().getPerson(person))) {
                 List<String> targetFactions = List.of(award.getRange().split(","));
 
@@ -69,7 +70,9 @@ public class FactionHunterAwards {
                     // targetFactions
                     for (String awardFaction : targetFactions) {
                         // does the awardFaction equal missionFaction? if so, break the loop
-                        if ((Objects.equals(awardFaction, missionFaction.getShortName()))) {
+                        awardFaction = awardFaction.trim();
+
+                        if (awardFaction.equalsIgnoreCase(missionFaction.getShortName())) {
                             isEligible = true;
                             break;
                         }
@@ -113,6 +116,11 @@ public class FactionHunterAwards {
                                 break;
                             case "deep periphery":
                                 if (missionFaction.isDeepPeriphery()) {
+                                    isEligible = true;
+                                }
+                                break;
+                            case "comstar":
+                                if (missionFaction.isComStar()) {
                                     isEligible = true;
                                 }
                                 break;

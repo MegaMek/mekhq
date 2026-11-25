@@ -48,9 +48,8 @@ import java.util.List;
 
 import megamek.common.compute.Compute;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
-import mekhq.campaign.personnel.familyTree.Genealogy;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 
 /**
  * The {@link RandomDependents} class manages the random addition and removal of dependent personnel based on the
@@ -192,18 +191,6 @@ public class RandomDependents {
 
                 if (roll == 0) {
                     dependentsToRemove.add(dependent);
-
-                    Genealogy genealogy = dependent.getGenealogy();
-                    for (Person child : genealogy.getChildren()) {
-                        if (child.isChild(currentDay)) {
-                            dependentsToRemove.add(child);
-                        }
-                    }
-
-                    Person spouse = genealogy.getSpouse();
-                    if (spouse != null && (spouse.isDependent() || !spouse.isEmployed())) {
-                        dependentsToRemove.add(spouse);
-                    }
                 }
             }
 

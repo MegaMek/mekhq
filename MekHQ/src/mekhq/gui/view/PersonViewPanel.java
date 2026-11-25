@@ -109,6 +109,7 @@ import javax.swing.table.TableColumn;
 import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.util.UIUtil;
+import megamek.common.enums.SkillLevel;
 import megamek.common.options.IOption;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.ui.EnhancedTabbedPane;
@@ -154,6 +155,7 @@ import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.personnel.skills.TechSpecialization;
 import mekhq.campaign.personnel.skills.enums.SkillAttribute;
 import mekhq.campaign.randomEvents.personalities.PersonalityController;
 import mekhq.campaign.universe.Faction;
@@ -2027,6 +2029,35 @@ public class PersonViewPanel extends JScrollablePanel {
 
     }
 
+    /**
+     * Builds the role description with each profession prefixed by the person's experience level in it, for example
+     * {@code Veteran MekTech (Myomer), Green MekWarrior}. The tech specialization suffix stays beside the technician
+     * profession it describes. Injury effects are excluded, matching the personnel table.
+     *
+     * @param specializationSuffix the specialization, already formatted with its brackets and leading space, or an
+     *                             empty string if there is none
+     *
+     * @return the role description with experience levels
+     */
+    private String getRoleDescWithExperienceLevels(String specializationSuffix) {
+        String role = prefixWithExperienceLevel(person.getPrimaryRoleDesc(), false);
+        if (person.getPrimaryRole().isTech()) {
+            role += specializationSuffix;
+        }
+        if (!person.getSecondaryRole().isNone()) {
+            role += ", " + prefixWithExperienceLevel(person.getSecondaryRoleDesc(), true);
+            if (!person.getPrimaryRole().isTech() && person.getSecondaryRole().isTech()) {
+                role += specializationSuffix;
+            }
+        }
+        return role;
+    }
+
+    private String prefixWithExperienceLevel(String roleDesc, boolean secondary) {
+        SkillLevel skillLevel = person.getSkillLevel(campaign, secondary, true);
+        return skillLevel.isNone() ? roleDesc : skillLevel + " " + roleDesc;
+    }
+
     private JPanel fillInfo() {
         JPanel pnlInfo = new JPanel(new GridBagLayout());
         pnlInfo.setBorder(RoundedLineBorder.createRoundedLineBorder(person.getFullTitle()));
@@ -2102,9 +2133,11 @@ public class PersonViewPanel extends JScrollablePanel {
         // A senior post sits beside the role because it is a different fact about the person: the role
         // is the job they do, the post is the position they hold within the command.
         String appointmentTitles = person.getSeniorAppointmentTitles();
+        String roleWithSpecialization = getRoleDescWithExperienceLevels(TechSpecialization.describeAsRoleSuffix(person,
+              campaign));
         String roleAndAppointment = appointmentTitles.isEmpty()
-              ? person.getRoleDesc()
-              : person.getRoleDesc() + " - " + appointmentTitles;
+              ? roleWithSpecialization
+              : roleWithSpecialization + " - " + appointmentTitles;
         lblType.setText(String.format(resourceMap.getString("format.italicNoWrap"), roleAndAppointment));
         lblType.getAccessibleContext().setAccessibleName("Role: " + roleAndAppointment);
         gridBagConstraints = new GridBagConstraints();
@@ -3111,7 +3144,7 @@ public class PersonViewPanel extends JScrollablePanel {
               "pnlInProgress.hide")));
         pnlProgressHide.setVisible(false);
 
-        boolean isUseReasoning = campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
+        boolean isUseReasoning = campaignOptions.isUseTalentXpCostMultiplier();
 
         // Each entry is a name and "progress/cost"
         List<String[]> entries = new ArrayList<>();

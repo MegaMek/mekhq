@@ -127,6 +127,10 @@ public class TheatreOfWarAwards {
                     } else {
                         continue;
                     }
+                } else {
+                    // Without StratCon, the enemy is not reliable enough to tell which side of a war a contract
+                    // was fought on, so wars that list both sides are skipped
+                    continue;
                 }
 
                 if (isEligible) {

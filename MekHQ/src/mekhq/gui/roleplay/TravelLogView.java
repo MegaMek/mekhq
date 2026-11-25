@@ -33,6 +33,7 @@
 package mekhq.gui.roleplay;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.baseComponents.hud.Hud.column;
 import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
 import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE;
 import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE_DEEP;
@@ -40,7 +41,6 @@ import static mekhq.gui.baseComponents.hud.HudStyle.TEXT;
 import static mekhq.gui.baseComponents.hud.HudStyle.TEXT_MUTED;
 import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 import static mekhq.gui.baseComponents.hud.HudStyle.leftAligned;
-import static mekhq.gui.roleplay.AskPage.column;
 import static mekhq.gui.roleplay.OracleConsole.RESOURCE_BUNDLE;
 import static mekhq.gui.roleplay.OracleConsole.formatDate;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;

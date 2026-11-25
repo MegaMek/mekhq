@@ -618,9 +618,6 @@ public class PlanetarySystem {
     }
 
     /**
-     * @return short name if set, else full name, else "unnamed"
-     */
-    /**
      * @param when the date to name the system as of, since ownership and name can change over time
      *
      * @return the system's name as a report hyperlink that focuses the interstellar map on it
@@ -629,6 +626,11 @@ public class PlanetarySystem {
         return String.format("<a href='SYSTEM:%s'>%s</a>", getId(), getName(when));
     }
 
+    /**
+     * @param when the date to name the system as of, since its name can change over time
+     *
+     * @return the system's name, or "Unknown System" if it has none
+     */
     public String getPrintableName(LocalDate when) {
         final String system = getName(when);
         return (system == null) ? "Unknown System" : system;

@@ -90,11 +90,13 @@ import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.enums.MarginOfSuccess;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudConfirmButton;
 import mekhq.gui.baseComponents.hud.HudStyle;
 import mekhq.gui.baseComponents.hud.HudVerdictBanner;
+import mekhq.gui.baseComponents.hud.HudWrappingLabel;
 
 /**
  * The contract negotiation table, drawn as a heads-up display in the style of the contract market. Lets the player
@@ -271,9 +273,9 @@ public class ContractNegotiationDialog extends JDialog {
         JPanel body = new JPanel(new BorderLayout());
         body.setOpaque(true);
         body.setBackground(SURFACE_DEEP);
-        mainScroll = MarketHud.scroll(buildMain(), SURFACE_DEEP);
+        mainScroll = Hud.scroll(buildMain(), SURFACE_DEEP);
         body.add(mainScroll, BorderLayout.CENTER);
-        sideScroll = MarketHud.scroll(buildSide(), GROUND);
+        sideScroll = Hud.scroll(buildSide(), GROUND);
         JComponent side = sideScroll;
         side.setBorder(BorderFactory.createMatteBorder(0, scaleForGUI(1), 0, 0, BORDER));
         side.setPreferredSize(new Dimension(scaleForGUI(SIDE_WIDTH), 0));
@@ -343,7 +345,7 @@ public class ContractNegotiationDialog extends JDialog {
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
               BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(14), scaleForGUI(10), scaleForGUI(14))));
 
-        JPanel identity = MarketHud.column();
+        JPanel identity = Hud.column();
         String scaleText = ChaosContractDeterminationScale.formatScale(contract.getExactScale(),
               campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE));
         identity.add(leftAligned(Hud.eyebrow(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.eyebrow",
@@ -364,7 +366,7 @@ public class ContractNegotiationDialog extends JDialog {
         readouts.add(Box.createHorizontalStrut(scaleForGUI(6)));
         JPanel bank = MarketHud.readout(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.budget.bank"), "", AMBER,
               SURFACE_DEEP);
-        bank.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+        bank.setToolTipText(Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
               "negotiate.contractMarket.budget.bank.tooltip")));
         bank.remove(1);
         bankValue.setForeground(AMBER);
@@ -385,7 +387,7 @@ public class ContractNegotiationDialog extends JDialog {
 
     /** The terms as step tracks with a legend, then the rented facilities. */
     private JPanel buildMain() {
-        JPanel main = MarketHud.column();
+        JPanel main = Hud.column();
         main.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(4), scaleForGUI(18), scaleForGUI(18),
               scaleForGUI(18)));
         main.add(leftAligned(heading("negotiate.contractMarket.section.terms")));
@@ -460,9 +462,9 @@ public class ContractNegotiationDialog extends JDialog {
         String costEach = getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.facility.each",
               Money.of(facilityUnitCost[index]).toAmountAndSymbolString());
         String benefit = getTextAt(RESOURCE_BUNDLE, labelKey + ".benefit");
-        JLabel name = new JLabel("<html>" + MarketHud.escape(getTextAt(RESOURCE_BUNDLE, labelKey))
+        JLabel name = new JLabel("<html>" + Hud.escape(getTextAt(RESOURCE_BUNDLE, labelKey))
                                        + "<br><span style='color:" + hex(TEXT_FAINT) + "'>"
-                                       + MarketHud.escape(costEach) + " &middot; " + MarketHud.escape(benefit)
+                                       + Hud.escape(costEach) + " &middot; " + Hud.escape(benefit)
                                        + "</span></html>");
         name.setForeground(TEXT);
         name.setFont(hudFont(Font.PLAIN, 0.92f, 0.0f));
@@ -497,7 +499,7 @@ public class ContractNegotiationDialog extends JDialog {
 
     /** The negotiators, the re-negotiation, and the impact on pay. */
     private JPanel buildSide() {
-        JPanel side = MarketHud.column();
+        JPanel side = Hud.column();
         side.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(14), scaleForGUI(16),
               scaleForGUI(14)));
 
@@ -540,7 +542,7 @@ public class ContractNegotiationDialog extends JDialog {
      * shown in place once an attempt has been made.
      */
     private JPanel buildRenegotiationCard() {
-        JPanel content = MarketHud.column();
+        JPanel content = Hud.column();
         content.add(leftAligned(MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
               "negotiate.contractMarket.renegotiate.explain"), TEXT_FAINT, Font.PLAIN, 0.84f)));
         content.add(Box.createVerticalStrut(scaleForGUI(8)));
@@ -620,7 +622,7 @@ public class ContractNegotiationDialog extends JDialog {
      */
     private void refreshNegotiatorCard() {
         Person negotiator = contract.getPlayerNegotiator();
-        JPanel content = MarketHud.column();
+        JPanel content = Hud.column();
         if (negotiator == null) {
             JLabel none = new JLabel(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.negotiator.none"));
             none.setForeground(AMBER);
@@ -649,7 +651,7 @@ public class ContractNegotiationDialog extends JDialog {
         change.addActionListener(event -> openNegotiatorPicker());
         if (isNegotiatorLocked()) {
             change.setArmed(false);
-            change.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+            change.setToolTipText(Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
                   "negotiate.contractMarket.negotiator.change.locked")));
         }
         JPanel changeRow = Hud.transparentPanel(new BorderLayout());
@@ -671,7 +673,7 @@ public class ContractNegotiationDialog extends JDialog {
         if (employerNegotiator == null) {
             return;
         }
-        JPanel content = MarketHud.column();
+        JPanel content = Hud.column();
         content.add(leftAligned(personSummary(employerNegotiator)));
         if (activeNegotiators) {
             content.add(Box.createVerticalStrut(scaleForGUI(10)));
@@ -688,12 +690,12 @@ public class ContractNegotiationDialog extends JDialog {
      * from both target numbers, natural aptitude, Edge rerolls and the player's traits.
      */
     private JPanel renegotiationOdds(Person employerNegotiator) {
-        JPanel block = MarketHud.column();
+        JPanel block = Hud.column();
         JLabel heading = new JLabel(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.odds.heading")
                                           .toUpperCase(Locale.ROOT));
         heading.setForeground(TEXT_FAINT);
         heading.setFont(hudFont(Font.BOLD, 0.7f, 0.14f));
-        heading.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+        heading.setToolTipText(Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
               "negotiate.contractMarket.odds.tooltip")));
         block.add(leftAligned(heading));
         block.add(Box.createVerticalStrut(scaleForGUI(4)));
@@ -705,7 +707,7 @@ public class ContractNegotiationDialog extends JDialog {
             return block;
         }
         NegotiatorProfile.TableOdds odds = NegotiatorProfile.odds(campaign, playerNegotiator, employerNegotiator,
-              scale);
+              scale, FactionStandingUtilities.getNegotiationModifier(campaign, contract));
         block.add(leftAligned(oddsRow("negotiate.contractMarket.odds.haggle", odds.haggle())));
         block.add(Box.createVerticalStrut(scaleForGUI(2)));
         block.add(leftAligned(oddsRow("negotiate.contractMarket.odds.exception", odds.exception())));
@@ -736,11 +738,11 @@ public class ContractNegotiationDialog extends JDialog {
     /** A person's portrait beside their name and Negotiation skill (and Edge, when the campaign uses it). */
     private JPanel personSummary(Person person) {
         JPanel summary = Hud.transparentPanel(new BorderLayout(scaleForGUI(10), 0));
-        JLabel portrait = MarketHud.portrait(null, scaleForGUI(PORTRAIT_SIZE));
+        JLabel portrait = Hud.portrait(null, scaleForGUI(PORTRAIT_SIZE));
         portrait.setIcon(portraits.computeIfAbsent(person,
-              key -> MarketHud.portrait(key, scaleForGUI(PORTRAIT_SIZE)).getIcon()));
-        summary.add(MarketHud.topAligned(portrait), BorderLayout.WEST);
-        JPanel text = MarketHud.column();
+              key -> Hud.portrait(key, scaleForGUI(PORTRAIT_SIZE)).getIcon()));
+        summary.add(Hud.topAligned(portrait), BorderLayout.WEST);
+        JPanel text = Hud.column();
         JLabel name = new JLabel(person.getFullTitle());
         name.setForeground(TEXT);
         name.setFont(hudFont(Font.BOLD, 0.92f, 0.0f));
@@ -788,7 +790,7 @@ public class ContractNegotiationDialog extends JDialog {
             }
             String name = option.getDisplayableName().replaceAll("\\s*\\([^)]*\\)", "");
             // The trait's name over its effect, so both have the card's full width.
-            JPanel row = MarketHud.column();
+            JPanel row = Hud.column();
             JLabel nameLabel = new JLabel(name);
             nameLabel.setForeground(NegotiatorProfile.isHelpfulTrait(trait) ? READY : DANGER);
             nameLabel.setFont(hudFont(Font.BOLD, 0.82f, 0.0f));
@@ -797,7 +799,7 @@ public class ContractNegotiationDialog extends JDialog {
                   "negotiate.contractMarket.trait." + trait), TEXT_FAINT, Font.PLAIN, 0.8f);
             row.add(leftAligned(effect));
             if (option.getDescription() != null) {
-                String toolTip = MarketHud.wrapToolTip(option.getDescription());
+                String toolTip = Hud.wrapToolTip(option.getDescription());
                 row.setToolTipText(toolTip);
                 nameLabel.setToolTipText(toolTip);
                 effect.setToolTipText(toolTip);
@@ -1212,12 +1214,14 @@ public class ContractNegotiationDialog extends JDialog {
                                              .booleanOption(PersonnelOptions.EDGE_COMMANDER_NEGOTIATION);
         MarginOfSuccess playerMargin = reportedNegotiationCheck(playerNegotiator,
               "negotiate.contractMarket.renegotiate.roll.player",
-              playerUsesEdge);
+              playerUsesEdge,
+              FactionStandingUtilities.getNegotiationModifier(campaign, contract));
         Person employerNegotiator = contract.getEmployerNegotiator();
         MarginOfSuccess employerMargin = employerNegotiator != null ?
                                                reportedNegotiationCheck(employerNegotiator,
                                                      "negotiate.contractMarket.renegotiate.roll.employer",
-                                                     isUseEdge) :
+                                                     isUseEdge,
+                                                     0) :
                                                MarginOfSuccess.BARELY_MADE_IT;
         return ActiveNegotiationMath.netMargin(playerMargin, employerMargin)
                      + NegotiatorProfile.of(playerNegotiator, scale).generalModifier();
@@ -1225,10 +1229,12 @@ public class ContractNegotiationDialog extends JDialog {
 
     /**
      * Resolves a Negotiation check for the given person, posts the result to the daily report's skill-checks tab, and
-     * returns its margin of success.
+     * returns its margin of success. The player's negotiator gets the campaign's Faction Standing modifier with the
+     * employer; the employer's negotiator gets none.
      */
-    private MarginOfSuccess reportedNegotiationCheck(Person negotiator, String reasonKey, boolean useEdge) {
-        ActionCheckResult result = negotiator.checkSkill(SkillType.S_NEGOTIATION, campaign)
+    private MarginOfSuccess reportedNegotiationCheck(Person negotiator, String reasonKey, boolean useEdge,
+          int standingModifier) {
+        ActionCheckResult result = NegotiatorProfile.negotiationCheck(campaign, negotiator, standingModifier)
                                          .resolve(useEdge, getTextAt(RESOURCE_BUNDLE, reasonKey));
         campaign.addReport(DailyReportType.SKILL_CHECKS, result.getReport());
         return result.getReportMargin();
@@ -1407,7 +1413,7 @@ public class ContractNegotiationDialog extends JDialog {
         for (HudConfirmButton button : List.of(haggleButton, exceptionButton)) {
             button.reset();
             button.setArmed(available);
-            button.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE, tooltipKey)));
+            button.setToolTipText(Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE, tooltipKey)));
         }
         attemptsLabel.setText(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.renegotiate.left", left)
                                     .toUpperCase(Locale.ROOT));
@@ -1444,12 +1450,12 @@ public class ContractNegotiationDialog extends JDialog {
                             : "negotiate.contractMarket.results.termLocked",
                       termLabel);
             };
-            lines.add("<span style='color:" + hex(change > 0 ? READY : DANGER) + "'>" + MarketHud.escape(line)
+            lines.add("<span style='color:" + hex(change > 0 ? READY : DANGER) + "'>" + Hud.escape(line)
                             + "</span>");
         }
         if (lines.isEmpty() && net != 0) {
             // A win or loss that changed nothing (no eligible term left in that direction).
-            lines.add(MarketHud.escape(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.results.noTerms")));
+            lines.add(Hud.escape(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.results.noTerms")));
         }
         resultBanner.setVerdict(getFormattedTextAt(RESOURCE_BUNDLE, headlineKey, Math.abs(net)),
               "<html>" + String.join("<br>", lines) + "</html>",
@@ -1563,26 +1569,26 @@ public class ContractNegotiationDialog extends JDialog {
         }
         Money change = payChange.minus(rental.minus(initialRental));
 
-        JPanel impact = MarketHud.section(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.section.impact.money"));
+        JPanel impact = Hud.section(getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.section.impact.money"));
         String monthly = baseMonthly.toAmountString();
         if (proposedMultiplier != originalMultiplier) {
-            monthly = "<html>" + MarketHud.escape(baseMonthly.toAmountString()) + " &rarr; <b style='color:"
+            monthly = "<html>" + Hud.escape(baseMonthly.toAmountString()) + " &rarr; <b style='color:"
                             + hex(proposedMultiplier > originalMultiplier ? READY : DANGER) + "'>"
-                            + MarketHud.escape(projectedMonthly.toAmountString()) + "</b></html>";
+                            + Hud.escape(projectedMonthly.toAmountString()) + "</b></html>";
         }
-        MarketHud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.pay"), monthly, null, null,
+        Hud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.pay"), monthly, null, null,
               false);
-        MarketHud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.metric.total"),
+        Hud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.metric.total"),
               totalPay.toAmountString(), null, totalPay.toAmountAndSymbolString(), false);
         if (!isPirateContract()) {
-            MarketHud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.impact.rental"),
+            Hud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.impact.rental"),
                   ContractMarketFormatting.costAmount(rental),
                   rental.isZero() ? null : DANGER, null, false);
         }
-        MarketHud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.impact.change"),
+        Hud.addRow(impact, getTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.impact.change"),
               ContractMarketFormatting.signedAmount(change),
               change.isNegative() ? DANGER : READY, null, true);
-        MarketHud.addSpanning(impact, MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
+        Hud.addSpanning(impact, MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
               "negotiate.contractMarket.impact.note"), TEXT_FAINT, Font.PLAIN, 0.78f), 6);
 
         impactHolder.removeAll();
@@ -1684,8 +1690,8 @@ public class ContractNegotiationDialog extends JDialog {
         private final Clause clause;
         private final JPanel panel = new JPanel(new GridBagLayout());
         private final Track track;
-        private final JLabel value = new MarketHud.WrappingLabel();
-        private final JLabel why = new MarketHud.WrappingLabel();
+        private final JLabel value = new HudWrappingLabel();
+        private final JLabel why = new HudWrappingLabel();
         private final HudButton lowerButton;
         private final HudButton raiseButton;
         private final JLabel lockBadge = new JLabel();
@@ -1699,7 +1705,7 @@ public class ContractNegotiationDialog extends JDialog {
                   BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
                   BorderFactory.createEmptyBorder(scaleForGUI(7), scaleForGUI(9), scaleForGUI(5), 0)));
 
-            JPanel label = MarketHud.column();
+            JPanel label = Hud.column();
             JLabel name = new JLabel(getTextAt(RESOURCE_BUNDLE, clause.labelKey));
             name.setForeground(TEXT_MUTED);
             name.setFont(hudFont(Font.PLAIN, 0.92f, 0.0f));
@@ -1765,12 +1771,12 @@ public class ContractNegotiationDialog extends JDialog {
             String proposedValue = valueOf(clause, ChaosContractStepsTable.fromStepValue(currentStep[index]));
             int delta = currentStep[index] - originalStep[index];
 
-            StringBuilder html = new StringBuilder("<html><b>").append(MarketHud.escape(originalValue));
+            StringBuilder html = new StringBuilder("<html><b>").append(Hud.escape(originalValue));
             if (delta != 0) {
                 boolean valueChanged = !originalValue.equals(proposedValue);
                 Color color = !valueChanged ? TEXT_MUTED : (delta > 0 ? READY : DANGER);
                 html.append(" &rarr; <span style='color:").append(hex(color)).append("'>")
-                      .append(MarketHud.escape(proposedValue)).append("</span>");
+                      .append(Hud.escape(proposedValue)).append("</span>");
             }
             html.append("</b>");
             List<String> chips = new ArrayList<>();
@@ -1798,7 +1804,7 @@ public class ContractNegotiationDialog extends JDialog {
             }
             value.setText(html.append("</html>").toString());
             if (delta != 0 && originalValue.equals(proposedValue)) {
-                value.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+                value.setToolTipText(Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
                       "negotiate.contractMarket.plateau.tooltip")));
             } else {
                 value.setToolTipText(null);
@@ -1817,7 +1823,7 @@ public class ContractNegotiationDialog extends JDialog {
                       BorderFactory.createLineBorder(fixed ? BORDER : AMBER, scaleForGUI(1)),
                       BorderFactory.createEmptyBorder(scaleForGUI(4), scaleForGUI(7), scaleForGUI(4),
                             scaleForGUI(7))));
-                lockBadge.setToolTipText(fixed ? MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+                lockBadge.setToolTipText(fixed ? Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
                       "negotiate.contractMarket.locked.permanent.tooltip")) : null);
                 controls.add(lockBadge);
             } else {
@@ -1836,14 +1842,14 @@ public class ContractNegotiationDialog extends JDialog {
                 controls.add(raiseButton);
             }
             String reason = raiseBlockReason(clause);
-            why.setText(reason == null ? " " : "<html>" + MarketHud.escape(reason) + "</html>");
+            why.setText(reason == null ? " " : "<html>" + Hud.escape(reason) + "</html>");
             track.repaint();
             controls.revalidate();
             controls.repaint();
         }
 
         private String chip(String text, Color color) {
-            return "<b style='color:" + hex(color) + "'>" + MarketHud.escape(text.toUpperCase(Locale.ROOT)) + "</b>";
+            return "<b style='color:" + hex(color) + "'>" + Hud.escape(text.toUpperCase(Locale.ROOT)) + "</b>";
         }
     }
 
@@ -1940,7 +1946,7 @@ public class ContractNegotiationDialog extends JDialog {
             readout.setBackground(SURFACE_DEEP);
             readout.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(5), scaleForGUI(10), scaleForGUI(5),
                   scaleForGUI(10)));
-            readout.setToolTipText(MarketHud.wrapToolTip(toolTip));
+            readout.setToolTipText(Hud.wrapToolTip(toolTip));
             JLabel keyLabel = HudStyle.keyLabel(key.toUpperCase(Locale.ROOT));
             keyLabel.setAlignmentX(Component.LEFT_ALIGNMENT);
             JPanel value = Hud.transparentPanel(null);
@@ -2018,7 +2024,8 @@ public class ContractNegotiationDialog extends JDialog {
 
     private String valueOf(Clause clause, ChaosContractStepsTable step) {
         // Show the effective term value: the step multiplier scaled by the campaign's configured per-term multiplier,
-        // so the negotiation screen matches the pay/salvage the contract will actually deliver.
+        // so the negotiation screen matches the pay/salvage the contract will actually deliver. Salvage also carries the
+        // contract's Scale taper, as AbstractContract#getSalvageRightsMultiplier applies it.
         return switch (clause) {
             case COMMAND -> step.getContractCommandRights().toString();
             case PAY -> percent(step.getBasePayMultiplier() * termOption(CampaignOption.CONTRACT_BASE_PAY_MULTIPLIER));
@@ -2032,7 +2039,8 @@ public class ContractNegotiationDialog extends JDialog {
             case SALVAGE -> step.isExchangeSalvage()
                                   ? getTextAt(RESOURCE_BUNDLE, "value.contractMarket.salvage.exchange")
                                   : percent(step.getSalvageMultiplier()
-                                                  * termOption(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER));
+                                                  * termOption(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER)
+                                                  * contract.getSalvageTaperMultiplier());
         };
     }
 

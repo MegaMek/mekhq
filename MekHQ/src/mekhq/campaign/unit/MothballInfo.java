@@ -32,6 +32,9 @@
  */
 package mekhq.campaign.unit;
 
+import static mekhq.campaign.enums.DailyReportType.TECHNICAL;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.io.PrintWriter;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -59,6 +62,7 @@ import org.w3c.dom.NodeList;
  */
 public class MothballInfo {
     private static final MMLogger LOGGER = MMLogger.create(MothballInfo.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Unit";
 
     private UUID techId;
     private int forceId;
@@ -68,6 +72,7 @@ public class MothballInfo {
     private UUID techOfficerId;
     private UUID navigatorId;
     private final Map<PersonnelRole, Integer> tempCrewMap = new HashMap<>();
+    private MothballC3State c3State = new MothballC3State();
 
     /**
      * Parameterless constructor, used for deserialization.
@@ -100,6 +105,9 @@ public class MothballInfo {
      * @param unit The unit to work with
      */
     public MothballInfo(Unit unit) {
+        // Captured first: it reads the unit's formation and network links, which mothballing is about to sever
+        c3State = new MothballC3State(unit, unit.getCampaign());
+
         Person tech = unit.getTech();
         if (tech != null) {
             techId = tech.getId();
@@ -232,6 +240,14 @@ public class MothballInfo {
 
             // If all the checks have passed, restore the unit to its last force
             campaign.getPlayerForce().addUnitToFormation(unit, forceId, campaign);
+
+            // C3 networks only exist inside the TO&E, so the wiring can only come back with the formation
+            int droppedC3Links = c3State.restore(unit, campaign);
+            if (droppedC3Links > 0) {
+                campaign.addReport(TECHNICAL,
+                      getFormattedTextAt(RESOURCE_BUNDLE, "MothballInfo.c3LinksDropped.text",
+                            unit.getHyperlinkedName(), droppedC3Links));
+            }
         }
 
         unit.resetEngineer();
@@ -276,6 +292,8 @@ public class MothballInfo {
             MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "tempCrewMap");
         }
 
+        c3State.writeToXML(pw, indent);
+
         MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, "mothballInfo");
     }
 
@@ -307,6 +325,8 @@ public class MothballInfo {
                     retVal.techOfficerId = UUID.fromString(wn2.getTextContent());
                 } else if (wn2.getNodeName().equalsIgnoreCase("navigatorID")) {
                     retVal.navigatorId = UUID.fromString(wn2.getTextContent());
+                } else if (wn2.getNodeName().equalsIgnoreCase("c3State")) {
+                    retVal.c3State = MothballC3State.generateInstanceFromXML(wn2);
                 } else if (wn2.getNodeName().equalsIgnoreCase("tempCrewMap")) {
                     NodeList tempCrewNodes = wn2.getChildNodes();
                     for (int y = 0; y < tempCrewNodes.getLength(); y++) {

@@ -37,7 +37,6 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
-import java.time.temporal.ChronoUnit;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashSet;
@@ -48,7 +47,6 @@ import java.util.Set;
 
 import jakarta.annotation.Nullable;
 import megamek.common.compute.Compute;
-import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -60,14 +58,12 @@ import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinition;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestPlacer;
-import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestRules;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConSupplyInterdictionBehavior;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConHexGeometry;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder.Pathing;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConPathfinder.StepCost;
 import mekhq.campaign.digitalGM.stratCon.sectorGeneration.StratConRoadPlacer;
-import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
@@ -75,11 +71,11 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * Supply lines: the routes that keep each side's facilities supplied.
  *
  * <p>Each side has a supply network on each sector (see {@link StratConSupplyNetwork}): a route from every one of its
- * facilities back to a source of its supply. Its sources are its Comms Centers, Bases of Operations and Space Ports,
+ * facilities back to a source of its supply. Its sources are its Supply Depots, Bases of Operations and Space Ports,
  * and every road that leaves the sector. Routes are laid by the same search that lays the roads, at the costs of
  * {@link StratConRoadPlacer#supplyRouteCost}: they keep to the roads where those serve and strike out across country
- * where they don't, but never pass through a facility the other side holds. Each of a side's Supply Depots on its
- * network also links that side's facilities within {@value #DEPOT_RANGE} hexes straight to itself, without a road.</p>
+ * where they don't, but never pass through a facility the other side holds. Each of a side's Supply Depots also links
+ * that side's facilities within {@value #DEPOT_RANGE} hexes straight to itself, without a road.</p>
  *
  * <p>Routes are laid once and kept. A facility that turns up, or changes sides, is joined to its side's network by the
  * cheapest way there. A facility taken by the other side, or a source that is lost, sends every route that ran through
@@ -93,8 +89,8 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * and neither the player nor the employer holds a source facility - all of them are cut off, and the player is told
  * why (see {@link #isPlayerSideWithoutSupply}).</p>
  *
- * <p>The enemy also sends Supply Interdictions against the player's routes, as often as it sends engineers to build
- * outposts (see {@link #processSupplyInterdictions}).</p>
+ * <p>The enemy also sends Supply Interdictions against the player's routes, as one of its attacks on the player's
+ * side's facilities (see {@link StratConFacilityAttacks}).</p>
  *
  * <p>Supply lines apply only with the improved sector generator, and only while the "Supply Lines" option is on. A
  * sector with no roads has none either.</p>
@@ -103,8 +99,6 @@ import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
  * @since 0.51.01
  */
 public final class StratConFacilitySupply {
-    private static final MMLogger LOGGER = MMLogger.create(StratConFacilitySupply.class);
-
     static final String RESOURCE_BUNDLE = StratConEnemyFacilityActivity.RESOURCE_BUNDLE;
 
     /**
@@ -117,6 +111,48 @@ public final class StratConFacilitySupply {
     static final int ROAD_CUT_DAYS = 28;
 
     private StratConFacilitySupply() {
+    }
+
+    /**
+     * Where a facility stands on its side's supply lines, for the screens that show it. Each screen maps it to its own
+     * text.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public enum SupplyStatus {
+        /** The sector has no roads, so no supply lines: there is nothing to show. */
+        NONE,
+        /** The facility's route to a source is blocked, or it has none. */
+        CUT,
+        /** The facility is a source of its side's supply, so it is never cut off. */
+        SOURCE,
+        /** The facility's route reaches a source unblocked. */
+        CONNECTED
+    }
+
+    /**
+     * @param track  the sector
+     * @param coords a facility's hex
+     *
+     * @return the facility's standing on its side's supply lines: {@link SupplyStatus#NONE} in a sector with no roads,
+     *       which has no supply lines; otherwise cut off, a source of its side's supply, or connected, in that order.
+     *       Does not check whether supply lines are in use; see {@link #isSupplyLinesActive}.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static SupplyStatus getSupplyStatus(StratConTrackState track, StratConCoords coords) {
+        if (track.getRoads().isEmpty()) {
+            return SupplyStatus.NONE;
+        }
+        if (isCutOff(track, coords)) {
+            return SupplyStatus.CUT;
+        }
+        if (isSupplySource(track, coords)) {
+            return SupplyStatus.SOURCE;
+        }
+        return SupplyStatus.CONNECTED;
     }
 
     /**
@@ -144,9 +180,27 @@ public final class StratConFacilitySupply {
      * @since 0.51.01
      */
     static boolean isSupplySource(FacilityType facilityType) {
-        return (facilityType == FacilityType.CommandCenter)
+        return (facilityType == FacilityType.SupplyDepot)
                      || (facilityType == FacilityType.BaseOfOperations)
                      || (facilityType == FacilityType.SpacePort);
+    }
+
+    /**
+     * @param track  the sector
+     * @param coords a hex in it
+     *
+     * @return {@code true} if a facility in the hex is a source of its side's supply. Its side's supply starts there,
+     *       so it is never cut off: interdicting the routes near it starves only the facilities beyond the cut.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static boolean isSupplySource(StratConTrackState track, StratConCoords coords) {
+        StratConFacility facility = track.getFacility(coords);
+        return (facility != null)
+                     && (isOnSide(facility, true) || isOnSide(facility, false))
+                     && !facility.isDefinitionMissing()
+                     && isSupplySource(facility.getFacilityType());
     }
 
     /**
@@ -236,6 +290,78 @@ public final class StratConFacilitySupply {
     }
 
     /**
+     * The facilities in a sector that no route joins to a source of their side's supply. Unlike
+     * {@link #updateCutOffFacilities}, this takes no account of cuts and Supply Interdictions, which block a route
+     * without removing it. Reads the routes as they stand.
+     *
+     * @param track the sector
+     *
+     * @return the hexes of those facilities, on either side; empty for a sector with no roads
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static List<StratConCoords> getUnroutedFacilityHexes(StratConTrackState track) {
+        List<StratConCoords> unrouted = new ArrayList<>();
+        if (track.getRoads().isEmpty()) {
+            return unrouted;
+        }
+
+        for (boolean isPlayerSide : new boolean[] { true, false }) {
+            StratConSupplyNetwork network = track.getSupplyNetwork(isPlayerSide);
+            for (StratConCoords facilityHex : getFacilityHexes(track, isPlayerSide)) {
+                if (!network.isRouted(facilityHex)) {
+                    unrouted.add(facilityHex);
+                }
+            }
+        }
+        return unrouted;
+    }
+
+    /**
+     * The hexes where a facility of a side could be joined to that side's supply routes as they stand: those a route
+     * could be laid to, and those within reach of one of its Supply Depots. Hexes on the other side's supply routes are
+     * left out, since a facility there would block them. Does not check whether a hex is free.
+     *
+     * @param track        the sector
+     * @param isPlayerSide {@code true} for the player's side, {@code false} for the enemy's
+     *
+     * @return the hexes; empty if the side has no source of supply in the sector
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static Set<StratConCoords> getSuppliableHexes(StratConTrackState track, boolean isPlayerSide) {
+        StepCost stepCost = StratConRoadPlacer.supplyRouteCost(track,
+              coords -> isHeldByOtherSide(track, coords, isPlayerSide));
+        Pathing pathing = StratConPathfinder.pathfind(track,
+              track.getSupplyNetwork(isPlayerSide).hexes(),
+              stepCost);
+
+        Set<StratConCoords> suppliableHexes = new LinkedHashSet<>(pathing.distance().keySet());
+        for (StratConCoords facilityHex : getFacilityHexes(track, isPlayerSide)) {
+            if (isRoutedSupplyDepot(track, facilityHex, isPlayerSide)) {
+                suppliableHexes.addAll(StratConHexGeometry.withinRadius(track, facilityHex, DEPOT_RANGE));
+            }
+        }
+        suppliableHexes.removeIf(coords -> isOnSupplyNetwork(track, coords, !isPlayerSide));
+        return suppliableHexes;
+    }
+
+    /**
+     * @return {@code true} if the hex holds one of the side's Supply Depots, on the side's network
+     */
+    private static boolean isRoutedSupplyDepot(StratConTrackState track, StratConCoords coords,
+          boolean isPlayerSide) {
+        StratConFacility facility = track.getFacility(coords);
+        return (facility != null)
+                     && isOnSide(facility, isPlayerSide)
+                     && !facility.isDefinitionMissing()
+                     && (facility.getFacilityType() == FacilityType.SupplyDepot)
+                     && track.getSupplyNetwork(isPlayerSide).isRouted(coords);
+    }
+
+    /**
      * Joins each of a side's facilities that has no route to the network, nearest first, as the roads join cities
      * (Prim's): Supply Depot links first, since they cost nothing, then the cheapest way from the network as it stands
      * to the nearest facility still without a route, again and again. A facility no way reaches is left without one.
@@ -287,13 +413,8 @@ public final class StratConFacilitySupply {
         boolean isLinked = true;
         while (isLinked && !unrouted.isEmpty()) {
             isLinked = false;
-            for (Map.Entry<StratConCoords, StratConFacility> entry : track.getFacilities().entrySet()) {
-                StratConFacility depot = entry.getValue();
-                StratConCoords depotCoords = entry.getKey();
-                if (!isOnSide(depot, isPlayerSide)
-                          || depot.isDefinitionMissing()
-                          || (depot.getFacilityType() != FacilityType.SupplyDepot)
-                          || !network.isRouted(depotCoords)) {
+            for (StratConCoords depotCoords : track.getFacilities().keySet()) {
+                if (!isRoutedSupplyDepot(track, depotCoords, isPlayerSide)) {
                     continue;
                 }
 
@@ -480,85 +601,19 @@ public final class StratConFacilitySupply {
     }
 
     /**
-     * The contract-level daily step for enemy Supply Interdictions: schedules the next month's once the last month's
-     * schedule runs out - as many as the enemy sends engineers (see
-     * {@link StratConEnemyFacilityActivity#getMonthlyEngineerCount}) - and places those due today across the player's
-     * supply routes in a random sector. One that finds no route to sit on is dropped. None are sent while supply lines
-     * are out of use or the enemy is idle, and none are placed against a routed enemy.
+     * Places a Supply Interdiction across one of the player's supply routes, in a random sector that has one to sit on.
+     * Called when the enemy's facility attack for the day is a Supply Interdiction (see
+     * {@link StratConFacilityAttacks}).
      *
-     * @param campaign      the current campaign
-     * @param contract      the contract
      * @param campaignState the contract's StratCon campaign state
+     * @param today         the current campaign date, from which its lifespan is counted
+     *
+     * @return the placed Supply Interdiction, or {@code null} if no sector had a route to interdict
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public static void processSupplyInterdictions(Campaign campaign, AbstractContract contract,
-          StratConCampaignState campaignState) {
-        List<LocalDate> interdictionDates = campaignState.getSupplyInterdictionDates();
-        // Anything scheduled before supply lines were turned off, or the enemy turned idle, is called off.
-        if (!isSupplyLinesActive(campaign) || (StratConEnemyFacilityActivity.getActivity(campaign) <= 0)) {
-            interdictionDates.clear();
-            return;
-        }
-
-        LocalDate today = campaign.getLocalDate();
-        LocalDate scheduledUntil = campaignState.getSupplyInterdictionsScheduledUntil();
-        if ((scheduledUntil == null) || !today.isBefore(scheduledUntil)) {
-            scheduleSupplyInterdictions(campaign, contract, campaignState, today);
-        }
-
-        int dueCount = 0;
-        for (LocalDate interdictionDate : interdictionDates) {
-            if (!interdictionDate.isAfter(today)) {
-                dueCount++;
-            }
-        }
-        if (dueCount == 0) {
-            return;
-        }
-        interdictionDates.removeIf(interdictionDate -> !interdictionDate.isAfter(today));
-
-        // The enemy is in no state to raid while routed.
-        if (contract.getMoraleLevel().isRouted()) {
-            return;
-        }
-
-        List<StratConPointOfInterest> placed = new ArrayList<>();
-        for (int interdiction = 0; interdiction < dueCount; interdiction++) {
-            StratConPointOfInterest pointOfInterest = placeSupplyInterdiction(campaignState, today);
-            if (pointOfInterest == null) {
-                LOGGER.info("No sector of contract {} had a supply route to interdict.", contract.getName());
-            } else {
-                placed.add(pointOfInterest);
-            }
-        }
-        StratConPointOfInterestRules.announceNewPointsOfInterest(campaign, contract, placed);
-    }
-
-    private static void scheduleSupplyInterdictions(Campaign campaign, AbstractContract contract,
-          StratConCampaignState campaignState, LocalDate today) {
-        LocalDate monthEnd = today.plusMonths(1);
-        campaignState.setSupplyInterdictionsScheduledUntil(monthEnd);
-
-        LocalDate contractEnd = contract.getEndingDate();
-        if ((contractEnd != null) && contractEnd.isBefore(monthEnd)) {
-            monthEnd = contractEnd;
-        }
-        int dayCount = (int) ChronoUnit.DAYS.between(today, monthEnd);
-        if (dayCount <= 0) {
-            return;
-        }
-
-        int interdictionCount = StratConEnemyFacilityActivity.getMonthlyEngineerCount(contract.getScale(),
-              campaign.getCampaignOptions().get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION),
-              StratConEnemyFacilityActivity.getActivity(campaign));
-        for (int interdiction = 0; interdiction < interdictionCount; interdiction++) {
-            campaignState.getSupplyInterdictionDates().add(today.plusDays(Compute.randomInt(dayCount)));
-        }
-    }
-
-    private static @Nullable StratConPointOfInterest placeSupplyInterdiction(StratConCampaignState campaignState,
+    static @Nullable StratConPointOfInterest placeSupplyInterdiction(StratConCampaignState campaignState,
           LocalDate today) {
         StratConPointOfInterestDefinition definition = StratConPointOfInterestDefinitions.getDefinition(
               StratConSupplyInterdictionBehavior.TYPE_ID);
@@ -620,7 +675,7 @@ public final class StratConFacilitySupply {
      * @param track the sector
      *
      * @return {@code true} if the player's side has facilities in the sector but nowhere for its supply to start from:
-     *       no Comms Center, Base of Operations or Space Port of its own, and no road out of the sector the enemy
+     *       no Supply Depot, Base of Operations or Space Port of its own, and no road out of the sector the enemy
      *       doesn't hold. Every one of those facilities is then cut off. A sector with no roads has no supply lines,
      *       so it never counts.
      *

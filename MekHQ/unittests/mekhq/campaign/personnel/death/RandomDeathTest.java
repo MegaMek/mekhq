@@ -58,15 +58,18 @@ import java.util.Set;
 
 import megamek.common.enums.Gender;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.AgeGroup;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.enums.HPGRating;
 import mekhq.campaign.universe.eras.Era;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 /**
  * Unit tests for the {@link RandomDeath} class.
@@ -285,5 +288,36 @@ public class RandomDeathTest {
 
         // Assert
         assertTrue(result);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+          // hits, HPG rating, expected multiplier
+          "0, X, 1.0",
+          "1, X, 1.1",
+          "3, X, 1.3",
+          "1, B, 1.05",
+          "2, A, 1.15",
+          "0, C, 1.0"
+    })
+    void testGetHealthModifier_standardMedicalAddsTenPercentPerHit(int hits, HPGRating hpgRating, double expected) {
+        when(mockedCampaignOptions.isUseAdvancedMedical()).thenReturn(false);
+        when(mockedCampaign.getPlayerForce().getForceDetachment().getCurrentLocation().getPlanet().getHPG(any()))
+              .thenReturn(hpgRating);
+        when(mockedPerson.getHits()).thenReturn(hits);
+        when(mockedPerson.needsFixing()).thenReturn(hits > 0);
+
+        assertEquals(expected, randomDeath.getHealthModifier(mockedPerson), 0.0001);
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+          "MALE, MALE",
+          "FEMALE, FEMALE",
+          "OTHER_MALE, MALE",
+          "OTHER_FEMALE, FEMALE"
+    })
+    void testGetCauseGender_mapsOtherGendersOntoCauseTables(Gender gender, Gender expected) {
+        assertEquals(expected, RandomDeath.getCauseGender(gender));
     }
 }

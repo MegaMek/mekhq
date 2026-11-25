@@ -41,6 +41,7 @@ import static mekhq.campaign.personnel.enums.PersonnelStatus.MEDICAL_COMPLICATIO
 import static mekhq.campaign.personnel.medical.BodyLocation.GENERIC;
 import static mekhq.campaign.personnel.medical.MedicalController.ACADEMY_MEDICAL_CARE_TARGET_NUMBER;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.HealingMarginOfSuccessEffects.getEffectFromHealingAttempt;
+import static mekhq.campaign.personnel.skills.SkillType.S_MEDTECH;
 import static mekhq.campaign.personnel.skills.SkillType.S_SURGERY;
 import static mekhq.campaign.personnel.skills.SkillType.S_TECH_CYBERNETICS;
 import static mekhq.campaign.personnel.skills.enums.SkillAttribute.BODY;
@@ -147,7 +148,7 @@ public class AdvancedMedicalAlternateHealing {
 
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
-            attemptHealing(campaign, patient, patient, modifiers, prostheticPenalties, 0, injury,
+            attemptHealing(campaign, patient, patient, modifiers, prostheticPenalties, 0, 0, injury,
                   healingSPAOptions, today, true);
         }
     }
@@ -158,7 +159,8 @@ public class AdvancedMedicalAlternateHealing {
      * <p>This method scans all permanent injuries and records the primary body locations that are associated with
      * prosthetic subtypes. These locations will later receive a flat penalty to healing attempts.</p>
      *
-     * <p>Cloned limbs are excluded, as they are biological replacements rather than artificial prosthetics.</p>
+     * <p>Cloned limbs are excluded, as they are biological replacements rather than artificial prosthetics. Cosmetic
+     * surgery and fracture repair are excluded too, as they fit nothing artificial.</p>
      *
      * @param patient the person whose permanent injuries are being examined
      *
@@ -171,7 +173,7 @@ public class AdvancedMedicalAlternateHealing {
         Set<BodyLocation> prostheticPenalties = new HashSet<>();
         for (Injury injury : patient.getPermanentInjuries()) {
             InjurySubType injurySubType = injury.getSubType();
-            if (injurySubType.isPermanentModification() && !isClonedLimb(injury)) {
+            if (injurySubType.isPermanentModification() && incursProstheticPenalty(injury)) {
                 BodyLocation location = injury.getLocation();
                 BodyLocation primaryLocation = location.getPrimaryLocation();
 
@@ -183,14 +185,14 @@ public class AdvancedMedicalAlternateHealing {
         return prostheticPenalties;
     }
 
-    private static boolean isClonedLimb(Injury injury) {
+    private static boolean incursProstheticPenalty(Injury injury) {
         InjuryType injuryType = injury.getType();
         if (injuryType == null) {
-            return false;
+            return true;
         }
 
         ProstheticType prostheticType = ProstheticType.getProstheticFromInjury(injuryType);
-        return prostheticType != null && prostheticType.isClonedLimb();
+        return prostheticType == null || prostheticType.incursProstheticHealingPenalty();
     }
 
     /**
@@ -264,9 +266,18 @@ public class AdvancedMedicalAlternateHealing {
         return miscPenalty;
     }
 
-    private static int getCyberneticsLevel(Person healer) {
-        Skill cyberneticsSkill = healer.getSkill(S_TECH_CYBERNETICS);
-        return (cyberneticsSkill == null) ? 0 : cyberneticsSkill.getTotalSkillLevel(healer.getSkillModifierData());
+    /**
+     * @param healer    the person providing care
+     * @param skillName the skill to look up
+     *
+     * @return the healer's total level in the skill, or 0 if they don't have it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static int getHealerSkillLevel(Person healer, String skillName) {
+        Skill skill = healer.getSkill(skillName);
+        return (skill == null) ? 0 : skill.getTotalSkillLevel(healer.getSkillModifierData());
     }
 
     /**
@@ -292,13 +303,14 @@ public class AdvancedMedicalAlternateHealing {
     private static void performHealingCheck(Campaign campaign, Person patient, Person doctor,
           List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties) {
         HealingSPAOptions healingSPAOptions = HealingSPAOptions.from(doctor, patient);
-        int cyberneticsLevel = prostheticPenalties.isEmpty() ? 0 : getCyberneticsLevel(doctor);
+        int cyberneticsLevel = prostheticPenalties.isEmpty() ? 0 : getHealerSkillLevel(doctor, S_TECH_CYBERNETICS);
+        int medTechLevel = getHealerSkillLevel(doctor, S_MEDTECH);
         LocalDate today = campaign.getLocalDate();
 
         // We need a defensive copy of the list as we're going to be removing injuries from it when successfully healing
         for (Injury injury : new ArrayList<>(patient.getInjuries())) {
-            attemptHealing(campaign, patient, doctor, modifiers, prostheticPenalties, cyberneticsLevel, injury,
-                  healingSPAOptions, today, false);
+            attemptHealing(campaign, patient, doctor, modifiers, prostheticPenalties, cyberneticsLevel, medTechLevel,
+                  injury, healingSPAOptions, today, false);
         }
     }
 
@@ -315,7 +327,8 @@ public class AdvancedMedicalAlternateHealing {
      * @param modifiers           A list of target roll modifiers that influence the healing outcome.
      * @param prostheticPenalties A set of body locations where prosthetic-related penalties may apply.
      * @param cyberneticsLevel    The healer's Tech/Cybernetics skill level, which reduces the prosthetic penalty.
-     * @param injury              The injury being treated, which includes severity, location, and status.
+     * @param medTechLevel        The healer's MedTech skill level, which reduces the injury penalty.
+     * @param injury             The injury being treated, which includes severity, location, and status.
      * @param healingSPAOptions   Various special options and attributes influencing the healing process, such as
      *                            holistic care or medical proficiency features.
      * @param today               The current date in the campaign, used for determining the healing progress for
@@ -328,7 +341,8 @@ public class AdvancedMedicalAlternateHealing {
      */
     private static void attemptHealing(Campaign campaign, Person patient, Person doctor,
           List<TargetRollModifier> modifiers, Set<BodyLocation> prostheticPenalties, int cyberneticsLevel,
-          Injury injury, HealingSPAOptions healingSPAOptions, LocalDate today, boolean isUnderAcademyCare) {
+          int medTechLevel, Injury injury, HealingSPAOptions healingSPAOptions, LocalDate today,
+          boolean isUnderAcademyCare) {
         addPathologicInsightModifier(modifiers, injury, healingSPAOptions.hasPathologicInsight());
 
         // If we're performing unassisted healing, recovery time is substantially decreased sevenfold, as per ATOW
@@ -342,7 +356,7 @@ public class AdvancedMedicalAlternateHealing {
 
         if (!injury.isPermanent()) {
             // This needs to be refetched each cycle as the number of concurrent injuries might have changed
-            int injuryPenalty = max(0, patient.getTotalInjurySeverity() - patient.getAdjustedToughness());
+            int injuryPenalty = getConcurrentInjuryPenalty(patient, injury, medTechLevel);
 
             int healingDelta = healingSPAOptions.hasHolisticCareSPA() && randomInt(20) == 0 ? -2 : -1;
             injury.changeTime(healingDelta);
@@ -366,7 +380,8 @@ public class AdvancedMedicalAlternateHealing {
                                         ? getMarginOfSuccessForAcademyCare(patient,
                                               campaign,
                                               modifiers,
-                                              miscPenalty)
+                                              miscPenalty,
+                                              willResolveThisCycle)
                                         : getMarginOfSuccessForHealing(doctor,
                                               patient,
                                               campaign,
@@ -374,7 +389,8 @@ public class AdvancedMedicalAlternateHealing {
                                               miscPenalty,
                                               useEdge,
                                               isUnassistedHealing,
-                                              isUseKinderHealing);
+                                              isUseKinderHealing,
+                                              willResolveThisCycle);
 
             if (willResolveThisCycle) {
                 HealingMarginOfSuccessEffects outcome = processHealingEffects(campaign,
@@ -393,15 +409,64 @@ public class AdvancedMedicalAlternateHealing {
     }
 
     /**
+     * Works out the healing penalty caused by the patient's other injuries.
+     *
+     * <p>Every injury the patient carries, except the one being treated, adds its hits to the penalty, and the
+     * patient's adjusted Toughness and each level the healer has in MedTech offset that total. The injury being
+     * treated is left out, so a patient with a single injury takes no penalty.</p>
+     *
+     * @param patient      the person being treated
+     * @param injury       the injury being treated
+     * @param medTechLevel the healer's MedTech skill level; a negative level gives no reduction
+     *
+     * @return the penalty to the healing roll, never negative
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int getConcurrentInjuryPenalty(Person patient, Injury injury, int medTechLevel) {
+        int otherInjurySeverity = patient.getTotalInjurySeverity() - injury.getHits();
+        return max(0, otherInjurySeverity - patient.getAdjustedToughness() - max(0, medTechLevel));
+    }
+
+    /**
+     * Builds the daily report line for a healing roll, noting what the roll means for the injury.
+     *
+     * <p>Only the roll made on the day an injury's recovery time runs out decides how it heals. On every other day a
+     * failed roll only delays recovery by a day, so the report says so to stop those rolls looking like setbacks.</p>
+     *
+     * @param actionCheckResult the result of the healing roll
+     * @param isResolvingCheck  {@code true} if this roll decides how the injury heals
+     *
+     * @return the report line, with a note on what the roll means
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static String getHealingReport(ActionCheckResult actionCheckResult, boolean isResolvingCheck) {
+        String noteKey;
+        if (isResolvingCheck) {
+            noteKey = "AdvancedMedicalAlternateHealing.check.final";
+        } else if (actionCheckResult.isSuccess()) {
+            noteKey = "AdvancedMedicalAlternateHealing.check.progress";
+        } else {
+            noteKey = "AdvancedMedicalAlternateHealing.check.delayed";
+        }
+
+        return actionCheckResult.getReport() + ' ' + getTextAt(RESOURCE_BUNDLE, noteKey);
+    }
+
+    /**
      * Performs the healing roll for a doctor and returns its margin of success.
      *
-     * @param doctor      the person performing the surgery check
-     * @param patient     the person being healed
-     * @param campaign    the {@link Campaign} context
-     * @param modifiers   the list of modifiers applied to the surgery roll
-     * @param miscPenalty the combined penalty for this healing attempt
-     * @param useEdge     {@code true} if medical Edge may be used to reroll a potentially permanent injury;
-     *                    {@code false} otherwise
+     * @param doctor           the person performing the surgery check
+     * @param patient          the person being healed
+     * @param campaign         the {@link Campaign} context
+     * @param modifiers        the list of modifiers applied to the surgery roll
+     * @param miscPenalty      the combined penalty for this healing attempt
+     * @param useEdge          {@code true} if medical Edge may be used to reroll a potentially permanent injury;
+     *                         {@code false} otherwise
+     * @param isResolvingCheck {@code true} if this roll decides how the injury heals
      *
      * @return the final margin of success after any Edge reroll
      *
@@ -410,7 +475,7 @@ public class AdvancedMedicalAlternateHealing {
      */
     private static int getMarginOfSuccessForHealing(Person doctor, Person patient, Campaign campaign,
           List<TargetRollModifier> modifiers, int miscPenalty, boolean useEdge, boolean isUnassistedHealing,
-          boolean isUseKinderHealing) {
+          boolean isUseKinderHealing, boolean isResolvingCheck) {
         ActionCheckResult actionCheckResult = getActionCheckResult(doctor,
               patient,
               campaign,
@@ -418,14 +483,15 @@ public class AdvancedMedicalAlternateHealing {
               miscPenalty,
               useEdge,
               isUnassistedHealing,
-              isUseKinderHealing);
+              isUseKinderHealing,
+              isResolvingCheck);
 
         return actionCheckResult.getMarginOfSuccess();
     }
 
     private static ActionCheckResult getActionCheckResult(Person doctor, Person patient, Campaign campaign,
           List<TargetRollModifier> modifiers, int miscPenalty, boolean useEdge, boolean isUnassistedHealing,
-          boolean isUseKinderHealing) {
+          boolean isUseKinderHealing, boolean isResolvingCheck) {
         ActionCheckResult actionCheckResult;
         if (isUnassistedHealing) {
             actionCheckResult = performBodyAttributeCheck(doctor, modifiers, miscPenalty, useEdge, isUseKinderHealing);
@@ -439,7 +505,7 @@ public class AdvancedMedicalAlternateHealing {
                   isUseKinderHealing);
         }
 
-        campaign.addReport(DailyReportType.SKILL_CHECKS, actionCheckResult.getReport());
+        campaign.addReport(DailyReportType.SKILL_CHECKS, getHealingReport(actionCheckResult, isResolvingCheck));
 
         return actionCheckResult;
     }
@@ -454,7 +520,8 @@ public class AdvancedMedicalAlternateHealing {
      * @param patient     the student being healed
      * @param campaign    the {@link Campaign} context
      * @param modifiers   the list of modifiers applied to the surgery roll
-     * @param miscPenalty the combined penalty for this healing attempt
+     * @param miscPenalty      the combined penalty for this healing attempt
+     * @param isResolvingCheck {@code true} if this roll decides how the injury heals
      *
      * @return the margin of success of the healing roll
      *
@@ -462,7 +529,7 @@ public class AdvancedMedicalAlternateHealing {
      * @since 0.51.01
      */
     private static int getMarginOfSuccessForAcademyCare(Person patient, Campaign campaign,
-          List<TargetRollModifier> modifiers, int miscPenalty) {
+          List<TargetRollModifier> modifiers, int miscPenalty, boolean isResolvingCheck) {
         TargetRoll targetNumber = new TargetRoll(ACADEMY_MEDICAL_CARE_TARGET_NUMBER, getTextAt(RESOURCE_BUNDLE,
               "AdvancedMedicalAlternateHealing.academyHealing.staff"));
         // The academy's staff make the roll, so the patient's own aptitude must not affect it
@@ -473,7 +540,7 @@ public class AdvancedMedicalAlternateHealing {
         ActionCheckResult actionCheckResult = skillCheck.resolve(false, getTextAt(RESOURCE_BUNDLE,
               "AdvancedMedicalAlternateHealing.academyHealing.normal"));
 
-        campaign.addReport(DailyReportType.SKILL_CHECKS, actionCheckResult.getReport());
+        campaign.addReport(DailyReportType.SKILL_CHECKS, getHealingReport(actionCheckResult, isResolvingCheck));
 
         return actionCheckResult.getMarginOfSuccess();
     }

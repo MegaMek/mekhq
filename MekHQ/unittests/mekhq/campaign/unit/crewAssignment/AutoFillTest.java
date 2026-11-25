@@ -33,6 +33,7 @@
 package mekhq.campaign.unit.crewAssignment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.ArgumentMatchers.any;
@@ -49,10 +50,12 @@ import megamek.common.battleArmor.BattleArmor;
 import megamek.common.enums.SkillLevel;
 import megamek.common.units.EntityMovementMode;
 import megamek.common.units.Infantry;
+import megamek.common.units.Mek;
 import megamek.common.units.Tank;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StageResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
@@ -169,5 +172,111 @@ class AutoFillTest {
 
         assertTrue(result.staged().isEmpty());
         assertTrue(plan.isEmpty());
+    }
+
+    private Unit mek(String chassis) {
+        Mek mek = mock(Mek.class);
+        when(mek.getChassis()).thenReturn(chassis);
+        when(mek.isChassisFamiliarityEligible()).thenReturn(true);
+        return fixture.soloPilotUnit(mek, chassis).unit;
+    }
+
+    private Person pilot(String name, SkillLevel level, Map<String, Integer> familiarity) {
+        Person pilot = person(name, PersonnelRole.MEKWARRIOR, level);
+        familiarity.forEach((chassis, score) -> when(pilot.getChassisFamiliarity(chassis)).thenReturn(score));
+        return pilot;
+    }
+
+    @Test
+    void familiarPilotsTakeTheirChassisFirst() {
+        Unit orion = mek("Orion");
+        Unit marauder = mek("Marauder");
+        Person heroic = pilot("Heroic", SkillLevel.HEROIC, Map.of());
+        Person veteran = pilot("Veteran", SkillLevel.VETERAN, Map.of("Orion", 200));
+
+        AutoFill.fill(plan, List.of(orion, marauder), SeatType.PILOT, List.of(heroic, veteran), ranking(Map.of()),
+              Familiarity.NORMAL);
+
+        assertEquals(orion, plan.plannedUnitOf(veteran));
+        assertEquals(marauder, plan.plannedUnitOf(heroic));
+    }
+
+    @Test
+    void familiarityIsIgnoredWhileDisabled() {
+        Unit orion = mek("Orion");
+        Unit marauder = mek("Marauder");
+        Person heroic = pilot("Heroic", SkillLevel.HEROIC, Map.of());
+        Person veteran = pilot("Veteran", SkillLevel.VETERAN, Map.of("Orion", 200));
+
+        AutoFill.fill(plan, List.of(orion, marauder), SeatType.PILOT, List.of(heroic, veteran), ranking(Map.of()),
+              Familiarity.DISABLED);
+
+        assertEquals(orion, plan.plannedUnitOf(heroic));
+        assertEquals(marauder, plan.plannedUnitOf(veteran));
+    }
+
+    @Test
+    void familiarityBelowTheFirstStepGivesNoPreference() {
+        Unit orion = mek("Orion");
+        Unit marauder = mek("Marauder");
+        Person heroic = pilot("Heroic", SkillLevel.HEROIC, Map.of());
+        Person veteran = pilot("Veteran", SkillLevel.VETERAN, Map.of("Orion", 99));
+
+        AutoFill.fill(plan, List.of(orion, marauder), SeatType.PILOT, List.of(heroic, veteran), ranking(Map.of()),
+              Familiarity.NORMAL);
+
+        assertEquals(orion, plan.plannedUnitOf(heroic));
+    }
+
+    @Test
+    void theHigherFamiliarityStepWinsTheSeat() {
+        Unit orion = mek("Orion");
+        Person elite = pilot("Elite", SkillLevel.ELITE, Map.of("Orion", 150));
+        Person regular = pilot("Regular", SkillLevel.REGULAR, Map.of("Orion", 200));
+
+        AutoFill.fill(plan, List.of(orion), SeatType.PILOT, List.of(elite, regular), ranking(Map.of()),
+              Familiarity.NORMAL);
+
+        assertEquals(orion, plan.plannedUnitOf(regular));
+        assertNull(plan.plannedUnitOf(elite));
+    }
+
+    @Test
+    void withinOneStepTheBetterPilotWinsTheSeat() {
+        Unit orion = mek("Orion");
+        Person elite = pilot("Elite", SkillLevel.ELITE, Map.of("Orion", 100));
+        Person regular = pilot("Regular", SkillLevel.REGULAR, Map.of("Orion", 199));
+
+        AutoFill.fill(plan, List.of(orion), SeatType.PILOT, List.of(elite, regular), ranking(Map.of()),
+              Familiarity.NORMAL);
+
+        assertEquals(orion, plan.plannedUnitOf(elite));
+    }
+
+    @Test
+    void aFamiliarPilotTakesTheUnitTheyKnowBest() {
+        Unit orion = mek("Orion");
+        Unit marauder = mek("Marauder");
+        Person pilot = pilot("Pilot", SkillLevel.VETERAN, Map.of("Orion", 100, "Marauder", 200));
+
+        AutoFill.fill(plan, List.of(orion, marauder), SeatType.PILOT, List.of(pilot), ranking(Map.of()),
+              Familiarity.NORMAL);
+
+        assertEquals(marauder, plan.plannedUnitOf(pilot));
+    }
+
+    @Test
+    void aFamiliarFillIsUndoneInOneStep() {
+        Unit orion = mek("Orion");
+        Unit marauder = mek("Marauder");
+        Person heroic = pilot("Heroic", SkillLevel.HEROIC, Map.of());
+        Person veteran = pilot("Veteran", SkillLevel.VETERAN, Map.of("Orion", 200));
+        AutoFill.fill(plan, List.of(orion, marauder), SeatType.PILOT, List.of(heroic, veteran), ranking(Map.of()),
+              Familiarity.NORMAL);
+
+        assertTrue(plan.undo());
+
+        assertTrue(plan.isEmpty());
+        assertFalse(plan.canUndo());
     }
 }

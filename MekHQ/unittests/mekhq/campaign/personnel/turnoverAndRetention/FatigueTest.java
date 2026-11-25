@@ -459,6 +459,7 @@ class FatigueTest {
             PlayerForce playerForce = mock(PlayerForce.class);
             when(campaign.getPlayerForce()).thenReturn(playerForce);
             when(playerForce.getCombatTeamsAsList(campaign)).thenReturn(List.of(combatTeam));
+            when(playerForce.getFormation(FORMATION_ID)).thenReturn(formation);
         }
 
         /**

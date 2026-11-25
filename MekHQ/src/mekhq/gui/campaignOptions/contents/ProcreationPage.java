@@ -33,7 +33,6 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static megamek.client.ui.WrapLayout.wordWrap;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -48,10 +47,12 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
 import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.personnel.enums.BabySurnameStyle;
 import mekhq.campaign.personnel.enums.RandomProcreationMethod;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
@@ -103,6 +104,12 @@ class ProcreationPage {
     private JSpinner spnRandomProcreationRelationshipDiceSize;
     private JLabel lblRandomProcreationRelationshiplessDiceSize;
     private JSpinner spnRandomProcreationRelationshiplessDiceSize;
+    private JCheckBox chkUseRandomPaternity;
+    private JLabel lblRandomPaternityMaximumChildAge;
+    private JSpinner spnRandomPaternityMaximumChildAge;
+    private JCheckBox chkUseRandomSameSexAdoption;
+    private JLabel lblRandomAdoptionMaximumChildAge;
+    private JSpinner spnRandomAdoptionMaximumChildAge;
 
     private JPanel pnlRandomSexualityPanel;
     private JLabel lblNoInterestInRelationshipsDiceSize;
@@ -160,21 +167,25 @@ class ProcreationPage {
      */
     private @Nonnull JPanel createProcreationGeneralOptionsPanel() {
         // Contents
-        chkUseManualProcreation = new CampaignOptionsCheckBox("UseManualProcreation");
+        chkUseManualProcreation = new CampaignOptionsCheckBox("UseManualProcreation",
+              getMetadata(new Version("0.49.05")));
         chkUseManualProcreation.addMouseListener(createTipPanelUpdater("UseManualProcreation"));
-        chkUseClanPersonnelProcreation = new CampaignOptionsCheckBox("UseClanPersonnelProcreation");
+        chkUseClanPersonnelProcreation = new CampaignOptionsCheckBox("UseClanPersonnelProcreation",
+              getMetadata(new Version("0.49.12")));
         chkUseClanPersonnelProcreation.addMouseListener(createTipPanelUpdater("UseClanPersonnelProcreation"));
-        chkUsePrisonerProcreation = new CampaignOptionsCheckBox("UsePrisonerProcreation");
+        chkUsePrisonerProcreation = new CampaignOptionsCheckBox("UsePrisonerProcreation",
+              getMetadata(new Version("0.49.05")));
         chkUsePrisonerProcreation
                 .addMouseListener(createTipPanelUpdater("UsePrisonerProcreation"));
 
-        lblMultiplePregnancyOccurrences = new CampaignOptionsLabel("MultiplePregnancyOccurrences");
+        lblMultiplePregnancyOccurrences = new CampaignOptionsLabel("MultiplePregnancyOccurrences",
+              getMetadata(new Version("0.49.05")));
         lblMultiplePregnancyOccurrences.addMouseListener(createTipPanelUpdater("MultiplePregnancyOccurrences"));
         spnMultiplePregnancyOccurrences = new CampaignOptionsSpinner("MultiplePregnancyOccurrences",
                 50, 1, 1000, 1);
         spnMultiplePregnancyOccurrences.addMouseListener(createTipPanelUpdater("MultiplePregnancyOccurrences"));
 
-        lblBabySurnameStyle = new CampaignOptionsLabel("BabySurnameStyle");
+        lblBabySurnameStyle = new CampaignOptionsLabel("BabySurnameStyle", getMetadata(new Version("0.47.05")));
         lblBabySurnameStyle.addMouseListener(createTipPanelUpdater("BabySurnameStyle"));
         comboBabySurnameStyle.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -190,25 +201,29 @@ class ProcreationPage {
         });
         comboBabySurnameStyle.addMouseListener(createTipPanelUpdater("BabySurnameStyle"));
 
-        chkAssignNonPrisonerBabiesFounderTag = new CampaignOptionsCheckBox("AssignNonPrisonerBabiesFounderTag");
+        chkAssignNonPrisonerBabiesFounderTag = new CampaignOptionsCheckBox("AssignNonPrisonerBabiesFounderTag",
+              getMetadata(new Version("0.49.05")));
         chkAssignNonPrisonerBabiesFounderTag.addMouseListener(createTipPanelUpdater("AssignNonPrisonerBabiesFounderTag"));
-        chkAssignChildrenOfFoundersFounderTag = new CampaignOptionsCheckBox("AssignChildrenOfFoundersFounderTag");
+        chkAssignChildrenOfFoundersFounderTag = new CampaignOptionsCheckBox("AssignChildrenOfFoundersFounderTag",
+              getMetadata(new Version("0.49.05")));
         chkAssignChildrenOfFoundersFounderTag.addMouseListener(createTipPanelUpdater("AssignChildrenOfFoundersFounderTag"));
-        chkDetermineFatherAtBirth = new CampaignOptionsCheckBox("DetermineFatherAtBirth");
+        chkDetermineFatherAtBirth = new CampaignOptionsCheckBox("DetermineFatherAtBirth",
+              getMetadata(new Version("0.47.07")));
         chkDetermineFatherAtBirth
                 .addMouseListener(createTipPanelUpdater("DetermineFatherAtBirth"));
-        chkDisplayTrueDueDate = new CampaignOptionsCheckBox("DisplayTrueDueDate");
+        chkDisplayTrueDueDate = new CampaignOptionsCheckBox("DisplayTrueDueDate", getMetadata(new Version("0.47.05")));
         chkDisplayTrueDueDate.addMouseListener(createTipPanelUpdater("DisplayTrueDueDate"));
 
-        lblNoInterestInChildrenDiceSize = new CampaignOptionsLabel("NoInterestInChildrenDiceSize");
+        lblNoInterestInChildrenDiceSize = new CampaignOptionsLabel("NoInterestInChildrenDiceSize",
+              getMetadata(new Version("0.50.01")));
         lblNoInterestInChildrenDiceSize.addMouseListener(createTipPanelUpdater("NoInterestInChildrenDiceSize"));
         spnNoInterestInChildrenDiceSize = new CampaignOptionsSpinner("NoInterestInChildrenDiceSize",
                 3, 1, 100000, 1);
         spnNoInterestInChildrenDiceSize.addMouseListener(createTipPanelUpdater("NoInterestInChildrenDiceSize"));
 
-        chkUseMaternityLeave = new CampaignOptionsCheckBox("UseMaternityLeave");
+        chkUseMaternityLeave = new CampaignOptionsCheckBox("UseMaternityLeave", getMetadata(new Version("0.50.01")));
         chkUseMaternityLeave.addMouseListener(createTipPanelUpdater("UseMaternityLeave"));
-        chkLogProcreation = new CampaignOptionsCheckBox("LogProcreation");
+        chkLogProcreation = new CampaignOptionsCheckBox("LogProcreation", getMetadata(new Version("0.49.05")));
         chkLogProcreation.addMouseListener(createTipPanelUpdater("LogProcreation"));
 
         // Layout the Panel
@@ -241,7 +256,8 @@ class ProcreationPage {
      */
     private @Nonnull JPanel createRandomProcreationPanel() {
         // Contents
-        lblRandomProcreationMethod = new CampaignOptionsLabel("RandomProcreationMethod");
+        lblRandomProcreationMethod = new CampaignOptionsLabel("RandomProcreationMethod",
+              getMetadata(new Version("0.49.05")));
         lblRandomProcreationMethod.addMouseListener(createTipPanelUpdater("RandomProcreationMethod"));
         comboRandomProcreationMethod.setRenderer(new DefaultListCellRenderer() {
             @Override
@@ -258,15 +274,17 @@ class ProcreationPage {
         comboRandomProcreationMethod.addMouseListener(createTipPanelUpdater("RandomProcreationMethod"));
 
         chkUseRelationshiplessRandomProcreation = new CampaignOptionsCheckBox(
-                "UseRelationshiplessRandomProcreation");
+                "UseRelationshiplessRandomProcreation", getMetadata(new Version("0.49.05")));
         chkUseRelationshiplessRandomProcreation.addMouseListener(createTipPanelUpdater("UseRelationshiplessRandomProcreation"));
-        chkUseRandomClanPersonnelProcreation = new CampaignOptionsCheckBox("UseRandomClanPersonnelProcreation");
+        chkUseRandomClanPersonnelProcreation = new CampaignOptionsCheckBox("UseRandomClanPersonnelProcreation",
+              getMetadata(new Version("0.49.12")));
         chkUseRandomClanPersonnelProcreation.addMouseListener(createTipPanelUpdater("UseRandomClanPersonnelProcreation"));
-        chkUseRandomPrisonerProcreation = new CampaignOptionsCheckBox("UseRandomPrisonerProcreation");
+        chkUseRandomPrisonerProcreation = new CampaignOptionsCheckBox("UseRandomPrisonerProcreation",
+              getMetadata(new Version("0.49.05")));
         chkUseRandomPrisonerProcreation.addMouseListener(createTipPanelUpdater("UseRandomPrisonerProcreation"));
 
         lblRandomProcreationRelationshipDiceSize = new CampaignOptionsLabel(
-                "RandomProcreationRelationshipDiceSize");
+                "RandomProcreationRelationshipDiceSize", getMetadata(new Version("0.50.01")));
         lblRandomProcreationRelationshipDiceSize.addMouseListener(createTipPanelUpdater("RandomProcreationRelationshipDiceSize"));
         spnRandomProcreationRelationshipDiceSize = new CampaignOptionsSpinner(
                 "RandomProcreationRelationshipDiceSize",
@@ -274,7 +292,7 @@ class ProcreationPage {
         spnRandomProcreationRelationshipDiceSize.addMouseListener(createTipPanelUpdater("RandomProcreationRelationshipDiceSize"));
 
         lblRandomProcreationRelationshiplessDiceSize = new CampaignOptionsLabel(
-                "RandomProcreationRelationshiplessDiceSize");
+                "RandomProcreationRelationshiplessDiceSize", getMetadata(new Version("0.50.01")));
         lblRandomProcreationRelationshiplessDiceSize.addMouseListener(createTipPanelUpdater("RandomProcreationRelationshiplessDiceSize"));
         spnRandomProcreationRelationshiplessDiceSize = new CampaignOptionsSpinner(
                 "RandomProcreationRelationshiplessDiceSize",
@@ -283,6 +301,28 @@ class ProcreationPage {
                 100000,
                 1);
         spnRandomProcreationRelationshiplessDiceSize.addMouseListener(createTipPanelUpdater("RandomProcreationRelationshiplessDiceSize"));
+
+        chkUseRandomPaternity = new CampaignOptionsCheckBox("UseRandomPaternity",
+                getMetadata(new Version("0.51.01.8")));
+        chkUseRandomPaternity.addMouseListener(createTipPanelUpdater("UseRandomPaternity"));
+
+        lblRandomPaternityMaximumChildAge = new CampaignOptionsLabel("RandomPaternityMaximumChildAge",
+                getMetadata(new Version("0.51.01.8")));
+        lblRandomPaternityMaximumChildAge.addMouseListener(createTipPanelUpdater("RandomPaternityMaximumChildAge"));
+        spnRandomPaternityMaximumChildAge = new CampaignOptionsSpinner("RandomPaternityMaximumChildAge",
+                5, 0, AbstractProcreation.MAXIMUM_ARRIVING_CHILD_AGE, 1);
+        spnRandomPaternityMaximumChildAge.addMouseListener(createTipPanelUpdater("RandomPaternityMaximumChildAge"));
+
+        chkUseRandomSameSexAdoption = new CampaignOptionsCheckBox("UseRandomSameSexAdoption",
+                getMetadata(new Version("0.51.01.8")));
+        chkUseRandomSameSexAdoption.addMouseListener(createTipPanelUpdater("UseRandomSameSexAdoption"));
+
+        lblRandomAdoptionMaximumChildAge = new CampaignOptionsLabel("RandomAdoptionMaximumChildAge",
+                getMetadata(new Version("0.51.01.8")));
+        lblRandomAdoptionMaximumChildAge.addMouseListener(createTipPanelUpdater("RandomAdoptionMaximumChildAge"));
+        spnRandomAdoptionMaximumChildAge = new CampaignOptionsSpinner("RandomAdoptionMaximumChildAge",
+                10, 0, AbstractProcreation.MAXIMUM_ARRIVING_CHILD_AGE, 1);
+        spnRandomAdoptionMaximumChildAge.addMouseListener(createTipPanelUpdater("RandomAdoptionMaximumChildAge"));
 
         // Layout the Panel
         final SettingsFormPanel panel = new SettingsFormPanel("RandomProcreationPanel",
@@ -295,6 +335,9 @@ class ProcreationPage {
                 chkUseRandomPrisonerProcreation);
         panel.addRow(lblRandomProcreationRelationshipDiceSize, spnRandomProcreationRelationshipDiceSize);
         panel.addRow(lblRandomProcreationRelationshiplessDiceSize, spnRandomProcreationRelationshiplessDiceSize);
+        panel.addCheckBoxGrid(2, chkUseRandomPaternity, chkUseRandomSameSexAdoption);
+        panel.addRow(lblRandomPaternityMaximumChildAge, spnRandomPaternityMaximumChildAge);
+        panel.addRow(lblRandomAdoptionMaximumChildAge, spnRandomAdoptionMaximumChildAge);
 
         return panel;
     }
@@ -302,21 +345,21 @@ class ProcreationPage {
     private @Nonnull JPanel createRandomSexualityPanel() {
         // Contents
         lblNoInterestInRelationshipsDiceSize = new CampaignOptionsLabel("NoInterestInRelationshipsDiceSize",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.01"), CampaignOptionFlag.IMPORTANT));
         lblNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater("NoInterestInRelationshipsDiceSize"));
         spnNoInterestInRelationshipsDiceSize = new CampaignOptionsSpinner("NoInterestInRelationshipsDiceSize",
                 10, 0, 100000, 1);
         spnNoInterestInRelationshipsDiceSize.addMouseListener(createTipPanelUpdater("NoInterestInRelationshipsDiceSize"));
 
         lblPrefersSameSexDiceSize = new CampaignOptionsLabel("PrefersSameSexDiceSize",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.01"), CampaignOptionFlag.IMPORTANT));
         lblPrefersSameSexDiceSize.addMouseListener(createTipPanelUpdater("PrefersSameSexDiceSize"));
         spnPrefersSameSexDiceSize = new CampaignOptionsSpinner("PrefersSameSexDiceSize",
                 14, 0, 100000, 1);
         spnPrefersSameSexDiceSize.addMouseListener(createTipPanelUpdater("PrefersSameSexDiceSize"));
 
         lblPrefersBothSexesDiceSize = new CampaignOptionsLabel("PrefersBothSexesDiceSize",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.10"), CampaignOptionFlag.IMPORTANT));
         lblPrefersBothSexesDiceSize.addMouseListener(createTipPanelUpdater("PrefersBothSexesDiceSize"));
         spnPrefersBothSexesDiceSize = new CampaignOptionsSpinner("PrefersBothSexesDiceSize",
                 20, 0, 100000, 1);
@@ -362,6 +405,10 @@ class ProcreationPage {
         chkUseRandomPrisonerProcreation.setSelected(model.useRandomPrisonerProcreation);
         spnRandomProcreationRelationshipDiceSize.setValue(model.randomProcreationRelationshipDiceSize);
         spnRandomProcreationRelationshiplessDiceSize.setValue(model.randomProcreationRelationshiplessDiceSize);
+        chkUseRandomPaternity.setSelected(model.useRandomPaternity);
+        spnRandomPaternityMaximumChildAge.setValue(model.randomPaternityMaximumChildAge);
+        chkUseRandomSameSexAdoption.setSelected(model.useRandomSameSexAdoption);
+        spnRandomAdoptionMaximumChildAge.setValue(model.randomAdoptionMaximumChildAge);
         spnNoInterestInRelationshipsDiceSize.setValue(model.noInterestInRelationshipsDiceSize);
         spnPrefersSameSexDiceSize.setValue(model.interestedInSameSexDiceSize);
         spnPrefersBothSexesDiceSize.setValue(model.interestedInBothSexesDiceSize);
@@ -397,6 +444,10 @@ class ProcreationPage {
         model.randomProcreationRelationshipDiceSize = (int) spnRandomProcreationRelationshipDiceSize.getValue();
         model.randomProcreationRelationshiplessDiceSize = (int) spnRandomProcreationRelationshiplessDiceSize
                 .getValue();
+        model.useRandomPaternity = chkUseRandomPaternity.isSelected();
+        model.randomPaternityMaximumChildAge = (int) spnRandomPaternityMaximumChildAge.getValue();
+        model.useRandomSameSexAdoption = chkUseRandomSameSexAdoption.isSelected();
+        model.randomAdoptionMaximumChildAge = (int) spnRandomAdoptionMaximumChildAge.getValue();
         model.interestedInSameSexDiceSize = (int) spnPrefersSameSexDiceSize.getValue();
         model.noInterestInRelationshipsDiceSize = (int) spnNoInterestInRelationshipsDiceSize.getValue();
         model.interestedInBothSexesDiceSize = (int) spnPrefersBothSexesDiceSize.getValue();

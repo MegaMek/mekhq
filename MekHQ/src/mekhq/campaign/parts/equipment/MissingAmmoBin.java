@@ -47,6 +47,7 @@ import megamek.common.units.Jumpship;
 import megamek.common.units.SmallCraft;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.StockCount;
 import mekhq.campaign.parts.enums.PartRepairType;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
@@ -152,6 +153,14 @@ public class MissingAmmoBin extends MissingEquipmentPart {
 
     protected int getFullShots() {
         return oneShot ? 1 : getType().getShots();
+    }
+
+    /**
+     * A missing bin is rebuilt for free, so its task shows no stock.
+     */
+    @Override
+    public @Nullable StockCount getShownStock() {
+        return null;
     }
 
     @Override

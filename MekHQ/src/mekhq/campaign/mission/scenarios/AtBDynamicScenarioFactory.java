@@ -90,6 +90,7 @@ import megamek.common.compute.Compute;
 import megamek.common.containers.MunitionTree;
 import megamek.common.enums.Gender;
 import megamek.common.enums.SkillLevel;
+import megamek.common.equipment.EquipmentType;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Transporter;
 import megamek.common.equipment.WeaponMounted;
@@ -103,6 +104,7 @@ import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.AtmosphericTaint;
+import megamek.common.planetaryConditions.PlanetaryConditions;
 import megamek.common.planetaryConditions.Wind;
 import megamek.common.units.*;
 import megamek.common.universe.FactionTag;
@@ -510,13 +512,78 @@ public class AtBDynamicScenarioFactory {
         return (int) floor(generatedEntities.size() / 4.0);
     }
 
-    private static void updateArmorKits(AtBDynamicScenario scenario, Entity entity, CampaignOptions campaignOptions) {
+    /**
+     * Dresses a conventional infantry platoon for the scenario's air, pressure and temperature. Other unit types are
+     * left untouched.
+     *
+     * <p>Package-private so the regression tests can check the result against MegaMek's own deployment rules.</p>
+     *
+     * @param scenario        the scenario the unit will fight in
+     * @param entity          the unit to dress
+     * @param campaignOptions the campaign options, to check whether weather conditions are in use
+     */
+    static void updateArmorKits(AtBScenario scenario, Entity entity, CampaignOptions campaignOptions) {
         if (entity instanceof ConvInfantry infantry) {
             boolean isLowPressure = scenario.getAtmosphere().isLighterThan(THIN);
             boolean isPoisonous = !scenario.getAtmosphericTaint().isBreathable();
             int temperature = getBattleTemperature(scenario, campaignOptions);
             changeInfantryKit(infantry, isLowPressure, isPoisonous, temperature);
         }
+    }
+
+    /**
+     * Re-dresses the scenario's fixed conventional infantry after its weather has been re-rolled.
+     *
+     * <p>A platoon's environmental kit (snow suit, heat suit, environment suit) is chosen against the conditions that
+     * existed when it was generated. Re-rolling the weather can change the temperature, which would leave a platoon
+     * in a snow suit on a temperate battlefield, or in nothing on a freezing one. This strips the kits this class
+     * issues and issues the right ones for the new conditions, covering both enemy/allied bot forces and
+     * player-controlled allies. Kits that did not come from this class (for example a marine suit from a fixed MUL)
+     * are left alone, as are all other unit types. Platoons generated at deployment time are not touched here: they
+     * are dressed for whatever conditions are current when they are created.</p>
+     *
+     * @param scenario        the scenario whose weather was re-rolled
+     * @param campaignOptions the campaign options, to check whether weather and planetary modifiers are in use
+     */
+    public static void redressInfantryForWeather(AtBScenario scenario, CampaignOptions campaignOptions) {
+        List<Entity> entities = new ArrayList<>(scenario.getAlliesPlayer());
+        for (BotForce botForce : scenario.getBotForces()) {
+            entities.addAll(botForce.getFixedEntityList());
+        }
+
+        boolean usePlanetaryModifiers = campaignOptions.get(CampaignOption.USE_PLANETARY_MODIFIERS);
+        for (Entity entity : entities) {
+            if (!(entity instanceof ConvInfantry infantry) || !isIssuedEnvironmentalKit(infantry.getArmorKit())) {
+                continue;
+            }
+
+            infantry.setArmorKit(null);
+            infantry.setArmorEncumbering(false);
+            infantry.setSpaceSuit(false);
+
+            if (usePlanetaryModifiers) {
+                updateArmorKits(scenario, infantry, campaignOptions);
+            } else {
+                changeInfantryKit(infantry, false, false, getBattleTemperature(scenario, campaignOptions));
+            }
+        }
+    }
+
+    /**
+     * @param kit the armor kit a platoon is wearing, or null
+     *
+     * @return true if the kit is one {@link #changeInfantryKit} can issue (snow suit, heat suit, or a light or
+     *       hostile environment suit)
+     */
+    private static boolean isIssuedEnvironmentalKit(@Nullable EquipmentType kit) {
+        if (kit == null) {
+            return false;
+        }
+        String name = kit.getInternalName();
+        return name.equals(MiscType.createSnowSuitInfArmor().getInternalName()) ||
+                     name.equals(MiscType.createISHeatSuitInfArmor().getInternalName()) ||
+                     name.equals(MiscType.createISEnvironmentSuitLightInfArmor().getInternalName()) ||
+                     name.equals(MiscType.createISEnvironmentSuitHostileInfArmor().getInternalName());
     }
 
     /**
@@ -665,7 +732,7 @@ public class AtBDynamicScenarioFactory {
 
                 // We only want the difficulty multipliers applying to enemy forces
                 double difficultyMultiplier = getOpForDifficultyMultiplier(scenario, campaign);
-                effectiveBV = (int) round(effectiveBV * difficultyMultiplier);
+                effectiveBV = applyOpposingBVMultiplier(scenario, (int) round(effectiveBV * difficultyMultiplier));
                 effectiveUnitCount = (int) round(effectiveUnitCount * difficultyMultiplier);
 
                 if (forceTemplate.getGenerationMethod() == ForceGenerationMethod.BVScaled.ordinal()) {
@@ -1338,7 +1405,8 @@ public class AtBDynamicScenarioFactory {
                 int playerUnitValue = calculateEffectiveUnitCount(scenario, campaign, true);
 
                 double difficultyMultiplier = getOpForDifficultyMultiplier(scenario, campaign);
-                forceBVBudget = (int) (playerBattleValue * forceMultiplier * difficultyMultiplier);
+                forceBVBudget = applyOpposingBVMultiplier(scenario,
+                      (int) (playerBattleValue * forceMultiplier * difficultyMultiplier));
 
                 LOGGER.info("Base bidding budget is {} BV2. This is seed force multiplied by scenario force " +
                                   "multiplier", forceBVBudget);
@@ -2039,12 +2107,14 @@ public class AtBDynamicScenarioFactory {
         // We want a minimum value here, to avoid situations where we spawn scenarios with only a
         // single turn requirement.
         // This effectively treats any player-aligned forces less than 6 as 6.
-        primaryUnitCount = max(DEFAULT_TIME_LIMIT, 6);
+        primaryUnitCount = max(primaryUnitCount, DEFAULT_TIME_LIMIT);
 
         for (ScenarioObjective objective : scenario.getScenarioObjectives()) {
-            // We set a default time to protect against instances where setting time limit fails
-            // for some reason.
-            objective.setTimeLimit(DEFAULT_TIME_LIMIT);
+            // Only fill in a default when the objective has no time limit at all. Fixed time limits come from the
+            // template and must be kept as authored.
+            if (objective.getTimeLimit() == null) {
+                objective.setTimeLimit(DEFAULT_TIME_LIMIT);
+            }
 
             if (objective.getTimeLimitType() == TimeLimitType.ScaledToPrimaryUnitCount) {
                 Integer scaleFactor = objective.getTimeLimitScaleFactor();
@@ -2563,22 +2633,56 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
+     * Last line of defense that makes sure a conventional infantry platoon is dressed for the battlefield it is about
+     * to be deployed onto.
+     *
+     * <p>Platoons are dressed when they are generated, but that kit does not reliably survive until the battle
+     * starts. A scenario's bot forces are saved as MUL data, which records only the kit's effects (such as the
+     * encumbering flag) and not the kit itself. Reloading the campaign therefore leaves an enemy platoon that was
+     * issued a snow suit with no kit at all, and MegaMek kills such a platoon the moment it deploys into extreme
+     * temperatures. Rather than trust that every earlier step dressed the platoon and kept it dressed, this is run
+     * against the conditions MegaMek will actually apply, immediately before the unit is sent to the game.</p>
+     *
+     * <p>Platoons that already wear a kit are left alone, as are all other unit types.</p>
+     *
+     * @param entity     the unit about to be deployed
+     * @param conditions the planetary conditions the game will use
+     */
+    public static void ensureInfantryProtection(Entity entity, PlanetaryConditions conditions) {
+        if (!(entity instanceof ConvInfantry platoon) || (platoon.getArmorKit() != null)) {
+            return;
+        }
+
+        boolean isLowPressure = conditions.getAtmosphere().isLighterThan(THIN);
+        boolean isPoisonous = !conditions.getAtmosphericTaint().isBreathable();
+        changeInfantryKit(platoon, isLowPressure, isPoisonous, conditions.getTemperature());
+    }
+
+    /**
      * Swaps out infantry armor kit based on provided conditions. Alternate armor kits are snow/heat suits (temperature
      * only), light environment suits (low pressure only), and hostile environment suit (tainted or multiple
      * conditions).
+     * <p>
+     * Platoons dressed for tainted air are also made XCT Troops. MegaMek only lets conventional infantry operate in a
+     * tainted or toxic atmosphere when they are XCT <i>and</i> wear a suitable kit (TO:AR p.54), so a suit on its own
+     * leaves the platoon doomed the moment it deploys.
+     * <p>
+     * Package-private so the regression tests can check the result against MegaMek's own deployment rules.
+     * </p>
      *
      * @param platoon       Conventional infantry platoon to configure
      * @param isLowPressure true if atmosphere is too thin to breathe
      * @param isTainted     true if atmosphere has contaminants
      * @param temperature   Scenario temperature, in degrees C
      */
-    private static void changeInfantryKit(ConvInfantry platoon, boolean isLowPressure, boolean isTainted,
+    static void changeInfantryKit(ConvInfantry platoon, boolean isLowPressure, boolean isTainted,
           int temperature) {
         boolean isHot = temperature > 50;
         boolean isCold = temperature < -30;
 
         if (isTainted) {
             platoon.setArmorKit(MiscType.createISEnvironmentSuitHostileInfArmor());
+            platoon.setSpecializations(platoon.getSpecializations() | ConvInfantry.XCT);
         } else if (!isLowPressure) {
 
             // Normal pressure, with extreme temperature
@@ -3748,6 +3852,23 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
+     * Applies the scenario's BV budget multiplier, set by scenario modifiers such as an enemy Space Port, to a budget
+     * for opposing forces.
+     *
+     * @param scenario the scenario being generated
+     * @param bvBudget the opposing force's budget before the multiplier
+     *
+     * @return the budget scaled by the multiplier, or unchanged when no modifier has set one
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int applyOpposingBVMultiplier(AtBDynamicScenario scenario, int bvBudget) {
+        double bvMultiplier = scenario.getEffectivePlayerBVMultiplier();
+        return (bvMultiplier > 0) ? (int) round(bvBudget * bvMultiplier) : bvBudget;
+    }
+
+    /**
      * Calculates from scratch the current effective player BV present in the given scenario, optionally including the
      * BV of already-generated allied bot forces.
      *
@@ -3793,10 +3914,8 @@ public class AtBDynamicScenarioFactory {
             LOGGER.info("Total Seed Force {}: {}", generationMethod, bvBudget);
         }
 
-        double bvMultiplier = scenario.getEffectivePlayerBVMultiplier();
-        if (bvMultiplier > 0) {
-            bvBudget = (int) round(bvBudget * scenario.getEffectivePlayerBVMultiplier());
-        }
+        // The scenario's BV budget multiplier is applied to opposing forces only (see applyOpposingBVMultiplier), so
+        // a modifier that strengthens the enemy does not strengthen allied forces scaled from the same budget.
 
         if (!includeAlliedBotForces) {
             LOGGER.info("Total Base {} Budget (player only): {}", generationMethod, bvBudget);
@@ -4278,13 +4397,6 @@ public class AtBDynamicScenarioFactory {
     }
 
     /**
-     * Calculates the difficulty multiplier based on campaign options.
-     *
-     * @param campaign the campaign for which to calculate the difficulty multiplier
-     *
-     * @return the difficulty multiplier
-     */
-    /**
      * Returns the difficulty multiplier to apply to OpFor BV budgets in the given scenario.
      *
      * <p>Convoy interception scenarios spawned by the Resupply system are always sized at twice the convoy's BV, so
@@ -4303,6 +4415,13 @@ public class AtBDynamicScenarioFactory {
         return getDifficultyMultiplier(campaign);
     }
 
+    /**
+     * Calculates the difficulty multiplier based on campaign options.
+     *
+     * @param campaign the campaign for which to calculate the difficulty multiplier
+     *
+     * @return the difficulty multiplier
+     */
     private static double getDifficultyMultiplier(Campaign campaign) {
         return switch (campaign.getCampaignOptions().get(CampaignOption.SKILL_LEVEL)) {
             case NONE, ULTRA_GREEN -> 0.5;

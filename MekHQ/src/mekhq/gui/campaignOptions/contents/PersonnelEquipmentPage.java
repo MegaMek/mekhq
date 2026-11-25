@@ -170,7 +170,7 @@ class PersonnelEquipmentPage {
     /** The General section: options that apply to every equipment kind (armor and tool kits alike). */
     private @Nonnull JPanel createGeneralPanel() {
         chkAddDefaultKitToProcurement = new CampaignOptionsCheckBox("AddDefaultKitToProcurement",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkAddDefaultKitToProcurement.addMouseListener(createTipPanelUpdater("AddDefaultKitToProcurement"));
 
         final SettingsFormPanel panel = new SettingsFormPanel("EquipmentGeneralPanel",
@@ -182,28 +182,30 @@ class PersonnelEquipmentPage {
     }
 
     private @Nonnull JPanel createArmorKitsPanel() {
-        lblMekWarriorDefaultKit = new CampaignOptionsLabel("MekWarriorDefaultKit", getMetadata(new Version(0, 51, 1)));
+        lblMekWarriorDefaultKit = new CampaignOptionsLabel("MekWarriorDefaultKit",
+              getMetadata(new Version("0.51.01.1")));
         lblMekWarriorDefaultKit.addMouseListener(createTipPanelUpdater("MekWarriorDefaultKit"));
         cboMekWarriorDefaultKit.addMouseListener(createTipPanelUpdater("MekWarriorDefaultKit"));
 
         lblVehicleCrewDefaultKit = new CampaignOptionsLabel("VehicleCrewDefaultKit",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         lblVehicleCrewDefaultKit.addMouseListener(createTipPanelUpdater("VehicleCrewDefaultKit"));
         cboVehicleCrewDefaultKit.addMouseListener(createTipPanelUpdater("VehicleCrewDefaultKit"));
 
-        lblAircraftDefaultKit = new CampaignOptionsLabel("AircraftDefaultKit", getMetadata(new Version(0, 51, 1)));
+        lblAircraftDefaultKit = new CampaignOptionsLabel("AircraftDefaultKit", getMetadata(new Version("0.51.01.1")));
         lblAircraftDefaultKit.addMouseListener(createTipPanelUpdater("AircraftDefaultKit"));
         cboAircraftDefaultKit.addMouseListener(createTipPanelUpdater("AircraftDefaultKit"));
 
-        chkNpcFactionArmorKits = new CampaignOptionsCheckBox("NpcFactionArmorKits", getMetadata(new Version(0, 51, 1)));
+        chkNpcFactionArmorKits = new CampaignOptionsCheckBox("NpcFactionArmorKits",
+              getMetadata(new Version("0.51.01.1")));
         chkNpcFactionArmorKits.addMouseListener(createTipPanelUpdater("NpcFactionArmorKits"));
 
         chkRequireMekWarriorKitToDeploy = new CampaignOptionsCheckBox("RequireMekWarriorKitToDeploy",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkRequireMekWarriorKitToDeploy.addMouseListener(createTipPanelUpdater("RequireMekWarriorKitToDeploy"));
 
         chkRequireAerospaceKitToDeploy = new CampaignOptionsCheckBox("RequireAerospaceKitToDeploy",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         chkRequireAerospaceKitToDeploy.addMouseListener(createTipPanelUpdater("RequireAerospaceKitToDeploy"));
 
         final SettingsFormPanel panel = new SettingsFormPanel("ArmorKitsPanel",
@@ -221,46 +223,49 @@ class PersonnelEquipmentPage {
 
     private @Nonnull JPanel createToolKitsPanel() {
         lblMekTechDefaultToolKit = new CampaignOptionsLabel("MekTechDefaultToolKit",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         lblMekTechDefaultToolKit.addMouseListener(createTipPanelUpdater("MekTechDefaultToolKit"));
         cboMekTechDefaultToolKit.addMouseListener(createTipPanelUpdater("MekTechDefaultToolKit"));
 
         lblMechanicDefaultToolKit = new CampaignOptionsLabel("MechanicDefaultToolKit",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         lblMechanicDefaultToolKit.addMouseListener(createTipPanelUpdater("MechanicDefaultToolKit"));
         cboMechanicDefaultToolKit.addMouseListener(createTipPanelUpdater("MechanicDefaultToolKit"));
 
         lblAeroTechDefaultToolKit = new CampaignOptionsLabel("AeroTechDefaultToolKit",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         lblAeroTechDefaultToolKit.addMouseListener(createTipPanelUpdater("AeroTechDefaultToolKit"));
         cboAeroTechDefaultToolKit.addMouseListener(createTipPanelUpdater("AeroTechDefaultToolKit"));
 
-        lblBATechDefaultToolKit = new CampaignOptionsLabel("BATechDefaultToolKit", getMetadata(new Version(0, 51, 1)));
+        lblBATechDefaultToolKit = new CampaignOptionsLabel("BATechDefaultToolKit",
+              getMetadata(new Version("0.51.01.1")));
         lblBATechDefaultToolKit.addMouseListener(createTipPanelUpdater("BATechDefaultToolKit"));
         cboBATechDefaultToolKit.addMouseListener(createTipPanelUpdater("BATechDefaultToolKit"));
 
-        lblVesselCrewDefaultToolKit = new CampaignOptionsLabel("VesselCrewDefaultToolKit", getMetadata(new Version(0,
-              51, 1)));
+        lblVesselCrewDefaultToolKit = new CampaignOptionsLabel("VesselCrewDefaultToolKit",
+              getMetadata(new Version("0.51.01.1")));
         lblVesselCrewDefaultToolKit.addMouseListener(createTipPanelUpdater("VesselCrewDefaultToolKit"));
         cboVesselCrewDefaultToolKit.addMouseListener(createTipPanelUpdater("VesselCrewDefaultToolKit"));
 
-        lblAstechDefaultToolKit = new CampaignOptionsLabel("AstechDefaultToolKit", getMetadata(new Version(0, 51, 1)));
+        lblAstechDefaultToolKit = new CampaignOptionsLabel("AstechDefaultToolKit",
+              getMetadata(new Version("0.51.01.1")));
         lblAstechDefaultToolKit.addMouseListener(createTipPanelUpdater("AstechDefaultToolKit"));
         cboAstechDefaultToolKit.addMouseListener(createTipPanelUpdater("AstechDefaultToolKit"));
 
-        lblDoctorDefaultToolKit = new CampaignOptionsLabel("DoctorDefaultToolKit", getMetadata(new Version(0, 51, 1)));
+        lblDoctorDefaultToolKit = new CampaignOptionsLabel("DoctorDefaultToolKit",
+              getMetadata(new Version("0.51.01.1")));
         lblDoctorDefaultToolKit.addMouseListener(createTipPanelUpdater("DoctorDefaultToolKit"));
         cboDoctorDefaultToolKit.addMouseListener(createTipPanelUpdater("DoctorDefaultToolKit"));
 
-        lblMedicDefaultToolKit = new CampaignOptionsLabel("MedicDefaultToolKit", getMetadata(new Version(0, 51, 1)));
+        lblMedicDefaultToolKit = new CampaignOptionsLabel("MedicDefaultToolKit", getMetadata(new Version("0.51.01.1")));
         lblMedicDefaultToolKit.addMouseListener(createTipPanelUpdater("MedicDefaultToolKit"));
         cboMedicDefaultToolKit.addMouseListener(createTipPanelUpdater("MedicDefaultToolKit"));
 
-        lblAdminDefaultToolKit = new CampaignOptionsLabel("AdminDefaultToolKit", getMetadata(new Version(0, 51, 1)));
+        lblAdminDefaultToolKit = new CampaignOptionsLabel("AdminDefaultToolKit", getMetadata(new Version("0.51.01.1")));
         lblAdminDefaultToolKit.addMouseListener(createTipPanelUpdater("AdminDefaultToolKit"));
         cboAdminDefaultToolKit.addMouseListener(createTipPanelUpdater("AdminDefaultToolKit"));
 
-        chkTechsNeedToolKit = new CampaignOptionsCheckBox("TechsNeedToolKit", getMetadata(new Version(0, 51, 1)));
+        chkTechsNeedToolKit = new CampaignOptionsCheckBox("TechsNeedToolKit", getMetadata(new Version("0.51.01.1")));
         chkTechsNeedToolKit.addMouseListener(createTipPanelUpdater("TechsNeedToolKit"));
 
         final SettingsFormPanel panel = new SettingsFormPanel("ToolKitsPanel",

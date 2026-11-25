@@ -62,6 +62,8 @@ final class QuoteTally {
     private int xp;
     private int minXp = Integer.MAX_VALUE;
     private int maxXp = Integer.MIN_VALUE;
+    private int shortMinXp = Integer.MAX_VALUE;
+    private int shortMaxXp = Integer.MIN_VALUE;
     private Money fees = Money.zero();
     private final List<TrainingPurchase> purchases = new ArrayList<>();
     private final List<Person> readyPeople = new ArrayList<>();
@@ -96,8 +98,34 @@ final class QuoteTally {
             purchases.add(purchase);
             readyPeople.add(purchase.person());
         } else {
+            // A refusal for XP still carries the price, so the player can see how much XP they need
+            if ((quote.refusal() == TrainingRefusal.NOT_ENOUGH_XP) && (quote.xp() > 0)) {
+                shortMinXp = Math.min(shortMinXp, quote.xp());
+                shortMaxXp = Math.max(shortMaxXp, quote.xp());
+            }
             addCannot(quote.refusal(), purchase.person());
         }
+    }
+
+    /**
+     * @return {@code true} if anyone was priced short on XP
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean hasShortPrice() {
+        return shortMinXp <= shortMaxXp;
+    }
+
+    /**
+     * @return {@code true} if {@link #costText(String, String)} has something to show: someone can make the
+     *       purchase, or someone is short on XP for it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    boolean hasCostText() {
+        return (ready() > 0) || hasShortPrice();
     }
 
     /** Counts someone who can't, without pricing anything. */
@@ -159,21 +187,28 @@ final class QuoteTally {
      * @param singleKey the line when everyone pays the same, with the XP as {0}
      * @param rangeKey  the line when they don't, with the lowest and highest as {0} and {1}
      *
-     * @return what each person pays, or empty if no one can
+     * @return what each person pays; when no one can, what those short on XP would pay; empty if neither
      */
     String costText(String singleKey, String rangeKey) {
-        if (ready() == 0) {
-            return "";
+        if (ready() > 0) {
+            return priceText(singleKey, rangeKey, minXp, maxXp);
         }
-        return (minXp == maxXp) ? getFormattedTextAt(RESOURCE_BUNDLE, singleKey, minXp) :
-                     getFormattedTextAt(RESOURCE_BUNDLE, rangeKey, minXp, maxXp);
+        if (hasShortPrice()) {
+            return priceText(singleKey, rangeKey, shortMinXp, shortMaxXp);
+        }
+        return "";
+    }
+
+    private static String priceText(String singleKey, String rangeKey, int lowestXp, int highestXp) {
+        return (lowestXp == highestXp) ? getFormattedTextAt(RESOURCE_BUNDLE, singleKey, lowestXp) :
+                     getFormattedTextAt(RESOURCE_BUNDLE, rangeKey, lowestXp, highestXp);
     }
 
     /**
      * @param isAffordable whether the campaign can pay everyone's fees
      *
-     * @return why the card's button can't be used, shown under it: the fees, or the most common reason no one can;
-     *       {@code null} if it can be used
+     * @return why the card's button can't be used, shown under it: the fees, or the most common reason no one can,
+     *       with the XP needed when that reason is a lack of XP; {@code null} if it can be used
      */
     @Nullable String unavailableReason(boolean isAffordable) {
         if (!isAffordable) {
@@ -188,6 +223,15 @@ final class QuoteTally {
                 top = entry;
             }
         }
-        return (top == null) ? null : ConsoleWidgets.reason(top.getValue().size(), top.getKey());
+        if (top == null) {
+            return null;
+        }
+        if ((top.getKey() == TrainingRefusal.NOT_ENOUGH_XP) && hasShortPrice()) {
+            String needed = (shortMinXp == shortMaxXp) ? String.valueOf(shortMinXp) :
+                                  getFormattedTextAt(RESOURCE_BUNDLE, "xp.range", shortMinXp, shortMaxXp);
+            return getFormattedTextAt(RESOURCE_BUNDLE, "reason.count.needsXp", top.getValue().size(),
+                  top.getKey().getLabel(), needed);
+        }
+        return ConsoleWidgets.reason(top.getValue().size(), top.getKey());
     }
 }

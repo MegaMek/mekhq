@@ -285,7 +285,8 @@ class StratConEscalationTest {
 
     @Test
     void moraleRisesOneLevelAndNoFurtherThanOverwhelming() {
-        assertEquals(ContractMoraleLevel.CRITICAL, StratConEscalation.getRaisedMoraleLevel(ContractMoraleLevel.ROUTED));
+        assertEquals(ContractMoraleLevel.CRITICAL,
+              StratConEscalation.getRaisedMoraleLevel(ContractMoraleLevel.SCATTERED));
         assertEquals(ContractMoraleLevel.ADVANCING,
               StratConEscalation.getRaisedMoraleLevel(ContractMoraleLevel.STALEMATE));
         assertEquals(ContractMoraleLevel.OVERWHELMING,
@@ -415,10 +416,11 @@ class StratConEscalationTest {
     }
 
     @Test
-    void moraleFallsOneLevelAndNoFurtherThanRouted() {
+    void moraleFallsOneLevelAndNoFurtherThanScattered() {
         assertEquals(ContractMoraleLevel.WEAKENED,
               StratConEscalation.getLoweredMoraleLevel(ContractMoraleLevel.STALEMATE));
-        assertEquals(ContractMoraleLevel.ROUTED, StratConEscalation.getLoweredMoraleLevel(ContractMoraleLevel.ROUTED));
+        assertEquals(ContractMoraleLevel.SCATTERED,
+              StratConEscalation.getLoweredMoraleLevel(ContractMoraleLevel.SCATTERED));
     }
 
     // The Diversionary Raid objective

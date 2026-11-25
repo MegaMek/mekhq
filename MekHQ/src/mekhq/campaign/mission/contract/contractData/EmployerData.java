@@ -121,4 +121,18 @@ public record EmployerData(ChaosEmployerType type,
     public @Nullable Faction getSponsorFaction() {
         return sponsorFactionCode == null ? null : Factions.getInstance().getFaction(sponsorFactionCode);
     }
+
+    /**
+     * The code of the faction whose Faction Standing this employer side answers to: the covert sponsor when there is
+     * one (including the real backer of a false flag operation, whose visible {@link #factionCode()} is only a front),
+     * otherwise the employer itself.
+     *
+     * @return the sponsor's faction code when one exists, otherwise the employer's faction code
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public String standingFactionCode() {
+        return (sponsorFactionCode != null) ? sponsorFactionCode : factionCode;
+    }
 }

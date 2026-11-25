@@ -88,7 +88,7 @@ public final class TrainingContext {
         this.campaign = campaign;
         options = campaign.getCampaignOptions();
         today = campaign.getLocalDate();
-        isUseReasoning = options.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
+        isUseReasoning = options.isUseTalentXpCostMultiplier();
         xpCostMultiplier = options.get(CampaignOption.XP_COST_MULTIPLIER);
         isAdminsHaveNegotiation = options.get(CampaignOption.ADMINS_HAVE_NEGOTIATION);
         isDoctorsUseAdministration = options.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);

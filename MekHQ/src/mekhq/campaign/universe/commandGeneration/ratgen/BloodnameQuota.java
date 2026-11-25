@@ -51,7 +51,8 @@ import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
  * thousand Bloodnamed warriors in a Clan of some seven thousand (the warrior caste was about 115,000 strong
  * across the Clans in 3062) is the ceiling: fifteen in a hundred if every slot were filled, which they never
  * all are. The Clans post the Bloodnamed to their better formations, so a front-line Cluster carries most of
- * them and a garrison or solahma unit almost none.</p>
+ * them and a garrison or solahma unit almost none. Heroic and Legendary forces go past that ceiling on purpose:
+ * they are the few formations the Clan's Bloodnamed are concentrated in, a quarter and a half of their warriors.</p>
  *
  * <p>Rolling for each warrior on their own skills, as MekHQ does when it hires one, cannot produce that: an
  * elite force rolls well for everyone and comes out mostly Bloodnamed. So the force is given a quota, a share
@@ -64,6 +65,12 @@ public final class BloodnameQuota {
     private static final MMLogger LOGGER = MMLogger.create(BloodnameQuota.class);
     private static final String LOG_TAG = "[CompanyGen][Pipeline][Bloodname]";
 
+    /**
+     * A legendary force: the Clan's most storied warriors, gathered in one place, so half of them carry a Bloodname.
+     */
+    static final double SHARE_LEGENDARY = 0.50;
+    /** A heroic force, an exceptional formation that draws far more Bloodnamed than the Clan at large. */
+    static final double SHARE_HEROIC = 0.25;
     /** The share of an elite force's warriors who hold a Bloodname: the Clan-wide ceiling. */
     static final double SHARE_ELITE = 0.15;
     /** A veteran, front-line force. */
@@ -160,6 +167,8 @@ public final class BloodnameQuota {
             return SHARE_REGULAR;
         }
         return switch (experience) {
+            case ForceDescriptor.EXP_LEGENDARY -> SHARE_LEGENDARY;
+            case ForceDescriptor.EXP_HEROIC -> SHARE_HEROIC;
             case ForceDescriptor.EXP_ELITE -> SHARE_ELITE;
             case ForceDescriptor.EXP_VETERAN -> SHARE_VETERAN;
             case ForceDescriptor.EXP_GREEN -> SHARE_GREEN;

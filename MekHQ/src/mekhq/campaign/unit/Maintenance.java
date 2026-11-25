@@ -57,8 +57,10 @@ import megamek.common.options.OptionsConstants;
 import megamek.common.rolls.TargetRoll;
 import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
+import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
@@ -164,13 +166,11 @@ public class Maintenance {
 
                 if (maintained) {
                     tech.setMinutesLeft(availableMinutes - minutesUsed);
-                    asTechsUsed = campaign.getPlayerForce().getHumanResources().getAvailableAsTechs(minutesUsed,
-                          false,
-                          campaign.isOvertimeAllowed(),
+                    ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+                    asTechsUsed = getAsTechsForMaintenance(humanResources, minutesUsed, campaign.isOvertimeAllowed(),
                           campaign.getCampaignOptions());
-                    int minutes = campaign.getPlayerForce().getHumanResources().getAsTechPoolMinutes() -
-                                        (asTechsUsed * minutesUsed);
-                    campaign.getPlayerForce().getHumanResources().setAsTechPoolMinutes(minutes);
+                    int minutes = humanResources.getAsTechPoolMinutes() - (asTechsUsed * minutesUsed);
+                    humanResources.setAsTechPoolMinutes(minutes);
                 }
                 if (!maintained) {
                     // A tech who could not do the work does not make the check: the unit is checked as unmaintained
@@ -303,11 +303,12 @@ public class Maintenance {
 
     /**
      * Checks whether the campaign is on a contract that runs maintenance at the full, weekly pace. Only active
-     * contracts other than Garrison Duty and Retainer count; otherwise maintenance progresses at x0.25 speed.
+     * contracts that are not garrison-type (see {@link ContractObjectiveType#isGarrisonType()}) count; otherwise
+     * maintenance progresses at x0.25 speed.
      *
      * @param campaign the campaign to check
      *
-     * @return {@code true} if any active contract is neither Garrison Duty nor a Retainer
+     * @return {@code true} if any active contract is not garrison-type
      *
      * @author Illiani
      * @since 0.51.01
@@ -315,7 +316,7 @@ public class Maintenance {
     public static boolean isOnCombatContract(Campaign campaign) {
         for (AbstractContract contract : campaign.getActiveContracts()) {
             ContractObjectiveType objectiveType = contract.getObjectiveType();
-            if (!objectiveType.isGarrisonDuty() && !objectiveType.isRetainer()) {
+            if (!objectiveType.isGarrisonType()) {
                 return true;
             }
         }
@@ -409,7 +410,7 @@ public class Maintenance {
      *
      * @param campaignOptions    the campaign options
      * @param unit               the unit being maintained
-     * @param isOnCombatContract whether a contract other than Garrison Duty or a Retainer is active
+     * @param isOnCombatContract whether a contract that is not garrison-type is active
      * @param isUnitInTransit    whether the unit is travelling
      *
      * @return the combined situational cost multiplier
@@ -443,7 +444,7 @@ public class Maintenance {
      * @param campaign           the campaign providing options
      * @param unit               the unit to project
      * @param isOnContract       whether a contract will be active
-     * @param isOnCombatContract whether that contract is neither Garrison Duty nor a Retainer
+     * @param isOnCombatContract whether that contract is not garrison-type
      * @param isTravelling       whether the force will be travelling; a unit with no location never travels
      *
      * @return the average daily maintenance cost, or zero if the unit will not be charged maintenance
@@ -686,6 +687,28 @@ public class Maintenance {
         }
 
         return partReport;
+    }
+
+    /**
+     * Works out how many AsTechs help a tech with a maintenance job.
+     *
+     * <p>A job that takes no time draws nothing from the AsTech pool, so a full team helps as long as the campaign has
+     * that many AsTechs. Every other job takes its helpers from the pool's remaining minutes as normal.</p>
+     *
+     * @param humanResources    the force's personnel, which holds the AsTech pool
+     * @param minutesUsed       the minutes the maintenance job takes
+     * @param isOvertimeAllowed whether the campaign allows overtime
+     * @param campaignOptions   the campaign options
+     *
+     * @return how many AsTechs help with the job, at most {@link MHQConstants#AS_TECH_TEAM_SIZE}
+     */
+    static int getAsTechsForMaintenance(ForceHumanResources humanResources, int minutesUsed,
+          boolean isOvertimeAllowed, CampaignOptions campaignOptions) {
+        if (minutesUsed <= 0) {
+            return Math.min(MHQConstants.AS_TECH_TEAM_SIZE, humanResources.getNumberAsTechs(campaignOptions));
+        }
+
+        return humanResources.getAvailableAsTechs(minutesUsed, false, isOvertimeAllowed, campaignOptions);
     }
 
     public static TargetRoll getTargetForMaintenance(Campaign campaign, IPartWork partWork, Person tech,

@@ -648,7 +648,7 @@ public class Skill {
      * SPA for one skill gets +1 to that skill and -1 to every other skill in this map (see
      * {@link #getSPAModifiers(PersonnelOptions, int, int)}).
      */
-    private static final Map<String, String> TECH_SPECIALIST_SPA_BY_SKILL = Map.of(
+    static final Map<String, String> TECH_SPECIALIST_SPA_BY_SKILL = Map.of(
           S_TECH_ELECTRONIC, TECH_SPECIALIST_ELECTRONIC,
           S_TECH_NUCLEAR, TECH_SPECIALIST_NUCLEAR,
           S_TECH_AERONAUTICS, TECH_SPECIALIST_AERONAUTICS,

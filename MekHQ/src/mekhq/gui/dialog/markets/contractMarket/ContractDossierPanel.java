@@ -51,11 +51,13 @@ import javax.swing.text.DefaultCaret;
 import jakarta.annotation.Nullable;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.digitalGM.stratCon.StratConCombatBonusProjection;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
 import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationScale;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.Planet;
@@ -63,8 +65,9 @@ import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudConfirmButton;
+import mekhq.gui.baseComponents.hud.HudWrapPanel;
+import mekhq.gui.baseComponents.hud.HudWrappingTextLabel;
 import mekhq.gui.utilities.MarkdownRenderer;
-import mekhq.gui.utilities.WrapLayout;
 import mekhq.gui.view.PlanetViewPanel;
 import org.apache.commons.lang3.StringUtils;
 
@@ -84,6 +87,10 @@ public class ContractDossierPanel extends JPanel {
     private static final String RESOURCE_BUNDLE = ChaosContractMarketDialog.RESOURCE_BUNDLE;
 
     private static final int PORTRAIT_SIZE = 48;
+    /** The narrowest the terms, intel and money columns may be; terms and money also widen to fit their rows. */
+    private static final int OVERVIEW_COLUMN_WIDTH = 260;
+    /** The narrowest the briefing (portrait and pitch) may be before the route preview moves beneath it. */
+    private static final int BRIEFING_MINIMUM_WIDTH = 380;
     private static final int COPIED_CONFIRMATION_MILLIS = 1800;
 
     private final transient Campaign campaign;
@@ -123,7 +130,7 @@ public class ContractDossierPanel extends JPanel {
               BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(14), scaleForGUI(10), scaleForGUI(14))));
         top.add(buildHeader(actions), BorderLayout.CENTER);
 
-        JPanel page = MarketHud.column();
+        JPanel page = Hud.column();
         page.add(leftAligned(buildOverview()));
         page.add(Box.createVerticalStrut(scaleForGUI(18)));
         page.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "tab.contractMarket.targetPlanet"))));
@@ -131,7 +138,7 @@ public class ContractDossierPanel extends JPanel {
         page.add(leftAligned(buildTargetPlanet()));
 
         add(top, BorderLayout.NORTH);
-        add(MarketHud.scroll(padded(page), SURFACE_DEEP), BorderLayout.CENTER);
+        add(Hud.scroll(padded(page), SURFACE_DEEP), BorderLayout.CENTER);
     }
 
     // region Header
@@ -147,7 +154,7 @@ public class ContractDossierPanel extends JPanel {
 
         JPanel markers = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(6), 0));
         for (MarketBadge badge : ContractMarketFormatting.badges(contract)) {
-            markers.add(MarketHud.badge(badge.text(), badge.color(), badge.toolTip()));
+            markers.add(Hud.badge(badge.text(), badge.color(), badge.toolTip()));
         }
         markers.add(new AssessmentChip());
         constraints.gridy = 0;
@@ -193,16 +200,17 @@ public class ContractDossierPanel extends JPanel {
     }
 
     private JPanel buildIdentity() {
-        JPanel identity = MarketHud.column();
+        JPanel identity = Hud.column();
 
-        JLabel eyebrow = Hud.eyebrow(joined(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.eyebrow"),
-              contract.getEmployerMarketDisplayName()));
+        // Each line wraps when the badges and buttons beside the identity leave it too little room.
+        JLabel eyebrow = HudWrappingTextLabel.copyOf(Hud.eyebrow(joined(
+              getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.eyebrow"), contract.getEmployerMarketDisplayName())));
         eyebrow.setIcon(new MarketHud.SwatchIcon(contract.getEmployerColor().getColour()));
         eyebrow.setIconTextGap(scaleForGUI(6));
         identity.add(leftAligned(eyebrow));
         identity.add(Box.createVerticalStrut(scaleForGUI(3)));
 
-        JLabel title = new JLabel(marketName(contract).toUpperCase(Locale.ROOT));
+        JLabel title = new HudWrappingTextLabel(marketName(contract).toUpperCase(Locale.ROOT));
         title.setForeground(ACCENT_BRIGHT);
         title.setFont(hudFont(Font.BOLD, 1.12f, 0.12f));
         identity.add(leftAligned(title));
@@ -219,7 +227,7 @@ public class ContractDossierPanel extends JPanel {
                          ? getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.status.transit",
                                estimate.transitDays())
                          : getTextAt(RESOURCE_BUNDLE, "value.contractMarket.noRoute"));
-        JLabel statusLabel = new JLabel(joined(status));
+        JLabel statusLabel = new HudWrappingTextLabel(joined(status));
         statusLabel.setForeground(TEXT_MUTED);
         statusLabel.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
         identity.add(leftAligned(statusLabel));
@@ -298,23 +306,38 @@ public class ContractDossierPanel extends JPanel {
 
     /**
      * The briefing first, then terms, intel and money in three columns, so the numbers that decide an offer sit
-     * together.
+     * together. When the dossier is too narrow for three, they wrap: terms and intel over money, then one above
+     * another.
      */
     private JPanel buildOverview() {
-        JPanel columns = Hud.transparentPanel(new GridLayout(1, 3, scaleForGUI(16), 0));
-        columns.add(MarketHud.topAligned(buildTerms()));
-        columns.add(MarketHud.topAligned(buildIntel()));
-        columns.add(MarketHud.topAligned(buildMoney()));
+        JPanel columns = Hud.transparentPanel(new MarketHud.ColumnWrapLayout(scaleForGUI(OVERVIEW_COLUMN_WIDTH),
+              scaleForGUI(16), scaleForGUI(14)));
+        // Terms and money are read whole, so their columns never get narrower than their rows; intel's long names
+        // (an opposition's full title, say) may be cut short, with a tooltip to read them.
+        columns.add(MarketHud.topAlignedWhole(buildTerms()));
+        columns.add(Hud.topAligned(buildIntel()));
+        columns.add(MarketHud.topAlignedWhole(buildMoney()));
 
-        // The route preview sits beside the briefing, in the space the pitch leaves, rather than adding height.
-        JPanel top = Hud.transparentPanel(new BorderLayout(scaleForGUI(18), 0));
+        // The route preview sits beside the briefing, in the space the pitch leaves, rather than adding height - unless
+        // that would squeeze the pitch, when it moves beneath it.
+        JPanel top = Hud.transparentPanel(new MarketHud.SidebarWrapLayout(scaleForGUI(BRIEFING_MINIMUM_WIDTH),
+              scaleForGUI(18), scaleForGUI(12)));
         top.setBorder(BorderFactory.createCompoundBorder(
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
               BorderFactory.createEmptyBorder(0, 0, scaleForGUI(12), 0)));
-        top.add(buildBriefing(), BorderLayout.CENTER);
-        top.add(MarketHud.topAligned(buildRoute()), BorderLayout.EAST);
+        top.add(buildBriefing());
+        top.add(Hud.topAligned(buildRoute()));
 
-        JPanel overview = MarketHud.column();
+        JPanel overview = Hud.column();
+        String warName = warName(contract);
+        if (warName != null) {
+            JLabel war = HudWrappingTextLabel.copyOf(Hud.eyebrow(warLine(contract)));
+            war.setForeground(DANGER);
+            war.setToolTipText(Hud.wrapToolTip(
+                  getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.war.tooltip", warName)));
+            overview.add(leftAligned(war));
+            overview.add(Box.createVerticalStrut(scaleForGUI(8)));
+        }
         overview.add(leftAligned(top));
         overview.add(Box.createVerticalStrut(scaleForGUI(14)));
         overview.add(leftAligned(columns));
@@ -341,7 +364,7 @@ public class ContractDossierPanel extends JPanel {
             heading.add(openMap, BorderLayout.EAST);
         }
 
-        JPanel route = MarketHud.column();
+        JPanel route = Hud.column();
         route.add(leftAligned(heading));
         route.add(Box.createVerticalStrut(scaleForGUI(5)));
         route.add(leftAligned(preview));
@@ -370,7 +393,7 @@ public class ContractDossierPanel extends JPanel {
     }
 
     private JPanel buildTerms() {
-        JPanel terms = MarketHud.section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.terms"));
+        JPanel terms = Hud.section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.terms"));
         addRow(terms, "dossier.contractMarket.terms.command", contract.getCommandRights().toString());
         addRow(terms, "dossier.contractMarket.terms.salvage", salvage(contract));
         addRow(terms, "dossier.contractMarket.terms.support", support(contract));
@@ -381,20 +404,20 @@ public class ContractDossierPanel extends JPanel {
 
         // The contract's random characteristics ride along at the foot of the Terms column.
         if (!contract.getCharacteristics().isEmpty()) {
-            JPanel flow = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(5), scaleForGUI(5)));
+            JPanel flow = new HudWrapPanel(scaleForGUI(5), scaleForGUI(5));
             List<ContractCharacteristic> ordered = new ArrayList<>(contract.getCharacteristics());
             ordered.sort(Comparator.comparing(ContractCharacteristic::getName));
             for (ContractCharacteristic characteristic : ordered) {
-                flow.add(MarketHud.badge(characteristic.getName(), polarityColor(characteristic),
+                flow.add(Hud.badge(characteristic.getName(), polarityColor(characteristic),
                       characteristic.getToolTipText()));
             }
-            MarketHud.addSpanning(terms, flow, 4);
+            Hud.addSpanning(terms, flow, 4);
         }
         return terms;
     }
 
     private JPanel buildIntel() {
-        JPanel intel = MarketHud.section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.intel"));
+        JPanel intel = Hud.section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.intel"));
         addRow(intel, "dossier.contractMarket.intel.alliedCommand",
               intelValue(ObfuscatableIntel.ALLIED_COMMAND, alliedCommand(contract)));
         addRow(intel, "dossier.contractMarket.intel.opposition",
@@ -403,7 +426,9 @@ public class ContractDossierPanel extends JPanel {
         addRow(intel, "dossier.contractMarket.intel.threat", intelValue(ObfuscatableIntel.THREAT, threat(contract)));
         addRow(intel, "dossier.contractMarket.intel.morale",
               intelValue(ObfuscatableIntel.MORALE, contract.getMoraleLevel().toString()));
-        addRow(intel, "dossier.contractMarket.intel.intensity", String.valueOf(contract.getTrackCount()));
+        addRow(intel, "dossier.contractMarket.intel.intensity",
+              ChaosContractDeterminationScale.formatScale(contract.getExactScale(),
+                    campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE)));
 
         // A muted, one-line advisory for a contract with a special nature. The natures are mutually exclusive, so at
         // most one shows. For a false flag it is an understated, ambiguously-worded paper-trail tell that (with the
@@ -418,7 +443,7 @@ public class ContractDossierPanel extends JPanel {
             advisoryKey = "dossier.contractMarket.intel.advisory.provingGround";
         }
         if (advisoryKey != null) {
-            MarketHud.addRow(intel, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.intel.advisory"),
+            Hud.addRow(intel, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.intel.advisory"),
                   getTextAt(RESOURCE_BUNDLE, advisoryKey), TEXT_FAINT, null, false);
         }
         return intel;
@@ -429,7 +454,7 @@ public class ContractDossierPanel extends JPanel {
      * apart from the guaranteed figures, because it has to be won.
      */
     private JPanel buildMoney() {
-        JPanel money = MarketHud.section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.money"));
+        JPanel money = Hud.section(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.section.money"));
 
         Money netPerMonth = estimate.getNetPerMonth();
         JPanel readouts = Hud.transparentPanel(new GridLayout(1, 2, scaleForGUI(6), 0));
@@ -439,19 +464,19 @@ public class ContractDossierPanel extends JPanel {
         readouts.add(total);
         JPanel perMonth = MarketHud.readout(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.metric.netPerMonth"),
               signedCompactMoney(netPerMonth), netPerMonth.isNegative() ? DANGER : READY, GROUND);
-        perMonth.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+        perMonth.setToolTipText(Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
               "dossier.contractMarket.metric.netPerMonth.tooltip")));
         readouts.add(perMonth);
         readouts.setBorder(BorderFactory.createEmptyBorder(0, 0, scaleForGUI(4), 0));
-        MarketHud.addSpanning(money, readouts, 0);
+        Hud.addSpanning(money, readouts, 0);
 
-        MarketHud.addRow(money, getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.money.monthly",
+        Hud.addRow(money, getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.money.monthly",
               contract.getLengthInMonths()), contract.getMonthlyPayOut().toAmountString(), null, null, false);
-        MarketHud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.metric.transport"),
+        Hud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.metric.transport"),
               contract.getTransportPayment().toAmountString(), null, null, false);
 
         String expensesBreakdown = buildExpensesBreakdown(estimate);
-        MarketHud.addRow(money, getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.expenses",
+        Hud.addRow(money, getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.expenses",
                     contract.getLengthInMonths(), Math.max(0, estimate.transitDays())),
               costAmount(estimate.operatingCosts()), DANGER, expensesBreakdown, false);
         // The third segment is every running cost besides payroll, maintenance and food - not the operating costs as a
@@ -466,24 +491,24 @@ public class ContractDossierPanel extends JPanel {
                     amount(estimate.foodAndHousing())),
               List.of(ACCENT, translucent(ACCENT, 150), translucent(ACCENT, 90), TEXT_FAINT));
         costBar.setToolTipText(expensesBreakdown);
-        MarketHud.addSpanning(money, costBar, 3);
+        Hud.addSpanning(money, costBar, 3);
 
         Money straightSupport = estimate.straightSupport();
         if (straightSupport.isPositive()) {
-            MarketHud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.straightSupport"),
+            Hud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.straightSupport"),
                   signedAmount(straightSupport), READY,
-                  MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+                  Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
                         "dossier.contractMarket.profit.straightSupport.tooltip")), false);
         }
 
         Money net = estimate.estimatedNet();
-        MarketHud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.net"),
+        Hud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.net"),
               signedAmount(net), net.isNegative() ? DANGER : READY, null, true);
         addCombatPayRows(money);
 
         JTextArea caveat = MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.caveat"),
               TEXT_FAINT, Font.PLAIN, 0.78f);
-        MarketHud.addSpanning(money, caveat, 6);
+        Hud.addSpanning(money, caveat, 6);
         return money;
     }
 
@@ -534,11 +559,11 @@ public class ContractDossierPanel extends JPanel {
                     : "dossier.contractMarket.profit.combatPay.essential.tooltip",
               bonusCount,
               contract.getContractFinanceData().combatPay().toAmountAndSymbolString());
-        MarketHud.addRow(money, getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.combatPay",
+        Hud.addRow(money, getFormattedTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.combatPay",
               bonusCount), signedAmount(estimate.potentialCombatPay()), READY, combatPayTooltip, false);
 
         Money netWithCombatPay = estimate.getNetWithCombatPay();
-        MarketHud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.netWithCombatPay"),
+        Hud.addRow(money, getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.profit.netWithCombatPay"),
               signedAmount(netWithCombatPay), netWithCombatPay.isNegative() ? DANGER : READY, null, true);
     }
 
@@ -555,10 +580,10 @@ public class ContractDossierPanel extends JPanel {
         JPanel briefing = Hud.transparentPanel(new BorderLayout(scaleForGUI(14), 0));
 
         JPanel portraitHolder = Hud.transparentPanel(new BorderLayout());
-        portraitHolder.add(MarketHud.portrait(negotiator, scaleForGUI(PORTRAIT_SIZE)), BorderLayout.NORTH);
+        portraitHolder.add(Hud.portrait(negotiator, scaleForGUI(PORTRAIT_SIZE)), BorderLayout.NORTH);
         briefing.add(portraitHolder, BorderLayout.WEST);
 
-        JPanel text = MarketHud.column();
+        JPanel text = Hud.column();
         String name = negotiator == null ? contract.getEmployerMarketDisplayName() : negotiator.getFullTitle();
         JPanel nameLine = Hud.transparentPanel(null);
         nameLine.setLayout(new BoxLayout(nameLine, BoxLayout.X_AXIS));
@@ -602,7 +627,7 @@ public class ContractDossierPanel extends JPanel {
             text.add(leftAligned(descriptionPane));
         }
         // Pinned to the top: stretched to the route preview's height, the quote's rule would run on below the text.
-        briefing.add(MarketHud.topAligned(text), BorderLayout.CENTER);
+        briefing.add(Hud.topAligned(text), BorderLayout.CENTER);
         return briefing;
     }
 
@@ -638,7 +663,7 @@ public class ContractDossierPanel extends JPanel {
     // region Helpers
 
     private void addRow(JPanel section, String labelKey, String value) {
-        MarketHud.addRow(section, getTextAt(RESOURCE_BUNDLE, labelKey), value, null, null, false);
+        Hud.addRow(section, getTextAt(RESOURCE_BUNDLE, labelKey), value, null, null, false);
     }
 
     /**

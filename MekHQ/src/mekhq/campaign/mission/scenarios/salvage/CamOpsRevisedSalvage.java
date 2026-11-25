@@ -75,10 +75,33 @@ public class CamOpsRevisedSalvage extends CamOpsStrictSalvage {
             return true;
         }
 
-        return !isInSpace &&
-                     (unit.getEntity() instanceof Mek) &&
-                     unit.isFullyCrewed() &&
-                     (unit.getCargoCapacityForSalvage() > 0.0);
+        return isHandlessMekWithCargo(unit, isInSpace) && unit.isFullyCrewed();
+    }
+
+    /**
+     * {@inheritDoc}
+     *
+     * <p>A 'Mek without two working hands is also equipped to salvage on the ground if it has cargo space.</p>
+     */
+    @Override
+    public boolean isEquippedToSalvage(Unit unit, boolean isInSpace) {
+        return super.isEquippedToSalvage(unit, isInSpace) || isHandlessMekWithCargo(unit, isInSpace);
+    }
+
+    /**
+     * Checks for the Revised exception: a 'Mek on the ground with cargo space, which can salvage using that cargo space
+     * even without two working hands.
+     *
+     * @param unit      the unit to check
+     * @param isInSpace {@code true} if the salvage operation takes place in space
+     *
+     * @return {@code true} if the unit is a 'Mek on the ground with cargo space
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean isHandlessMekWithCargo(Unit unit, boolean isInSpace) {
+        return !isInSpace && (unit.getEntity() instanceof Mek) && (unit.getCargoCapacityForSalvage() > 0.0);
     }
 
     /**

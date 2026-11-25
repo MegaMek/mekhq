@@ -88,8 +88,11 @@ public class ForceGeneratorTab {
     private Supplier<ForceNamingMethod> namingMethodSupplier;
     private BooleanSupplier numberRegimentsSupplier;
 
-    private static final int PREFERRED_ECHELON_INNER_SPHERE = 4;
-    private static final int PREFERRED_ECHELON_CLAN = 5;
+    /** A Lance, a Star or a Level II: every ruleset numbers these echelon 3. */
+    private static final int PREFERRED_ECHELON = 3;
+
+    /** The lift the campaign's hangar already holds, measured on first use; see {@link #liftAlreadyInHangar()}. */
+    private @Nullable ExistingLift hangarLift;
 
     private Consumer<FactionRecord> factionChangeListener;
     private final List<Consumer<ForceDescriptor>> forceGeneratedListeners = new ArrayList<>();
@@ -126,38 +129,68 @@ public class ForceGeneratorTab {
         optionsView.setOnFactionChanged(this::factionChanged);
         optionsView.setExportMULButtonVisible(false);
         // The role filters restrict every draw in the tree to units that can fill the ticked role, which
-        // suits picking a lance of artillery carriers and not designing a command; the formation mix is
-        // the tool for shaping a command.
+        // suits picking a lance of artillery carriers and not designing a command.
         optionsView.setMissionRoleFiltersVisible(false);
+        // A command is meant to read as a varied force, not a roll of the same top-weighted units: repeats within a
+        // lance, and across the command's rolls, are made less likely. MegaMek's own generator leaves this off.
+        optionsView.setUnitVarietyBias(true);
         optionsView.setYearFieldEditable(false);
         if (campaign != null) {
             // Before setCurrentYear, which populates the pickers: the preference decides what they open on.
             applyPreferredEchelon(campaign.getPlayerForce().isClanForce());
             optionsView.setCurrentYear(campaign.getGameYear());
-            // Seed the faction from the campaign so the designer opens aligned to the campaign's faction
-            // rather than the view's built-in "IS" default. Must run after setCurrentYear, which would
-            // otherwise reset the selection.
-            Faction campaignFaction = campaign.getPlayerForce().getFaction();
-            if (campaignFaction != null) {
-                String code = campaignFaction.getShortName();
-                boolean seeded = optionsView.setSelectedFaction(code);
-                LOGGER.info("[CompanyGen][ForceGenTab][Faction] seed faction picker with campaign faction '{}': {}",
-                      code, seeded ? "applied" : "skipped (no matching FactionRecord in RATGenerator)");
-            }
+            // The command is always generated for the campaign's own faction; the designer offers no faction or
+            // command picker. Must run after setCurrentYear, which would otherwise reset the selection.
+            lockToCampaignFaction(optionsView);
         }
+    }
+
+    /**
+     * Points the force generator at the campaign's faction. A campaign faction the RAT Generator has no record of is
+     * tried through its parents, so {@code CS.X} falls back to {@code CS}, rather than leaving the generator on its
+     * built-in default.
+     *
+     * @param optionsView the force generator's settings
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void lockToCampaignFaction(ForceGeneratorOptionsView optionsView) {
+        Faction campaignFaction = campaign.getPlayerForce().getFaction();
+        if (campaignFaction == null) {
+            LOGGER.warn("[CompanyGen][ForceGenTab][Faction] campaign has no faction; the generator keeps its default");
+            return;
+        }
+        String candidate = campaignFaction.getShortName();
+        while ((candidate != null) && !candidate.isBlank()) {
+            if (optionsView.setSelectedFaction(candidate)) {
+                LOGGER.info("[CompanyGen][ForceGenTab][Faction] generating for campaign faction '{}' as '{}'",
+                      campaignFaction.getShortName(), candidate);
+                return;
+            }
+            int lastSeparator = candidate.lastIndexOf('.');
+            candidate = (lastSeparator < 0) ? null : candidate.substring(0, lastSeparator);
+        }
+        LOGGER.warn("[CompanyGen][ForceGenTab][Faction] campaign faction '{}' has no RAT Generator record, nor does"
+              + " any parent of it; the generator keeps its default", campaignFaction.getShortName());
     }
 
     private ExistingLift liftAlreadyInHangar() {
         if (campaign == null) {
             return ExistingLift.NONE;
         }
-        List<Entity> entities = new ArrayList<>();
-        for (Unit unit : campaign.getUnits()) {
-            if (unit.getEntity() != null) {
-                entities.add(unit.getEntity());
+        // The force generator asks every time the settings are read, which Review does on each refresh. The hangar
+        // cannot change while the designer is open, so its ships are measured once.
+        if (hangarLift == null) {
+            List<Entity> entities = new ArrayList<>();
+            for (Unit unit : campaign.getUnits()) {
+                if (unit.getEntity() != null) {
+                    entities.add(unit.getEntity());
+                }
             }
+            hangarLift = ExistingLift.of(entities);
         }
-        return ExistingLift.of(entities);
+        return hangarLift;
     }
 
     /**
@@ -252,14 +285,14 @@ public class ForceGeneratorTab {
     }
 
     /**
-     * Opens the size picker on a company for an Inner Sphere faction and a Trinary-equivalent for a Clan, the sizes a
-     * new command most often starts at.
+     * Opens the size picker on a Lance, Star or Level II. A new campaign is best started with three of those (two
+     * Level IIs), rolled one at a time.
      */
     private void applyPreferredEchelon(boolean isClanFaction) {
         if (viewUi == null) {
             return;
         }
-        int echelon = isClanFaction ? PREFERRED_ECHELON_CLAN : PREFERRED_ECHELON_INNER_SPHERE;
+        int echelon = PREFERRED_ECHELON;
         viewUi.getOptionsView().setPreferredEchelon(echelon);
         LOGGER.info("[CompanyGen][ForceGenTab][Echelon] size picker opens on echelon {} (clan={})", echelon,
               isClanFaction);
@@ -324,24 +357,6 @@ public class ForceGeneratorTab {
         return optionsView == null ? null : optionsView.buildForceDescriptor();
     }
 
-    /** Forgets the formation the mix asks for, so a restored set of defaults asks for none. */
-    public void clearFormationMix() {
-        if (viewUi != null) {
-            viewUi.getOptionsView().clearFormationSelection();
-        }
-    }
-
-    /**
-     * Points the formation mix at a formation on the board, so its editor offers that formation's options rather than
-     * the settings'.
-     *
-     * @param node the formation, or {@code null} to hand the mix back to the settings
-     */
-    public void setFormationMixContext(@Nullable ForceDescriptor node) {
-        if (viewUi != null) {
-            viewUi.getOptionsView().setFormationMixContext(node);
-        }
-    }
 
     public boolean isGenerateCompanyCommandLance() {
         return generateCompanyCommandLance;
@@ -366,29 +381,9 @@ public class ForceGeneratorTab {
         targetOptions.setGenerateMercenaryCompanyCommandLance(generateCompanyCommandLance);
         ForceDescriptor fd = optionsView.buildForceDescriptor();
         if (fd != null) {
+            // The rank-authority faction stays the campaign's, which CommandGenerationDialog seeds: the force is
+            // always generated for it.
             targetOptions.getForceDescriptorSnapshot().populateFromForceDescriptor(fd);
-            // Override the rank-authority faction with whatever the player picked on the Force page.
-            // CommandGenerationDialog seeded both inputs from campaign.getPlayerForce().getFaction() at
-            // dialog open (the picker via initializeEngine, CommandGenerationOptions.specifiedFaction via
-            // seedSpecifiedFactionFromCampaign). If the player changed the faction mid-dialog, that becomes
-            // the final authority for rank assignment so the rank picker and the unit picker stay aligned.
-            String snapshotFactionCode = fd.getFaction();
-            if (snapshotFactionCode != null && !snapshotFactionCode.isBlank()) {
-                Faction override = resolveRankAuthority(snapshotFactionCode);
-                if (override != null) {
-                    Faction previous = targetOptions.getSpecifiedFaction();
-                    targetOptions.setSpecifiedFaction(override);
-                    LOGGER.info("[CompanyGen][ForceGenTab][Faction] override specifiedFaction: '{}' -> '{}' (sourced from the Force page's faction picker)",
-                          previous == null ? "null" : previous.getShortName(),
-                          override.getShortName());
-                } else {
-                    LOGGER.warn("[CompanyGen][ForceGenTab][Faction] faction code '{}' has no matching mekhq.campaign.universe.Faction, nor does any parent of it; leaving specifiedFaction='{}' unchanged",
-                          snapshotFactionCode,
-                          targetOptions.getSpecifiedFaction() == null
-                                ? "null"
-                                : targetOptions.getSpecifiedFaction().getShortName());
-                }
-            }
         }
     }
 

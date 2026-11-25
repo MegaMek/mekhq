@@ -185,7 +185,8 @@ public class PrisonerRansomEvent {
           boolean isFriendlyPOWs) {
         StringBuilder message = new StringBuilder();
         String key = isFriendlyPOWs ? "pows" : "prisoners";
-        message.append(getFormattedTextAt(RESOURCE_BUNDLE, key + ".message", commanderAddress, payment));
+        message.append(getFormattedTextAt(RESOURCE_BUNDLE, key + ".message", commanderAddress,
+              payment.toAmountString()));
 
         // Create a table to hold the personnel
         message.append("<br><table style='width:100%; text-align:left;'>");

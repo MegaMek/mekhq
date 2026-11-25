@@ -45,6 +45,7 @@ import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.mission.utilities.CombatRole;
 import mekhq.campaign.unit.Unit;
 
 public class ChaosContractDeterminationScale {
@@ -103,29 +104,90 @@ public class ChaosContractDeterminationScale {
         return scale;
     }
 
-    static double generateScaleForDetachment(PlayerForce playerForce, LocalHangar hangar,
-          boolean convertSupportPointsToBattleValue) {
-        int validBattleValue = 0;
-
-        for (Unit unit : hangar.getUnits()) {
-            int formationId = unit.getFormationId();
-            Formation formation = playerForce.getFormation(formationId);
-            if (formation != null) {
-                if (formation.isFormationType(STANDARD) && formation.getCombatRoleInMemory().isCombatRole()) {
-                    Entity entity = unit.getEntity();
-                    validBattleValue += entity != null ? entity.calculateBattleValue(true, true) : 0;
-                }
-            }
-        }
-
-        return convertBattleValueToExactScale(validBattleValue, convertSupportPointsToBattleValue);
+    /**
+     * Only Frontline and Maneuver formations count toward Scale. Patrol is a combat role elsewhere, but not here.
+     *
+     * @param role the formation's combat role
+     *
+     * @return {@code true} if a formation with this role counts toward Scale
+     */
+    private static boolean isScaleRole(CombatRole role) {
+        return role != null && (role.isFrontline() || role.isManeuver());
     }
 
     /**
-     * Determines the Scale of the player's entire TO&amp;E, for Hot Spots upkeep. Unlike
-     * {@link #generateScaleForDetachment(PlayerForce, LocalHangar, boolean)}, every unit assigned to a
-     * formation counts, regardless of formation type or combat role. Units outside the TO&amp;E and mothballed units
-     * are ignored.
+     * The single rule for which units count toward Scale, shared by contract Scale and TO&amp;E Scale so the two never
+     * disagree. A unit counts only when it is not mothballed and sits in a
+     * {@link mekhq.campaign.force.FormationType#STANDARD STANDARD} formation whose role is Frontline or Maneuver. The
+     * type check matters because every formation starts out as Frontline, and turning it into a Support, Convoy,
+     * Security or Salvage formation leaves that role in place.
+     *
+     * @param playerForce the player force whose TO&amp;E the unit is placed in
+     * @param unit        the unit to check
+     *
+     * @return {@code true} if the unit's Battle Value counts toward Scale
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean countsTowardScale(PlayerForce playerForce, Unit unit) {
+        if (unit.isMothballed()) {
+            return false;
+        }
+
+        Formation formation = playerForce.getFormation(unit.getFormationId());
+        return formation != null
+                     && formation.isFormationType(STANDARD)
+                     && isScaleRole(formation.getCombatRoleInMemory());
+    }
+
+    /**
+     * Converts the Battle Value of the units that count toward Scale into exact Scale.
+     *
+     * @param playerForce                       the player force whose TO&amp;E is weighed
+     * @param units                             the units to weigh
+     * @param convertSupportPointsToBattleValue whether the per-Scale battlefield support point allotment is folded into
+     *                                          the per-Scale Battle Value
+     *
+     * @return the exact (unrounded) Scale of the counted units
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static double generateScale(PlayerForce playerForce, Collection<Unit> units,
+          boolean convertSupportPointsToBattleValue) {
+        int totalBattleValue = 0;
+
+        for (Unit unit : units) {
+            if (countsTowardScale(playerForce, unit)) {
+                Entity entity = unit.getEntity();
+                totalBattleValue += entity != null ? entity.calculateBattleValue(true, true) : 0;
+            }
+        }
+
+        return convertBattleValueToExactScale(totalBattleValue, convertSupportPointsToBattleValue);
+    }
+
+    /**
+     * Determines the Scale of the units a detachment commits to a contract. See
+     * {@link #countsTowardScale(PlayerForce, Unit)} for which units count.
+     *
+     * @param playerForce                       the player force whose TO&amp;E is weighed
+     * @param hangar                            the detachment's hangar
+     * @param convertSupportPointsToBattleValue whether the per-Scale battlefield support point allotment is folded into
+     *                                          the per-Scale Battle Value
+     *
+     * @return the exact (unrounded) Scale of the detachment
+     */
+    static double generateScaleForDetachment(PlayerForce playerForce, LocalHangar hangar,
+          boolean convertSupportPointsToBattleValue) {
+        return generateScale(playerForce, hangar.getUnits(), convertSupportPointsToBattleValue);
+    }
+
+    /**
+     * Determines the Scale of the player's entire TO&amp;E, for Hot Spots upkeep and the Command Center. It counts the
+     * same units as contract Scale (see {@link #countsTowardScale(PlayerForce, Unit)}), so while the player force has a
+     * single detachment the two figures match.
      *
      * @param playerForce                       the player force whose TO&amp;E is weighed
      * @param hangar                            the hangar holding the player force's units
@@ -158,21 +220,7 @@ public class ChaosContractDeterminationScale {
      */
     public static double generateScaleForTableOfOrganization(PlayerForce playerForce, Collection<Unit> units,
           boolean convertSupportPointsToBattleValue) {
-        int totalBattleValue = 0;
-
-        for (Unit unit : units) {
-            if (unit.isMothballed()) {
-                continue;
-            }
-
-            Formation formation = playerForce.getFormation(unit.getFormationId());
-            if (formation != null) {
-                Entity entity = unit.getEntity();
-                totalBattleValue += entity != null ? entity.calculateBattleValue(true, true) : 0;
-            }
-        }
-
-        return convertBattleValueToExactScale(totalBattleValue, convertSupportPointsToBattleValue);
+        return generateScale(playerForce, units, convertSupportPointsToBattleValue);
     }
 
     /**

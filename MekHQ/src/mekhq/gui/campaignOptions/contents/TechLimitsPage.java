@@ -118,12 +118,13 @@ class TechLimitsPage {
         // Canon Purchases/Refits
         allowCanonOnlyBox = new CampaignOptionsCheckBox("AllowCanonOnlyBox");
         allowCanonOnlyBox.addMouseListener(createTipPanelUpdater("AllowCanonOnlyBox"));
-        allowCanonRefitOnlyBox = new CampaignOptionsCheckBox("AllowCanonRefitOnlyBox");
+        allowCanonRefitOnlyBox = new CampaignOptionsCheckBox("AllowCanonRefitOnlyBox",
+              getMetadata(new Version("0.43.02")));
         allowCanonRefitOnlyBox.addMouseListener(createTipPanelUpdater("AllowCanonRefitOnlyBox"));
 
         // Clan Tech Refits Pre 3052
         limitClanTechBox = new CampaignOptionsCheckBox("LimitClanTechBox",
-              getMetadata(new Version(0, 51, 1)));
+              getMetadata(new Version("0.51.01.1")));
         limitClanTechBox.addMouseListener(createTipPanelUpdater("LimitClanTechBox"));
 
         // Maximum Tech Level
@@ -136,7 +137,7 @@ class TechLimitsPage {
 
         // Variable Tech Level
         variableTechLevelBox = new CampaignOptionsCheckBox("VariableTechLevelBox",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.43.04"), CampaignOptionFlag.CUSTOM_SYSTEM));
         variableTechLevelBox.addMouseListener(createTipPanelUpdater("VariableTechLevelBox"));
 
         // Ammo by Type

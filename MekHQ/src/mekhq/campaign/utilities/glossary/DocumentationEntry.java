@@ -48,58 +48,52 @@ import mekhq.MHQConstants;
  *
  * <p>This class provides methods to retrieve localized titles, sort entries, and look up entries by name.</p>
  *
+ * <p>Each document is a Markdown file under {@code docs/mekhq/}, shown in the Glossary Console's reader. The files
+ * are written in GitHub-flavored Markdown, so they read the same in the repository.</p>
+ *
  * @author Illiani
  * @since 0.50.07
  */
 public enum DocumentationEntry {
-    ACAR("ACAR", "GlossaryDocs/ACAR-Abstract Combat Auto-Resolve documentation", new Version("0.50.06")),
-    AGING_EFFECTS("AGING_EFFECTS", "GlossaryDocs/Personnel Modules/Aging Effects", new Version("0.50.06")),
-    AWARDS_MODULE("AWARDS_MODULE", "GlossaryDocs/Personnel Modules/Awards Module", new Version("0.50.06")),
-    CHAOS_CAMPAIGNS("CHAOS_CAMPAIGNS", "GlossaryDocs/MegaMek -MekHQ Chaos Campaign Guide", new Version("0.50.06")),
-    COMBAT_TEAMS("COMBAT_TEAMS", "GlossaryDocs/Combat Teams, Roles & Reinforcements", new Version("0.50.10")),
-    COOP_CAMPAIGNS("COOP_CAMPAIGNS", "GlossaryDocs/MekHQ Co-Op Campaign Guide v1", new Version("0.50.06")),
-    EDUCATION_MODULE("EDUCATION_MODULE", "GlossaryDocs/Personnel Modules/Education Module", new Version("0.50.06")),
-    FACTION_STANDINGS("FACTION_STANDINGS", "GlossaryDocs/Faction Standings", new Version("0.50.11")),
-    NEW_PLAYER_GUIDE("NEW_PLAYER_GUIDE", "GlossaryDocs/0_MHQ New Player Guide", new Version("0.50.06")),
-    PRISONERS_OF_WAR("PRISONERS_OF_WAR",
-          "GlossaryDocs/Prisoners of War & Abstracted Search and Rescue",
-          new Version("0.50.06")),
-    RANDOM_DEATH("RANDOM_DEATH", "GlossaryDocs/Personnel Modules/Random Death in MekHQ", new Version("0.50.06")),
-    RANDOM_DEPENDENTS("RANDOM_DEPENDENTS", "GlossaryDocs/Personnel Modules/Random Dependents", new Version("0.50.06")),
-    RANDOM_PERSONALITIES("RANDOM_PERSONALITIES", "GlossaryDocs/Personnel Modules/Random Personalities", new Version(
-          "0.50.06")),
-    RECRUITMENT("RECRUITMENT", "GlossaryDocs/Personnel Modules/Recruitment", new Version("0.50.07")),
-    RESUPPLY_AND_CONVOYS("RESUPPLY_AND_CONVOYS", "GlossaryDocs/Resupply & Convoys", new Version("0.50.06")),
-    STARTING_ATTRIBUTE_SCORES("STARTING_ATTRIBUTE_SCORES",
-          "GlossaryDocs/Personnel Modules/Starting Attribute Scores",
-          new Version("0.50.10")),
-    TURNOVER_AND_RETENTION("TURNOVER_AND_RETENTION",
-          "GlossaryDocs/Personnel Modules/Turnover & Retention Module (feat. Fatigue)",
-          new Version("0.50.06")),
-    UNIT_MARKETS("UNIT_MARKETS", "GlossaryDocs/Unit Markets", new Version("0.50.06"));
+    FORMATION_ICONS("FORMATION_ICONS", "glossaryDocs/Force Icons", "0.49.06", "0.51.01.13", "0.51.01.13"),
+    RANDOM_PORTRAITS("RANDOM_PORTRAITS", "glossaryDocs/Portrait Generation", "0.47.04", "0.51.01.13",
+          "0.51.01.13"),
+    RANKS("RANKS", "glossaryDocs/Ranks", "0.49.00", "0.51.01.13", "0.51.01.13");
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.DocumentationEntry";
 
-    private final String DIRECTORY = "docs/";
-    private final String FILE_EXTENSION = ".pdf";
+    private final String DIRECTORY = "docs/mekhq/";
+    private final String FILE_EXTENSION = ".md";
 
     private final String lookUpName;
     private final String fileAddress;
-    private final Version versionAddedOrLastUpdated;
+    private final Version versionAdded;
+    private final Version versionLastUpdated;
+    private final Version versionLastVerified;
 
     /**
-     * Constructs a {@code DocumentationEntry} with the specified lookup name.
+     * Constructs a {@code DocumentationEntry} with the specified lookup name, document and version history.
      *
-     * @param lookUpName  the resource key used to look up this entry's localized strings
-     * @param fileAddress the document address
+     * <p>Each version is the release that first shipped the change, including its revision where it has one, such
+     * as {@code 0.51.01.4}. A change not yet released takes the version of the release it will ship in.</p>
+     *
+     * @param lookUpName          the resource key used to look up this entry's localized strings
+     * @param fileAddress         the document's path under {@code docs/mekhq/}, without its {@code .md} extension
+     * @param versionAdded        the release that first listed this document in the glossary
+     * @param versionLastUpdated  the release that last shipped a significant revision of the document
+     * @param versionLastVerified the release in which the document was last checked against the game and found
+     *                            accurate
      *
      * @author Illiani
      * @since 0.50.07
      */
-    DocumentationEntry(String lookUpName, String fileAddress, Version versionAddedOrLastUpdated) {
+    DocumentationEntry(String lookUpName, String fileAddress, String versionAdded, String versionLastUpdated,
+          String versionLastVerified) {
         this.lookUpName = lookUpName;
         this.fileAddress = fileAddress;
-        this.versionAddedOrLastUpdated = versionAddedOrLastUpdated;
+        this.versionAdded = new Version(versionAdded);
+        this.versionLastUpdated = new Version(versionLastUpdated);
+        this.versionLastVerified = new Version(versionLastVerified);
     }
 
     /**
@@ -127,25 +121,47 @@ public enum DocumentationEntry {
     }
 
     /**
-     * Returns the version in which this entry was added or last updated.
-     *
-     * @return the version this entry was added or last updated in
+     * @return the release that first listed this document in the glossary
      *
      * @author Illiani
      * @since 0.51.01
      */
-    public Version getVersionAddedOrLastUpdated() {
-        return versionAddedOrLastUpdated;
+    public Version getVersionAdded() {
+        return versionAdded;
+    }
+
+    /**
+     * Returns the release that last shipped a significant revision of this document. This is never older than
+     * {@link #getVersionAdded()}, and is the version that decides whether the document is shown as new or changed.
+     *
+     * @return the release that last significantly updated this document
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Version getVersionLastUpdated() {
+        return versionLastUpdated;
+    }
+
+    /**
+     * @return the release in which this document was last checked and found accurate; never older than
+     *       {@link #getVersionLastUpdated()}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Version getVersionLastVerified() {
+        return versionLastVerified;
     }
 
     /**
      * Returns the title of this object, possibly appended with an icon/text indicating if it was added or updated since
      * the last development or milestone version.
      *
-     * <p>If {@link #versionAddedOrLastUpdated} is equal to or newer than the current version,
+     * <p>If {@link #versionLastUpdated} is equal to or newer than the current version,
      * an "added since last development" icon/text is appended.</p>
      *
-     * <p>Otherwise, if {@link #versionAddedOrLastUpdated} is newer than the last milestone version,
+     * <p>Otherwise, if {@link #versionLastUpdated} is newer than the last milestone version,
      * an "added since last milestone" icon/text is appended.</p>
      *
      * @return the title string, with an update/version icon appended if applicable
@@ -158,11 +174,11 @@ public enum DocumentationEntry {
         Version lastMilestone = MHQConstants.LAST_MILESTONE;
         String title = getTitle();
 
-        // We use an inverted 'isLowerThan' check as that will include instances where 'versionAddedOrLastUpdated' is
-        // the same as 'currentVersion'
-        if (!versionAddedOrLastUpdated.isLowerThan(currentVersion)) {
+        // We use an inverted 'isLowerThan' check as that will include instances where 'versionLastUpdated' is the
+        // same as 'currentVersion'
+        if (!versionLastUpdated.isLowerThan(currentVersion)) {
             title += ' ' + MHQConstants.ADDED_SINCE_LAST_DEVELOPMENT;
-        } else if (versionAddedOrLastUpdated.isHigherThan(lastMilestone)) {
+        } else if (versionLastUpdated.isHigherThan(lastMilestone)) {
             title += ' ' + MHQConstants.ADDED_SINCE_LAST_MILESTONE;
         }
 

@@ -537,6 +537,13 @@ public class TaskTableMouseAdapter extends JPopupMenuAdapter {
                 menuItem = new JMenuItem(canFabricate);
                 menuItem.setEnabled(false);
                 menu.add(menuItem);
+
+                if (fabricatable.isFabricating()) {
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "TaskTableMouseAdapter.FABRICATE.off"));
+                    menuItem.setActionCommand("FABRICATE_OFF");
+                    menuItem.addActionListener(this);
+                    menu.add(menuItem);
+                }
             }
 
             popup.add(menu);

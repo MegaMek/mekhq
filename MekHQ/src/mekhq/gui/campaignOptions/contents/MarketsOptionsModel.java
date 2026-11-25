@@ -41,9 +41,6 @@ import mekhq.campaign.market.enums.ContractMarketMethod;
 import mekhq.campaign.market.enums.UnitMarketMethod;
 import mekhq.campaign.market.personnelMarket.enums.PersonnelMarketStyle;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
-import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsRevised;
-import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketCamOpsStrict;
-import mekhq.campaign.market.personnelMarket.markets.PersonnelMarketMekHQ;
 import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 
 class MarketsOptionsModel {
@@ -68,14 +65,12 @@ class MarketsOptionsModel {
     SalvageSystem salvageSystem;
     boolean useRiskySalvage;
     boolean keepEnemyCamouflageOnSalvage;
+    boolean reduceSalvageQuality;
     boolean enableSalvageFlagByDefault;
     boolean useClanSalvageClause;
     boolean useDynamicDifficulty;
     boolean useBolsterContractSkill;
     boolean useChaosScaleSupportPointConversion;
-    boolean multiplyTrackIntensityByScale;
-    boolean minimumOneTrackPerRoll;
-    boolean rollTracksWeekly;
     boolean useContractFactionModifiers;
     boolean useIntelObfuscation;
     boolean useNonNegotiableTerms;
@@ -93,7 +88,6 @@ class MarketsOptionsModel {
     double contractBattlefieldLossMultiplier;
     double contractTransportMultiplier;
     double contractSalvageMultiplier;
-    double scenarioTempoMultiplier;
     boolean useChaosSupportPointConversion;
     boolean basePayOnlyConsidersScale;
     boolean capContractScaleByHiringHall;
@@ -136,14 +130,12 @@ class MarketsOptionsModel {
         salvageSystem = options.get(CampaignOption.SALVAGE_SYSTEM);
         useRiskySalvage = options.get(CampaignOption.IS_USE_RISKY_SALVAGE);
         keepEnemyCamouflageOnSalvage = options.get(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE);
+        reduceSalvageQuality = options.get(CampaignOption.IS_REDUCE_SALVAGE_QUALITY);
         enableSalvageFlagByDefault = options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT);
         useClanSalvageClause = options.get(CampaignOption.USE_CLAN_SALVAGE_CLAUSE);
         useDynamicDifficulty = options.get(CampaignOption.USE_DYNAMIC_DIFFICULTY);
         useBolsterContractSkill = options.get(CampaignOption.USE_BOLSTER_CONTRACT_SKILL);
         useChaosScaleSupportPointConversion = options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
-        multiplyTrackIntensityByScale = options.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE);
-        minimumOneTrackPerRoll = options.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL);
-        rollTracksWeekly = options.get(CampaignOption.ROLL_TRACKS_WEEKLY);
         useContractFactionModifiers = options.get(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS);
         useIntelObfuscation = options.get(CampaignOption.USE_INTEL_OBFUSCATION);
         useNonNegotiableTerms = options.get(CampaignOption.USE_NON_NEGOTIABLE_TERMS);
@@ -161,7 +153,6 @@ class MarketsOptionsModel {
         contractBattlefieldLossMultiplier = options.get(CampaignOption.CONTRACT_BATTLEFIELD_LOSS_MULTIPLIER);
         contractTransportMultiplier = options.get(CampaignOption.CONTRACT_TRANSPORT_MULTIPLIER);
         contractSalvageMultiplier = options.get(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER);
-        scenarioTempoMultiplier = options.get(CampaignOption.SCENARIO_TEMPO_MULTIPLIER);
         useChaosSupportPointConversion = options.get(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION);
         basePayOnlyConsidersScale = options.get(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE);
         capContractScaleByHiringHall = options.get(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL);
@@ -185,17 +176,7 @@ class MarketsOptionsModel {
         if (personnelMarketStyle != null) {
             // No campaign when saving a preset, whose options must not swap out the running campaign's market
             if (campaign != null) {
-                NewPersonnelMarket currentMarket = campaign.getPlayerForce().getHumanResources().getNewPersonnelMarket();
-                if (personnelMarketStyle != currentMarket.getAssociatedPersonnelMarketStyle()) {
-                    NewPersonnelMarket replacementMarket = switch (personnelMarketStyle) {
-                        case PERSONNEL_MARKET_DISABLED -> new NewPersonnelMarket();
-                        case MEKHQ -> new PersonnelMarketMekHQ();
-                        case CAMPAIGN_OPERATIONS_REVISED -> new PersonnelMarketCamOpsRevised();
-                        case CAMPAIGN_OPERATIONS_STRICT -> new PersonnelMarketCamOpsStrict();
-                    };
-                    replacementMarket.setCampaign(campaign);
-                    campaign.setNewPersonnelMarket(replacementMarket);
-                }
+                NewPersonnelMarket.ensureMarketStyle(campaign, personnelMarketStyle);
             }
             options.set(CampaignOption.PERSONNEL_MARKET_STYLE, personnelMarketStyle);
         }
@@ -222,14 +203,12 @@ class MarketsOptionsModel {
         options.set(CampaignOption.SALVAGE_SYSTEM, salvageSystem);
         options.set(CampaignOption.IS_USE_RISKY_SALVAGE, useRiskySalvage);
         options.set(CampaignOption.IS_KEEP_ENEMY_CAMOUFLAGE_ON_SALVAGE, keepEnemyCamouflageOnSalvage);
+        options.set(CampaignOption.IS_REDUCE_SALVAGE_QUALITY, reduceSalvageQuality);
         options.set(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT, enableSalvageFlagByDefault);
         options.set(CampaignOption.USE_CLAN_SALVAGE_CLAUSE, useClanSalvageClause);
         options.set(CampaignOption.USE_DYNAMIC_DIFFICULTY, useDynamicDifficulty);
         options.set(CampaignOption.USE_BOLSTER_CONTRACT_SKILL, useBolsterContractSkill);
         options.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, useChaosScaleSupportPointConversion);
-        options.set(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE, multiplyTrackIntensityByScale);
-        options.set(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL, minimumOneTrackPerRoll);
-        options.set(CampaignOption.ROLL_TRACKS_WEEKLY, rollTracksWeekly);
         options.set(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS, useContractFactionModifiers);
         options.set(CampaignOption.USE_INTEL_OBFUSCATION, useIntelObfuscation);
         options.set(CampaignOption.USE_NON_NEGOTIABLE_TERMS, useNonNegotiableTerms);
@@ -247,7 +226,6 @@ class MarketsOptionsModel {
         options.set(CampaignOption.CONTRACT_BATTLEFIELD_LOSS_MULTIPLIER, contractBattlefieldLossMultiplier);
         options.set(CampaignOption.CONTRACT_TRANSPORT_MULTIPLIER, contractTransportMultiplier);
         options.set(CampaignOption.CONTRACT_SALVAGE_MULTIPLIER, contractSalvageMultiplier);
-        options.set(CampaignOption.SCENARIO_TEMPO_MULTIPLIER, scenarioTempoMultiplier);
         options.set(CampaignOption.USE_CHAOS_SUPPORT_POINT_CONVERSION, useChaosSupportPointConversion);
         options.set(CampaignOption.BASE_PAY_ONLY_CONSIDERS_SCALE, basePayOnlyConsidersScale);
         options.set(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL, capContractScaleByHiringHall);

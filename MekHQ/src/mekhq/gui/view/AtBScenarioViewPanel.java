@@ -36,6 +36,7 @@ package mekhq.gui.view;
 import static megamek.common.options.OptionsConstants.BASE_BLIND_DROP;
 import static megamek.common.options.OptionsConstants.BASE_REAL_BLIND_DROP;
 import static megamek.common.units.Entity.getEntityMajorTypeName;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.awt.BorderLayout;
@@ -66,6 +67,7 @@ import javax.swing.tree.TreeSelectionModel;
 import jakarta.annotation.Nullable;
 import megamek.client.ui.dialogs.UnitEditorDialog;
 import megamek.client.ui.dialogs.buttonDialogs.BotConfigDialog;
+import megamek.client.ui.dialogs.unitSelectorDialogs.EntityReadoutDialog;
 import megamek.common.interfaces.IStartingPositions;
 import megamek.common.planetaryConditions.Atmosphere;
 import megamek.common.planetaryConditions.PlanetaryConditions;
@@ -78,6 +80,7 @@ import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationStub;
 import mekhq.campaign.force.UnitStub;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
+import mekhq.campaign.mission.scenarios.AtBDynamicScenarioFactory;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.BotForceStub;
 import mekhq.campaign.mission.scenarios.Loot;
@@ -152,6 +155,8 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
     private final StubTreeModel playerForceModel;
 
     private static final String RESOURCE_BUNDLE = "mekhq.resources.AtBScenarioViewPanel";
+
+    private static final int STATS_VALUE_COLUMN = 2;
 
     public AtBScenarioViewPanel(AtBScenario s, Campaign c, JFrame frame) {
         super();
@@ -298,8 +303,9 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                     ScenarioForceTemplate template = ((AtBDynamicScenario) scenario).getPlayerForceTemplates()
                                                            .get(forceID);
                     if (template != null && template.getActualDeploymentZone() >= 0) {
-                        forceBuilder.append("Deploy: ");
-                        forceBuilder.append(IStartingPositions.START_LOCATION_NAMES[template.getActualDeploymentZone()]);
+                        forceBuilder.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                              "lblDeploymentZone.text",
+                              IStartingPositions.START_LOCATION_NAMES[template.getActualDeploymentZone()]));
                         forceBuilder.append("<br/>");
                     }
                     chop = true;
@@ -458,6 +464,45 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                 gridBagConstraints.anchor = GridBagConstraints.NORTHWEST;
                 panStats.add(new JLabel(loot.getShortDescription()), gridBagConstraints);
             }
+        }
+
+        applyStatsColumnLayout();
+    }
+
+    /**
+     * Normalizes the column behavior of the stats grid once every row has been added.
+     *
+     * <p>Rows are built with a shared, repeatedly mutated {@link GridBagConstraints}, so the first row's
+     * {@code weightx} leaked onto both the label column and the value column. That split any spare width evenly
+     * between them, leaving the value column narrow and starting part-way across the panel, which in turn made
+     * wrapping HTML text (unit names, deployment zones) break across lines.</p>
+     *
+     * <p>This makes the label and reroll-checkbox columns take only the width they need (and never wrap), and
+     * gives all spare width to the value column, with its content aligned to the start of the cell.</p>
+     */
+    private void applyStatsColumnLayout() {
+        GridBagLayout layout = (GridBagLayout) panStats.getLayout();
+
+        for (Component component : panStats.getComponents()) {
+            GridBagConstraints constraints = layout.getConstraints(component);
+            if (constraints.gridwidth != 1) {
+                // Full-width rows (description, details, force trees, loot) manage their own layout
+                continue;
+            }
+
+            if (constraints.gridx == STATS_VALUE_COLUMN) {
+                constraints.weightx = 1.0;
+                constraints.fill = GridBagConstraints.HORIZONTAL;
+                constraints.insets = new Insets(1, 0, 1, 0);
+            } else {
+                constraints.weightx = 0.0;
+                constraints.fill = GridBagConstraints.NONE;
+                constraints.insets = new Insets(1, 0, 1, 10);
+                component.setMinimumSize(component.getPreferredSize());
+            }
+            constraints.anchor = GridBagConstraints.FIRST_LINE_START;
+
+            layout.setConstraints(component, constraints);
         }
     }
 
@@ -935,6 +980,7 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
         }
         if (chkReroll[REROLL_WEATHER] != null && chkReroll[REROLL_WEATHER].isSelected()) {
             scenario.setWeatherConditions(campaign.getCampaignOptions().get(CampaignOption.USE_NO_TORNADOES));
+            AtBDynamicScenarioFactory.redressInfantryForWeather(scenario, campaign.getCampaignOptions());
             scenario.useReroll();
             chkReroll[REROLL_WEATHER].setSelected(false);
             lblWeatherDesc.setText(scenario.getWeather().toString());
@@ -1064,7 +1110,33 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                           scenario.getBotForce(this.forceIndex).getFullEntityList(campaign).get(unitIndex));
                     editorDialog.setVisible(true);
                 }
+            } else if (command.equalsIgnoreCase("VIEW_TRO")) {
+                Entity entity = getSelectedEntity();
+                if (entity != null) {
+                    new EntityReadoutDialog(frame, entity).setVisible(true);
+                }
             }
+        }
+
+        /**
+         * @return the entity shown on the selected row of the tree, or {@code null} if no unit is selected or the
+         *       selected row doesn't represent a valid entity
+         */
+        private @Nullable Entity getSelectedEntity() {
+            // Row 0 is the bot force itself, its units follow in order
+            int unitIndex = tree.getMinSelectionRow() - 1;
+            List<Entity> entities = scenario.getBotForce(forceIndex).getFullEntityList(campaign);
+            return ((unitIndex >= 0) && (unitIndex < entities.size())) ? entities.get(unitIndex) : null;
+        }
+
+        /**
+         * @return {@code true} if the units in this bot force have their identities hidden from the player by blind
+         *       drop
+         */
+        private boolean isHiddenByBlindDrop() {
+            boolean isBlindDrop = campaign.getGameOptions().getOption(BASE_BLIND_DROP).booleanValue();
+            boolean isTrueBlindDrop = campaign.getGameOptions().getOption(BASE_REAL_BLIND_DROP).booleanValue();
+            return (isBlindDrop || isTrueBlindDrop) && (scenario.getBotForce(forceIndex).getTeam() != 1);
         }
 
         @Override
@@ -1086,7 +1158,17 @@ public class AtBScenarioViewPanel extends JScrollablePanel {
                     return;
                 }
 
+                // Right-clicking doesn't select the row by default, so without this the menu would act on whichever
+                // unit was previously selected, rather than the one that was clicked
+                tree.setSelectionPath(path);
+
                 JMenuItem menuItem;
+                if (!isHiddenByBlindDrop() && (getSelectedEntity() != null)) {
+                    menuItem = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "AtBScenarioViewPanel.menu.viewTRO"));
+                    menuItem.setActionCommand("VIEW_TRO");
+                    menuItem.addActionListener(this);
+                    popup.add(menuItem);
+                }
                 if ((path.getPathCount() > 1) &&
                           (tree.getSelectionRows() != null) &&
                           (tree.getSelectionRows()[0] != 0) &&

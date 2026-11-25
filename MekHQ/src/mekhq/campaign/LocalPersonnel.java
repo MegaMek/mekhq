@@ -44,7 +44,6 @@ import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.personnel.Person;
 import mekhq.utilities.MHQXMLUtility;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 /**
  * Roster of {@link Person}s, keyed by UUID.
@@ -83,9 +82,10 @@ public class LocalPersonnel extends LinkedHashMap<UUID, Person> implements ILoca
      * <p>Compatibility post-processing (edge conversion, academy validation) is left to the caller.</p>
      */
     public static void loadFromXML(Node wn, Campaign campaign, Version version) {
-        NodeList wList = wn.getChildNodes();
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
+        // Walk the siblings rather than indexing getChildNodes(): each child's own NodeList can take this list's
+        // shared Xerces cache, after which every getLength() and item(x) re-walks the list from the start, making
+        // a large campaign's load quadratic in the number of personnel
+        for (Node wn2 = wn.getFirstChild(); wn2 != null; wn2 = wn2.getNextSibling()) {
             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
                 continue;
             }

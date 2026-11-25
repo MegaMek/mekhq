@@ -169,7 +169,7 @@ final class CampaignOptionCodecs {
         register(CampaignOption.AUTO_RESOLVE_METHOD, enumCodec(AutoResolveMethod::valueOf));
         register(CampaignOption.CHASSIS_FAMILIARITY_MODE, enumCodec(Familiarity::valueOf));
         register(CampaignOption.LITHIUM_FUSION_BATTERY_MODE, enumCodec(LithiumFusionBatteryMode::valueOf));
-        register(CampaignOption.UNIT_COST_MODEL, enumCodec(UnitCostModel::valueOf));
+        register(CampaignOption.UNIT_COST_MODEL, enumCodec(UnitCostModel::fromString));
 
         // Enums persisted by a lookup name/key rather than Enum.name().
         register(CampaignOption.ACQUISITIONS_TYPE,

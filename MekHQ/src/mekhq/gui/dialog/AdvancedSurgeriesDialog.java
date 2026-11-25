@@ -99,6 +99,7 @@ import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.personnel.medical.SurgeonRanking;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AdvancedMedicalAlternate;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjurySubType;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.ProstheticType;
@@ -106,7 +107,6 @@ import mekhq.campaign.personnel.medical.advancedMedicalAlternate.SurgeryRiskCalc
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.SurgeryRiskCalculator.Risk;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.SurgeryRiskCalculator.SurgeryOdds;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
-import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.roleplay.CheckOdds;
 import mekhq.campaign.roleplay.CheckTarget;
 import mekhq.campaign.universe.Faction;
@@ -1943,40 +1943,25 @@ public class AdvancedSurgeriesDialog extends JDialog {
     // region Surgeons
 
     /**
-     * Determines the senior surgeon at the given location, based on doctor status and rank/skill tiebreakers.
+     * Determines the best surgeon at the given location: the active doctor with the highest Surgery skill, with rank
+     * (and then experience) used to break ties.
      *
      * @param currentLocation the current location
      *
-     * @return the most senior surgeon, or {@code null} if none are available
+     * @return the best surgeon, or {@code null} if none are available
      *
      * @author Illiani
      * @since 0.50.10
      */
     private @Nullable Person getSurgeon(AbstractLocation currentLocation) {
-        Person seniorSurgeon = null;
-
-        for (Person person : currentLocation.fetchPersonnelAtLocation()) {
-            if (person.isActive() && person.isDoctor()) {
-                if (seniorSurgeon == null) {
-                    seniorSurgeon = person;
-                    continue;
-                }
-
-                if (person.outRanksUsingSkillTiebreaker(campaignOptions,
-                      campaign.getPlayerForce().isClanForce(),
-                      campaign.getLocalDate(),
-                      seniorSurgeon)) {
-                    seniorSurgeon = person;
-                }
-            }
-        }
-
-        return seniorSurgeon;
+        return SurgeonRanking.getBestSurgeon(currentLocation.fetchPersonnelAtLocation(),
+              campaignOptions,
+              campaign.getPlayerForce().isClanForce(),
+              campaign.getLocalDate());
     }
 
     private static int getSurgeryLevel(Person person) {
-        Skill skill = person.getSkill(S_SURGERY);
-        return skill == null ? -1 : skill.getTotalSkillLevel(person.getSkillModifierData());
+        return SurgeonRanking.getSurgerySkillLevel(person);
     }
 
     /** @return {@code true} if the campaign's surgeon can't perform surgery of this level, so a local is hired */

@@ -32,9 +32,6 @@
  */
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
-import mekhq.campaign.ForceHumanResources;
-import mekhq.campaign.campaignOptions.CampaignOption;
-import mekhq.campaign.force.PlayerForce;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
@@ -43,7 +40,6 @@ import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.atLeast;
-import static org.mockito.Mockito.atMost;
 import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -53,17 +49,17 @@ import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.EnumMap;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.function.Consumer;
 
 import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.generator.AbstractSkillGenerator;
@@ -73,7 +69,6 @@ import mekhq.campaign.randomEvents.prisoners.PrisonerStatus;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
-import testUtilities.MHQTestUtilities;
 import mekhq.campaign.universe.commandGeneration.ratgen.SupportPersonnelGenerator.Result;
 import org.apache.logging.log4j.Level;
 import org.apache.logging.log4j.LogManager;
@@ -82,6 +77,7 @@ import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import testUtilities.MHQTestUtilities;
 
 class SupportPersonnelGeneratorTest {
 
@@ -444,13 +440,7 @@ class SupportPersonnelGeneratorTest {
     // ===== Helpers =====
 
     private static CommandGenerationOptions baseOptions() {
-        CommandGenerationOptions options = new CommandGenerationOptions();
-        // Route through the mocked Campaign.getFaction() instead of the real default
-        // specifiedFaction (which would resolve through the Ranks singleton — not initialized in
-        // unit-test context, and would NPE on getRankSystem). The rank-system-swap path is
-        // covered by integration testing in the live MekHQ launch, not here.
-        options.setUseSpecifiedFactionToAssignRanks(false);
-        return options;
+        return new CommandGenerationOptions();
     }
 
     private Campaign newCampaignWithUnits(List<Unit> units, int personnelCount) {

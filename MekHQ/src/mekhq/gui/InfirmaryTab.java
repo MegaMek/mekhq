@@ -68,8 +68,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.OptimizeInfirmaryAssignments;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
+import mekhq.campaign.events.BulkGenerationCompletedEvent;
 import mekhq.campaign.events.MedicPoolChangedEvent;
-import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.persons.PersonEvent;
 import mekhq.campaign.events.persons.PersonMedicalAssignmentEvent;
 import mekhq.campaign.events.scenarios.ScenarioResolvedEvent;
@@ -499,7 +499,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
                 boolean canAssignToDoctor = canAssignToDoctor(doctor);
                 Person patient = unassignedPatientModel.getElementAt(i);
 
-                if (null != patient && patient.needsFixing() && canAssignToDoctor) {
+                if (null != patient && patient.needsFixing() && canAssignToDoctor
+                          && !patient.getId().equals(doctor.getId())) {
                     patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
                     break;
@@ -509,7 +510,8 @@ public final class InfirmaryTab extends CampaignGuiTab {
             for (Person patient : selectedPatients) {
                 boolean canAssignToDoctor = canAssignToDoctor(doctor);
 
-                if (null != patient && patient.needsFixing() && canAssignToDoctor) {
+                if (null != patient && patient.needsFixing() && canAssignToDoctor
+                          && !patient.getId().equals(doctor.getId())) {
                     patient.setDoctorId(doctor.getId(), healingWaitingPeriod);
                     MekHQ.triggerEvent(new PersonMedicalAssignmentEvent(doctor, patient));
                 }
@@ -531,7 +533,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
 
     public void refreshDoctorsList() {
         // While a bulk generation recruits personnel off the EDT, skip this refresh: iterating the roster while the
-        // worker grows it throws ConcurrentModificationException. The OrganizationChangedEvent fired when the
+        // worker grows it throws ConcurrentModificationException. The BulkGenerationCompletedEvent fired when the
         // generation completes reschedules this refresh against the finished campaign.
         if (getCampaign().isBulkGenerationInProgress()) {
             return;
@@ -625,7 +627,7 @@ public final class InfirmaryTab extends CampaignGuiTab {
      * @since 0.51.01
      */
     @Subscribe
-    public void handle(OrganizationChangedEvent ev) {
+    public void handle(BulkGenerationCompletedEvent ev) {
         doctorListScheduler.schedule();
         patientListScheduler.schedule();
     }

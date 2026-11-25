@@ -380,7 +380,7 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
             market = UnitMarketType.OPEN;
         }
 
-        if (num <= 1) {
+        if (num < 1) {
             return;
         }
 
@@ -437,7 +437,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
     }
 
     /**
-     * This generates a random weight using the static weight generation methods in this market
+     * This generates a random weight using the static weight generation methods in this market. Regional 'Mek weights
+     * follow the Unit Market's own option, not the one used for scenario generation.
      *
      * @param campaign the campaign to generate the unit weight based on
      * @param unitType the unit type to determine the format of weight to generate
@@ -447,7 +448,8 @@ public class AtBMonthlyUnitMarket extends AbstractUnitMarket {
      */
     @Override
     protected int generateWeight(final Campaign campaign, final int unitType, final Faction faction) {
-        return AtBStaticWeightGenerator.getRandomWeight(campaign, unitType, faction);
+        return AtBStaticWeightGenerator.getRandomWeight(unitType, faction,
+              campaign.getCampaignOptions().get(CampaignOption.UNIT_MARKET_REGIONAL_MEK_VARIATIONS));
     }
     //endregion Offer Generation
 

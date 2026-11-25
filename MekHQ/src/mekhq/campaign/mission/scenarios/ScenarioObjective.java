@@ -43,6 +43,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.Set;
+import java.util.regex.Pattern;
 import javax.xml.namespace.QName;
 
 import jakarta.xml.bind.JAXBContext;
@@ -51,6 +52,7 @@ import jakarta.xml.bind.Marshaller;
 import jakarta.xml.bind.Unmarshaller;
 import jakarta.xml.bind.annotation.XmlElement;
 import jakarta.xml.bind.annotation.XmlElementWrapper;
+import jakarta.xml.bind.annotation.XmlTransient;
 import megamek.common.OffBoardDirection;
 import megamek.logging.MMLogger;
 import mekhq.campaign.mission.scenarios.ObjectiveEffect.EffectScalingType;
@@ -90,6 +92,13 @@ public class ScenarioObjective {
     }
 
     private ObjectiveCriterion objectiveCriterion;
+
+    /**
+     * The authored description override. Bound to XML through the field rather than through
+     * {@link #getDescription()}, because that getter falls back to generated text; saving through it would write the
+     * generated text into saves, where it would come back as a stale override that never updates.
+     */
+    @XmlElement(name = "description")
     private String description;
     private OffBoardDirection destinationEdge;
     private int percentage;
@@ -209,7 +218,11 @@ public class ScenarioObjective {
      * optional override, and the only meaningful source for {@link ObjectiveCriterion#Custom} objectives); otherwise
      * the description is generated from the structured definition via {@link #getGeneratedDescription()}, so authors do
      * not have to hand-write text that merely restates the objective's fields.
+     *
+     * <p>Marked {@link XmlTransient} so that saves store only the authored override (see the {@code description}
+     * field), never the generated text.</p>
      */
+    @XmlTransient
     public String getDescription() {
         if (description != null && !description.isBlank()) {
             return description;
@@ -240,7 +253,20 @@ public class ScenarioObjective {
         if (objectiveCriterion == ObjectiveCriterion.Custom) {
             return getOverrideDescription();
         }
+        return buildGeneratedDescription(getTimeLimitString());
+    }
 
+    /**
+     * Builds the generated description using the given time limit clause in place of the objective's own.
+     *
+     * @param timeLimitClause the time limit clause, e.g. {@code " for at least 12 turns"}, or blank for none
+     *
+     * @return the generated description
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private String buildGeneratedDescription(String timeLimitClause) {
         String amount = (fixedAmount != null)
                               ? getFormattedTextAt(RESOURCE_BUNDLE, "objective.amount.units", fixedAmount)
                               : getFormattedTextAt(RESOURCE_BUNDLE, "objective.amount.percentage", percentage);
@@ -260,14 +286,57 @@ public class ScenarioObjective {
         };
         String sentence = getFormattedTextAt(RESOURCE_BUNDLE, criterionKey, amount, edge);
 
-        String timeLimit = getTimeLimitString();
-        if (!timeLimit.isBlank()) {
-            // getTimeLimitString() yields e.g. " within at most 5 turns"; splice it in before the trailing period
-            sentence = sentence.substring(0, sentence.length() - 1) + timeLimit + ".";
+        if (!timeLimitClause.isBlank()) {
+            // the clause reads e.g. " within at most 5 turns"; splice it in before the trailing period
+            sentence = sentence.substring(0, sentence.length() - 1) + timeLimitClause + ".";
         }
 
         String effects = describeEffects();
         return effects.isBlank() ? sentence : sentence + " " + effects;
+    }
+
+    /**
+     * Clears the stored description if it is only generated text that older versions wrote into saves, so the
+     * description is generated again from the objective's current fields. The turn count is allowed to differ, since
+     * that is exactly the part that went stale when the time limit changed after the text was saved. Authored
+     * descriptions, and {@link ObjectiveCriterion#Custom} objectives, are left alone.
+     *
+     * @return {@code true} if a stale description was cleared
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean clearStaleGeneratedDescription() {
+        if ((description == null) || description.isBlank() || (objectiveCriterion == null) ||
+                  (objectiveCriterion == ObjectiveCriterion.Custom)) {
+            return false;
+        }
+
+        boolean matchesGeneratedText;
+        if (timeLimitType == TimeLimitType.None) {
+            matchesGeneratedText = description.equals(buildGeneratedDescription(""));
+        } else {
+            // Generate the text with a marker in place of the turn count, then accept any number (or the "null" an
+            // unset limit printed as) where the marker sits.
+            final String turnCountMarker = "@@TURNS@@";
+            String generatedWithMarker = buildGeneratedDescription(formatTimeLimitClause(turnCountMarker));
+            int markerIndex = generatedWithMarker.indexOf(turnCountMarker);
+            if (markerIndex < 0) {
+                matchesGeneratedText = description.equals(generatedWithMarker);
+            } else {
+                String textBeforeTurnCount = generatedWithMarker.substring(0, markerIndex);
+                String textAfterTurnCount = generatedWithMarker.substring(markerIndex + turnCountMarker.length());
+                Pattern generatedTextPattern = Pattern.compile(Pattern.quote(textBeforeTurnCount) +
+                                                                     "(?:\\d[\\d.,\\s\\p{Zs}]*|null)" +
+                                                                     Pattern.quote(textAfterTurnCount));
+                matchesGeneratedText = generatedTextPattern.matcher(description).matches();
+            }
+        }
+
+        if (matchesGeneratedText) {
+            description = "";
+        }
+        return matchesGeneratedText;
     }
 
     /** Renders the success/failure effects as a compact parenthetical, e.g. {@code (+1 Scenario VP if completed)}. */
@@ -422,8 +491,22 @@ public class ScenarioObjective {
         if (timeLimitType == TimeLimitType.None) {
             return "";
         }
+        return formatTimeLimitClause(getTimeLimit());
+    }
+
+    /**
+     * Formats the time limit clause (at most / at least) around the given turn count.
+     *
+     * @param turnCount the turn count to show
+     *
+     * @return the clause, e.g. {@code " for at least 12 turns"}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private String formatTimeLimitClause(Object turnCount) {
         return getFormattedTextAt(RESOURCE_BUNDLE,
-              isTimeLimitAtMost() ? "objective.timeLimit.atMost" : "objective.timeLimit.atLeast", getTimeLimit());
+              isTimeLimitAtMost() ? "objective.timeLimit.atMost" : "objective.timeLimit.atLeast", turnCount);
     }
 
     /**
@@ -650,6 +733,9 @@ public class ScenarioObjective {
             Unmarshaller um = context.createUnmarshaller();
             JAXBElement<ScenarioObjective> templateElement = um.unmarshal(xmlNode, ScenarioObjective.class);
             resultingObjective = templateElement.getValue();
+            if (resultingObjective != null) {
+                resultingObjective.clearStaleGeneratedDescription();
+            }
         } catch (Exception ex) {
             LOGGER.error("Error Deserializing Scenario Objective", ex);
         }

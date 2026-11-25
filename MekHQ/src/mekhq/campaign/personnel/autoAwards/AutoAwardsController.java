@@ -44,6 +44,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.Kill;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.personnel.Award;
 import mekhq.campaign.personnel.AwardsFactory;
@@ -68,6 +69,75 @@ public class AutoAwardsController {
     final private List<Award> ignoredAwards = new ArrayList<>();
 
     private static final MMLogger logger = MMLogger.create(AutoAwardsController.class);
+
+    private static final List<String> FORMATION_KILL_AWARD_SIZES = List.of("lance", "company", "battalion", "regiment",
+          "brigade", "division", "corps", "army");
+
+    /** Set while {@link #issueEligibleAwards} runs: awards are issued straight away rather than at a ceremony. */
+    private boolean isCeremonySkipped;
+
+    /**
+     * Issues every award the campaign's personnel are eligible for, exactly as accepting the award ceremony unchanged
+     * would, without showing it. Shows nothing, so it is safe to call before the campaign window exists.
+     *
+     * @param campaign the campaign to be processed
+     */
+    public void issueEligibleAwards(Campaign campaign) {
+        isCeremonySkipped = true;
+        try {
+            ManualController(campaign, false);
+        } finally {
+            isCeremonySkipped = false;
+        }
+    }
+
+    /**
+     * Gives a person an award and logs it. A promotion award replaces any promotion award they already hold.
+     *
+     * @param campaign the campaign the person belongs to
+     * @param person   the person receiving the award
+     * @param award    the award
+     */
+    public static void issueAward(Campaign campaign, Person person, Award award) {
+        if (award.canBeAwarded(person)
+                  && award.getItem().equalsIgnoreCase("rank")
+                  && award.getRange().equalsIgnoreCase("Promotion")) {
+            List<Award> awardsForRemoval = new ArrayList<>();
+            for (Award existingAward : person.getAwardController().getAwards()) {
+                if (existingAward.getItem().equalsIgnoreCase("rank")
+                          && existingAward.getRange().equalsIgnoreCase("promotion")) {
+                    awardsForRemoval.add(existingAward);
+                }
+            }
+            for (Award awardPendingRemoval : awardsForRemoval) {
+                person.getAwardController().removeAwardSilent(awardPendingRemoval.getSet(),
+                      awardPendingRemoval.getName(), null);
+            }
+        }
+
+        person.getAwardController().addAndLogAward(campaign, award.getSet(), award.getName(),
+              campaign.getLocalDate());
+    }
+
+    /**
+     * Issues every award in the ceremony's pages that is ticked, as the ceremony's Issue Awards button does when the
+     * player leaves every page as it is.
+     *
+     * @param allAwardData the ceremony's pages: rows of the person's id, the award, and whether it is ticked
+     */
+    private void issueAllAwards(Map<Integer, Map<Integer, List<Object>>> allAwardData) {
+        for (Map<Integer, List<Object>> page : allAwardData.values()) {
+            for (List<Object> row : page.values()) {
+                if (!Boolean.TRUE.equals(row.get(2))) {
+                    continue;
+                }
+                Person person = campaign.getPlayerForce().getHumanResources().getPerson((UUID) row.getFirst());
+                if (person != null) {
+                    issueAward(campaign, person, (Award) row.get(1));
+                }
+            }
+        }
+    }
 
     /**
      * The controller for the manual-automatic processing of Awards
@@ -239,6 +309,11 @@ public class AutoAwardsController {
      */
     public void PostGraduationController(Campaign campaign, List<UUID> personnel,
           HashMap<UUID, List<Object>> academyAttributes) {
+        // Graduation is reported whether or not autoAwards is enabled, so the check is made here
+        if (!campaign.getCampaignOptions().get(CampaignOption.ENABLE_AUTO_AWARDS)) {
+            return;
+        }
+
         logger.info("autoAwards (Education Conclusion) has started");
 
         this.campaign = campaign;
@@ -402,7 +477,7 @@ public class AutoAwardsController {
                         case "kill":
                             if ((!award.getRange().equalsIgnoreCase("scenario"))
                                       && (!award.getRange().equalsIgnoreCase("mission"))) {
-                                if (campaign.getCampaignOptions().get(CampaignOption.ENABLE_FORMATION_KILL_AWARDS)) {
+                                if (isKillAwardTracked(campaign.getCampaignOptions(), award)) {
                                     killAwards.add(award);
                                 } else {
                                     ignoredAwards.add(award);
@@ -496,8 +571,7 @@ public class AutoAwardsController {
                         case "kill":
                             // Scenario Kill Awards are handled by the post-scenario controller
                             if (!award.getRange().equalsIgnoreCase("scenario")) {
-                                if ((campaign.getCampaignOptions().get(CampaignOption.ENABLE_INDIVIDUAL_KILL_AWARDS))
-                                          || (campaign.getCampaignOptions().get(CampaignOption.ENABLE_FORMATION_KILL_AWARDS))) {
+                                if (isKillAwardTracked(campaign.getCampaignOptions(), award)) {
                                     killAwards.add(award);
                                 } else {
                                     ignoredAwards.add(award);
@@ -660,6 +734,25 @@ public class AutoAwardsController {
     }
 
     /**
+     * Checks whether autoAwards tracks a kill award. Individual kill awards follow the individual kill option and
+     * formation kill awards follow the formation kill option.
+     *
+     * @param campaignOptions the campaign options
+     * @param award           the kill award
+     *
+     * @return {@code true} if the award's kind of kill award is enabled
+     */
+    static boolean isKillAwardTracked(CampaignOptions campaignOptions, Award award) {
+        String size = award.getSize();
+        // An award with no size, or one autoAwards doesn't recognise, is treated as an individual award
+        boolean isFormationAward = (size != null) && FORMATION_KILL_AWARD_SIZES.contains(size.toLowerCase());
+
+        return isFormationAward ?
+                     campaignOptions.get(CampaignOption.ENABLE_FORMATION_KILL_AWARDS) :
+                     campaignOptions.get(CampaignOption.ENABLE_INDIVIDUAL_KILL_AWARDS);
+    }
+
+    /**
      * Process the awards for the given personnel.
      *
      * @param personnel            the List of personnel to process awards for
@@ -787,7 +880,9 @@ public class AutoAwardsController {
             }
         }
 
-        if (!allAwardData.isEmpty()) {
+        if (!allAwardData.isEmpty() && isCeremonySkipped) {
+            issueAllAwards(allAwardData);
+        } else if (!allAwardData.isEmpty()) {
             AutoAwardsDialog autoAwardsDialog = new AutoAwardsDialog(campaign, allAwardData, 0);
             autoAwardsDialog.setModalityType(ModalityType.APPLICATION_MODAL);
             autoAwardsDialog.setLocation(autoAwardsDialog.getLocation().x, 0);

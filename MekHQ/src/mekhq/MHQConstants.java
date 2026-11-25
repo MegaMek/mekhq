@@ -172,6 +172,8 @@ public final class MHQConstants extends SuiteConstants {
     public static final String AWAY_FROM_MAIN_FORCE_BACKGROUND = "awayFromMainForceBackground";
     public static final String STRAT_CON_HEX_COORD_FOREGROUND = "stratconHexCoordForeground";
     public static final String USE_ALTERNATE_STRAT_CON_FOG_OF_WAR = "useAlternateStratConFogOfWar";
+    public static final String SHOW_STRAT_CON_SECTOR_ENVIRONMENT = "showStratConSectorEnvironment";
+    public static final String SHOW_STRAT_CON_FACILITY_EFFECTS = "showStratConFacilityEffects";
     public static final String FONT_COLOR_NEGATIVE = "fontColorNegative";
     public static final String FONT_COLOR_AMAZING = "fontColorAmazing";
     public static final String FONT_COLOR_POSITIVE = "fontColorPositive";
@@ -196,6 +198,7 @@ public final class MHQConstants extends SuiteConstants {
     public static final String SAVE_MONTHLY_KEY = "saveMonthly";
     public static final String SAVE_YEARLY_KEY = "saveYearly";
     public static final String SAVE_BEFORE_SCENARIOS_KEY = "saveBeforeScenarios";
+    public static final String SAVE_AFTER_SCENARIOS_KEY = "saveAfterScenarios";
     public static final String SAVE_BEFORE_MISSION_END = "saveBeforeMissionEnd";
     public static final String MAXIMUM_NUMBER_SAVES_KEY = "maximumNumberAutoSaves";
     public static final int DEFAULT_NUMBER_SAVES = 5;
@@ -259,7 +262,6 @@ public final class MHQConstants extends SuiteConstants {
     public static final String INDIVIDUAL_RANK_SYSTEM_DIRECTORY_PATH = "individualRankSystemDirectoryPath";
     public static final String UNIT_SPRITE_EXPORT_DIRECTORY_PATH = "unitSpriteExportDirectoryPath";
     public static final String LAYERED_FORCE_ICON_DIRECTORY_PATH = "layeredFormationIconDirectoryPath";
-    public static final String LAUNCHER_NEW_PLAYER_QUICKSTART_PATH = "campaigns/The Learning Ropes.cpnx.gz";
     // endregion File Paths
 
     // region Nag Tab

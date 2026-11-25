@@ -277,7 +277,7 @@ public class CombatTeam {
     /**
      * This static method updates the combat teams across the campaign. It starts at the top level formation, and
      * calculates the combat teams for each sub-formation. It keeps only the eligible combat teams and imports them into
-     * the campaign. After every formation is processed, an 'OrganizationChangedEvent' is triggered by that formation.
+     * the campaign. Once every formation is processed, a single 'OrganizationChangedEvent' is triggered.
      *
      * @param campaign the current campaign.
      */
@@ -307,17 +307,18 @@ public class CombatTeam {
             formation.setCombatTeamStatus(isEligible);
         }
 
-        // Update the TO&E and then begin recursively walking it
-        MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+        // Walk the rest of the TO&E, then tell the TO&E once. An event per formation made a single unit move fire
+        // hundreds of events on a large campaign, and every listener only needs to know that something changed.
         recalculateSubFormationStrategicStatus(campaign,
               campaign.getPlayerForce().getCombatTeamsAsMap(campaign), formation);
+        MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
     }
 
     /**
      * This method is used to update the combat teams for the campaign working downwards from a specified node, through
      * all of its sub-formations. It creates a new {@link CombatTeam} for each sub-formation and checks its eligibility.
      * Eligible formations are imported into the campaign, and the combat team status of the respective formation is set
-     * to {@code true}. After every formation is processed, an 'OrganizationChangedEvent' is triggered. This function
+     * to {@code true}. This function
      * runs recursively on each sub-formation, effectively traversing the complete TO&E.
      *
      * @param campaign    the current {@link Campaign}.
@@ -352,8 +353,7 @@ public class CombatTeam {
                 formation.setCombatTeamStatus(isEligible);
             }
 
-            // Update the TO&E and then continue recursively walking it
-            MekHQ.triggerEvent(new OrganizationChangedEvent(formation));
+            // Continue recursively walking the TO&E; recalculateCombatTeams fires the one event when the walk ends
             recalculateSubFormationStrategicStatus(campaign,
                   campaign.getPlayerForce().getCombatTeamsAsMap(campaign), formation);
         }

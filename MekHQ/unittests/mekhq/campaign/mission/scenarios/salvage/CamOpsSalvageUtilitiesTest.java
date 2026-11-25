@@ -247,6 +247,22 @@ class CamOpsSalvageUtilitiesTest {
         void handlessMekCannotUseCargoInSpace() {
             assertFalse(REVISED_RULES.canSalvage(handlessMek(10.0, true), true));
         }
+
+        /**
+         * The planner tells "Not fully crewed" apart from "Not in this environment" by whether the unit is equipped.
+         */
+        @Test
+        void shortCrewedHandlessMekWithCargoIsEquippedButCannotSalvage() {
+            Unit unit = handlessMek(10.0, false);
+
+            assertTrue(REVISED_RULES.isEquippedToSalvage(unit, false));
+            assertFalse(REVISED_RULES.canSalvage(unit, false));
+        }
+
+        @Test
+        void strictRulesDontCountAHandlessMekAsEquipped() {
+            assertFalse(STRICT_RULES.isEquippedToSalvage(handlessMek(10.0, true), false));
+        }
     }
 
     @Nested

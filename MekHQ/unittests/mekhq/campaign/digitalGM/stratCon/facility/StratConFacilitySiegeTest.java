@@ -111,7 +111,6 @@ class StratConFacilitySiegeTest {
         campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
         options = mock(CampaignOptions.class);
         when(options.get(CampaignOption.USE_FACILITY_OPERATIONS)).thenReturn(true);
-        when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(0.0);
         when(options.get(CampaignOption.USE_FATIGUE)).thenReturn(false);
         when(options.get(CampaignOption.FATIGUE_RATE)).thenReturn(1);
         when(options.isUseStratConMaplessMode()).thenReturn(false);
@@ -308,7 +307,6 @@ class StratConFacilitySiegeTest {
 
         @Test
         void aBesiegedFacilityGetsNoUpkeep() {
-            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(1.0);
             track.getCutOffFacilities().clear();
             facility.setGarrison(0);
             besiege(FORMATION_ID, 0);
@@ -345,10 +343,9 @@ class StratConFacilitySiegeTest {
 
         @Test
         void aCutOffFacilityIsNeverRelieved() {
-            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(3.0);
             besiege(FORMATION_ID, 0);
 
-            assertNull(StratConFacilitySiege.tryRelief(campaign, contract, track, FACILITY_COORDS, FORMATION_ID));
+            assertNull(StratConFacilitySiege.tryRelief(campaign, contract, track, FACILITY_COORDS, FORMATION_ID, 0));
         }
     }
 
@@ -629,10 +626,10 @@ class StratConFacilitySiegeTest {
         }
 
         @Test
-        void aRoutedGarrisonNeverSorties() {
+        void aGarrisonNeverSortiesWhileTheContractIsPeaceful() {
             track.getCutOffFacilities().clear();
             track.setScenarioOdds(100);
-            when(contract.getMoraleLevel()).thenReturn(ContractMoraleLevel.ROUTED);
+            when(contract.isPeaceful()).thenReturn(true);
             besiege(FORMATION_ID, 0);
 
             assertNull(StratConFacilitySiege.trySortie(campaign,
@@ -658,22 +655,23 @@ class StratConFacilitySiegeTest {
         }
 
         @Test
-        void noReliefComesWithoutEnemyActivity() {
+        void noReliefComesOnARollAboveItsChance() {
             track.getCutOffFacilities().clear();
             besiege(FORMATION_ID, 0);
 
-            assertNull(StratConFacilitySiege.tryRelief(campaign, contract, track, FACILITY_COORDS, FORMATION_ID));
-            assertNull(campaignState.getLastCounterattackDate());
+            assertNull(StratConFacilitySiege.tryRelief(campaign,
+                  contract,
+                  track,
+                  FACILITY_COORDS,
+                  FORMATION_ID,
+                  StratConEnemyFacilityActivity.RELIEF_CHANCE_PERCENT));
         }
 
         @Test
-        void aReliefForceWithNoBesiegerToFallOnDoesNotCountAsACounterattack() {
+        void noReliefComesWithNoBesiegerToFallOn() {
             track.getCutOffFacilities().clear();
-            when(options.get(CampaignOption.ENEMY_FACILITY_ACTIVITY)).thenReturn(3.0);
-            campaignState.setLastCounterattackDate(TODAY.minusDays(100));
 
-            assertNull(StratConFacilitySiege.tryRelief(campaign, contract, track, FACILITY_COORDS, FORMATION_ID));
-            assertEquals(TODAY.minusDays(100), campaignState.getLastCounterattackDate());
+            assertNull(StratConFacilitySiege.tryRelief(campaign, contract, track, FACILITY_COORDS, FORMATION_ID, 0));
         }
     }
 }

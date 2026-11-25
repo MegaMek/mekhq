@@ -88,6 +88,7 @@ import megamek.common.units.SmallCraft;
 import megamek.common.units.Tank;
 import megamek.common.weapons.bayWeapons.BayWeapon;
 import megamek.logging.MMLogger;
+import megamek.release.ReleaseChannel;
 import mekhq.MHQConstants;
 import mekhq.MekHQ;
 import mekhq.NullEntityException;
@@ -723,6 +724,27 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             for (Person person : campaign.getPlayerForce().getHumanResources().getPersonnel()) {
                 AdvancedMedicalAlternateImplants.recordMissingDerivedImplantProsthetics(campaign, person);
             }
+        }
+    }
+
+    /**
+     * Removes any dead prisoners still on the roster.
+     *
+     * <p>Prisoners are removed from the roster when they die, but earlier versions left them there, where the player
+     * could still free, execute, or ransom them.</p>
+     *
+     * @param campaign the campaign that has just been loaded
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static void removeDeadPrisoners(Campaign campaign) {
+        ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
+        List<Person> deadPrisoners = humanResources.getPersonnel().stream().filter(Person::isDeadPrisoner).toList();
+
+        for (Person prisoner : deadPrisoners) {
+            LOGGER.info("Removing dead prisoner from the roster: {}", prisoner.getFullTitle());
+            humanResources.removePerson(campaign, prisoner);
         }
     }
 
@@ -1736,14 +1758,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /**
-     * Processes a custom unit in a campaign.
-     *
-     * @param retVal The {@see Campaign} being parsed.
-     * @param wn     The current XML element representing a custom unit.
-     *
-     * @return A value indicating whether a new custom unit file was added to disk.
-     */
-    /**
      * Keeps an existing campaign on its original CamOps reputation instead of silently switching it to Chaos
      * Reputation.
      *
@@ -1802,6 +1816,14 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         return false;
     }
 
+    /**
+     * Processes a custom unit in a campaign.
+     *
+     * @param retVal The {@see Campaign} being parsed.
+     * @param wn     The current XML element representing a custom unit.
+     *
+     * @return A value indicating whether a new custom unit file was added to disk.
+     */
     private static boolean processCustom(Campaign retVal, Node wn) {
         String sCustomsDir = "data" +
                                    File.separator +
@@ -2008,11 +2030,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     private static void processUnitNodes(Campaign retVal, Node wn, Version version) {
         LOGGER.info("Loading Unit Nodes from XML...");
 
-        NodeList wList = wn.getChildNodes();
-
-        // Okay, lets iterate through the children, eh?
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
+        // Walk the siblings rather than indexing getChildNodes(): each child's own NodeList can take this list's
+        // shared Xerces cache, after which every getLength() and item(x) re-walks the list from the start, making
+        // a large campaign's load quadratic in the number of units
+        for (Node wn2 = wn.getFirstChild(); wn2 != null; wn2 = wn2.getNextSibling()) {
 
             // If it's not an element node, we ignore it.
             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
@@ -2037,12 +2058,11 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     private static void processPartNodes(Campaign retVal, Node wn, Version version) {
         LOGGER.info("Loading Part Nodes from XML...");
 
-        NodeList wList = wn.getChildNodes();
-
-        // Okay, lets iterate through the children, eh?
+        // Walk the siblings rather than indexing getChildNodes(): each child's own NodeList can take this list's
+        // shared Xerces cache, after which every getLength() and item(x) re-walks the list from the start, making
+        // a large campaign's load quadratic in the number of parts
         List<Part> parts = new ArrayList<>();
-        for (int x = 0; x < wList.getLength(); x++) {
-            Node wn2 = wList.item(x);
+        for (Node wn2 = wn.getFirstChild(); wn2 != null; wn2 = wn2.getNextSibling()) {
 
             // If it's not an element node, we ignore it.
             if (wn2.getNodeType() != Node.ELEMENT_NODE) {
@@ -2179,6 +2199,17 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
     }
 
     /**
+     * Reads the release channel of the build that wrote a save from its root {@code campaign} element.
+     *
+     * @param campaignElement the save's root element
+     *
+     * @return the channel, or {@code null} for a save written by a development build or before channels were saved
+     */
+    public static @Nullable ReleaseChannel parseVersionChannel(Element campaignElement) {
+        return ReleaseChannel.fromKey(campaignElement.getAttribute("channel"));
+    }
+
+    /**
      * Designed to create a campaign object from an input stream containing an XML structure.
      *
      * @return The created Campaign object, or null if there was a problem.
@@ -2226,6 +2257,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Assuming there is no upgrade path, we set version and continue parsing the campaign.
         campaign.setVersion(version);
+        campaign.setVersionChannel(parseVersionChannel(campaignEle));
 
         // Indicates whether new units were written to disk while
         // loading the Campaign file. If so, we need to kick back off loading
@@ -2759,8 +2791,22 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Build a new, clean warehouse from the current parts
         LocalWarehouse warehouse = new LocalWarehouse();
+        // Only spares merge, and only into spares, but every merge scans the whole warehouse for a match. Adding the
+        // spares first, in their usual order, keeps each scan to the spares added so far instead of every part fitted
+        // to a unit as well, which on a large campaign cut minutes of quadratic work from loading. The fitted parts
+        // are added afterwards, where they never merge.
+        List<Part> partsInMergeOrder = new ArrayList<>();
+        List<Part> fittedParts = new ArrayList<>();
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         for (Part part : campaign.getPlayerForce().getWarehouse().getParts()) {
+            if (part.isSpare()) {
+                partsInMergeOrder.add(part);
+            } else {
+                fittedParts.add(part);
+            }
+        }
+        partsInMergeOrder.addAll(fittedParts);
+        for (Part part : partsInMergeOrder) {
             // Remove empty AmmoStorage entries that shouldn't exist (see #7414)
             if (part instanceof AmmoStorage ammoStorage && ammoStorage.getShots() <= 0 && part.isSpare()) {
                 LOGGER.info("Discarding empty AmmoStorage: {}", part.getName());
@@ -2851,6 +2897,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         LegacyContractConverter.settlePendingLegacyContracts(campaign);
         // Free any forces stranded on the scenarios of contracts whose completion was interrupted in earlier versions.
         MissionCompletionManager.releaseCompletedContractDeployments(campaign);
+        // Has to come after everyone has been reconnected to their location, so nobody is reconnected after removal
+        removeDeadPrisoners(campaign);
         LOGGER.info("Load of campaign file complete!");
 
         return campaign;

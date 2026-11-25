@@ -81,6 +81,7 @@ import java.awt.event.MouseEvent;
 import java.time.LocalDate;
 import java.util.*;
 import java.util.function.BiConsumer;
+import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
@@ -107,6 +108,7 @@ import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.Utilities;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.Kill;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
@@ -139,6 +141,7 @@ import mekhq.campaign.personnel.medical.BodyLocation;
 import mekhq.campaign.personnel.medical.advancedMedical.InjuryUtil;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.DiseaseService;
 import mekhq.campaign.personnel.medical.advancedMedicalAlternate.Inoculations;
+import mekhq.campaign.personnel.procreation.AbstractProcreation;
 import mekhq.campaign.personnel.quartermaster.AbstractKitIssuer;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.quartermaster.ArmorKitIssuer;
@@ -249,6 +252,10 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private static final String CMD_REMOVE_SPOUSE = "REMOVE_SPOUSE";
     private static final String CMD_ADD_PREGNANCY = "ADD_PREGNANCY";
     private static final String CMD_REMOVE_PREGNANCY = "PREGNANCY_SPOUSE";
+    private static final String CMD_CHANGE_PREGNANCY_SIZE = "CHANGE_PREGNANCY_SIZE";
+    private static final String CMD_GIVE_BIRTH_NOW = "GIVE_BIRTH_NOW";
+    /** Passed with {@link #CMD_ADD_PREGNANCY} to roll the number of babies as normal. */
+    private static final int RANDOM_PREGNANCY_SIZE = 0;
     private static final String CMD_LOYALTY = "LOYALTY";
     private static final String CMD_PERSONALITY = "PERSONALITY";
     private static final String CMD_ADD_RANDOM_ABILITY = "ADD_RANDOM_ABILITY";
@@ -314,6 +321,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     private final PersonnelTableModel personnelModel;
 
     private static final String GUI_RESOURCE_BUNDLE = "mekhq.resources.GUI";
+    private static final String PERSONNEL_RESOURCE_BUNDLE = "mekhq.resources.Personnel";
     @Deprecated(since = "0.50.11", forRemoval = true)
     private final transient ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.GUI",
           MekHQ.getMHQOptions().getLocale());
@@ -401,7 +409,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_RANK_SYSTEM: {
-                final RankSystem rankSystem = Ranks.getRankSystemFromCode(data[1]);
+                final RankSystem rankSystem = Ranks.getRankSystemFromCode(data[1],
+                      getCampaign().getPlayerForce().getRankSystem());
                 final RankValidator rankValidator = new RankValidator();
                 for (final Person person : people) {
                     person.setRankSystem(rankValidator, rankSystem);
@@ -479,7 +488,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                     campaign.getPlayerForce().getHumanResources().personUpdated(campaign, person);
                     if (getCampaignOptions().isUsePortraitForRole(role) &&
                               getCampaignOptions().get(CampaignOption.ASSIGN_PORTRAIT_ON_ROLE_CHANGE) &&
-                              person.getPortrait().hasDefaultFilename()) {
+                              person.getPortrait().hasDefaultFilename() &&
+                              ForceHumanResources.isRankEligibleForRandomPortrait(getCampaignOptions(), person)) {
                         Campaign campaign1 = getCampaign();
                         campaign1.getPlayerForce()
                               .getHumanResources()
@@ -500,15 +510,48 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 break;
             }
             case CMD_ADD_PREGNANCY: {
+                final AbstractProcreation procreation = getCampaign().getPlayerForce()
+                                                              .getHumanResources()
+                                                              .getProcreation();
+                final int size = MathUtility.parseInt(data[1]);
                 Stream.of(people)
                       .filter(person -> person.getGender().isFemale())
-                      .filter(person -> (getCampaign().getPlayerForce().getHumanResources().getProcreation()
-                                               .canProcreate(getCampaign().getLocalDate(), person, false) == null))
+                      .filter(person -> (procreation.canProcreate(getCampaign().getLocalDate(), person, false) ==
+                                               null))
                       .forEach(person -> {
-                          getCampaign().getPlayerForce().getHumanResources().getProcreation()
-                                .addPregnancy(getCampaign(), getCampaign().getLocalDate(), person, false);
+                          if (size == RANDOM_PREGNANCY_SIZE) {
+                              procreation.addPregnancy(getCampaign(), getCampaign().getLocalDate(), person, false);
+                          } else {
+                              procreation.addPregnancy(getCampaign(),
+                                    getCampaign().getLocalDate(),
+                                    person,
+                                    size,
+                                    false);
+                          }
                           MekHQ.triggerEvent(new PersonChangedEvent(person));
                       });
+                break;
+            }
+            case CMD_CHANGE_PREGNANCY_SIZE: {
+                final AbstractProcreation procreation = getCampaign().getPlayerForce()
+                                                              .getHumanResources()
+                                                              .getProcreation();
+                final int size = MathUtility.parseInt(data[1]);
+                Stream.of(people).filter(Person::isPregnant).forEach(person -> {
+                    procreation.setPregnancySize(person, size);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                });
+                break;
+            }
+            case CMD_GIVE_BIRTH_NOW: {
+                // Births happen today, however far along the pregnancy is, with the usual reports and recovery
+                final AbstractProcreation procreation = getCampaign().getPlayerForce()
+                                                              .getHumanResources()
+                                                              .getProcreation();
+                Stream.of(people).filter(Person::isPregnant).forEach(person -> {
+                    procreation.birth(getCampaign(), getCampaign().getLocalDate(), person);
+                    MekHQ.triggerEvent(new PersonChangedEvent(person));
+                });
                 break;
             }
             case CMD_REMOVE_PREGNANCY: {
@@ -1534,7 +1577,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
 
                 PopupValueChoiceDialog salaryDialog = new PopupValueChoiceDialog(getFrame(),
                       true,
-                      resources.getString("changeSalary.text"),
+                      resources.getString("setSalary.text"),
+                      resources.getString("changeSalary.instructions"),
                       Math.clamp(originalSalary, -1, 1000000000),
                       -1,
                       1000000000);
@@ -2054,7 +2098,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
         JMenu changeRankSystemMenu = new JMenu(resources.getString("changeRankSystem.text"));
         final RankSystem campaignRankSystem = getCampaign().getPlayerForce().getRankSystem();
         // First allow them to revert to the campaign system
-        cbMenuItem = new JCheckBoxMenuItem(resources.getString("useCampaignRankSystem.text"));
+        cbMenuItem = new JCheckBoxMenuItem(getFormattedTextAt("mekhq.resources.GUI", "useCampaignRankSystem.text",
+              campaignRankSystem.toString()));
         cbMenuItem.setSelected(campaignRankSystem.equals(person.getRankSystem()));
         cbMenuItem.setActionCommand(makeCommand(CMD_RANK_SYSTEM, campaignRankSystem.getCode()));
         cbMenuItem.addActionListener(this);
@@ -3500,6 +3545,8 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                 }
             });
             menu.add(miSecondInCommand);
+
+            addSeniorAppointmentsMenu(menu, person);
         }
 
         addFlagMenuItem(menu, selected, "blockMaternityLeave", null, Person::isBlockMaternityLeave,
@@ -3841,20 +3888,48 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                           .filter(p -> p.getGender().isFemale())
                           .anyMatch(p -> getCampaign().getPlayerForce().getHumanResources().getProcreation()
                                                .canProcreate(getCampaign().getLocalDate(), p, false) == null)) {
-                    menuItem = new JMenuItem(resources.getString(oneSelected ?
-                                                                       "addPregnancy.text" :
-                                                                       "addPregnancies.text"));
-                    menuItem.setActionCommand(CMD_ADD_PREGNANCY);
+                    // A random number of babies as normal, or a set number for twins, triplets, and so on
+                    JMenu addPregnancyMenu = new JMenu(resources.getString(oneSelected ?
+                                                                                 "addPregnancy.text" :
+                                                                                 "addPregnancies.text"));
+                    menuItem = new JMenuItem(getText("pregnancySize.random.text"));
+                    menuItem.setActionCommand(makeCommand(CMD_ADD_PREGNANCY, String.valueOf(RANDOM_PREGNANCY_SIZE)));
                     menuItem.addActionListener(this);
-                    familyMenu.add(menuItem);
+                    addPregnancyMenu.add(menuItem);
+                    addPregnancyMenu.addSeparator();
+                    addPregnancySizeItems(addPregnancyMenu, CMD_ADD_PREGNANCY, null);
+                    familyMenu.add(addPregnancyMenu);
                 }
 
                 if (Stream.of(selected).anyMatch(Person::isPregnant)) {
+                    JMenu changePregnancySizeMenu = new JMenu(getText("changePregnancySize.text"));
+                    // With one person selected, their current number of babies is shown but can't be picked
+                    Integer currentSize = (oneSelected && person.isPregnant()) ?
+                                                person.getExtraData().get(AbstractProcreation.PREGNANCY_CHILDREN_DATA,
+                                                      1) :
+                                                null;
+                    addPregnancySizeItems(changePregnancySizeMenu, CMD_CHANGE_PREGNANCY_SIZE, currentSize);
+                    familyMenu.add(changePregnancySizeMenu);
+
+                    menuItem = new JMenuItem(getText("giveBirthNow.text"));
+                    menuItem.setToolTipText(wordWrap(getText("giveBirthNow.tooltip")));
+                    menuItem.setActionCommand(CMD_GIVE_BIRTH_NOW);
+                    menuItem.addActionListener(this);
+                    familyMenu.add(menuItem);
+
                     menuItem = new JMenuItem(resources.getString(oneSelected ?
                                                                        "removePregnancy.text" :
                                                                        "removePregnancies.text"));
                     menuItem.setActionCommand(CMD_REMOVE_PREGNANCY);
                     menuItem.addActionListener(this);
+                    familyMenu.add(menuItem);
+                }
+
+                // A biological child they already had, or an adopted child, for parents of any gender
+                if (oneSelected && !person.isChild(getCampaign().getLocalDate(), true)) {
+                    menuItem = new JMenuItem(getText("addNewChild.text"));
+                    menuItem.addActionListener(evt -> new AddChildDialog(getFrame(), getCampaign(), person)
+                                                            .setVisible(true));
                     familyMenu.add(menuItem);
                 }
             }
@@ -4045,6 +4120,25 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
     }
 
     /**
+     * Adds an item to the menu for each possible number of babies, from a single baby up to the most a pregnancy can
+     * have. Each item sends the given command with its number of babies.
+     *
+     * @param menu        the menu to add the items to
+     * @param command     the command each item sends
+     * @param currentSize the selected person's current number of babies, whose item is disabled, or {@code null} if
+     *                    there is none
+     */
+    private void addPregnancySizeItems(final JMenu menu, final String command, final @Nullable Integer currentSize) {
+        for (int size = 1; size <= AbstractProcreation.MAXIMUM_PREGNANCY_SIZE; size++) {
+            JMenuItem sizeItem = new JMenuItem(getText("pregnancySize." + size + ".text"));
+            sizeItem.setActionCommand(makeCommand(command, String.valueOf(size)));
+            sizeItem.addActionListener(this);
+            sizeItem.setEnabled((currentSize == null) || (currentSize != size));
+            menu.add(sizeItem);
+        }
+    }
+
+    /**
      * Creates a menu for changing the primary role of the selected personnel.
      * <p>
      * Evaluates the provided roles against the currently selected people to determine eligibility. Roles are
@@ -4212,6 +4306,93 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
             }
         }
         JMenuHelpers.addMenuIfNonEmpty(menu, deprecatedRoles);
+    }
+
+    /**
+     * Adds a submenu for the senior posts the company generator hands out, so the player can move a post to
+     * someone else or take it away. Each post has one holder, so appointing someone removes it from whoever held
+     * it before. A department head is one per department, so only the head of the same primary role is replaced.
+     *
+     * @param menu   the Flags menu to add the submenu to
+     * @param person the single selected person
+     */
+    private void addSeniorAppointmentsMenu(JMenu menu, Person person) {
+        JMenu appointmentsMenu = new JMenu(resources.getString("miSeniorAppointments.text"));
+        appointmentsMenu.setName("miSeniorAppointments");
+
+        addSeniorAppointmentMenuItem(appointmentsMenu, person, "miChiefMedicalOfficer",
+              Person::isChiefMedicalOfficer, Person::setChiefMedicalOfficer,
+              holder -> getTextAt(PERSONNEL_RESOURCE_BUNDLE, "seniorAppointment.chiefMedicalOfficer.title"));
+        addSeniorAppointmentMenuItem(appointmentsMenu, person, "miHeadTechnician",
+              Person::isHeadTechnician, Person::setHeadTechnician,
+              holder -> getTextAt(PERSONNEL_RESOURCE_BUNDLE, "seniorAppointment.headTechnician.title"));
+        addSeniorAppointmentMenuItem(appointmentsMenu, person, "miChiefAdministrator",
+              Person::isChiefAdministrator, Person::setChiefAdministrator,
+              holder -> getTextAt(PERSONNEL_RESOURCE_BUNDLE, "seniorAppointment.chiefAdministrator.title"));
+
+        // The generator only heads tech departments. The item still shows for anyone already flagged, so a head
+        // who has since changed role can have the post taken away.
+        PersonnelRole department = person.getPrimaryRole();
+        if (department.isTech() || person.isDepartmentHead()) {
+            addSeniorAppointmentMenuItem(appointmentsMenu, person, "miDepartmentHead",
+                  holder -> holder.isDepartmentHead() && (holder.getPrimaryRole() == department),
+                  Person::setDepartmentHead, Person::getDepartmentHeadTitle);
+        }
+
+        menu.add(appointmentsMenu);
+    }
+
+    /**
+     * Adds a checkbox for one senior post. Ticking it appoints the person and removes the post from every other
+     * holder; unticking it removes the post from the person. Each change is written to the daily report.
+     *
+     * @param menu        the menu to add the item to
+     * @param person      the single selected person
+     * @param resourceKey the resource bundle key for the item text and tooltip
+     * @param holdsPost   whether a given person holds this post
+     * @param setter      sets or clears the post on a person
+     * @param postTitle   the post's display name for a holder, read while they still hold it
+     */
+    private void addSeniorAppointmentMenuItem(JMenu menu, Person person, String resourceKey,
+          Predicate<Person> holdsPost, BiConsumer<Person, Boolean> setter, Function<Person, String> postTitle) {
+        JCheckBoxMenuItem item = new JCheckBoxMenuItem(resources.getString(resourceKey + ".text"));
+        item.setToolTipText(resources.getString(resourceKey + ".toolTipText"));
+        item.setName(resourceKey);
+        boolean alreadyHoldsPost = holdsPost.test(person);
+        item.setSelected(alreadyHoldsPost);
+        item.addActionListener(event -> {
+            if (alreadyHoldsPost) {
+                removeSeniorAppointment(person, setter, postTitle);
+                return;
+            }
+            for (Person incumbent : getCampaign().getPlayerForce().getPersonnel().values()) {
+                if ((incumbent != person) && holdsPost.test(incumbent)) {
+                    removeSeniorAppointment(incumbent, setter, postTitle);
+                }
+            }
+            setter.accept(person, true);
+            getCampaign().addReport(PERSONNEL, getFormattedText("appointedSeniorPost.format",
+                  person.getHyperlinkedFullTitle(), postTitle.apply(person)));
+            MekHQ.triggerEvent(new PersonChangedEvent(person));
+        });
+        menu.add(item);
+    }
+
+    /**
+     * Takes a senior post away from its holder and writes the change to the daily report.
+     *
+     * @param holder    the person losing the post
+     * @param setter    clears the post on a person
+     * @param postTitle the post's display name, read before the post is cleared because a department head's title
+     *                  is empty once the flag is off
+     */
+    private void removeSeniorAppointment(Person holder, BiConsumer<Person, Boolean> setter,
+          Function<Person, String> postTitle) {
+        String title = postTitle.apply(holder);
+        setter.accept(holder, false);
+        getCampaign().addReport(PERSONNEL, getFormattedText("removedSeniorPost.format",
+              holder.getHyperlinkedFullTitle(), title));
+        MekHQ.triggerEvent(new PersonChangedEvent(holder));
     }
 
     /**

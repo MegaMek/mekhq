@@ -99,6 +99,12 @@ public final class LegacyContractConverter {
     /** Placeholder objective when the legacy save has none. */
     private static final ContractObjectiveType DEFAULT_OBJECTIVE = ContractObjectiveType.GARRISON_DUTY;
 
+    /**
+     * The most months a rout lasted under the old model, which ended it {@code max(1, d6 - 3)} months, less a day,
+     * after it began (see {@link #hasRaidedBeforeRaidModel}).
+     */
+    static final int LEGACY_MAXIMUM_ROUT_MONTHS = 3;
+
     private LegacyContractConverter() {}
 
     /**
@@ -157,7 +163,8 @@ public final class LegacyContractConverter {
         int difficulty = 0;
 
         ContractMoraleLevel moraleLevel = ContractMoraleLevel.STALEMATE;
-        LocalDate routEndDate = null;
+        // A legacy rout end date marks a lull (see convertLegacyRout)
+        boolean hasRoutEnd = false;
         Money routedPayout = null;
 
         // Matches the legacy default: a contract that never involved a Batchall counts as accepted.
@@ -214,8 +221,8 @@ public final class LegacyContractConverter {
                     case "holdingCellsRented" -> holdingCells = MathUtility.parseInt(value);
                     case "requiredCombatTeams" -> scale = MathUtility.parseInt(value);
                     case "difficulty" -> difficulty = MathUtility.parseInt(value);
-                    case "moraleLevel" -> moraleLevel = ContractMoraleLevel.valueOf(value);
-                    case "routEnd" -> routEndDate = MHQXMLUtility.parseDate(value);
+                    case "moraleLevel" -> moraleLevel = ContractMoraleLevel.parseFromString(value);
+                    case "routEnd" -> hasRoutEnd = true;
                     case "routedPayout" -> routedPayout = Money.fromXmlString(value);
                     case "batchallAccepted" -> batchallAccepted = Boolean.parseBoolean(value);
                     case "sharesPct" -> sharesPercent = MathUtility.parseInt(value);
@@ -286,7 +293,9 @@ public final class LegacyContractConverter {
         contract.setObjectiveData(new ContractObjectiveData(objective, ContractObjectiveType.UNDEFINED));
         contract.setContractFinanceData(new ContractFinanceData(transportAmount, baseAmount, Money.zero()));
         contract.setRentedFacilitiesData(new RentedFacilitiesData(hospitalBeds, kitchens, holdingCells));
-        contract.setMoraleData(new MoraleData(moraleLevel, routEndDate, routedPayout));
+        contract.setMoraleData(hasRoutEnd
+                                     ? convertLegacyRout(moraleLevel, objective, routedPayout)
+                                     : new MoraleData(moraleLevel, false, routedPayout));
 
         // Point any restored StratCon state back at its new contract.
         if (contract.getStratConCampaignState() != null) {
@@ -313,6 +322,68 @@ public final class LegacyContractConverter {
             }
         }
         return contract;
+    }
+
+    /**
+     * Reads a rout from a save from before 0.51.01, which gave the rout an end date. On a garrison-type
+     * contract (see {@link ContractObjectiveType#isGarrisonType()}) that rout was a lull with no enemy activity, which
+     * is now a peaceful spell between raids; on any other contract the lull simply ends. Either way the enemy does not
+     * stay at its lowest level: as when a lull used to end, it returns no lower than Stalemate.
+     *
+     * @param moraleLevel   the morale level read from the save, or {@code null} if none was
+     * @param objectiveType the contract's objective, or {@code null} if unknown
+     * @param finalPayout   the final payout read from the save, or {@code null} if none was
+     *
+     * @return the contract's morale data
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static MoraleData convertLegacyRout(@Nullable ContractMoraleLevel moraleLevel,
+          @Nullable ContractObjectiveType objectiveType, @Nullable Money finalPayout) {
+        boolean isPeaceful = (objectiveType != null) && objectiveType.isGarrisonType();
+        ContractMoraleLevel level = ((moraleLevel == null) || moraleLevel.isScattered())
+                                          ? ContractMoraleLevel.STALEMATE
+                                          : moraleLevel;
+        return new MoraleData(level, isPeaceful, finalPayout);
+    }
+
+    /**
+     * Works out whether the enemy has already raided a garrison-type contract saved under the old rout
+     * model, which began such a contract with the enemy routed. An enemy that is active had come back from a rout, so
+     * it has raided - and brought any Batchall - already. One that is routed has too, unless this is still the rout the
+     * contract began with.
+     *
+     * <p>The old model ended every rout on the day before a whole number of months - one to
+     * {@value #LEGACY_MAXIMUM_ROUT_MONTHS} - after the day it began, and began the contract's own rout on its start
+     * date. So a rout ending on one of those days from the start date is taken for the rout the contract began with.
+     * A later rout ends on such a day from when it began instead, and only lines up with the start date if it began on
+     * a monthly anniversary of it. Comparing against a span of months alone is not enough: a rout begun a month into
+     * the contract can still end within three months of its start.</p>
+     *
+     * @param startDate         the contract's start date, or {@code null} if unknown
+     * @param legacyRoutEndDate the end date of the rout in progress, or {@code null} if the enemy was active
+     *
+     * @return {@code true} if the enemy has already raided
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static boolean hasRaidedBeforeRaidModel(@Nullable LocalDate startDate, @Nullable LocalDate legacyRoutEndDate) {
+        if (legacyRoutEndDate == null) {
+            return true;
+        }
+
+        if (startDate == null) {
+            return false;
+        }
+
+        for (int months = 1; months <= LEGACY_MAXIMUM_ROUT_MONTHS; months++) {
+            if (legacyRoutEndDate.equals(startDate.plusMonths(months).minusDays(1))) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /** Credits a closed-out legacy contract's outstanding lump sum (its routed payout) to the player. */

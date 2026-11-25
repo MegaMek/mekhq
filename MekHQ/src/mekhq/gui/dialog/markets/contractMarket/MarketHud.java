@@ -33,32 +33,32 @@
 package mekhq.gui.dialog.markets.contractMarket;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
-import static mekhq.gui.baseComponents.hud.HudStyle.BORDER;
-import static mekhq.gui.baseComponents.hud.HudStyle.DIVIDER;
-import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE;
 import static mekhq.gui.baseComponents.hud.HudStyle.SURFACE_HIGHLIGHT;
-import static mekhq.gui.baseComponents.hud.HudStyle.TEXT;
-import static mekhq.gui.baseComponents.hud.HudStyle.TEXT_FAINT;
 import static mekhq.gui.baseComponents.hud.HudStyle.hudFont;
 import static mekhq.gui.baseComponents.hud.HudStyle.translucent;
 
 import java.awt.*;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
-import javax.swing.*;
-import javax.swing.plaf.basic.BasicHTML;
+import javax.swing.BorderFactory;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
+import javax.swing.JComponent;
+import javax.swing.JLabel;
+import javax.swing.JPanel;
+import javax.swing.JTextArea;
+import javax.swing.SwingUtilities;
 import javax.swing.text.DefaultCaret;
-import javax.swing.text.View;
 
-import jakarta.annotation.Nullable;
-import mekhq.campaign.personnel.Person;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudStyle;
 
 /**
  * Layout pieces shared by the contract market's board, dossier and comparison, built on the HUD kit in the style of the
- * Oracle Console: label-and-value rows, compact readouts, outlined badges, the difficulty pip meter and small painted
- * icons. Colours and fonts come from {@link HudStyle}.
+ * Oracle Console: compact readouts, wrapped text, the difficulty pip meter, small painted icons and the layouts that
+ * wrap columns to the window's width. The general pieces (columns, scroll panes, label-and-value sections, badges and
+ * portraits) are in {@link Hud}. Colours and fonts come from {@link HudStyle}.
  *
  * @author Illiani
  * @since 0.51.01
@@ -71,128 +71,44 @@ final class MarketHud {
 
     // region Containers
 
-    /** @return a transparent panel that stacks its children vertically */
-    static JPanel column() {
-        JPanel column = Hud.transparentPanel(null);
-        column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
-        return column;
-    }
-
     /**
-     * Wraps content in a HUD scroll pane that only scrolls vertically: the content is pinned to the top and always
-     * fits the pane's width, so wrapped text reflows instead of scrolling sideways.
-     *
-     * @param content    the content
-     * @param background the colour behind the content
-     */
-    static JScrollPane scroll(JComponent content, Color background) {
-        JPanel holder = new WidthTrackingPanel();
-        holder.setOpaque(true);
-        holder.setBackground(background);
-        holder.add(content, BorderLayout.NORTH);
-        JScrollPane scroll = new JScrollPane(holder);
-        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        Hud.styleScroll(scroll, background, false);
-        return scroll;
-    }
-
-    /**
-     * A label-and-value section: a section heading over rows added with {@link #addRow}.
-     *
-     * @param heading the section's heading
-     */
-    static JPanel section(String heading) {
-        JPanel section = Hud.transparentPanel(new GridBagLayout());
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = 0;
-        constraints.gridwidth = 2;
-        constraints.weightx = 1.0;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(0, 0, scaleForGUI(4), 0);
-        section.add(Hud.sectionHeading(heading), constraints);
-        return section;
-    }
-
-    /**
-     * Adds one label-and-value row to a {@link #section}, with a hairline divider beneath it.
-     *
-     * @param section    the section
-     * @param label      the faint label on the left
-     * @param value      the value on the right
-     * @param valueColor the value's colour, or {@code null} for the standard text colour
-     * @param toolTip    a tooltip for the whole row, or {@code null}
-     * @param emphasize  {@code true} to draw the row in bold, for totals
-     */
-    static void addRow(JPanel section, String label, String value, @Nullable Color valueColor,
-          @Nullable String toolTip, boolean emphasize) {
-        int row = section.getComponentCount();
-        Color divider = DIVIDER;
-
-        JLabel labelComponent = new JLabel(label);
-        labelComponent.setForeground(emphasize ? TEXT : TEXT_FAINT);
-        labelComponent.setFont(hudFont(emphasize ? Font.BOLD : Font.PLAIN, 0.9f, 0.0f));
-        labelComponent.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, divider),
-              BorderFactory.createEmptyBorder(scaleForGUI(3), 0, scaleForGUI(3), scaleForGUI(10))));
-
-        JLabel valueComponent = new JLabel(value, SwingConstants.RIGHT);
-        valueComponent.setForeground(valueColor == null ? TEXT : valueColor);
-        valueComponent.setFont(hudFont(emphasize ? Font.BOLD : Font.PLAIN, emphasize ? 0.96f : 0.9f, 0.0f));
-        valueComponent.setBorder(BorderFactory.createCompoundBorder(
-              BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, divider),
-              BorderFactory.createEmptyBorder(scaleForGUI(3), 0, scaleForGUI(3), 0)));
-        // Long values (an opposition's full name, say) are cut short in a narrow column rather than pushing it wider;
-        // a label's minimum width is otherwise its whole text. The tooltip keeps them readable.
-        valueComponent.setMinimumSize(new Dimension(scaleForGUI(24), valueComponent.getPreferredSize().height));
-        valueComponent.setToolTipText(toolTip == null ? value : toolTip);
-        if (toolTip != null) {
-            labelComponent.setToolTipText(toolTip);
-        }
-
-        GridBagConstraints labelConstraints = new GridBagConstraints();
-        labelConstraints.gridx = 0;
-        labelConstraints.gridy = row;
-        labelConstraints.fill = GridBagConstraints.HORIZONTAL;
-        labelConstraints.anchor = GridBagConstraints.WEST;
-        section.add(labelComponent, labelConstraints);
-
-        GridBagConstraints valueConstraints = new GridBagConstraints();
-        valueConstraints.gridx = 1;
-        valueConstraints.gridy = row;
-        valueConstraints.weightx = 1.0;
-        valueConstraints.fill = GridBagConstraints.HORIZONTAL;
-        valueConstraints.anchor = GridBagConstraints.EAST;
-        section.add(valueComponent, valueConstraints);
-    }
-
-    /**
-     * Adds a full-width component, such as a cost bar or a wrapped caveat, beneath a {@link #section}'s rows.
+     * Pins a {@link Hud#section} to the top of its cell, like {@link Hud#topAligned}, and asks for enough width that no
+     * row's label or value is ever cut short. {@link ColumnWrapLayout} honours that width. Use it for sections whose
+     * values must always be read whole, such as figures; leave out sections with long names that can safely be cut
+     * short.
      *
      * @param section the section
-     * @param content the component
-     * @param top     the gap above it, before scaling
      */
-    static void addSpanning(JPanel section, JComponent content, int top) {
-        GridBagConstraints constraints = new GridBagConstraints();
-        constraints.gridx = 0;
-        constraints.gridy = section.getComponentCount();
-        constraints.gridwidth = 2;
-        constraints.weightx = 1.0;
-        constraints.fill = GridBagConstraints.HORIZONTAL;
-        constraints.anchor = GridBagConstraints.WEST;
-        constraints.insets = new Insets(scaleForGUI(top), 0, 0, 0);
-        section.add(content, constraints);
+    static JPanel topAlignedWhole(JPanel section) {
+        JPanel holder = Hud.topAligned(section);
+        holder.setMinimumSize(new Dimension(labelValueWidth(section), 0));
+        return holder;
     }
 
     /**
-     * Pins a section to the top of a grid cell, so a short column does not stretch to match a tall neighbour.
+     * @return the width a {@link Hud#section}'s label-and-value rows need to show every label and value in full: the
+     *       widest label beside the widest value, as the section's two columns line up
      */
-    static JPanel topAligned(JComponent content) {
-        JPanel holder = Hud.transparentPanel(new BorderLayout());
-        holder.add(content, BorderLayout.NORTH);
-        return holder;
+    private static int labelValueWidth(JPanel section) {
+        if (!(section.getLayout() instanceof GridBagLayout layout)) {
+            return 0;
+        }
+        int labelWidth = 0;
+        int valueWidth = 0;
+        for (Component component : section.getComponents()) {
+            GridBagConstraints constraints = layout.getConstraints(component);
+            if (constraints.gridwidth != 1) {
+                continue;
+            }
+            Insets insets = constraints.insets;
+            int width = component.getPreferredSize().width + insets.left + insets.right;
+            if (constraints.gridx == 0) {
+                labelWidth = Math.max(labelWidth, width);
+            } else if (constraints.gridx == 1) {
+                valueWidth = Math.max(valueWidth, width);
+            }
+        }
+        return labelWidth + valueWidth;
     }
 
     // endregion Containers
@@ -227,25 +143,6 @@ final class MarketHud {
     }
 
     /**
-     * An outlined, tracked badge such as "Batchall" or "Proving Ground", explained on hover.
-     *
-     * @param text    the badge's text
-     * @param color   the text and outline colour
-     * @param toolTip what the badge means, or {@code null}
-     */
-    static JLabel badge(String text, Color color, @Nullable String toolTip) {
-        JLabel badge = new JLabel(text.toUpperCase(Locale.ROOT));
-        badge.setForeground(color);
-        badge.setFont(hudFont(Font.BOLD, 0.68f, 0.12f));
-        badge.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(color, scaleForGUI(1)),
-              BorderFactory.createEmptyBorder(scaleForGUI(2), scaleForGUI(7), scaleForGUI(2), scaleForGUI(7))));
-        if (toolTip != null) {
-            badge.setToolTipText(wrapToolTip(toolTip));
-        }
-        return badge;
-    }
-
-    /**
      * Read-only text that wraps to whatever width its container gives it.
      *
      * @param text  the text
@@ -254,7 +151,12 @@ final class MarketHud {
      * @param size  a multiplier on the base label font size
      */
     static JTextArea wrappedText(String text, Color color, int style, float size) {
-        JTextArea area = new JTextArea(text);
+        JTextArea area = new JTextArea();
+        // Read-only text never needs its caret on screen, and a caret that follows the text would scroll the page. Set
+        // before the text: JTextArea(String) moves the caret as it fills in, and each move queues a scroll to the
+        // caret that runs once the area is on a scrolling page, leaving the dossier opened part-way down.
+        ((DefaultCaret) area.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
+        area.setText(text);
         area.setEditable(false);
         area.setFocusable(false);
         area.setLineWrap(true);
@@ -263,43 +165,7 @@ final class MarketHud {
         area.setBorder(null);
         area.setForeground(color);
         area.setFont(hudFont(style, size, 0.0f));
-        // Read-only text never needs its caret on screen, and a caret that follows the text would scroll the page.
-        ((DefaultCaret) area.getCaret()).setUpdatePolicy(DefaultCaret.NEVER_UPDATE);
         return area;
-    }
-
-    /**
-     * A square portrait of a person, or a blank square of the same size when there is no one to show.
-     *
-     * @param person the person, or {@code null}
-     * @param size   the scaled edge length
-     */
-    static JLabel portrait(@Nullable Person person, int size) {
-        JLabel portrait = new JLabel();
-        portrait.setPreferredSize(new Dimension(size, size));
-        portrait.setMinimumSize(new Dimension(size, size));
-        portrait.setOpaque(true);
-        portrait.setBackground(SURFACE_HIGHLIGHT);
-        portrait.setBorder(BorderFactory.createLineBorder(HudStyle.BORDER_CYAN, scaleForGUI(1)));
-        if (person != null) {
-            ImageIcon icon = person.getPortraitImageIconWithFallback(true);
-            if (icon != null) {
-                portrait.setIcon(new ImageIcon(icon.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH)));
-            }
-        }
-        return portrait;
-    }
-
-    /** @return the tooltip wrapped to a comfortable reading width */
-    static String wrapToolTip(String toolTip) {
-        return "<html><div style='width:" + scaleForGUI(280) + "px'>" + escape(toolTip) + "</div></html>";
-    }
-
-    static String escape(@Nullable String text) {
-        if (text == null) {
-            return "";
-        }
-        return text.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;");
     }
 
     // endregion Pieces
@@ -430,84 +296,285 @@ final class MarketHud {
 
     // endregion Painted pieces
 
-    /** A scroll pane's content that always fits the pane's width, so only vertical scrolling is ever needed. */
-    static final class WidthTrackingPanel extends JPanel implements Scrollable {
-        WidthTrackingPanel() {
-            super(new BorderLayout());
+    /**
+     * A layout whose arrangement follows the container's actual width, such as content that wraps into rows when it
+     * is too narrow to sit side by side. Use it where something above sets that width, such as a {@link Hud#scroll}
+     * pane's content.
+     *
+     * <p>Swing measures a container's preferred height before it knows the width it will get, so after a resize the
+     * height the container was given may suit its old arrangement. When that happens, the layout asks for one more
+     * pass, which measures at the new width.</p>
+     */
+    abstract static class WidthDrivenLayout implements LayoutManager {
+        /** The width the last preferred height was measured at, or -1 before the first measure. */
+        private int measuredWidth = -1;
+
+        /** @return the width the components would like when nothing narrows them */
+        protected abstract int naturalWidth(List<Component> components);
+
+        /** @return the narrowest width the components can be arranged in */
+        protected abstract int narrowestWidth(List<Component> components);
+
+        /**
+         * Works out the arrangement for a width, and places the components when asked to.
+         *
+         * @param components the visible components, in order
+         * @param x          the left edge of the space to fill
+         * @param y          the top edge of the space to fill
+         * @param available  the width to fill
+         * @param place      {@code true} to set the components' bounds, {@code false} to only measure
+         *
+         * @return the height the arrangement takes
+         */
+        protected abstract int arrange(List<Component> components, int x, int y, int available, boolean place);
+
+        @Override
+        public void addLayoutComponent(String name, Component component) {
         }
 
         @Override
-        public Dimension getPreferredScrollableViewportSize() {
-            return getPreferredSize();
+        public void removeLayoutComponent(Component component) {
         }
 
         @Override
-        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return scaleForGUI(16);
+        public Dimension preferredLayoutSize(Container parent) {
+            synchronized (parent.getTreeLock()) {
+                List<Component> components = visibleComponents(parent);
+                Insets insets = parent.getInsets();
+                int natural = naturalWidth(components);
+                // Before the first layout there is no width yet, so assume the natural one.
+                int available = parent.getWidth() > 0 ? parent.getWidth() - insets.left - insets.right : natural;
+                measuredWidth = available;
+                return new Dimension(natural + insets.left + insets.right,
+                      arrange(components, 0, 0, available, false) + insets.top + insets.bottom);
+            }
         }
 
         @Override
-        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return visibleRect.height;
+        public Dimension minimumLayoutSize(Container parent) {
+            synchronized (parent.getTreeLock()) {
+                List<Component> components = visibleComponents(parent);
+                Insets insets = parent.getInsets();
+                int narrowest = narrowestWidth(components);
+                return new Dimension(narrowest + insets.left + insets.right,
+                      arrange(components, 0, 0, narrowest, false) + insets.top + insets.bottom);
+            }
         }
 
         @Override
-        public boolean getScrollableTracksViewportWidth() {
-            return true;
+        public void layoutContainer(Container parent) {
+            synchronized (parent.getTreeLock()) {
+                Insets insets = parent.getInsets();
+                int available = Math.max(0, parent.getWidth() - insets.left - insets.right);
+                arrange(visibleComponents(parent), insets.left, insets.top, available, true);
+
+                // Measured at another width, so the height given may not suit this arrangement; one more pass
+                // measures at this width, and so does not ask again.
+                if (available != measuredWidth && parent instanceof JComponent component) {
+                    measuredWidth = available;
+                    SwingUtilities.invokeLater(component::revalidate);
+                }
+            }
         }
 
-        @Override
-        public boolean getScrollableTracksViewportHeight() {
-            return false;
+        /**
+         * @return the component's preferred height at a width; wrapped text inside it measures at the width it last
+         *       had, so it is given this one first
+         */
+        protected static int heightAt(Component component, int width) {
+            if (component.getWidth() != width) {
+                component.setSize(width, component.getHeight());
+            }
+            return component.getPreferredSize().height;
         }
-    }
 
-    /** @return a hairline-bordered surface panel, for setting off one block such as an empty-state notice */
-    static JPanel framedSurface(int padding) {
-        JPanel panel = new JPanel(new BorderLayout());
-        panel.setOpaque(true);
-        panel.setBackground(SURFACE);
-        int inset = scaleForGUI(padding);
-        panel.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(BORDER, scaleForGUI(1)),
-              BorderFactory.createEmptyBorder(inset, inset, inset, inset)));
-        return panel;
+        private static List<Component> visibleComponents(Container parent) {
+            List<Component> components = new ArrayList<>();
+            for (Component component : parent.getComponents()) {
+                if (component.isVisible()) {
+                    components.add(component);
+                }
+            }
+            return components;
+        }
     }
 
     /**
-     * A label for HTML text that wraps to the width its layout gives it and grows tall enough for every line. A plain
-     * {@link JLabel} keeps the one-line height it measured before it knew its width, so wrapped lines overlap whatever
-     * sits below. Its preferred width never exceeds the width it was last given, and it can shrink to nothing, so it
-     * never widens the row it sits in.
+     * Lays out columns side by side when there is room, and wraps them into rows when there is not: as many columns
+     * across as fit, in order. Three columns go three across, then two over one, then one above another. A column
+     * needs the layout's minimum column width, or more when its own minimum width has been set (as
+     * {@link #topAlignedWhole} does). A full row shares its spare width equally; a column in a shorter, last row is as
+     * wide as an even share of a full row, or its own need if that is wider. Each column is as tall as its row's
+     * tallest, so wrap columns in {@link Hud#topAligned} to keep a short one pinned to the top.
      */
-    static final class WrappingLabel extends JLabel {
-        @Override
-        public Dimension getPreferredSize() {
-            Dimension natural = super.getPreferredSize();
-            int width = getWidth();
-            View view = (View) getClientProperty(BasicHTML.propertyKey);
-            if (view == null || width <= 0 || natural.width <= width) {
-                return natural;
-            }
-            Insets insets = getInsets();
-            int textWidth = Math.max(1, width - insets.left - insets.right);
-            view.setSize(textWidth, 0);
-            int height = (int) Math.ceil(view.getPreferredSpan(View.Y_AXIS)) + insets.top + insets.bottom;
-            return new Dimension(width, height);
+    static final class ColumnWrapLayout extends WidthDrivenLayout {
+        private final int minimumColumnWidth;
+        private final int horizontalGap;
+        private final int verticalGap;
+
+        /**
+         * @param minimumColumnWidth the narrowest a column may be before the columns wrap, scaled
+         * @param horizontalGap      the gap between columns in a row, scaled
+         * @param verticalGap        the gap between rows, scaled
+         */
+        ColumnWrapLayout(int minimumColumnWidth, int horizontalGap, int verticalGap) {
+            this.minimumColumnWidth = minimumColumnWidth;
+            this.horizontalGap = horizontalGap;
+            this.verticalGap = verticalGap;
         }
 
         @Override
-        public Dimension getMinimumSize() {
-            return new Dimension(0, getPreferredSize().height);
+        protected int naturalWidth(List<Component> columns) {
+            return rowWidth(columns);
         }
 
         @Override
-        public void setBounds(int x, int y, int width, int height) {
-            boolean resized = width != getWidth();
-            super.setBounds(x, y, width, height);
-            if (resized) {
-                // Its height depends on its width, so lay out again now the width is known.
-                SwingUtilities.invokeLater(this::revalidate);
+        protected int narrowestWidth(List<Component> columns) {
+            int narrowest = minimumColumnWidth;
+            for (Component column : columns) {
+                narrowest = Math.max(narrowest, need(column));
             }
+            return narrowest;
+        }
+
+        @Override
+        protected int arrange(List<Component> columns, int x, int y, int available, boolean place) {
+            if (columns.isEmpty()) {
+                return 0;
+            }
+            int across = columnsAcross(columns, available);
+            int evenShare = Math.max(0, (available - (across - 1) * horizontalGap) / across);
+
+            int top = y;
+            for (int start = 0; start < columns.size(); start += across) {
+                List<Component> row = columns.subList(start, Math.min(start + across, columns.size()));
+                int[] widths = new int[row.size()];
+                if (row.size() == across) {
+                    int spare = Math.max(0, available - rowWidth(row)) / across;
+                    for (int index = 0; index < row.size(); index++) {
+                        widths[index] = need(row.get(index)) + spare;
+                    }
+                } else {
+                    for (int index = 0; index < row.size(); index++) {
+                        widths[index] = Math.max(evenShare, need(row.get(index)));
+                    }
+                }
+
+                int rowHeight = 0;
+                for (int index = 0; index < row.size(); index++) {
+                    rowHeight = Math.max(rowHeight, heightAt(row.get(index), widths[index]));
+                }
+                if (place) {
+                    int left = x;
+                    for (int index = 0; index < row.size(); index++) {
+                        row.get(index).setBounds(left, top, widths[index], rowHeight);
+                        left += widths[index] + horizontalGap;
+                    }
+                }
+                top += rowHeight + verticalGap;
+            }
+            return top - verticalGap - y;
+        }
+
+        /** @return the most columns across, up to all of them, for which every row fits the width */
+        private int columnsAcross(List<Component> columns, int available) {
+            for (int across = columns.size(); across > 1; across--) {
+                boolean fits = true;
+                for (int start = 0; start < columns.size() && fits; start += across) {
+                    fits = rowWidth(columns.subList(start, Math.min(start + across, columns.size()))) <= available;
+                }
+                if (fits) {
+                    return across;
+                }
+            }
+            return 1;
+        }
+
+        /** @return the width a row of columns needs, gaps included */
+        private int rowWidth(List<Component> row) {
+            int width = Math.max(0, row.size() - 1) * horizontalGap;
+            for (Component column : row) {
+                width += need(column);
+            }
+            return width;
+        }
+
+        /** @return the width a column needs: the layout's minimum, or its own minimum width when that is set */
+        private int need(Component column) {
+            return column.isMinimumSizeSet()
+                         ? Math.max(minimumColumnWidth, column.getMinimumSize().width)
+                         : minimumColumnWidth;
+        }
+    }
+
+    /**
+     * Lays out a main component with a fixed-width side component to its right while the main one keeps at least its
+     * minimum width, and with the side component beneath it, at its own width, when it would not. The first component
+     * is the main one, the second the side one. Side by side, both are as tall as the taller, so wrap the side
+     * component in {@link Hud#topAligned} to keep it pinned to the top.
+     */
+    static final class SidebarWrapLayout extends WidthDrivenLayout {
+        private final int minimumMainWidth;
+        private final int horizontalGap;
+        private final int verticalGap;
+
+        /**
+         * @param minimumMainWidth the narrowest the main component may be before the side one moves beneath it,
+         *                         scaled
+         * @param horizontalGap    the gap between the two side by side, scaled
+         * @param verticalGap      the gap between the two one above the other, scaled
+         */
+        SidebarWrapLayout(int minimumMainWidth, int horizontalGap, int verticalGap) {
+            this.minimumMainWidth = minimumMainWidth;
+            this.horizontalGap = horizontalGap;
+            this.verticalGap = verticalGap;
+        }
+
+        @Override
+        protected int naturalWidth(List<Component> components) {
+            return components.size() < 2 ? minimumMainWidth
+                         : minimumMainWidth + horizontalGap + components.get(1).getPreferredSize().width;
+        }
+
+        @Override
+        protected int narrowestWidth(List<Component> components) {
+            return components.size() < 2 ? minimumMainWidth
+                         : Math.min(minimumMainWidth, components.get(1).getMinimumSize().width);
+        }
+
+        @Override
+        protected int arrange(List<Component> components, int x, int y, int available, boolean place) {
+            if (components.isEmpty()) {
+                return 0;
+            }
+            Component main = components.get(0);
+            if (components.size() < 2) {
+                int height = heightAt(main, available);
+                if (place) {
+                    main.setBounds(x, y, available, height);
+                }
+                return height;
+            }
+
+            Component side = components.get(1);
+            Dimension sideSize = side.getPreferredSize();
+            int mainWidth = available - horizontalGap - sideSize.width;
+            if (mainWidth >= minimumMainWidth) {
+                int height = Math.max(heightAt(main, mainWidth), sideSize.height);
+                if (place) {
+                    main.setBounds(x, y, mainWidth, height);
+                    side.setBounds(x + mainWidth + horizontalGap, y, sideSize.width, height);
+                }
+                return height;
+            }
+
+            int mainHeight = heightAt(main, available);
+            if (place) {
+                main.setBounds(x, y, available, mainHeight);
+                side.setBounds(x, y + mainHeight + verticalGap, Math.min(sideSize.width, available),
+                      sideSize.height);
+            }
+            return mainHeight + verticalGap + sideSize.height;
         }
     }
 }

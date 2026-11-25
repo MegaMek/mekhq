@@ -15,7 +15,6 @@
 /MekHQ/campaigns/*
 !/MekHQ/campaigns/archive
 !/MekHQ/campaigns/archive/**
-!/MekHQ/campaigns/The Learning Ropes.cpnx.gz
 /MekHQ/classes/
 /MekHQ/data/images/awards/
 !/MekHQ/data/images/awards/standard/

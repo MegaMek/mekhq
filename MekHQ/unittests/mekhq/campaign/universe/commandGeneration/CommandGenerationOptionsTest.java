@@ -99,7 +99,6 @@ class CommandGenerationOptionsTest {
 
         // Rank assignment and personnel flags.
         assertTrue(options.isAutomaticallyAssignRanks());
-        assertFalse(options.isUseSpecifiedFactionToAssignRanks());
         assertTrue(options.isAssignCompanyCommanderFlag());
         assertTrue(options.isAssignMekWarriorsCallSigns());
         assertTrue(options.isAssignFounderFlag());
@@ -114,15 +113,11 @@ class CommandGenerationOptionsTest {
         assertTrue(options.isGenerateOriginNodeFormationIcon());
         assertFalse(options.isUseOriginNodeFormationIconLogo());
 
-        // Finances: the command is granted free, with working capital defaulting to six months of its running
-        // costs, floored so it can pay its first month's wages.
-        assertTrue(options.isProcessFinances());
-        assertEquals(6, options.getStartingCashMonths());
-        assertFalse(options.isRandomizeStartingCash());
-        assertEquals(18, options.getRandomStartingCashDiceCount());
-        assertEquals(10_000_000L, options.getMinimumStartingFloat());
+        // Finances: the command is granted free, with working capital defaulting to twelve months of its running
+        // costs and never less than ten million, and no starting loan.
+        assertEquals(12, options.getStartingCashMonths());
+        assertEquals(10_000_000L, options.getMinimumStartingCash());
         assertFalse(options.isStartingLoan());
-        assertFalse(options.isPayForSetup());
     }
 
     /**
@@ -157,7 +152,7 @@ class CommandGenerationOptionsTest {
         assertTrue(origin.isRandomizeOrigin());
         assertTrue(origin.isRandomizeDependentOrigin());
         assertFalse(origin.isRandomizeAroundSpecifiedPlanet());
-        assertEquals(0, origin.getOriginSearchRadius());
+        assertEquals(45, origin.getOriginSearchRadius());
         assertEquals(0.6, origin.getOriginDistanceScale(), 0.0001);
         assertFalse(origin.isAllowClanOrigins());
         assertTrue(origin.isExtraRandomOrigin());

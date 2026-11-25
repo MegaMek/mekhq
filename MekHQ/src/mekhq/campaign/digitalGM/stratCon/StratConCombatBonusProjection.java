@@ -39,23 +39,25 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConTargetIntelligenceBehavior;
 import mekhq.campaign.mission.contract.AbstractContract;
-import mekhq.campaign.mission.contract.contractGeneration.TrackIntensityTable;
 
 /**
  * How many times a contract offer can pay its combat bonus, if the player wins every chance at it.
  *
- * <p>Ordinarily the bonus is paid for each Essential scenario won. Their schedule is rolled when the contract is
- * generated, so their number is already known. When the contract's special Nav Points replace its Essential scenarios
- * (under "Contracts Use Special Mechanics"), the bonus is paid for each Nav Point secured instead. Those are rolled the
- * same way, but only when the contract is accepted, so their average number is used. An Objective Raid's target
- * intelligence pays nothing itself: the bonus comes from the Essential scenarios fought at the facilities it leads to,
- * of which there is at most one per point of Scale. Without StratCon, or in mapless play, there are no Essential
- * scenarios or Nav Points, so no combat bonus is paid.</p>
+ * <p>Ordinarily the bonus is paid for each Essential scenario won: one a month per point of Scale (see
+ * {@link StratConSpawnRates}), laid out when the contract is generated, so their number is known exactly. A contract
+ * whose definition has no Essential scenarios to fight gets none (see
+ * {@link StratConContractInitializer#usesEssentialScenarios}). When the contract's special Nav Points replace its
+ * Essential scenarios (under "Contracts Use Special Mechanics"), the bonus is paid for each Nav Point secured instead:
+ * {@value StratConSpawnRates#NAV_POINTS_PER_SCALE} a month per point of Scale, also known exactly. An Objective Raid's
+ * target intelligence pays nothing itself: the bonus comes from the Essential scenarios fought at the facilities it
+ * leads to, of which there is at most one per point of Scale. Without StratCon, or in mapless play, there are no
+ * Essential scenarios or Nav Points, so no combat bonus is paid.</p>
  *
  * <p>Other one-off bonuses, such as handing a captured facility over to the employer or the fights at a contract's
- * objective facilities, depend on how the contract is played and are not counted.</p>
+ * objective facilities, depend on how the contract is played and are not counted. Counterattacks on the player's
+ * side's facilities never pay it.</p>
  *
- * @param bonusCount     how many times the bonus can be paid; an average, so not always whole
+ * @param bonusCount     how many times the bonus can be paid
  * @param isFromNavPoint {@code true} if the bonus comes from the contract's Nav Points rather than its Essential
  *                       scenarios
  *
@@ -80,10 +82,8 @@ public record StratConCombatBonusProjection(double bonusCount, boolean isFromNav
             return new StratConCombatBonusProjection(0, false);
         }
 
-        StratConContractMechanics mechanics = StratConContractMechanics.forContract(contract);
-        boolean isReplacingEssentialScenarios = campaignOptions.get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS)
-                                                      && mechanics.isReplacingEssentialScenarios();
-        if (!isReplacingEssentialScenarios) {
+        boolean isContractsUseSpecialMechanics = campaignOptions.get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS);
+        if (StratConContractInitializer.usesEssentialScenarios(contract, isContractsUseSpecialMechanics)) {
             int essentialScenarioCount = 0;
             for (int monthlyCount : contract.getScenarioSchedule()) {
                 essentialScenarioCount += monthlyCount;
@@ -91,15 +91,16 @@ public record StratConCombatBonusProjection(double bonusCount, boolean isFromNav
             return new StratConCombatBonusProjection(essentialScenarioCount, false);
         }
 
-        // Rolled as StratConContractInitializer.scheduleSpecialPointsOfInterest does, which rolls at least once
-        int rollCount = campaignOptions.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)
-                              ? max(1, contract.getScale())
-                              : 1;
-        double navPointCount = TrackIntensityTable.getExpectedScheduleTotal(contract.getLengthInMonths(),
-              contract.getTrackCount(),
-              rollCount,
-              campaignOptions.get(CampaignOption.MINIMUM_ONE_TRACK_PER_ROLL),
-              campaignOptions.get(CampaignOption.ROLL_TRACKS_WEEKLY));
+        if (!StratConContractInitializer.isReplacingEssentialScenarios(contract, isContractsUseSpecialMechanics)) {
+            // Neither Essential scenarios nor Nav Points standing in for them
+            return new StratConCombatBonusProjection(0, false);
+        }
+
+        StratConContractMechanics mechanics = StratConContractMechanics.forContract(contract);
+        double navPointCount = (double) max(1, contract.getLengthInMonths())
+                                     * StratConSpawnRates.getCount(contract,
+              StratConSpawnRates.isFactorSupportPointsIntoScale(campaignOptions, contract),
+              StratConSpawnRates.NAV_POINTS_PER_SCALE);
 
         if (StratConTargetIntelligenceBehavior.TYPE_ID.equals(mechanics.pointOfInterestTypeId())) {
             // Only one piece of intelligence per point of Scale leads to a facility (see its onScheduled)
@@ -107,5 +108,45 @@ public record StratConCombatBonusProjection(double bonusCount, boolean isFromNav
         }
 
         return new StratConCombatBonusProjection(navPointCount, true);
+    }
+
+    /**
+     * Works out how many combat bonuses a month a contract's combat pay is spread across, so every contract type offers
+     * the same total combat pay at the same Scale and length: combat pay per bonus is the contract's monthly combat pay
+     * divided by this.
+     *
+     * <p>Ordinarily that is the contract's Essential scenarios, {@value StratConSpawnRates#ESSENTIAL_SCENARIOS_PER_SCALE}
+     * a month per point of Scale. Nav Points that replace a contract's Essential scenarios come
+     * {@value StratConSpawnRates#NAV_POINTS_PER_SCALE} a month per point of Scale, so each pays proportionately less.
+     * Both counts are rounded as the contract's schedules round them (see {@link StratConSpawnRates#getCount}), so the
+     * monthly total holds at any Scale, not only a whole one. Target intelligence is the exception: it pays nothing
+     * itself, and the Essential scenarios at the facilities it leads to are paid as Essential scenarios are.</p>
+     *
+     * @param campaignOptions the campaign options, for "Contracts Use Special Mechanics" and how the contract's Scale
+     *                        is counted
+     * @param contract        the contract
+     *
+     * @return the combat bonuses a month, never below one
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getMonthlyCombatBonusCount(CampaignOptions campaignOptions, AbstractContract contract) {
+        // Compared rather than unboxed, so a mocked options object (which returns null) reads as off
+        boolean isContractsUseSpecialMechanics =
+              Boolean.TRUE.equals(campaignOptions.get(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS));
+        boolean isFactorSupportPointsIntoScale = StratConSpawnRates.isFactorSupportPointsIntoScale(campaignOptions,
+              contract);
+
+        boolean isPaidThroughNavPoints =
+              StratConContractInitializer.isReplacingEssentialScenarios(contract, isContractsUseSpecialMechanics)
+                    && !StratConTargetIntelligenceBehavior.TYPE_ID.equals(
+                    StratConContractMechanics.forContract(contract).pointOfInterestTypeId());
+
+        return StratConSpawnRates.getCount(contract,
+              isFactorSupportPointsIntoScale,
+              isPaidThroughNavPoints
+                    ? StratConSpawnRates.NAV_POINTS_PER_SCALE
+                    : StratConSpawnRates.ESSENTIAL_SCENARIOS_PER_SCALE);
     }
 }

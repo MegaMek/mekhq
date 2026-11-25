@@ -32,7 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -170,20 +170,22 @@ class BackgroundsPage {
     private @Nonnull JPanel createRandomBackgroundsPanel() {
         // Contents
         chkUseRandomPersonalities = new CampaignOptionsCheckBox("UseRandomPersonalities",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.DOCUMENTED));
+                getMetadata(new Version("0.50.00"), CampaignOptionFlag.DOCUMENTED));
         chkUseRandomPersonalities.addMouseListener(createTipPanelUpdater("UseRandomPersonalities"));
         chkUseRandomTalent = new CampaignOptionsCheckBox("UseRandomTalent",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.DOCUMENTED));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.DOCUMENTED));
         chkUseRandomTalent.addMouseListener(createTipPanelUpdater("UseRandomTalent"));
         chkUsePersonalityTagsOnly = new CampaignOptionsCheckBox("UsePersonalityTagsOnly",
-                getMetadata(new Version(0, 51, 1), CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.IMPORTANT));
         chkUsePersonalityTagsOnly.addMouseListener(createTipPanelUpdater("UsePersonalityTagsOnly"));
-        chkUseRandomPersonalityReputation = new CampaignOptionsCheckBox("UseRandomPersonalityReputation");
+        chkUseRandomPersonalityReputation = new CampaignOptionsCheckBox("UseRandomPersonalityReputation",
+              getMetadata(new Version("0.50.00")));
         chkUseRandomPersonalityReputation.addMouseListener(createTipPanelUpdater("UseRandomPersonalityReputation"));
-        chkUseReasoningXpMultiplier = new CampaignOptionsCheckBox("UseReasoningXpMultiplier");
+        chkUseReasoningXpMultiplier = new CampaignOptionsCheckBox("UseReasoningXpMultiplier",
+              getMetadata(new Version("0.50.05")));
         chkUseReasoningXpMultiplier.addMouseListener(createTipPanelUpdater("UseReasoningXpMultiplier"));
         chkUseSimulatedRelationships = new CampaignOptionsCheckBox("UseSimulatedRelationships",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.01"), CampaignOptionFlag.IMPORTANT));
         chkUseSimulatedRelationships.addMouseListener(createTipPanelUpdater("UseSimulatedRelationships"));
 
         // Layout the Panels
@@ -215,21 +217,23 @@ class BackgroundsPage {
      */
     private @Nonnull JPanel createRandomOriginOptionsPanel() {
         // Contents
-        chkRandomizeOrigin = new CampaignOptionsCheckBox("RandomizeOrigin");
+        chkRandomizeOrigin = new CampaignOptionsCheckBox("RandomizeOrigin", getMetadata(new Version("0.47.03")));
         chkRandomizeOrigin.addMouseListener(createTipPanelUpdater("RandomizeOrigin"));
-        chkRandomizeDependentsOrigin = new CampaignOptionsCheckBox("RandomizeDependentsOrigin");
+        chkRandomizeDependentsOrigin = new CampaignOptionsCheckBox("RandomizeDependentsOrigin",
+              getMetadata(new Version("0.47.05")));
         chkRandomizeDependentsOrigin.addMouseListener(createTipPanelUpdater("RandomizeDependentsOrigin"));
 
-        chkRandomizeAroundSpecifiedPlanet = new CampaignOptionsCheckBox("RandomizeAroundSpecifiedPlanet");
+        chkRandomizeAroundSpecifiedPlanet = new CampaignOptionsCheckBox("RandomizeAroundSpecifiedPlanet",
+              getMetadata(new Version("0.49.07")));
         chkRandomizeAroundSpecifiedPlanet.addActionListener(evt -> refreshSystemsAndPlanets());
         chkRandomizeAroundSpecifiedPlanet.addMouseListener(createTipPanelUpdater("RandomizeAroundSpecifiedPlanet"));
 
         chkSpecifiedSystemFactionSpecific = new CampaignOptionsCheckBox("SpecifiedSystemFactionSpecific",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.03"), CampaignOptionFlag.IMPORTANT));
         chkSpecifiedSystemFactionSpecific.addActionListener(evt -> refreshSystemsAndPlanets());
         chkSpecifiedSystemFactionSpecific.addMouseListener(createTipPanelUpdater("SpecifiedSystemFactionSpecific"));
 
-        lblSpecifiedSystem = new CampaignOptionsLabel("SpecifiedSystem");
+        lblSpecifiedSystem = new CampaignOptionsLabel("SpecifiedSystem", getMetadata(new Version("0.49.07")));
         lblSpecifiedSystem.addMouseListener(createTipPanelUpdater("SpecifiedSystem"));
         comboSpecifiedSystem.setModel(new DefaultComboBoxModel<>(
                 getPlanetarySystems(chkSpecifiedSystemFactionSpecific.isSelected() ? generalPage.getFaction() : null)));
@@ -253,7 +257,7 @@ class BackgroundsPage {
         });
         comboSpecifiedSystem.addMouseListener(createTipPanelUpdater("SpecifiedSystem"));
 
-        lblSpecifiedPlanet = new CampaignOptionsLabel("SpecifiedPlanet");
+        lblSpecifiedPlanet = new CampaignOptionsLabel("SpecifiedPlanet", getMetadata(new Version("0.49.07")));
         lblSpecifiedPlanet.addMouseListener(createTipPanelUpdater("SpecifiedPlanet"));
         final PlanetarySystem planetarySystem = comboSpecifiedSystem.getSelectedItem();
         if (planetarySystem != null) {
@@ -273,20 +277,20 @@ class BackgroundsPage {
         });
         comboSpecifiedPlanet.addMouseListener(createTipPanelUpdater("SpecifiedPlanet"));
 
-        lblOriginSearchRadius = new CampaignOptionsLabel("OriginSearchRadius");
+        lblOriginSearchRadius = new CampaignOptionsLabel("OriginSearchRadius", getMetadata(new Version("0.47.03")));
         lblOriginSearchRadius.addMouseListener(createTipPanelUpdater("OriginSearchRadius"));
         spnOriginSearchRadius = new CampaignOptionsSpinner("OriginSearchRadius", 0, 0, 2000, 25);
         spnOriginSearchRadius.addMouseListener(createTipPanelUpdater("OriginSearchRadius"));
 
         lblOriginDistanceScale = new CampaignOptionsLabel("OriginDistanceScale",
-                getMetadata(null, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.47.03"), CampaignOptionFlag.IMPORTANT));
         lblOriginDistanceScale.addMouseListener(createTipPanelUpdater("OriginDistanceScale"));
         spnOriginDistanceScale = new CampaignOptionsSpinner("OriginDistanceScale", 0.6, 0.1, 2.0, 0.1);
         spnOriginDistanceScale.addMouseListener(createTipPanelUpdater("OriginDistanceScale"));
 
-        chkAllowClanOrigins = new CampaignOptionsCheckBox("AllowClanOrigins");
+        chkAllowClanOrigins = new CampaignOptionsCheckBox("AllowClanOrigins", getMetadata(new Version("0.49.07")));
         chkAllowClanOrigins.addMouseListener(createTipPanelUpdater("AllowClanOrigins"));
-        chkExtraRandomOrigin = new CampaignOptionsCheckBox("ExtraRandomOrigin");
+        chkExtraRandomOrigin = new CampaignOptionsCheckBox("ExtraRandomOrigin", getMetadata(new Version("0.49.00")));
         chkExtraRandomOrigin.addMouseListener(createTipPanelUpdater("ExtraRandomOrigin"));
 
         // The system/planet combos are backed by the whole universe, so an unprototyped
@@ -348,9 +352,9 @@ class BackgroundsPage {
     private void updateComboTooltip(MMComboBox<?> combo) {
         final Object selected = combo.getSelectedItem();
         if (selected instanceof PlanetarySystem system) {
-            combo.setToolTipText(system.getName(generalPage.getDate()));
+            combo.setToolTipText(wordWrap(system.getName(generalPage.getDate())));
         } else if (selected instanceof Planet planet) {
-            combo.setToolTipText(planet.getName(generalPage.getDate()));
+            combo.setToolTipText(wordWrap(planet.getName(generalPage.getDate())));
         } else {
             combo.setToolTipText(null);
         }

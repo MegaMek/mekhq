@@ -65,10 +65,12 @@ import javax.swing.table.TableCellRenderer;
 import javax.swing.table.TableColumn;
 
 import jakarta.annotation.Nullable;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractCharacteristic;
 import mekhq.campaign.mission.contract.contractData.ObfuscatableIntel;
+import mekhq.campaign.mission.contract.contractGeneration.ChaosContractDeterminationScale;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudChip;
@@ -327,8 +329,9 @@ final class MarketComparePage {
         textRow(built, "dossier.contractMarket.intel.morale", offers,
               contract -> intel(contract, ObfuscatableIntel.MORALE, contract.getMoraleLevel().toString()));
         rankedRow(built, "dossier.contractMarket.intel.intensity", false, offers,
-              contract -> String.valueOf(contract.getTrackCount()), contract -> (double) contract.getTrackCount(),
-              Better.NEITHER);
+              contract -> ChaosContractDeterminationScale.formatScale(contract.getExactScale(),
+                    market.campaign().getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE)),
+              AbstractContract::getExactScale, Better.NEITHER);
 
         section(built, "compare.contractMarket.section.terms");
         // Command rights run from least freedom (Integrated) to most (Independent), so a later right is better.
@@ -381,7 +384,7 @@ final class MarketComparePage {
         List<Cell> cells = new ArrayList<>();
         for (AbstractContract contract : offers) {
             String value = text.apply(contract);
-            cells.add(new Cell(MarketHud.escape(value), value, null, false, -1, null, 0, value));
+            cells.add(new Cell(Hud.escape(value), value, null, false, -1, null, 0, value));
         }
         rows.add(new Row(getTextAt(RESOURCE_BUNDLE, labelKey), rowToolTip(labelKey), false, false, cells));
     }
@@ -399,7 +402,7 @@ final class MarketComparePage {
         for (int index = 0; index < offers.size(); index++) {
             String value = text.apply(offers.get(index));
             boolean isBest = best != null && best.equals(numbers.get(index));
-            cells.add(new Cell(MarketHud.escape(value), value, isBest ? READY : null, isBest, -1, null, 0, null));
+            cells.add(new Cell(Hud.escape(value), value, isBest ? READY : null, isBest, -1, null, 0, null));
         }
         rows.add(new Row(getTextAt(RESOURCE_BUNDLE, labelKey), rowToolTip(labelKey), false, isKey, cells));
     }
@@ -438,7 +441,7 @@ final class MarketComparePage {
             int difficulty = assessmentDifficulty(contract);
             String text = getFormattedTextAt(RESOURCE_BUNDLE, "compare.contractMarket.assessment",
                   assessmentLabel(contract), difficulty);
-            cells.add(new Cell(MarketHud.escape(text), text, severityColor(difficulty), false, -1, null, difficulty,
+            cells.add(new Cell(Hud.escape(text), text, severityColor(difficulty), false, -1, null, difficulty,
                   null));
         }
         String labelKey = "dossier.contractMarket.intel.assessment";
@@ -460,10 +463,10 @@ final class MarketComparePage {
                     case ADVERSE -> DANGER;
                     case NEUTRAL -> AMBER;
                 };
-                names.add("<span style='color:" + hex(color) + "'>" + MarketHud.escape(characteristic.getName())
+                names.add("<span style='color:" + hex(color) + "'>" + Hud.escape(characteristic.getName())
                                 + "</span>");
-                descriptions.add("<b>" + MarketHud.escape(characteristic.getName()) + "</b>: "
-                                       + MarketHud.escape(characteristic.getToolTipText()));
+                descriptions.add("<b>" + Hud.escape(characteristic.getName()) + "</b>: "
+                                       + Hud.escape(characteristic.getToolTipText()));
                 plain.add(characteristic.getName());
             }
             cells.add(listCell(names, descriptions, plain));
@@ -480,9 +483,9 @@ final class MarketComparePage {
             List<String> descriptions = new ArrayList<>();
             List<String> plain = new ArrayList<>();
             for (MarketBadge badge : ContractMarketFormatting.badges(contract)) {
-                names.add("<span style='color:" + hex(badge.color()) + "'>" + MarketHud.escape(badge.text())
+                names.add("<span style='color:" + hex(badge.color()) + "'>" + Hud.escape(badge.text())
                                 + "</span>");
-                descriptions.add("<b>" + MarketHud.escape(badge.text()) + "</b>: " + MarketHud.escape(badge.toolTip()));
+                descriptions.add("<b>" + Hud.escape(badge.text()) + "</b>: " + Hud.escape(badge.toolTip()));
                 plain.add(badge.text());
             }
             cells.add(listCell(names, descriptions, plain));
@@ -494,9 +497,9 @@ final class MarketComparePage {
     private static Cell listCell(List<String> names, List<String> descriptions, List<String> plain) {
         if (names.isEmpty()) {
             String none = getTextAt(RESOURCE_BUNDLE, "compare.contractMarket.none");
-            return new Cell(MarketHud.escape(none), "", TEXT_FAINT, false, -1, null, 0, null);
+            return new Cell(Hud.escape(none), "", TEXT_FAINT, false, -1, null, 0, null);
         }
-        String separator = MarketHud.escape(getTextAt(RESOURCE_BUNDLE, "value.contractMarket.listSeparator"));
+        String separator = Hud.escape(getTextAt(RESOURCE_BUNDLE, "value.contractMarket.listSeparator"));
         String toolTip = "<html><div style='width:" + scaleForGUI(280) + "px'>" + String.join("<br>", descriptions)
                                + "</div></html>";
         return new Cell(String.join(separator, names), String.join(",", plain), null, false, -1, null, 0, toolTip);
@@ -548,7 +551,7 @@ final class MarketComparePage {
               "compare.contractMarket.tooltip.").replace("compare.contractMarket.row.",
               "compare.contractMarket.tooltip."));
         return isResourceKeyValid(toolTip)
-                     ? MarketHud.wrapToolTip(toolTip) : null;
+                     ? Hud.wrapToolTip(toolTip) : null;
     }
 
     // endregion Rows
@@ -606,12 +609,14 @@ final class MarketComparePage {
         private final Bar bar = new Bar();
         private final MarketHud.PipMeter pips = new MarketHud.PipMeter(0, ACCENT);
         private final JPanel south = Hud.transparentPanel(new BorderLayout());
+        private final Font plainFont = hudFont(Font.PLAIN, 0.9f, 0.0f);
+        private final Font boldFont = hudFont(Font.BOLD, 0.9f, 0.0f);
 
         private CellRenderer() {
             super(new BorderLayout());
             setBorder(BorderFactory.createEmptyBorder(scaleForGUI(3), scaleForGUI(12), scaleForGUI(4),
                   scaleForGUI(12)));
-            value.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
+            value.setFont(plainFont);
             best.setText(getTextAt(RESOURCE_BUNDLE, "compare.contractMarket.best"));
             best.setForeground(READY);
             best.setFont(hudFont(Font.BOLD, 0.66f, 0.12f));
@@ -639,9 +644,10 @@ final class MarketComparePage {
 
             Cell cell = (Cell) object;
             setBackground(isChosen ? SURFACE : tableRow.isKey() ? KEY_ROW : SURFACE_DEEP);
-            value.setText("<html>" + cell.text() + "</html>");
+            // Font and colour go on before the text: a label re-parses its HTML whenever either changes after it.
+            value.setFont(cell.isBest() || tableRow.isKey() ? boldFont : plainFont);
             value.setForeground(cell.color() == null ? TEXT : cell.color());
-            value.setFont(hudFont(cell.isBest() || tableRow.isKey() ? Font.BOLD : Font.PLAIN, 0.9f, 0.0f));
+            value.setText("<html>" + cell.text() + "</html>");
             best.setVisible(cell.isBest());
 
             south.removeAll();

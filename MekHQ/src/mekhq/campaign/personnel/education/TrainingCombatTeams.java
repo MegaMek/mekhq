@@ -208,7 +208,7 @@ public class TrainingCombatTeams {
 
         int formationSize = formation.getUnits().size();
         int standardLanceSize = campaign.getPlayerForce().getFaction().getFormationBaseSize();
-        int classSizeModifier = max(0, standardLanceSize - formationSize);
+        int classSizeModifier = getClassSizeModifier(formationSize, standardLanceSize);
 
         ActionCheckResult actionCheckResult = performTrainingSkillCheck(campaign, commander, classSizeModifier);
 
@@ -241,7 +241,7 @@ public class TrainingCombatTeams {
     private static void performTraining(Campaign campaign, Formation formation, Person commander,
           Map<String, Integer> educatorSkills, ActionCheckResult actionCheckResult) {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
-        boolean useReasoningXPChanges = campaignOptions.get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
+        boolean useReasoningXPChanges = campaignOptions.isUseTalentXpCostMultiplier();
         boolean isUseFatigue = campaignOptions.get(CampaignOption.USE_FATIGUE);
         int fatigueRate = campaignOptions.get(CampaignOption.FATIGUE_RATE);
         double xpCostMultiplier = campaignOptions.get(CampaignOption.XP_COST_MULTIPLIER);
@@ -594,6 +594,25 @@ public class TrainingCombatTeams {
     static boolean isTrainingImpossible(List<Skill> skillsBeingTrained, ActionCheckResult actionCheckResult) {
         boolean isNothingBeingTrained = skillsBeingTrained.isEmpty();
         return !actionCheckResult.isSuccess() || isNothingBeingTrained;
+    }
+
+    /**
+     * Works out the penalty to the Training check for an oversized class.
+     *
+     * <p>A training formation as large as the faction's standard formation (a lance of four for most Inner Sphere
+     * factions, a Star of five for the Clans) trains without penalty. Each unit beyond that adds +1 to the target
+     * number. A smaller formation is never penalised.</p>
+     *
+     * @param formationSize     the number of units in the training formation, the educator's own unit included
+     * @param standardClassSize the faction's standard formation size
+     *
+     * @return the penalty to the Training check; never negative
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static int getClassSizeModifier(int formationSize, int standardClassSize) {
+        return max(0, formationSize - standardClassSize);
     }
 
     private static ActionCheckResult performTrainingSkillCheck(Campaign campaign, Person educator,

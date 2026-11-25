@@ -42,6 +42,7 @@ import java.awt.BorderLayout;
 import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.WindowAdapter;
 import java.awt.event.WindowEvent;
@@ -81,9 +82,11 @@ import mekhq.gui.baseComponents.hud.HudModeSelector;
 import mekhq.gui.baseComponents.hud.HudStatTile;
 import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.AbilityGroup;
 import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.AttributeGroup;
+import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.RankGroup;
 import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.SkillGroup;
 import mekhq.gui.dialog.trainingConsole.TrainingConsoleState.Sort;
 import mekhq.gui.dialog.trainingConsole.TrainingRoster.PersonEntry;
+import mekhq.gui.view.PersonViewPanel;
 
 /**
  * The Training Console: one place to spend XP for any number of people at once, replacing the Spend XP menu, Mass
@@ -148,6 +151,10 @@ public class TrainingConsole extends JDialog {
     private final HudButton railToggle = new HudButton("", false, true);
     private final HudFilterList<PersonnelRole> roleFilter = new HudFilterList<>(value -> {
         state.role = value;
+        refreshList();
+    });
+    private final HudFilterList<RankGroup> rankFilter = new HudFilterList<>(value -> {
+        state.rankGroup = value;
         refreshList();
     });
     private final HudFilterList<String> formationFilter = new HudFilterList<>(value -> {
@@ -233,7 +240,7 @@ public class TrainingConsole extends JDialog {
             state.query = text;
             refreshList();
         }, this::onRow, this::selectShown, this::clearSelection, this::sortBy, state.selected::contains,
-              person -> plan.purchaseCountOf(person), person -> plan.availableXpOf(person));
+              person -> plan.purchaseCountOf(person), person -> plan.availableXpOf(person), this::viewRecord);
 
         for (Person person : people) {
             PersonEntry entry = roster.entryFor(person);
@@ -366,6 +373,9 @@ public class TrainingConsole extends JDialog {
         JPanel column = ConsoleWidgets.column();
         column.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.role"))));
         column.add(leftAligned(roleFilter));
+        column.add(Box.createVerticalStrut(scaleForGUI(12)));
+        column.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.rank"))));
+        column.add(leftAligned(rankFilter));
         column.add(Box.createVerticalStrut(scaleForGUI(12)));
         column.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.level"))));
         column.add(leftAligned(levelFilter));
@@ -559,6 +569,7 @@ public class TrainingConsole extends JDialog {
               (PersonnelRole role) -> role.getLabel(false)));
         Map<String, Integer> byFormation = new TreeMap<>();
         Map<SkillLevel, Integer> byLevel = new EnumMap<>(SkillLevel.class);
+        Map<RankGroup, Integer> byRankGroup = new EnumMap<>(RankGroup.class);
         String query = state.query.trim().toLowerCase(Locale.ROOT);
         for (PersonEntry entry : roster.entries()) {
             Person person = entry.person();
@@ -573,11 +584,13 @@ public class TrainingConsole extends JDialog {
                 byFormation.merge(entry.formationName(), 1, Integer::sum);
             }
             byLevel.merge(entry.skillLevel(), 1, Integer::sum);
+            byRankGroup.merge(rankGroupOf(entry), 1, Integer::sum);
             base.add(entry);
         }
         List<PersonEntry> filtered = new ArrayList<>();
         for (PersonEntry entry : base) {
             if (((state.role == null) || (entry.role() == state.role))
+                      && ((state.rankGroup == null) || (rankGroupOf(entry) == state.rankGroup))
                       && ((state.formation == null) || entry.formationName().equals(state.formation))
                       && ((state.level == null) || (entry.skillLevel() == state.level))) {
                 filtered.add(entry);
@@ -618,6 +631,13 @@ public class TrainingConsole extends JDialog {
         roleFilter.setItems(roles);
         roleFilter.setSelected(state.role);
 
+        List<Item<RankGroup>> rankGroups = new ArrayList<>();
+        rankGroups.add(new Item<>(null, getTextAt(RESOURCE_BUNDLE, "rail.allRanks"), base.size()));
+        byRankGroup.forEach((rankGroup, count) -> rankGroups.add(new Item<>(rankGroup,
+              getTextAt(RESOURCE_BUNDLE, "rail.rank." + rankGroup.name()), count)));
+        rankFilter.setItems(rankGroups);
+        rankFilter.setSelected(state.rankGroup);
+
         List<Item<SkillLevel>> levels = new ArrayList<>();
         levels.add(new Item<>(null, getTextAt(RESOURCE_BUNDLE, "rail.allLevels"), base.size()));
         byLevel.forEach((level, count) -> levels.add(new Item<>(level, level.toString(), count)));
@@ -633,6 +653,18 @@ public class TrainingConsole extends JDialog {
         includePrisoners.setSelected(state.isIncludePrisoners);
         onlyStaged.setSelected(state.isOnlyStaged);
         hideExcluded.setSelected(state.isHideExcluded);
+    }
+
+    /**
+     * @param entry a person in the list
+     *
+     * @return whether the person's rank puts them among the officers or the enlisted
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static RankGroup rankGroupOf(PersonEntry entry) {
+        return entry.isOfficer() ? RankGroup.OFFICERS : RankGroup.ENLISTED;
     }
 
     /** Redraws the purchase panel, the review page, the tiles and the dock, after a purchase or a setting changed. */
@@ -684,7 +716,16 @@ public class TrainingConsole extends JDialog {
         JPanel top = Hud.transparentPanel(new BorderLayout(scaleForGUI(8), 0));
         top.add(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE, "basket.title")), BorderLayout.WEST);
         if (!selection.isEmpty()) {
-            top.add(Hud.link(getTextAt(RESOURCE_BUNDLE, "people.clear"), this::clearSelection), BorderLayout.EAST);
+            JPanel links = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
+            if (selection.size() == 1) {
+                Person person = selection.get(0);
+                JLabel view = Hud.link(getTextAt(RESOURCE_BUNDLE, "basket.viewRecord"), () -> viewRecord(person));
+                view.setToolTipText(getTextAt(RESOURCE_BUNDLE, "basket.viewRecord.toolTipText"));
+                links.add(view);
+                links.add(Box.createHorizontalStrut(scaleForGUI(14)));
+            }
+            links.add(Hud.link(getTextAt(RESOURCE_BUNDLE, "people.clear"), this::clearSelection));
+            top.add(links, BorderLayout.EAST);
         }
         top.setAlignmentX(Component.LEFT_ALIGNMENT);
         basket.add(top);
@@ -949,6 +990,34 @@ public class TrainingConsole extends JDialog {
         } else {
             refreshPanel();
         }
+    }
+
+    /**
+     * Shows a person's full record, as the Personnel tab shows it, in a window of its own. It is read-only, and modal
+     * over the console, so the staged plan cannot change while it is open; it shows the person as they are, without
+     * the training staged for them.
+     *
+     * @param person the person
+     */
+    private void viewRecord(Person person) {
+        JDialog view = new JDialog(this, person.getFullTitle(), true);
+        JScrollPane scroll = new JScrollPane(new PersonViewPanel(person, campaign, campaign.getGUI()),
+              ScrollPaneConstants.VERTICAL_SCROLLBAR_AS_NEEDED, ScrollPaneConstants.HORIZONTAL_SCROLLBAR_NEVER);
+        scroll.getVerticalScrollBar().setUnitIncrement(scaleForGUI(16));
+        JButton close = new JButton(getTextAt(RESOURCE_BUNDLE, "recordView.close"));
+        close.addActionListener(event -> view.dispose());
+        JPanel buttons = new JPanel();
+        buttons.add(close);
+
+        JPanel content = new JPanel(new BorderLayout());
+        content.add(scroll, BorderLayout.CENTER);
+        content.add(buttons, BorderLayout.SOUTH);
+        view.setContentPane(content);
+        view.getRootPane().setDefaultButton(close);
+        view.setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
+        view.setSize(scaleForGUI(760, 720));
+        view.setLocationRelativeTo(this);
+        view.setVisible(true);
     }
 
     private void sortBy(Sort sort) {

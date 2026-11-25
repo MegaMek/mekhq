@@ -83,7 +83,9 @@ class FinancesStraightSupportTest {
         campaignOptions.set(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP, false);
         campaignOptions.set(CampaignOption.PAY_FOR_MAINTAIN, false);
         campaignOptions.set(CampaignOption.PAY_FOR_OVERHEAD, true);
-        campaignOptions.set(CampaignOption.USE_PEACETIME_COST, false);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS, false);
+        campaignOptions.set(CampaignOption.PAY_FOR_TRAINING_MUNITIONS, false);
+        campaignOptions.set(CampaignOption.PAY_FOR_PEACETIME_FUEL, false);
         campaignOptions.set(CampaignOption.PAY_FOR_SALARIES, false);
         campaignOptions.set(CampaignOption.USE_TAXES, false);
         campaignOptions.set(CampaignOption.USE_SHARE_SYSTEM, false);
@@ -102,7 +104,7 @@ class FinancesStraightSupportTest {
         when(accountant.getOverheadExpenses()).thenReturn(OVERHEAD);
         when(accountant.getPeacetimeCost(anyBoolean())).thenReturn(Money.zero());
         when(accountant.getMonthlyFoodAndHousingExpenses()).thenReturn(Money.zero());
-        when(accountant.getWeeklyMaintenanceCosts()).thenReturn(Money.zero());
+        when(accountant.getProjectedMonthlyMaintenanceCosts()).thenReturn(Money.zero());
         when(campaign.getAccountant()).thenReturn(accountant);
 
         finances = new Finances();

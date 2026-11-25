@@ -39,6 +39,7 @@ import java.util.List;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.stratCon.StratConCombatBonusProjection;
 import mekhq.campaign.finances.Accountant;
 import mekhq.campaign.finances.ContractExpenseProjection;
@@ -158,16 +159,28 @@ public record ContractProfitEstimate(int transitDays, int contractMonths, Money 
         Money spareParts = Money.zero();
         Money trainingMunitions = Money.zero();
         Money fuel = Money.zero();
-        if (campaign.getCampaignOptions().isChargingPeacetimeCost()) {
+        CampaignOptions campaignOptions = campaign.getCampaignOptions();
+        if (campaignOptions.isChargingPeacetimeCost()) {
             Collection<Unit> units = accountant.getUnitsInFormations();
             List<Unit> transitUnits = new ArrayList<>(units);
             transitUnits.removeAll(mothballedForTransit);
-            spareParts = Accountant.getSparePartsTotal(units).multipliedBy(months)
-                               .plus(Accountant.getSparePartsTotal(transitUnits).multipliedBy(transitMonths));
-            trainingMunitions = Accountant.getAmmoTotal(units).multipliedBy(months)
-                                      .plus(Accountant.getAmmoTotal(transitUnits).multipliedBy(transitMonths));
-            fuel = Accountant.getFuelTotal(units).multipliedBy(months)
-                         .plus(Accountant.getFuelTotal(transitUnits).multipliedBy(transitMonths));
+            if (campaignOptions.isChargingPeacetimeSpareParts()) {
+                spareParts = Accountant.getSparePartsTotal(units).multipliedBy(months)
+                                   .plus(Accountant.getSparePartsTotal(transitUnits).multipliedBy(transitMonths));
+            }
+            if (campaignOptions.isChargingPeacetimeTrainingMunitions()) {
+                trainingMunitions = Accountant.getAmmoTotal(units).multipliedBy(months)
+                                          .plus(Accountant.getAmmoTotal(transitUnits).multipliedBy(transitMonths));
+            }
+            if (campaignOptions.isChargingPeacetimeFuel()) {
+                // Every active fusion engine in the hangar adds to the hydrogen pool, not only those in the TO&E
+                Collection<Unit> hydrogenProducers = campaign.getPlayerForce().getHangar().getUnits();
+                List<Unit> transitHydrogenProducers = new ArrayList<>(hydrogenProducers);
+                transitHydrogenProducers.removeAll(mothballedForTransit);
+                fuel = Accountant.getFuelTotal(hydrogenProducers, units).multipliedBy(months)
+                             .plus(Accountant.getFuelTotal(transitHydrogenProducers, transitUnits)
+                                         .multipliedBy(transitMonths));
+            }
         }
 
         Money operatingCosts = salaries.plus(maintenance)

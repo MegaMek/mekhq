@@ -33,7 +33,6 @@
 package mekhq.gui.campaignOptions.contents;
 
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -125,34 +124,36 @@ class MedicalPage {
         spnNaturalHealWaitingPeriod
               .addMouseListener(createTipPanelUpdater("NaturalHealWaitingPeriod"));
 
-        lblMinimumHitsForVehicles = new CampaignOptionsLabel("MinimumHitsForVehicles");
+        lblMinimumHitsForVehicles = new CampaignOptionsLabel("MinimumHitsForVehicles",
+              getMetadata(new Version("0.49.00")));
         lblMinimumHitsForVehicles.addMouseListener(createTipPanelUpdater("MinimumHitsForVehicles"));
         spnMinimumHitsForVehicles = new CampaignOptionsSpinner("MinimumHitsForVehicles", 1, 1, 5, 1);
         spnMinimumHitsForVehicles.addMouseListener(createTipPanelUpdater("MinimumHitsForVehicles"));
 
-        chkUseRandomHitsForVehicles = new CampaignOptionsCheckBox("UseRandomHitsForVehicles");
+        chkUseRandomHitsForVehicles = new CampaignOptionsCheckBox("UseRandomHitsForVehicles",
+              getMetadata(new Version("0.49.00")));
         chkUseRandomHitsForVehicles
               .addMouseListener(createTipPanelUpdater("UseRandomHitsForVehicles"));
 
         chkUseTougherHealing = new CampaignOptionsCheckBox("UseTougherHealing",
-              getMetadata(null, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseTougherHealing.addMouseListener(createTipPanelUpdater("UseTougherHealing"));
 
         chkUseAlternativeAdvancedMedical = new CampaignOptionsCheckBox("UseAlternativeAdvancedMedical",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+              getMetadata(new Version("0.50.10"), CampaignOptionFlag.CUSTOM_SYSTEM,
                     CampaignOptionFlag.IMPORTANT));
         chkUseAlternativeAdvancedMedical.addMouseListener(createTipPanelUpdater("UseAlternativeAdvancedMedical"));
 
         chkUseAlternativeAdvancedMedicalFewerPermanentInjuries = new CampaignOptionsCheckBox(
               "UseAlternativeAdvancedMedicalFewerPermanentInjuries",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.CUSTOM_SYSTEM,
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.CUSTOM_SYSTEM,
                     CampaignOptionFlag.IMPORTANT));
         chkUseAlternativeAdvancedMedicalFewerPermanentInjuries.addMouseListener(createTipPanelUpdater(
               "UseAlternativeAdvancedMedicalFewerPermanentInjuries"));
 
         lblAlternativeAdvancedMedicalHealingTimeMultiplier = new CampaignOptionsLabel(
               "AlternativeAdvancedMedicalHealingTimeMultiplier",
-              getMetadata(new Version(0, 51, 1), CampaignOptionFlag.IMPORTANT));
+              getMetadata(new Version("0.51.01.1"), CampaignOptionFlag.IMPORTANT));
         lblAlternativeAdvancedMedicalHealingTimeMultiplier.addMouseListener(createTipPanelUpdater(
               "AlternativeAdvancedMedicalHealingTimeMultiplier"));
         spnAlternativeAdvancedMedicalHealingTimeMultiplier = new CampaignOptionsSpinner(
@@ -165,30 +166,30 @@ class MedicalPage {
               "AlternativeAdvancedMedicalHealingTimeMultiplier"));
 
         chkUseRandomDiseases = new CampaignOptionsCheckBox("UseRandomDiseases",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM,
+              getMetadata(new Version("0.50.10"), CampaignOptionFlag.CUSTOM_SYSTEM,
                     CampaignOptionFlag.IMPORTANT));
         chkUseRandomDiseases.addMouseListener(createTipPanelUpdater("UseRandomDiseases"));
 
-        lblMaximumPatients = new CampaignOptionsLabel("MaximumPatients");
+        lblMaximumPatients = new CampaignOptionsLabel("MaximumPatients", getMetadata(new Version("0.50.00")));
         lblMaximumPatients.addMouseListener(createTipPanelUpdater("MaximumPatients"));
         spnMaximumPatients = new CampaignOptionsSpinner("MaximumPatients", 25, 1, 100, 1);
         spnMaximumPatients.addMouseListener(createTipPanelUpdater("MaximumPatients"));
 
         chkDoctorsUseAdministration = new CampaignOptionsCheckBox("DoctorsUseAdministration",
-              getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.50.05"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkDoctorsUseAdministration
               .addMouseListener(createTipPanelUpdater("DoctorsUseAdministration"));
 
         chkUseUsefulMedics = new CampaignOptionsCheckBox("UseUsefulMedics",
-              getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.CUSTOM_SYSTEM));
+              getMetadata(new Version("0.50.07"), CampaignOptionFlag.CUSTOM_SYSTEM));
         chkUseUsefulMedics.addMouseListener(createTipPanelUpdater("UseUsefulMedics"));
 
         chkUseMASHTheatres = new CampaignOptionsCheckBox("UseMASHTheatres",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         chkUseMASHTheatres.addMouseListener(createTipPanelUpdater("UseMASHTheatres"));
 
         lblMASHTheatreCapacity = new CampaignOptionsLabel("MASHTheatreCapacity",
-              getMetadata(MILESTONE_BEFORE_METADATA));
+              getMetadata(new Version("0.50.10")));
         lblMASHTheatreCapacity.addMouseListener(createTipPanelUpdater("MASHTheatreCapacity"));
         spnMASHTheatreCapacity = new CampaignOptionsSpinner("MASHTheatreCapacity", 25, 1, 100, 1);
         spnMASHTheatreCapacity.addMouseListener(createTipPanelUpdater("MASHTheatreCapacity"));

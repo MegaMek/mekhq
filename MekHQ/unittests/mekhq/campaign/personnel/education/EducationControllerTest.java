@@ -77,6 +77,8 @@ import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 import org.mockito.MockedStatic;
 
 /**
@@ -898,6 +900,48 @@ class EducationControllerTest {
             assertTrue(person.getEduTagAlongs().isEmpty());
             assertEquals(PersonnelStatus.ACTIVE, spouse.getStatus());
             assertEquals(PersonnelStatus.ACTIVE, child.getStatus());
+        }
+    }
+
+    @ParameterizedTest
+    @CsvSource({
+          // isUseRandomTalent, talentScore, expected pass rate
+          "false, 0, 60",
+          "false, 12, 60",
+          "false, -12, 60",
+          "true, 0, 60",
+          "true, 12, 72",
+          "true, -12, 48"
+    })
+    void testGetInitialEducationPassRate_averageTalentKeepsBaseRate(boolean isUseRandomTalent, int talentScore,
+          int expected) {
+        assertEquals(expected, EducationController.getInitialEducationPassRate(isUseRandomTalent, talentScore));
+    }
+
+    @Nested
+    class GraduationRewards {
+        @ParameterizedTest
+        @CsvSource({ "3, 0, 0", "3, 1, 3", "3, 4, 12", "5, 2, 10", "3, -1, 0" })
+        void curriculumXpIsTheBaseRateForEachLevel(int curriculumXpRate, int educationLevel, int expectedXp) {
+            assertEquals(expectedXp, EducationController.getCurriculumXp(curriculumXpRate, educationLevel));
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "7, 300, 3", "7, 600, 5", "7, 900, 8", "7, 1200, 10", "5, 300, 4", "9, 300, 2", "7, 10, 1",
+                     "11, 150, 1" })
+        void facultyXpCountsPartBlocksOfDays(int facultySkill, int daysAttended, int expectedXp) {
+            // Courses shorter than 600 days, or not a whole multiple of it, still reflect the faculty's skill
+            assertEquals(expectedXp, EducationController.getFacultyXp(facultySkill, daysAttended));
+        }
+
+        @ParameterizedTest
+        @CsvSource({ "50, 10, false, 0, 50", "50, 10, false, 12, 62", "95, 99, false, 0, 95", "50, 10, true, 0, 10",
+                     "95, 99, true, 0, 89", "85, 88, true, 12, 89", "85, 88, true, -12, 73" })
+        void graduationRoll(int firstRoll, int secondRoll, boolean isHomeSchool, int reasoningModifier,
+              int expectedRoll) {
+            // In-unit education keeps the lower roll and can never reach honors, even for a bright student
+            assertEquals(expectedRoll,
+                  EducationController.getAdultGraduationRoll(firstRoll, secondRoll, isHomeSchool, reasoningModifier));
         }
     }
 }

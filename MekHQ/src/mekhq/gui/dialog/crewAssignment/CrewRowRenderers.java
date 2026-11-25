@@ -32,6 +32,7 @@
  */
 package mekhq.gui.dialog.crewAssignment;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -46,7 +47,9 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.function.BooleanSupplier;
 import java.util.function.Predicate;
+import java.util.function.Supplier;
 import java.util.stream.Collectors;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -67,14 +70,14 @@ import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Reason;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTech;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTempCrew;
-import mekhq.campaign.unit.crewAssignment.SeatEligibility;
 import mekhq.campaign.unit.crewAssignment.SeatType;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
 import mekhq.gui.baseComponents.hud.HudLinkList;
-import mekhq.gui.baseComponents.hud.HudRing;
 import mekhq.gui.baseComponents.hud.HudToolTip;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.FamiliarityEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
-import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.UnitEntry;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.SkillEntry;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SkillGroup;
 
 /**
  * The row renderers of the crew assignment lists, and the labels they share. Links in a row carry the {@link Unit} or
@@ -281,118 +284,54 @@ final class CrewRowRenderers {
 
     // endregion Shared labels
 
-    // region Units
-
-    /** A unit row: its crewing ring, name and type, formation and lead crew member, and a badge per seat. */
-    static final class UnitRow extends Row implements ListCellRenderer<UnitEntry> {
-        private final AssignmentPlan plan;
-        private final Predicate<Unit> isSelected;
-        private HudRing ring;
-        private final JLabel formation = label(LINE_FONT, TEXT_MUTED);
-        private final JLabel lead = label(LINE_FONT, ACCENT_BRIGHT);
-
-        UnitRow(AssignmentPlan plan, Predicate<Unit> isSelected) {
-            super(true);
-            this.plan = plan;
-            this.isSelected = isSelected;
-            secondLine.add(formation);
-            secondLine.add(lead);
-        }
-
-        @Override
-        void addMarker(JPanel left) {
-            ring = new HudRing();
-            left.add(Box.createHorizontalStrut(scaleForGUI(6)));
-            left.add(ring);
-        }
-
-        @Override
-        public Component getListCellRendererComponent(JList<? extends UnitEntry> list, UnitEntry entry, int index,
-              boolean selectedInList, boolean cellHasFocus) {
-            Unit unit = entry.unit();
-            paintState(isSelected.test(unit));
-            CrewCoverage.UnitCoverage coverage = CrewCoverage.of(unit, plan);
-            ring.setColor(crewingColor(coverage.crewing()), false);
-            name.setText(unit.getName());
-            role.setText(entry.typeName());
-            status.setText(entry.damageName());
-            status.setForeground(damageColor(entry.damageState()));
-            formation.setText(entry.formationName().isEmpty() ? "" : entry.formationName() + "  ·  ");
-
-            Person leader = firstCrew(unit);
-            if (leader == null) {
-                setLink(list, index, lead, getTextAt(RESOURCE_BUNDLE,
-                      (coverage.temp() > 0) ? "row.tempCrewOnly" : "row.noCrew"), null);
-            } else {
-                setLink(list, index, lead,
-                      getFormattedTextAt(RESOURCE_BUNDLE, "row.lead", leader.getFullTitle()), leader);
-            }
-
-            badges.removeAll();
-            for (CrewCoverage.SeatCoverage seat : coverage.seats()) {
-                // Real people over the seat's size, then any places temporary crew hold, such as "GUNNER 2/10 +8 TEMP"
-                JLabel badge = badge();
-                String text = seatLabel(unit, seat.seat().type()).toUpperCase(Locale.ROOT) + ' ' + seat.real() + '/'
-                                    + seat.seat().capacity();
-                if (seat.temp() > 0) {
-                    text += ' ' + getFormattedTextAt(RESOURCE_BUNDLE, "row.tempCrew", seat.temp())
-                                        .toUpperCase(Locale.ROOT);
-                }
-                badge.setText(text);
-                if (seat.uncovered() > 0) {
-                    setBadgeColor(badge, AMBER, AMBER.darker());
-                } else if (seat.temp() > 0) {
-                    setBadgeColor(badge, ACCENT, BORDER_CYAN);
-                } else {
-                    setBadgeColor(badge, READY, BORDER);
-                }
-                badges.add(Box.createHorizontalStrut(scaleForGUI(4)));
-                badges.add(badge);
-            }
-            if (SeatEligibility.takesTech(unit)) {
-                JLabel techBadge = badge();
-                Person tech = plan.plannedTechOf(unit);
-                techBadge.setText(getTextAt(RESOURCE_BUNDLE, (tech == null) ? "row.noTech" : "row.tech")
-                                        .toUpperCase(Locale.ROOT));
-                if (tech == null) {
-                    setBadgeColor(techBadge, AMBER, AMBER.darker());
-                } else {
-                    setBadgeColor(techBadge, READY, BORDER);
-                    techBadge.setToolTipText(tech.getFullTitle());
-                }
-                badges.add(Box.createHorizontalStrut(scaleForGUI(4)));
-                badges.add(techBadge);
-            }
-            return this;
-        }
-
-        private static Person firstCrew(Unit unit) {
-            List<Person> crew = unit.getCrew();
-            return crew.isEmpty() ? null : crew.get(0);
-        }
-    }
-
-    // endregion Units
-
     // region People
 
     /** A person row: their name and role, where they will serve, their abilities, and their experience level. */
     static final class PersonRow extends Row implements ListCellRenderer<PersonEntry> {
         private final AssignmentPlan plan;
         private final Predicate<Person> isSelected;
+        /** {@code true} while the row is drawn on the Techs page, where it shows a tech's workload, not their seat. */
+        private final BooleanSupplier isTechView;
+        /** The unit whose gunnery and piloting skills the row shows, or {@code null} for the person's own role's. */
+        private final Supplier<Unit> skillUnit;
+        /** The Skills filter's group, whose best skill the row shows, or {@code null} for none. */
+        private final Supplier<SkillGroup> skillGroup;
         private final JLabel where = label(LINE_FONT, TEXT_MUTED);
         /** Hits and fatigue, on the second line beside where the person serves. */
         private final JLabel condition = label(LINE_FONT, TEXT_MUTED);
+        /** The chassis the person is most familiar with, or the selected unit's; empty while familiarity is off. */
+        private final JLabel familiarity = label(LINE_FONT, TEXT_MUTED);
+        /** The selected unit's chassis, whose familiarity the row shows first, or {@code null} for none. */
+        private final Supplier<String> familiarityChassis;
+        /** The skill values that matter for the choice at hand, such as "3/4 · Scouting 5". */
+        private final JLabel skills = label(LINE_FONT, TEXT);
         private final JLabel abilities = badge();
         private final JLabel skill = label(SKILL_FONT, TEXT);
 
-        PersonRow(AssignmentPlan plan, Predicate<Person> isSelected) {
-            super(true);
+        /**
+         * @param skillUnit          the unit whose gunnery and piloting skills to show, or {@code null} for each
+         *                           person's own combat role's
+         * @param skillGroup         the group of skills to show each person's best of, or {@code null} for none
+         * @param familiarityChassis the selected unit's chassis, whose familiarity is shown first, or {@code null}
+         *                           to show each person's best chassis
+         */
+        PersonRow(AssignmentPlan plan, Predicate<Person> isSelected, BooleanSupplier isTechView,
+              Supplier<Unit> skillUnit, Supplier<SkillGroup> skillGroup, Supplier<String> familiarityChassis) {
+            // No tick box: one person is selected at a time, shown by the row's accent bar and lighter background
+            super(false);
             this.plan = plan;
             this.isSelected = isSelected;
+            this.isTechView = isTechView;
+            this.skillUnit = skillUnit;
+            this.skillGroup = skillGroup;
+            this.familiarityChassis = familiarityChassis;
             secondLine.add(where);
             secondLine.add(Box.createHorizontalStrut(scaleForGUI(10)));
             secondLine.add(condition);
+            secondLine.add(Box.createHorizontalStrut(scaleForGUI(10)));
+            secondLine.add(familiarity);
+            badges.add(skills);
+            badges.add(Box.createHorizontalStrut(scaleForGUI(10)));
             badges.add(abilities);
             badges.add(Box.createHorizontalStrut(scaleForGUI(10)));
             skill.setHorizontalAlignment(JLabel.RIGHT);
@@ -420,7 +359,15 @@ final class CrewRowRenderers {
 
             Unit planned = plan.plannedUnitOf(person);
             StagedAssignment change = plan.changeFor(person);
-            if ((planned == null) && person.isTech()) {
+            if (isTechView.getAsBoolean() && person.isTech()) {
+                // On the Techs page the time left is what decides who takes the next unit, so it is spelled out
+                int units = plan.plannedTechUnits(person).size();
+                int used = plan.plannedTechMinutes(person);
+                int available = plan.techMinutesAvailable(person);
+                setLink(list, index, where, getFormattedTextAt(RESOURCE_BUNDLE, "row.techLoad.free", units,
+                      Math.max(0, available - used), available), null);
+                where.setForeground((used > available) ? DANGER : (used == available) ? AMBER : TEXT);
+            } else if ((planned == null) && person.isTech()) {
                 int units = plan.plannedTechUnits(person).size();
                 int used = plan.plannedTechMinutes(person);
                 int available = plan.techMinutesAvailable(person);
@@ -434,6 +381,9 @@ final class CrewRowRenderers {
                                     getFormattedTextAt(RESOURCE_BUNDLE, "row.staged", planned.getName());
                 setLink(list, index, where, text, planned);
             }
+
+            showSkills(entry);
+            showFamiliarity(entry);
 
             int count = entry.abilities().size();
             abilities.setVisible(count > 0);
@@ -450,6 +400,78 @@ final class CrewRowRenderers {
             skill.setText(entry.skillLevel().toString().toUpperCase(Locale.ROOT));
             skill.setForeground(skillColor(entry.skillLevel()));
             return this;
+        }
+
+        /**
+         * Shows the skills that matter for the choice at hand: gunnery/piloting, for the selected unit or the person's
+         * own combat role, as the Personnel tab's aggregate combat column writes them; then their best skill in the
+         * Skills filter's group. The tooltip names each skill. On the Techs page only the filtered skill is shown.
+         */
+        private void showSkills(PersonEntry entry) {
+            List<String> parts = new ArrayList<>();
+            List<String> named = new ArrayList<>();
+            if (!isTechView.getAsBoolean()) {
+                List<String> combat = CrewAssignmentState.combatSkills(entry.person(), skillUnit.get());
+                List<String> values = new ArrayList<>();
+                for (String name : combat) {
+                    SkillEntry held = entry.skills().get(name);
+                    values.add((held == null) ? "-" : String.valueOf(held.value()));
+                    if (held != null) {
+                        named.add(held.name() + ' ' + held.value());
+                    }
+                }
+                // Someone with none of the skills shows nothing, rather than a row of dashes
+                if (!named.isEmpty()) {
+                    parts.add(String.join("/", values));
+                }
+            }
+            SkillGroup group = skillGroup.get();
+            SkillEntry best = (group == null) ? null : CrewAssignmentState.best(entry.skills(), group);
+            if (best != null) {
+                parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "row.skillGroup",
+                      getTextAt(RESOURCE_BUNDLE, "SkillGroup." + group.name()), best.value()));
+                named.add(best.name() + ' ' + best.value());
+            }
+            skills.setVisible(!parts.isEmpty());
+            skills.setText(String.join("  ·  ", parts));
+            skills.setToolTipText(named.isEmpty() ? null :
+                                        HudToolTip.html(getTextAt(RESOURCE_BUNDLE, "row.skills.title"),
+                                              String.join(", ", named)));
+        }
+
+        /**
+         * Names the chassis the person knows best, such as "Familiar: Orion 200 (+1 more)". With a unit selected, its
+         * chassis is named instead, in green, if the person has any familiarity with it. The tooltip lists the few
+         * chassis the person knows best, ending in an ellipsis when there are more, as a person can know any number.
+         */
+        private void showFamiliarity(PersonEntry entry) {
+            FamiliarityEntry known = entry.familiarity();
+            familiarity.setVisible(known.count() > 0);
+            if (known.count() == 0) {
+                familiarity.setText("");
+                familiarity.setToolTipText(null);
+                return;
+            }
+            String selected = familiarityChassis.get();
+            int selectedScore = (selected == null) ? 0 : entry.person().getChassisFamiliarity(selected);
+            boolean showsSelected = selectedScore > 0;
+            String chassis = showsSelected ? selected : known.top().get(0).getKey();
+            int score = showsSelected ? selectedScore : known.top().get(0).getValue();
+            int others = known.count() - 1;
+            familiarity.setText((others == 0) ?
+                                      getFormattedTextAt(RESOURCE_BUNDLE, "row.familiarity", chassis, score) :
+                                      getFormattedTextAt(RESOURCE_BUNDLE, "row.familiarity.more", chassis, score,
+                                            others));
+            familiarity.setForeground(showsSelected ? READY : TEXT);
+
+            // Such as "Orion 200, Marauder 120, Rifleman 85...", the trailing ellipsis marking chassis left unlisted
+            String listed = known.top().stream()
+                                  .map(chassisEntry -> chassisEntry.getKey() + ' ' + chassisEntry.getValue())
+                                  .collect(Collectors.joining(", "));
+            if (known.count() > known.top().size()) {
+                listed += "...";
+            }
+            familiarity.setToolTipText(wordWrap(listed));
         }
     }
 

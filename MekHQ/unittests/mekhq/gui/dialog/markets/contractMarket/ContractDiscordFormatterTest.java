@@ -54,6 +54,7 @@ class ContractDiscordFormatterTest {
               "Objective Raid \u00B7 Galatea \u00B7 6-month term \u00B7 12 days transit",
               "Even Fight 5/10",
               List.of("Proving Ground"),
+              null,
               "Leutnant Katrina Steiner",
               briefing,
               List.of(new Section("Terms",
@@ -97,6 +98,7 @@ class ContractDiscordFormatterTest {
               "Asset Retrieval \u00B7 Luthien \u00B7 6-month term \u00B7 214 days transit",
               "Even Fight 5/10",
               List.of("Proving Ground", "Double Support Payouts"),
+              null,
               "Tai-i Yatun Kartosuwiryo",
               briefing,
               List.of(new Section("Terms",
@@ -188,7 +190,7 @@ class ContractDiscordFormatterTest {
     @Test
     void textInsideTheStatBlockCannotCloseItEarly() {
         ContractReadout sneaky = new ContractReadout("Employer", "Title", "status ``` sneaky", "Even Fight 5/10",
-              List.of(), null, "", List.of(), "caveat");
+              List.of(), null, null, "", List.of(), "caveat");
 
         String message = ContractDiscordFormatter.format(sneaky);
 
@@ -203,6 +205,25 @@ class ContractDiscordFormatterTest {
 
         assertFalse(message.contains("> "));
         assertFalse(message.contains("Leutnant Katrina Steiner"), "no speaker without words to attribute");
+    }
+
+    @Test
+    void theWarLineHeadsTheBriefing() {
+        ContractReadout atWar = new ContractReadout("Employer", "Title", "status", "Even Fight 5/10", List.of(),
+              "Ongoing War · Fourth Succession War", "Speaker", "We need you on Galatea.", List.of(), "caveat");
+
+        String message = ContractDiscordFormatter.format(atWar);
+
+        int war = message.indexOf("**ONGOING WAR · FOURTH SUCCESSION WAR**\n");
+        assertTrue(war >= 0, message);
+        assertTrue(war < message.indexOf("> We need you on Galatea."), "the war line comes before the briefing");
+    }
+
+    @Test
+    void anOfferWithNoWarHasNoWarLine() {
+        String message = ContractDiscordFormatter.format(readout("Operation Sundowner", "We need you on Galatea."));
+
+        assertFalse(message.contains("ONGOING WAR"));
     }
 
     @Test

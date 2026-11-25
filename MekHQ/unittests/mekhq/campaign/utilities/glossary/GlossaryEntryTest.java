@@ -34,6 +34,7 @@ package mekhq.campaign.utilities.glossary;
 
 import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.List;
@@ -84,5 +85,14 @@ class GlossaryEntryTest {
                                           .toList();
 
         assertEquals(lookUpNames.size(), uniqueTitles.size(), "Titles are not unique.");
+    }
+
+    @ParameterizedTest
+    @EnumSource(GlossaryEntry.class)
+    void testVersionHistoryIsInOrder(GlossaryEntry entry) {
+        assertFalse(entry.getVersionLastUpdated().isLowerThan(entry.getVersionAdded()),
+              entry.name() + " was last updated before it was added");
+        assertFalse(entry.getVersionLastVerified().isLowerThan(entry.getVersionLastUpdated()),
+              entry.name() + " was last verified before it was last updated");
     }
 }

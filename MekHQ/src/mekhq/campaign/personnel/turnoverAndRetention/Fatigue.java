@@ -181,6 +181,8 @@ public class Fatigue {
      * their recovery status. If the fatigue exceeds the campaign's leave threshold, the person's status is updated to
      * {@link PersonnelStatus#ON_LEAVE}.</p>
      *
+     * <p>Prisoners still accumulate and recover fatigue, but no fatigue reports are generated for them.</p>
+     *
      * <p>This should be called whenever a person gains Fatigue.</p>
      *
      * @param campaign the campaign context in which the person operates.
@@ -193,38 +195,62 @@ public class Fatigue {
         }
 
         int effectiveFatigue = getEffectiveFatigue(person, campaign);
+        boolean shouldReportFatigue = shouldReportFatigue(person);
 
         if ((effectiveFatigue >= 5) && (effectiveFatigue < 9)) {
-            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "fatigueTired.text",
-                  person.getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
-                  CLOSING_SPAN_TAG));
+            if (shouldReportFatigue) {
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "fatigueTired.text",
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                      CLOSING_SPAN_TAG));
+            }
 
             person.setIsRecoveringFromFatigue(true);
         } else if ((effectiveFatigue >= 9) && (effectiveFatigue < 12)) {
-            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "fatigueFatigued.text",
-                  person.getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
-                  CLOSING_SPAN_TAG));
+            if (shouldReportFatigue) {
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "fatigueFatigued.text",
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                      CLOSING_SPAN_TAG));
+            }
 
             person.setIsRecoveringFromFatigue(true);
         } else if ((effectiveFatigue >= 12) && (effectiveFatigue < 17)) {
-            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "fatigueExhausted.text",
-                  person.getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                  CLOSING_SPAN_TAG));
+            if (shouldReportFatigue) {
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "fatigueExhausted.text",
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                      CLOSING_SPAN_TAG));
+            }
 
             person.setIsRecoveringFromFatigue(true);
         } else if (effectiveFatigue >= 17) {
-            campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "fatigueCritical.text",
-                  person.getHyperlinkedFullTitle(),
-                  spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
-                  CLOSING_SPAN_TAG));
+            if (shouldReportFatigue) {
+                campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "fatigueCritical.text",
+                      person.getHyperlinkedFullTitle(),
+                      spanOpeningWithCustomColor(ReportingUtilities.getNegativeColor()),
+                      CLOSING_SPAN_TAG));
+            }
 
             person.setIsRecoveringFromFatigue(true);
         }
 
         processFatigueLeave(campaign, person, effectiveFatigue);
+    }
+
+    /**
+     * Determines whether fatigue state changes for a person should appear in the daily report. Prisoners are excluded,
+     * as their fatigue has no bearing on the campaign's active duty roster; free personnel and bondsmen are reported.
+     *
+     * @param person the person whose fatigue may be reported.
+     *
+     * @return {@code true} if the person's fatigue should be reported; {@code false} otherwise.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean shouldReportFatigue(Person person) {
+        return person.getPrisonerStatus().isFreeOrBondsman();
     }
 
     /**
@@ -447,10 +473,12 @@ public class Fatigue {
 
             if (person.getIsRecoveringFromFatigue()) {
                 if (person.getFatigueDirect() <= 0) {
-                    campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "fatigueRecovered.text",
-                          person.getHyperlinkedFullTitle(),
-                          spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
-                          CLOSING_SPAN_TAG));
+                    if (shouldReportFatigue(person)) {
+                        campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE, "fatigueRecovered.text",
+                              person.getHyperlinkedFullTitle(),
+                              spanOpeningWithCustomColor(ReportingUtilities.getPositiveColor()),
+                              CLOSING_SPAN_TAG));
+                    }
 
                     person.setIsRecoveringFromFatigue(false);
 

@@ -243,8 +243,15 @@ public class StratConFacilityOverviewDialog extends JDialog {
                                 unknown;
         String supply = "";
         if (isSupplyLinesActive) {
-            supply = getTextAt(RESOURCE_BUNDLE,
-                  StratConFacilitySupply.isCutOff(track, coords) ? "overview.supply.cut" : "overview.supply.ok");
+            String supplyKey = switch (StratConFacilitySupply.getSupplyStatus(track, coords)) {
+                case NONE -> null;
+                case CUT -> "overview.supply.cut";
+                case SOURCE -> "overview.supply.source";
+                case CONNECTED -> "overview.supply.ok";
+            };
+            if (supplyKey != null) {
+                supply = getTextAt(RESOURCE_BUNDLE, supplyKey);
+            }
         }
 
         String owner = getTextAt(RESOURCE_BUNDLE,

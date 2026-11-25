@@ -99,7 +99,7 @@ public abstract class AbstractSalvage {
      * Checks whether a formation set to 'Salvage' may fight in a scenario and still recover that scenario's salvage.
      *
      * <p>Under CamOps (Strict) rules, a salvage team cannot take part in the fighting; it sits on the sidelines until
-     * the OpFor has been routed. Other systems may allow Salvage formations to fight and then salvage. Units in any
+     * the OpFor has been driven off. Other systems may allow Salvage formations to fight and then salvage. Units in any
      * other kind of formation can never salvage a scenario they fought in.</p>
      *
      * @return {@code true} if Salvage formations may fight and then salvage the same scenario
@@ -160,6 +160,24 @@ public abstract class AbstractSalvage {
      */
     public boolean canSalvage(Unit unit, boolean isInSpace) {
         return unit.canSalvage(isInSpace);
+    }
+
+    /**
+     * Checks whether a unit has what it needs to salvage in the current environment, leaving its crew aside.
+     *
+     * <p>A unit that is equipped to salvage but fails {@link #canSalvage(Unit, boolean)} is held back only by its
+     * crew. By default, this is {@link Unit#isEquippedToSalvage(boolean)}.</p>
+     *
+     * @param unit      the unit to check
+     * @param isInSpace {@code true} if the salvage operation takes place in space
+     *
+     * @return {@code true} if the unit is equipped to salvage in this environment
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isEquippedToSalvage(Unit unit, boolean isInSpace) {
+        return unit.isEquippedToSalvage(isInSpace);
     }
 
     /**

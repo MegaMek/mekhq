@@ -33,12 +33,14 @@
 
 package mekhq.campaign.unit;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doNothing;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -53,6 +55,7 @@ import java.util.UUID;
 import megamek.common.units.Dropship;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -148,6 +151,54 @@ class UnitVesselEngineerTest {
     }
 
     @Test
+    void crewMemberWhoseUnitIsStillALoadPlaceholderIsEngineer() {
+        // While a campaign loads, the engineer is chosen before each person's unit placeholder is swapped for the
+        // real unit
+        Person captain = vesselCrewStillLoading(10);
+
+        unit.resetEngineer();
+
+        assertSame(captain, unit.getEngineer());
+    }
+
+    @Test
+    void activationSurvivesEngineerResetWhileLoading() {
+        // A DropShip part-way through activation lost its remaining time, and went back to plain mothballed, on every
+        // load. Mothballed first: mothballing a unit sends its crew ashore
+        unit.setMothballed(true);
+        vesselCrewStillLoading(10);
+        unit.setMothballTime(10608);
+
+        unit.resetEngineer();
+
+        assertEquals(10608, unit.getMothballTime());
+    }
+
+    @Test
+    void mothballingSurvivesEngineerResetWhileLoading() {
+        // Not yet mothballed, so the running time is mothballing work; it was lost on load the same way
+        vesselCrewStillLoading(10);
+        unit.setMothballTime(10608);
+
+        unit.resetEngineer();
+
+        assertEquals(10608, unit.getMothballTime());
+    }
+
+    @Test
+    void crewMemberOfAnotherUnitIsNotEngineer() {
+        unit.setId(UUID.randomUUID());
+        Person transferredCaptain = vesselCrew(10);
+        Unit otherUnit = mock(Unit.class);
+        when(otherUnit.getId()).thenReturn(UUID.randomUUID());
+        when(transferredCaptain.getUnit()).thenReturn(otherUnit);
+
+        unit.resetEngineer();
+
+        assertNull(unit.getEngineer());
+    }
+
+    @Test
     void vesselWithNoCrewHasNoEngineer() {
         unit.resetEngineer();
 
@@ -158,6 +209,7 @@ class UnitVesselEngineerTest {
     private Person vesselCrew(int rank) {
         UUID id = UUID.randomUUID();
         Person person = mock(Person.class);
+        lenient().when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(person.getId()).thenReturn(id);
         when(person.getUnit()).thenReturn(unit);
         when(campaign.getPlayerForce().getHumanResources().getPerson(eq(id))).thenReturn(person);
@@ -168,6 +220,24 @@ class UnitVesselEngineerTest {
         });
 
         unit.addVesselCrew(person);
+        return person;
+    }
+
+    /**
+     * Adds a vessel crew member whose unit is, as during campaign loading, a placeholder carrying this unit's id rather
+     * than the unit itself.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private Person vesselCrewStillLoading(int rank) {
+        UUID unitId = UUID.randomUUID();
+        unit.setId(unitId);
+        Unit placeholder = mock(Unit.class);
+        when(placeholder.getId()).thenReturn(unitId);
+
+        Person person = vesselCrew(rank);
+        when(person.getUnit()).thenReturn(placeholder);
         return person;
     }
 }

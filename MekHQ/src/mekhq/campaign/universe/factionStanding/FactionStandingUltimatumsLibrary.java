@@ -206,7 +206,9 @@ public class FactionStandingUltimatumsLibrary {
      */
     static boolean isValidDissenterPreference(FactionStandingUltimatumData ultimatum) {
         String preference = ultimatum.dissenterPreference();
-        return FactionStandingUltimatumData.ROGUE_PREFERENCE.equals(preference)
+        return ultimatum.hasNoDissent()
+                     || (FactionStandingUltimatumData.ROGUE_PREFERENCE.equals(preference)
+                               && ultimatum.isGoingRogueOffered())
                      || ultimatum.getSide(preference) != null;
     }
 
@@ -238,7 +240,7 @@ public class FactionStandingUltimatumsLibrary {
                 continue;
             }
 
-            if (ultimatum.sides().isEmpty()) {
+            if (ultimatum.getChoosableSides().isEmpty()) {
                 LOGGER.warn("Ultimatum {} has no sides to choose between and will never trigger", ultimatum.name());
                 continue;
             }

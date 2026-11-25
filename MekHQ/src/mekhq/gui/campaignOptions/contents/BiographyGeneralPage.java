@@ -32,8 +32,6 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.MILESTONE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -47,10 +45,10 @@ import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import megamek.Version;
 import megamek.client.ui.comboBoxes.MMComboBox;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.campaign.personnel.enums.FamilialRelationshipDisplayLevel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -116,7 +114,7 @@ class BiographyGeneralPage {
         comboFamilyDisplayLevel = new MMComboBox<>("comboFamilyDisplayLevel",
                 FamilialRelationshipDisplayLevel.values());
 
-        chkUseDylansRandomXP = new CampaignOptionsCheckBox("UseDylansRandomXP");
+        chkUseDylansRandomXP = new CampaignOptionsCheckBox("UseDylansRandomXP", getMetadata(new Version("0.49.00")));
         chkUseDylansRandomXP.addMouseListener(createTipPanelUpdater("UseDylansRandomXP"));
 
         lblGender = new CampaignOptionsLabel("Gender");
@@ -125,13 +123,13 @@ class BiographyGeneralPage {
         spnGender.addMouseListener(createTipPanelUpdater("Gender"));
 
         lblNonBinaryDiceSize = new CampaignOptionsLabel("NonBinaryDiceSize",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.01"), CampaignOptionFlag.IMPORTANT));
         lblNonBinaryDiceSize.addMouseListener(createTipPanelUpdater("NonBinaryDiceSize"));
         spnNonBinaryDiceSize = new CampaignOptionsSpinner("NonBinaryDiceSize", 60, 0, 100000, 1);
         spnNonBinaryDiceSize.addMouseListener(createTipPanelUpdater("NonBinaryDiceSize"));
 
         lblFamilyDisplayLevel = new CampaignOptionsLabel("FamilyDisplayLevel",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.49.12"), CampaignOptionFlag.IMPORTANT));
         lblFamilyDisplayLevel.addMouseListener(createTipPanelUpdater("FamilyDisplayLevel"));
         comboFamilyDisplayLevel.addMouseListener(createTipPanelUpdater("FamilyDisplayLevel"));
 
@@ -182,20 +180,22 @@ class BiographyGeneralPage {
      */
     private @Nonnull JPanel createAnniversariesPanel() {
         // Contents
-        chkAnnounceBirthdays = new CampaignOptionsCheckBox("AnnounceBirthdays");
+        chkAnnounceBirthdays = new CampaignOptionsCheckBox("AnnounceBirthdays", getMetadata(new Version("0.49.20")));
         chkAnnounceBirthdays.addMouseListener(createTipPanelUpdater("AnnounceBirthdays"));
-        chkAnnounceRecruitmentAnniversaries = new CampaignOptionsCheckBox("AnnounceRecruitmentAnniversaries");
+        chkAnnounceRecruitmentAnniversaries = new CampaignOptionsCheckBox("AnnounceRecruitmentAnniversaries",
+              getMetadata(new Version("0.50.01")));
         chkAnnounceRecruitmentAnniversaries.addMouseListener(createTipPanelUpdater("AnnounceRecruitmentAnniversaries"));
         chkAnnounceRetireeDeath = new CampaignOptionsCheckBox("AnnounceRetireeDeath",
-                getMetadata(new Version(0, 51, 0)));
+                getMetadata(new Version("0.51.01.1")));
         chkAnnounceRetireeDeath.addMouseListener(createTipPanelUpdater("AnnounceRetireeDeath"));
         chkAnnounceRetireeDeathExpanded = new CampaignOptionsCheckBox("AnnounceRetireeDeathExpanded",
-                getMetadata(new Version(0, 51, 0)));
+                getMetadata(new Version("0.51.01.1")));
         chkAnnounceRetireeDeathExpanded.addMouseListener(createTipPanelUpdater("AnnounceRetireeDeathExpanded"));
-        chkAnnounceOfficersOnly = new CampaignOptionsCheckBox("AnnounceOfficersOnly");
+        chkAnnounceOfficersOnly = new CampaignOptionsCheckBox("AnnounceOfficersOnly",
+              getMetadata(new Version("0.49.20")));
         chkAnnounceOfficersOnly.addMouseListener(createTipPanelUpdater("AnnounceOfficersOnly"));
         chkAnnounceChildBirthdays = new CampaignOptionsCheckBox("AnnounceChildBirthdays",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.49.20"), CampaignOptionFlag.IMPORTANT));
         chkAnnounceChildBirthdays.addMouseListener(createTipPanelUpdater("AnnounceChildBirthdays"));
 
         // Layout the Panel
@@ -215,11 +215,14 @@ class BiographyGeneralPage {
 
     private @Nonnull JPanel createLifeEventsPanel() {
         // Contents
-        chkShowLifeEventDialogBirths = new CampaignOptionsCheckBox("ShowLifeEventDialogBirths");
+        chkShowLifeEventDialogBirths = new CampaignOptionsCheckBox("ShowLifeEventDialogBirths",
+              getMetadata(new Version("0.50.05")));
         chkShowLifeEventDialogBirths.addMouseListener(createTipPanelUpdater("ShowLifeEventDialogBirths"));
-        chkShowLifeEventDialogComingOfAge = new CampaignOptionsCheckBox("ShowLifeEventDialogComingOfAge");
+        chkShowLifeEventDialogComingOfAge = new CampaignOptionsCheckBox("ShowLifeEventDialogComingOfAge",
+              getMetadata(new Version("0.50.05")));
         chkShowLifeEventDialogComingOfAge.addMouseListener(createTipPanelUpdater("ShowLifeEventDialogComingOfAge"));
-        chkShowLifeEventDialogCelebrations = new CampaignOptionsCheckBox("ShowLifeEventDialogCelebrations");
+        chkShowLifeEventDialogCelebrations = new CampaignOptionsCheckBox("ShowLifeEventDialogCelebrations",
+              getMetadata(new Version("0.50.05")));
         chkShowLifeEventDialogCelebrations.addMouseListener(createTipPanelUpdater("ShowLifeEventDialogCelebrations"));
 
         // Layout the Panel
@@ -237,19 +240,19 @@ class BiographyGeneralPage {
     private @Nonnull JPanel createComingOfAgePanel() {
         // Contents
         chkVeterancySPAs = new CampaignOptionsCheckBox("VeterancySPAs",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(new Version("0.50.10"), CampaignOptionFlag.RECOMMENDED));
         chkVeterancySPAs.addMouseListener(createTipPanelUpdater("VeterancySPAs"));
 
         chkAwardRelevantVeterancySPAs = new CampaignOptionsCheckBox("AwardRelevantVeterancySPAs",
-                getMetadata(new Version(0, 51, 0), CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.51.00"), CampaignOptionFlag.IMPORTANT));
         chkAwardRelevantVeterancySPAs.addMouseListener(createTipPanelUpdater("AwardRelevantVeterancySPAs"));
 
         chkComingOfAgeSPAs = new CampaignOptionsCheckBox("ComingOfAgeAbilities",
-                getMetadata(null, CampaignOptionFlag.RECOMMENDED));
+                getMetadata(new Version("0.50.05"), CampaignOptionFlag.RECOMMENDED));
         chkComingOfAgeSPAs.addMouseListener(createTipPanelUpdater("ComingOfAgeAbilities"));
 
         chkRewardComingOfAgeRPSkills = new CampaignOptionsCheckBox("ComingOfAgeRPSkills",
-                getMetadata(MILESTONE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.07"), CampaignOptionFlag.IMPORTANT));
         chkRewardComingOfAgeRPSkills.addMouseListener(createTipPanelUpdater("ComingOfAgeRPSkills"));
 
         // Layout the Panel

@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.digitalGM.stratCon.gm;
 
+import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.digitalGM.DigitalGMRegistry;
 import mekhq.campaign.digitalGM.IDigitalGM;
@@ -140,6 +141,23 @@ public final class StratConGMs {
      */
     public static ISectorGenerationStrategy sectorGeneration(CampaignOptions campaignOptions) {
         return resolveGM(campaignOptions).getSectorGenerationStrategy(campaignOptions);
+    }
+
+    /**
+     * Sends home every formation whose StratCon deployment has ended, using the digital GM governing the campaign.
+     * Unlike the strategy lookups, this does nothing when no StratCon GM is active: there is no deployment to end.
+     *
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static void processForceReturns(Campaign campaign) {
+        IDigitalGM activeGM = DigitalGMRegistry.getActiveGM(campaign.getCampaignOptions()).orElse(null);
+
+        if (activeGM instanceof AbstractStratConGM stratConGM) {
+            stratConGM.processForceReturns(campaign);
+        }
     }
 
     /**

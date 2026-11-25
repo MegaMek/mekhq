@@ -33,6 +33,8 @@
 package mekhq;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
@@ -40,8 +42,11 @@ import static testUtilities.MHQTestUtilities.mockCampaign;
 import java.util.List;
 import java.util.UUID;
 
+import megamek.client.Client;
+import megamek.client.bot.princess.BehaviorSettings;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.unit.Unit;
 import org.junit.jupiter.api.Test;
 
@@ -102,5 +107,30 @@ class GameThreadTest {
         List<Unit> ordered = GameThread.inTOEOrder(List.of(firstOutside, inTOE, secondOutside), campaign);
 
         assertEquals(List.of(inTOE, firstOutside, secondOutside), ordered);
+    }
+
+    private static MekHQ appFor(Campaign campaign) {
+        MekHQ app = mock(MekHQ.class);
+        when(app.getCampaign()).thenReturn(campaign);
+        return app;
+    }
+
+    @Test
+    void keepsTheAutoResolveBehaviorForAnyScenario() {
+        // Auto Resolve must hand the player's units to Princess in every scenario, not only StratCon ones
+        BehaviorSettings behaviorSettings = mock(BehaviorSettings.class);
+
+        GameThread gameThread = new GameThread("Player", "", mock(Client.class), appFor(mockCampaign()), List.of(),
+              mock(Scenario.class), true, behaviorSettings);
+
+        assertSame(behaviorSettings, gameThread.autoResolveBehaviorSettings);
+    }
+
+    @Test
+    void anOrdinaryGameHasNoAutoResolveBehavior() {
+        GameThread gameThread = new GameThread("Player", "", mock(Client.class), appFor(mockCampaign()), List.of(),
+              mock(Scenario.class));
+
+        assertNull(gameThread.autoResolveBehaviorSettings);
     }
 }

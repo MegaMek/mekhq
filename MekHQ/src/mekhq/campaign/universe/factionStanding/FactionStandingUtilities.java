@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.universe.factionStanding;
 
+import static mekhq.campaign.universe.Faction.BANDIT_CASTE_FACTION_CODE;
+import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -51,6 +53,7 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PronounData;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.universe.Faction;
+import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.factionHints.FactionHints;
 
@@ -146,6 +149,30 @@ public class FactionStandingUtilities {
         final FactionStandingLevel standing = calculateFactionStandingLevel(regard);
 
         return standing.getNegotiationModifier();
+    }
+
+    /**
+     * Returns the negotiation modifier the player's negotiator gets for a contract, from the campaign's Standing with
+     * the contract's employer (the real sponsor, for a false flag operation).
+     *
+     * <p>A positive modifier makes the negotiator's Negotiation check easier, a negative one harder.</p>
+     *
+     * @param campaign the current campaign
+     * @param contract the contract being negotiated
+     *
+     * @return the negotiation modifier, or {@code 0} if Standing does not affect negotiations
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getNegotiationModifier(final Campaign campaign, final AbstractContract contract) {
+        if (!campaign.getCampaignOptions().isUseFactionStandingNegotiationSafe()) {
+            return 0;
+        }
+
+        double regard = campaign.getPlayerForce().getFactionStandings()
+                              .getRegardForFaction(contract.getStandingEmployerFactionCode(), true);
+        return getNegotiationModifier(regard);
     }
 
     /**
@@ -302,6 +329,28 @@ public class FactionStandingUtilities {
     }
 
     /**
+     * Returns the multiplier applied to a contract's monthly pay, from the campaign's Standing with the contract's
+     * employer (the real sponsor, for a false flag operation).
+     *
+     * @param campaign the current campaign
+     * @param contract the contract being paid
+     *
+     * @return the pay multiplier, or {@code 1.0} if Standing does not affect contract pay
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getContractPayMultiplier(final Campaign campaign, final AbstractContract contract) {
+        if (!campaign.getCampaignOptions().isUseFactionStandingContractPaySafe()) {
+            return 1.0;
+        }
+
+        double regard = campaign.getPlayerForce().getFactionStandings()
+                              .getRegardForFaction(contract.getStandingEmployerFactionCode(), true);
+        return getContractPayMultiplier(regard);
+    }
+
+    /**
      * Returns the support point modifier applied at the start of a contract for the given regard value.
      *
      * @param regard the regard value to evaluate
@@ -343,6 +392,10 @@ public class FactionStandingUtilities {
      * active. If not, and if faction standing is used as a criterion, the method evaluates the player's highest faction
      * regard across all active contracts, granting access if this level meets the threshold.</p>
      *
+     * <p>Each contract is judged by the regard of the faction whose standing it answers to
+     * ({@link AbstractContract#getStandingEmployerFactionCode()}): for a false flag operation that is the real sponsor,
+     * not the front the employer presents.</p>
+     *
      * <p>If there are no active contracts, access is denied.</p>
      *
      * @param overridingCommandCircuitRequirements {@code true} if command circuit requirements are overridden
@@ -372,7 +425,8 @@ public class FactionStandingUtilities {
         double highestRegard = FactionStandingLevel.STANDING_LEVEL_0.getMinimumRegard();
         if (useFactionStandingCommandCircuit) {
             for (AbstractContract contract : activeContracts) {
-                double currentRegard = factionStandings.getRegardForFaction(contract.getEmployerFactionCode(), true);
+                double currentRegard = factionStandings.getRegardForFaction(contract.getStandingEmployerFactionCode(),
+                      true);
                 if (currentRegard > highestRegard) {
                     highestRegard = currentRegard;
                 }
@@ -384,22 +438,24 @@ public class FactionStandingUtilities {
     }
 
     /**
-     * Determines whether command circuit access should be granted based on campaign settings, GM mode, current faction
-     * standings, and contract employer.
+     * Determines whether command circuit access should be granted for a single contract, based on campaign settings,
+     * GM mode, current faction standings, and the faction whose standing that contract answers to.
      *
      * <p>Access is immediately granted if both command circuit requirements are overridden and GM mode is
-     * active. If not, and if faction standing is used as a criterion, the method evaluates the player's highest faction
-     * regard across all active contracts, granting access if this level meets the threshold.</p>
-     *
-     * <p>If there are no active contracts, access is denied.</p>
+     * active. Otherwise, access is granted only when faction standing is used as a criterion and the player's regard
+     * with {@code standingFactionCode} meets the threshold - the same rule
+     * {@link #isUseCommandCircuit(boolean, boolean, boolean, FactionStandings, List)} applies to accepted contracts, so
+     * a contract's projected start date and the fleet's actual journey agree.</p>
      *
      * <p><b>Note:</b> this overload is intended for when evaluating a contract without the contract being
-     * initialized yet.</p>
+     * accepted yet.</p>
      *
      * @param overridingCommandCircuitRequirements {@code true} if command circuit requirements are overridden
      * @param isGM                                 {@code true} if GM mode is enabled
+     * @param useFactionStandingCommandCircuit     {@code true} if faction standing is used to determine access
      * @param factionStandings                     player faction standing data
-     * @param employerCode                         employer faction code
+     * @param standingFactionCode                  the code of the faction whose standing the contract answers to (see
+     *                                             {@link AbstractContract#getStandingEmployerFactionCode()})
      *
      * @return {@code true} if command circuit access should be used; {@code false} otherwise
      *
@@ -407,14 +463,18 @@ public class FactionStandingUtilities {
      * @since 0.50.07
      */
     public static boolean isUseCommandCircuit(boolean overridingCommandCircuitRequirements, boolean isGM,
-          FactionStandings factionStandings, String employerCode) {
+          boolean useFactionStandingCommandCircuit, FactionStandings factionStandings, String standingFactionCode) {
         boolean useCommandCircuit = overridingCommandCircuitRequirements && isGM;
 
         if (useCommandCircuit) {
             return true;
         }
 
-        double currentRegard = factionStandings.getRegardForFaction(employerCode, true);
+        if (!useFactionStandingCommandCircuit) {
+            return false;
+        }
+
+        double currentRegard = factionStandings.getRegardForFaction(standingFactionCode, true);
         useCommandCircuit = hasCommandCircuitAccess(currentRegard);
         return useCommandCircuit;
     }
@@ -624,7 +684,7 @@ public class FactionStandingUtilities {
             return true;
         }
 
-        return person.getPrisonerStatus().isFreeOrBondsman();
+        return !person.getPrisonerStatus().isFreeOrBondsman();
     }
 
     /**
@@ -880,18 +940,36 @@ public class FactionStandingUtilities {
      * @since 0.50.07
      */
     public static String getFallbackFactionKey(String dialogKey, Faction judgingFaction) {
+        // The Bandit Caste speaks with the pirates' voice, so it falls back the same way the pirates do
+        Faction textFaction = getJudgmentTextFaction(judgingFaction);
         String affixKey;
 
-        if (judgingFaction.isClan()) {
+        if (textFaction.isClan()) {
             affixKey = DIALOG_KEY_AFFIX_CLAN;
-        } else if (judgingFaction.isPeriphery()) {
+        } else if (textFaction.isPeriphery()) {
             affixKey = DIALOG_KEY_AFFIX_PERIPHERY;
         } else {
             affixKey = DIALOG_KEY_AFFIX_INNER_SPHERE;
         }
 
-        String judgingFactionCode = judgingFaction.getShortName();
+        String judgingFactionCode = textFaction.getShortName();
 
         return dialogKey.replace('.' + judgingFactionCode, '.' + affixKey);
+    }
+
+    /**
+     * Returns the faction whose dialog text should be used when a faction judges the player. The Bandit Caste is just
+     * another flavor of pirate, so it uses the pirates' text; every other faction speaks for itself.
+     *
+     * @param judgingFaction the faction issuing the judgment
+     *
+     * @return the pirate faction for the Bandit Caste (when it exists), otherwise {@code judgingFaction}
+     */
+    public static Faction getJudgmentTextFaction(Faction judgingFaction) {
+        if (!BANDIT_CASTE_FACTION_CODE.equals(judgingFaction.getShortName())) {
+            return judgingFaction;
+        }
+        Faction pirates = Factions.getInstance().getFaction(PIRATE_FACTION_CODE);
+        return (pirates != null) ? pirates : judgingFaction;
     }
 }

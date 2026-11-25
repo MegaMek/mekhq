@@ -42,6 +42,7 @@ import static mekhq.gui.baseComponents.hud.HudStyle.TEXT_MUTED;
 import static mekhq.gui.baseComponents.hud.HudStyle.leftAligned;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
+import static mekhq.utilities.MHQInternationalization.isResourceKeyValid;
 
 import java.awt.BorderLayout;
 import java.awt.Component;
@@ -361,6 +362,10 @@ final class AutoTrainPage {
     private static HudCheckBox check(TrainingConsole console, String key, boolean isSelected,
           Consumer<Boolean> onChange) {
         HudCheckBox box = new HudCheckBox(getTextAt(RESOURCE_BUNDLE, key));
+        String toolTipText = getTextAt(RESOURCE_BUNDLE, key + ".toolTipText");
+        if (isResourceKeyValid(toolTipText)) {
+            box.setToolTipText(WrapLayout.wordWrap(toolTipText));
+        }
         box.setSelected(isSelected);
         box.addActionListener(event -> {
             onChange.accept(box.isSelected());

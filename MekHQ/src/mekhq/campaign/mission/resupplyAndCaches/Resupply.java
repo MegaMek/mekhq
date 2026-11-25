@@ -35,12 +35,10 @@ package mekhq.campaign.mission.resupplyAndCaches;
 import static java.lang.Math.max;
 import static java.lang.Math.min;
 import static java.lang.Math.round;
-import static megamek.common.enums.SkillLevel.NONE;
 import static megamek.common.equipment.MiscType.F_SPONSON_TURRET;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.force.FormationType.CONVOY;
 import static mekhq.campaign.force.FormationType.STANDARD;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.EntityUtilities.getEntityFromUnitId;
 
 import java.time.LocalDate;
@@ -53,6 +51,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.UUID;
 
+import megamek.common.enums.SkillLevel;
 import megamek.common.equipment.MiscType;
 import megamek.common.units.Entity;
 import megamek.common.units.Mek;
@@ -111,6 +110,7 @@ public class Resupply {
     private final int targetCargoTonnagePlayerConvoy;
     private double totalPlayerCargoCapacity;
     private int negotiatorSkill;
+    private SkillLevel negotiatorSkillLevel;
     private List<Part> convoyContents;
     private Money convoyContentsValueBase;
     private Money convoyContentsValueCalculated;
@@ -294,10 +294,10 @@ public class Resupply {
     }
 
     /**
-     * Retrieves the negotiation skill level of the designated negotiator for the resupply process. This skill level is
-     * used to influence procurement outcomes and quality.
+     * Retrieves the experience level of the designated negotiator's Negotiation skill, used to influence the quality of
+     * the parts supplied. This is 0 for an Ultra-Green negotiator, or if there is no negotiator.
      *
-     * @return The negotiation skill level of the negotiator.
+     * @return The negotiator's experience level.
      */
     public int getNegotiatorSkill() {
         return negotiatorSkill;
@@ -546,7 +546,7 @@ public class Resupply {
         }
 
         // Make procurement checks for each of the items in the individual pools
-        Procurement procurement = new Procurement(negotiatorSkill, currentYear, employerFaction);
+        Procurement procurement = new Procurement(negotiatorSkillLevel, currentYear, employerFaction);
 
         partsPool = procurement.makeProcurementChecks(partsPool, true, true);
         Collections.shuffle(partsPool);
@@ -838,25 +838,28 @@ public class Resupply {
      *
      * @return A multiplier value for the given part type.
      */
-    private static double getPartMultiplier(Part part) {
+    static double getPartMultiplier(Part part) {
         double multiplier = DEFAULT_PART_MULTIPLIER;
 
         // This is based on the Mishra Method, found in the Company Generator, rebalanced so that scarce, expensive
         // components the player cannot easily self-supply (engines, gyros, MASC, weapons and other equipment) are
         // favored rather than penalized.
+        // Armor and ammunition are checked before the critical components, as checkEquipmentSubType() is true for
+        // any part that is not equipment, armor included. Ammunition reaches the pools as AmmoStorage, the part
+        // bought for an AmmoBin, so both are checked.
         if (part instanceof HeatSink) {
             multiplier = HEAT_SINK_MULTIPLIER;
         } else if (part instanceof MekLocation) {
             if (((MekLocation) part).getLoc() == Mek.LOC_HEAD) {
                 multiplier = MEK_HEAD_MULTIPLIER;
             }
+        } else if (part instanceof AmmoBin || part instanceof AmmoStorage || part instanceof Armor) {
+            multiplier = ARMOR_AND_AMMO_MULTIPLIER;
         } else if (part instanceof MASC ||
                          part instanceof MekGyro ||
                          part instanceof EnginePart ||
                          checkEquipmentSubType(part)) {
             multiplier = CRITICAL_COMPONENT_MULTIPLIER;
-        } else if (part instanceof AmmoBin || part instanceof Armor) {
-            multiplier = ARMOR_AND_AMMO_MULTIPLIER;
         }
 
         return multiplier;
@@ -892,10 +895,13 @@ public class Resupply {
      */
     private void calculateNegotiationSkill() {
         Person negotiator;
-        negotiatorSkill = NONE.ordinal();
+        // negotiatorSkill is the experience level, used as the quality modifier, and stays 0 without a negotiator.
+        // negotiatorSkillLevel is what the procurement checks use.
+        negotiatorSkill = 0;
+        negotiatorSkillLevel = SkillLevel.NONE;
 
         if (contract.getObjectiveType().isGuerrillaType() ||
-                  PIRATE_FACTION_CODE.equals(contract.getEmployerFactionCode())) {
+                  Faction.isPirateOrBanditCaste(contract.getEmployerFactionCode())) {
             negotiator = campaign.getPlayerForce().getHumanResources()
                                .getCommander(campaign.getCampaignOptions(),
                                      campaign.getPlayerForce().isClanForce(),
@@ -921,6 +927,7 @@ public class Resupply {
                       campaign.getPlayerForce().isClanForce(), campaign.getLocalDate());
                 int skillLevel = skill.getFinalSkillValue(skillModifierData);
                 negotiatorSkill = skill.getType().getExperienceLevel(skillLevel);
+                negotiatorSkillLevel = SkillType.skillLevelFromExperienceLevel(negotiatorSkill);
             }
         }
     }

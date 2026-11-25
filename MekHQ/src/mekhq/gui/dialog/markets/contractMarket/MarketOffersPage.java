@@ -50,12 +50,15 @@ import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseEvent;
 import java.util.ArrayList;
 import java.util.EnumMap;
+import java.util.IdentityHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import javax.swing.*;
+import javax.swing.border.Border;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.text.View;
 
@@ -96,7 +99,21 @@ final class MarketOffersPage {
     private final HudTabStrip searchStrip;
     private final Map<MarketSort, HudChip> sortChips = new EnumMap<>(MarketSort.class);
     private final DefaultListModel<AbstractContract> listModel = new DefaultListModel<>();
-    private final JList<AbstractContract> list = new JList<>(listModel);
+    private final JList<AbstractContract> list = new JList<>(listModel) {
+        /**
+         * Each row's tooltip is its difficulty, answered here rather than read off the renderer: the default asks the
+         * renderer to draw the row under the mouse, re-parsing its HTML, on every mouse move over the board.
+         */
+        @Override
+        public String getToolTipText(MouseEvent event) {
+            int index = locationToIndex(event.getPoint());
+            if ((index < 0) || !getCellBounds(index, index).contains(event.getPoint())) {
+                return null;
+            }
+            return ChaosContractMarketDialog.difficultyToolTip(getModel().getElementAt(index));
+        }
+    };
+    private final OfferRenderer renderer;
     private final HudConfirmButton clearBoard;
     private final HudButton exportButton;
     private final JPanel dossierHolder = new JPanel(new BorderLayout());
@@ -130,7 +147,8 @@ final class MarketOffersPage {
 
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         list.setBackground(SURFACE_DEEP);
-        list.setCellRenderer(new OfferRenderer());
+        renderer = new OfferRenderer();
+        list.setCellRenderer(renderer);
         // Rows stretch to the list's width; a narrow fixed width only stops the list asking for a wider board.
         list.setFixedCellWidth(scaleForGUI(200));
         // Names wrap to the list's width, so each row's height depends on it: re-measure when the width changes.
@@ -191,11 +209,11 @@ final class MarketOffersPage {
         JPanel exchangeFoot = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(5), scaleForGUI(3)));
         exchangeFoot.add(exportButton);
         exchangeFoot.add(importButton);
-        JPanel feet = MarketHud.column();
+        JPanel feet = Hud.column();
         feet.add(HudStyle.leftAligned(boardFoot));
         feet.add(HudStyle.leftAligned(exchangeFoot));
 
-        JPanel boardTop = MarketHud.column();
+        JPanel boardTop = Hud.column();
         boardTop.add(HudStyle.leftAligned(searchStrip));
         boardTop.add(Box.createVerticalStrut(scaleForGUI(8)));
         boardTop.add(HudStyle.leftAligned(sortRow));
@@ -241,13 +259,19 @@ final class MarketOffersPage {
         List<AbstractContract> ordered = market.sortedContracts();
         updatingList = true;
         try {
-            listModel.clear();
-            ordered.forEach(listModel::addElement);
+            // Refilling the list re-measures every row, so it is only done when the board itself changed: a new
+            // order or set of offers, or (with a rebuild) an offer whose terms were negotiated or edited. Choosing
+            // another offer only moves the selection.
+            if (rebuildDossier || !isShowing(ordered)) {
+                renderer.forget();
+                listModel.clear();
+                listModel.addAll(ordered);
+            }
             AbstractContract selected = market.selected();
-            if (selected != null) {
-                list.setSelectedValue(selected, true);
-            } else {
+            if (selected == null) {
                 list.clearSelection();
+            } else if (list.getSelectedValue() != selected) {
+                list.setSelectedValue(selected, true);
             }
         } finally {
             updatingList = false;
@@ -260,6 +284,19 @@ final class MarketOffersPage {
         if (rebuildDossier || (selected != shownInDossier)) {
             showDossier(selected);
         }
+    }
+
+    /** @return {@code true} if the list already shows exactly these offers, in this order */
+    private boolean isShowing(List<AbstractContract> ordered) {
+        if (listModel.size() != ordered.size()) {
+            return false;
+        }
+        for (int index = 0; index < ordered.size(); index++) {
+            if (listModel.get(index) != ordered.get(index)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     private void showDossier(AbstractContract contract) {
@@ -309,7 +346,7 @@ final class MarketOffersPage {
         String titleKey = marketDisabled ? "empty.contractMarket.disabled.title" : "empty.contractMarket.title";
         String bodyKey = marketDisabled ? "empty.contractMarket.disabled.body" : "empty.contractMarket.body";
 
-        JPanel text = MarketHud.column();
+        JPanel text = Hud.column();
         JLabel title = new JLabel(getTextAt(RESOURCE_BUNDLE, titleKey).toUpperCase(Locale.ROOT));
         title.setForeground(ACCENT_BRIGHT);
         title.setFont(hudFont(Font.BOLD, 0.95f, 0.12f));
@@ -318,7 +355,7 @@ final class MarketOffersPage {
         text.add(HudStyle.leftAligned(MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE, bodyKey), TEXT_MUTED,
               Font.PLAIN, 0.92f)));
 
-        JPanel notice = MarketHud.framedSurface(18);
+        JPanel notice = Hud.framedSurface(18);
         notice.add(text, BorderLayout.CENTER);
 
         JPanel holder = Hud.transparentPanel(new BorderLayout());
@@ -337,16 +374,29 @@ final class MarketOffersPage {
         /** Gaps and padding around the text: the card's insets, the accent bar, the ring, and the gaps between. */
         private static final int TEXT_CHROME = 10 + 10 + 3 + 12 + 9 + 9 + 6;
 
+        /**
+         * An offer's name and sub-lines, parsed and sized once. Swing parses a label's HTML every time its text is
+         * set, and a list asks for every row each time it measures and for each visible row each time it paints, so
+         * one shared label would parse every offer over and over.
+         *
+         * @param html  the text the label holds
+         * @param label the label
+         * @param width the width it was sized to wrap at
+         */
+        private record PreparedText(String html, JLabel label, int width) {}
+
         private final HudRing ring = new HudRing();
-        private final JLabel text = new JLabel();
+        private final Font textFont = hudFont(Font.PLAIN, 0.9f, 0.0f);
+        private final Map<AbstractContract, PreparedText> texts = new IdentityHashMap<>();
+        private JLabel shownText;
         private final JLabel figure = new JLabel();
         private final JLabel figureUnit = new JLabel();
         private final int figureWidth;
+        private final Border plainBorder = rowBorder(false);
+        private final Border selectedBorder = rowBorder(true);
 
         private OfferRenderer() {
             super(new BorderLayout(scaleForGUI(9), 0));
-            text.setVerticalAlignment(SwingConstants.TOP);
-            text.setFont(hudFont(Font.PLAIN, 0.9f, 0.0f));
 
             figure.setFont(hudFont(Font.BOLD, 1.0f, 0.0f));
             figure.setAlignmentX(Component.RIGHT_ALIGNMENT);
@@ -373,8 +423,22 @@ final class MarketOffersPage {
             figureHolder.add(figureColumn, BorderLayout.NORTH);
 
             add(ringHolder, BorderLayout.WEST);
-            add(text, BorderLayout.CENTER);
             add(figureHolder, BorderLayout.EAST);
+        }
+
+        /** The row's divider beneath, and for the selected row the accent bar down its left edge. */
+        private static Border rowBorder(boolean isSelected) {
+            return BorderFactory.createCompoundBorder(
+                  BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
+                  BorderFactory.createCompoundBorder(
+                        BorderFactory.createMatteBorder(0, scaleForGUI(isSelected ? 3 : 0), 0, 0, ACCENT),
+                        BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(isSelected ? 7 : 10),
+                              scaleForGUI(8), scaleForGUI(10))));
+        }
+
+        /** Drops every prepared text, so offers no longer on the board are not kept. */
+        void forget() {
+            texts.clear();
         }
 
         @Override
@@ -390,21 +454,20 @@ final class MarketOffersPage {
                   contract.getLengthInMonths()));
 
             StringBuilder html = new StringBuilder("<html><b style='color:").append(hex(TEXT)).append("'>")
-                                       .append(MarketHud.escape(marketName(contract))).append("</b><br>")
+                                       .append(Hud.escape(marketName(contract))).append("</b><br>")
                                        .append("<span style='color:").append(hex(TEXT_MUTED))
-                                       .append("'>").append(MarketHud.escape(String.join(separator, parts)))
+                                       .append("'>").append(Hud.escape(String.join(separator, parts)))
                                        .append("</span>");
             List<String> badges = new ArrayList<>();
             for (MarketBadge badge : ContractMarketFormatting.badges(contract)) {
                 badges.add("<span style='color:" + hex(badge.color()) + "'>"
-                                 + MarketHud.escape(badge.text().toUpperCase(Locale.ROOT)) + "</span>");
+                                 + Hud.escape(badge.text().toUpperCase(Locale.ROOT)) + "</span>");
             }
             if (!badges.isEmpty()) {
                 html.append("<br><span><b>").append(String.join(separator, badges))
                       .append("</b></span>");
             }
-            text.setText(html.append("</html>").toString());
-            fitTextToWidth(textWidth(source));
+            showText(contract, html.append("</html>").toString(), textWidth(source));
 
             ring.setColor(severityColor(assessmentDifficulty(contract)), true);
             Money profit = market.estimate(contract).getNetWithCombatPay();
@@ -413,14 +476,39 @@ final class MarketOffersPage {
 
             setOpaque(true);
             setBackground(isSelected ? SURFACE : SURFACE_DEEP);
-            setBorder(BorderFactory.createCompoundBorder(
-                  BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
-                  BorderFactory.createCompoundBorder(
-                        BorderFactory.createMatteBorder(0, scaleForGUI(isSelected ? 3 : 0), 0, 0, ACCENT),
-                        BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(isSelected ? 7 : 10),
-                              scaleForGUI(8), scaleForGUI(10)))));
-            setToolTipText(ChaosContractMarketDialog.difficultyToolTip(contract));
+            setBorder(isSelected ? selectedBorder : plainBorder);
+            // The row's tooltip is answered by the list itself, without drawing the row.
             return this;
+        }
+
+        /**
+         * Puts the offer's text in the row, re-using its prepared label unless the text or the width it wraps at has
+         * changed since.
+         */
+        private void showText(AbstractContract contract, String html, int width) {
+            PreparedText prepared = texts.get(contract);
+            if ((prepared == null) || !prepared.html().equals(html)) {
+                JLabel label = new JLabel();
+                label.setVerticalAlignment(SwingConstants.TOP);
+                // The font goes on first: setting it after the text would parse the HTML a second time.
+                label.setFont(textFont);
+                label.setText(html);
+                fitTextToWidth(label, width);
+                prepared = new PreparedText(html, label, width);
+                texts.put(contract, prepared);
+            } else if (prepared.width() != width) {
+                fitTextToWidth(prepared.label(), width);
+                prepared = new PreparedText(html, prepared.label(), width);
+                texts.put(contract, prepared);
+            }
+
+            if (shownText != prepared.label()) {
+                if (shownText != null) {
+                    remove(shownText);
+                }
+                shownText = prepared.label();
+                add(shownText, BorderLayout.CENTER);
+            }
         }
 
         /**
@@ -428,7 +516,7 @@ final class MarketOffersPage {
          * wide; a CSS width would not do, as Swing scales its {@code px} unit by about 1.3 and the text would overrun
          * the figure beside it.
          */
-        private void fitTextToWidth(int width) {
+        private static void fitTextToWidth(JLabel text, int width) {
             View view = (View) text.getClientProperty(BasicHTML.propertyKey);
             if (view == null) {
                 text.setPreferredSize(null);

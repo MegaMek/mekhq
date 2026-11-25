@@ -49,9 +49,9 @@ import megamek.client.ui.settings.SettingsSpinner;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 
 /**
- * The Save Options page of the MekHQ Client Options dialog: an Autosave section (frequency radio buttons, save-before
- * triggers, and the saved-game count) and a Campaign Save section (XML output toggles). Owns its controls and copies
- * them back into the shared {@link MHQOptionsModel} in {@link #writeToModel()}.
+ * The Save Options page of the MekHQ Client Options dialog: an Autosave section (frequency radio buttons, save
+ * triggers around scenarios and missions, and the saved-game count) and a Campaign Save section (XML output toggles).
+ * Owns its controls and copies them back into the shared {@link MHQOptionsModel} in {@link #writeToModel()}.
  */
 class MHQSaveOptionsPage extends MHQOptionsPage {
     // Autosave
@@ -61,6 +61,7 @@ class MHQSaveOptionsPage extends MHQOptionsPage {
     private JRadioButton optionSaveMonthly;
     private JRadioButton optionSaveYearly;
     private SettingsCheckBox chkSaveBeforeScenarios;
+    private SettingsCheckBox chkSaveAfterScenarios;
     private SettingsCheckBox chkSaveBeforeMissionEnd;
     private SettingsSpinner spinnerSavedGamesCount;
 
@@ -119,6 +120,7 @@ class MHQSaveOptionsPage extends MHQOptionsPage {
         optionSaveYearly.setSelected(model.autosaveYearly);
 
         chkSaveBeforeScenarios = checkBox("checkSaveBeforeScenarios", model.autosaveBeforeScenarios);
+        chkSaveAfterScenarios = checkBox("checkSaveAfterScenarios", model.autosaveAfterScenarios);
         chkSaveBeforeMissionEnd = checkBox("checkSaveBeforeMissionEnd", model.autosaveBeforeMissionEnd);
 
         SettingsLabel labelSavedGamesCount = new SettingsLabel(TEXT_PROVIDER, "labelSavedGamesCount");
@@ -129,7 +131,7 @@ class MHQSaveOptionsPage extends MHQOptionsPage {
         SettingsFormPanel panel = new SettingsFormPanel("MHQAutosaveContent", FORM_LABEL_WIDTH,
               FORM_CONTROL_WIDTH);
         panel.addComponentGrid(1, optionNoSave, optionSaveDaily, optionSaveWeekly, optionSaveMonthly, optionSaveYearly);
-        panel.addCheckBoxGrid(2, chkSaveBeforeScenarios, chkSaveBeforeMissionEnd);
+        panel.addCheckBoxGrid(2, chkSaveBeforeScenarios, chkSaveAfterScenarios, chkSaveBeforeMissionEnd);
         panel.addRow(labelSavedGamesCount, spinnerSavedGamesCount);
         return panel;
     }
@@ -158,6 +160,7 @@ class MHQSaveOptionsPage extends MHQOptionsPage {
         model.autosaveMonthly = optionSaveMonthly.isSelected();
         model.autosaveYearly = optionSaveYearly.isSelected();
         model.autosaveBeforeScenarios = chkSaveBeforeScenarios.isSelected();
+        model.autosaveAfterScenarios = chkSaveAfterScenarios.isSelected();
         model.autosaveBeforeMissionEnd = chkSaveBeforeMissionEnd.isSelected();
         model.maximumNumberOfAutoSaves = (Integer) spinnerSavedGamesCount.getValue();
         model.preferGzippedOutput = chkPreferGzippedOutput.isSelected();

@@ -162,11 +162,7 @@ class FactionStandingUltimatumsLibraryTest {
     @DisplayName("Every ultimatum has all of its dialog resource keys")
     void testEveryUltimatumHasResourceKeys() {
         for (FactionStandingUltimatumData ultimatum : getDistinctFixtureUltimatums()) {
-            List<String> sideIds = new ArrayList<>();
-            for (FactionStandingUltimatumSide side : ultimatum.sides()) {
-                sideIds.add(side.id());
-            }
-            for (String key : FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), sideIds)) {
+            for (String key : getRequiredKeys(ultimatum)) {
                 String text = getTextAt(RESOURCE_BUNDLE, key);
                 assertFalse(text.startsWith(MISSING_RESOURCE_TAG), "Missing resource key: " + key);
             }
@@ -358,15 +354,22 @@ class FactionStandingUltimatumsLibraryTest {
     }
 
     /**
+     * Lists the text keys the ultimatum needs, for the ways of going rogue it actually offers: a Pirate card needs
+     * {@code .rogue.pirate.pitch} and a Bandit Caste card needs {@code .rogue.banditCaste.pitch}. A third party that
+     * introduces the ultimatum isn't a card, so it needs no pitch or news.
+     *
      * @author Illiani
      * @since 0.51.01
      */
     private static List<String> getRequiredKeys(FactionStandingUltimatumData ultimatum) {
         List<String> sideIds = new ArrayList<>();
-        for (FactionStandingUltimatumSide side : ultimatum.sides()) {
+        for (FactionStandingUltimatumSide side : ultimatum.getChoosableSides()) {
             sideIds.add(side.id());
         }
-        return FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), sideIds);
+        return FactionStandingUltimatumDialog.getRequiredTextKeys(ultimatum.name(), sideIds,
+              ultimatum.hasNoDissent(), ultimatum.hasSharedResult(),
+              FactionStandingUltimatumDialog.getRogueKinds(ultimatum.isMercenaryOffered(),
+                    ultimatum.isPirateOffered(), ultimatum.isBanditCasteOffered()));
     }
 
     // ----- malformed data -----
@@ -434,6 +437,47 @@ class FactionStandingUltimatumsLibraryTest {
         assertTrue(FactionStandingUltimatumsLibrary.isValidDissenterPreference(
               buildUltimatumWithSides("ROGUE_PREFERENCE", List.of(side), "ROGUE")));
         assertNotNull(new FactionStandingUltimatumsLibrary(List.of(unknown)).getUltimatum(TEST_DATE, "FC"));
+    }
+
+    @Test
+    @DisplayName("A ROGUE dissenter preference is invalid when no way of going rogue is offered")
+    void testRoguePreferenceInvalidWhenRogueNotOffered() {
+        FactionStandingUltimatumSide side = new FactionStandingUltimatumSide("LA", "Leader", PersonnelRole.NOBLE,
+              "LA");
+
+        FactionStandingUltimatumData noRogue = buildUltimatumWithFlags(List.of(side), "ROGUE", false, false, false,
+              false);
+        FactionStandingUltimatumData banditCasteOnly = buildUltimatumWithFlags(List.of(side), "ROGUE", false, false,
+              false, true);
+
+        assertFalse(FactionStandingUltimatumsLibrary.isValidDissenterPreference(noRogue));
+        assertTrue(FactionStandingUltimatumsLibrary.isValidDissenterPreference(banditCasteOnly));
+    }
+
+    @Test
+    @DisplayName("With no dissent, any dissenter preference is valid")
+    void testAnyPreferenceValidWithNoDissent() {
+        FactionStandingUltimatumSide side = new FactionStandingUltimatumSide("LA", "Leader", PersonnelRole.NOBLE,
+              "LA");
+
+        assertTrue(FactionStandingUltimatumsLibrary.isValidDissenterPreference(
+              buildUltimatumWithFlags(List.of(side), "DC", true, null, null, null)));
+        assertTrue(FactionStandingUltimatumsLibrary.isValidDissenterPreference(
+              buildUltimatumWithFlags(List.of(side), null, true, null, null, null)));
+        assertTrue(FactionStandingUltimatumsLibrary.isValidDissenterPreference(
+              buildUltimatumWithFlags(List.of(side), "ROGUE", true, false, false, false)));
+    }
+
+    /**
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static FactionStandingUltimatumData buildUltimatumWithFlags(List<FactionStandingUltimatumSide> sides,
+          String dissenterPreference, boolean hasNoDissent, Boolean offersMercenary, Boolean offersPirate,
+          Boolean offersBanditCaste) {
+        return new FactionStandingUltimatumData("FLAGS", TEST_DATE.toString(), null, List.of("FC"), sides,
+              dissenterPreference, false, 0, false, hasNoDissent, offersMercenary, offersPirate, offersBanditCaste,
+              false);
     }
 
     @Test

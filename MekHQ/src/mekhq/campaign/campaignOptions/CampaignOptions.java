@@ -311,6 +311,19 @@ public class CampaignOptions {
         return get(CampaignOption.USE_ADVANCED_MEDICAL) || get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL);
     }
 
+    /**
+     * Checks whether a character's Talent should change their XP costs.
+     *
+     * <p>Talent only affects XP costs when both <b>Assign Random Talent</b> and <b>Talent Influences XP Costs</b>
+     * are enabled. Without Random Talent, Talent scores are hidden, so they should not quietly change what players
+     * pay.</p>
+     *
+     * @return {@code true} if Talent-based XP cost multipliers should be applied, {@code false} otherwise
+     */
+    public boolean isUseTalentXpCostMultiplier() {
+        return get(CampaignOption.USE_RANDOM_TALENT) && get(CampaignOption.USE_REASONING_XP_MULTIPLIER);
+    }
+
     // endregion Medical
 
     // region Prisoners
@@ -558,13 +571,6 @@ public class CampaignOptions {
     }
 
     /**
-     * Checks whether tracking faction standing is enabled and if the use of faction standing command circuits are
-     * active.
-     *
-     * @return {@code true} if both faction standing tracking and faction standing command circuit usage are enabled;
-     *       {@code false} otherwise.
-     */
-    /**
      * Hot Spots upkeep replaces unit maintenance, so maintenance is never charged alongside it, whatever its own option
      * says. The options dialog already prevents combining them; this also covers presets and hand-edited saves.
      *
@@ -590,18 +596,70 @@ public class CampaignOptions {
     }
 
     /**
-     * Hot Spots upkeep replaces peacetime operating costs, so they are never charged alongside it, whatever their own
-     * option says.
+     * Whether any part of peacetime operating costs (spare parts, training munitions, fuel) is selected, regardless of
+     * Hot Spots upkeep.
      *
-     * @return {@code true} if peacetime operating costs are charged
+     * @return {@code true} if at least one peacetime operating cost is selected
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isAnyPeacetimeCostSelected() {
+        return get(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS)
+                     || get(CampaignOption.PAY_FOR_TRAINING_MUNITIONS)
+                     || get(CampaignOption.PAY_FOR_PEACETIME_FUEL);
+    }
+
+    /**
+     * Hot Spots upkeep replaces peacetime operating costs, so they are never charged alongside it, whatever their own
+     * options say.
+     *
+     * @return {@code true} if any peacetime operating cost is charged
      *
      * @author Illiani
      * @since 0.51.01
      */
     public boolean isChargingPeacetimeCost() {
-        return get(CampaignOption.USE_PEACETIME_COST) && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
+        return isAnyPeacetimeCostSelected() && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
     }
 
+    /**
+     * @return {@code true} if peacetime spare parts are charged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isChargingPeacetimeSpareParts() {
+        return get(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS) && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
+    }
+
+    /**
+     * @return {@code true} if peacetime training munitions are charged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isChargingPeacetimeTrainingMunitions() {
+        return get(CampaignOption.PAY_FOR_TRAINING_MUNITIONS) && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
+    }
+
+    /**
+     * @return {@code true} if peacetime fuel is charged
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean isChargingPeacetimeFuel() {
+        return get(CampaignOption.PAY_FOR_PEACETIME_FUEL) && !get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP);
+    }
+
+    /**
+     * Checks whether tracking faction standing is enabled and if the use of faction standing command circuits are
+     * active.
+     *
+     * @return {@code true} if both faction standing tracking and faction standing command circuit usage are enabled;
+     *       {@code false} otherwise.
+     */
     public boolean isUseFactionStandingCommandCircuitSafe() {
         return get(CampaignOption.TRACK_FACTION_STANDING) && get(CampaignOption.USE_FACTION_STANDING_COMMAND_CIRCUIT);
     }

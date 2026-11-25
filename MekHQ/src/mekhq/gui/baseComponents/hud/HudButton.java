@@ -136,6 +136,15 @@ public class HudButton extends JPanel {
     }
 
     /**
+     * Clicks the button from code, as if the player had: does nothing while it is disarmed.
+     */
+    public void click() {
+        if (armed) {
+            fire();
+        }
+    }
+
+    /**
      * Adds a listener that is told when the player clicks the button or presses Space or Enter on it while it is armed.
      *
      * @param listener the listener to add

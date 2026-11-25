@@ -64,7 +64,6 @@ import static mekhq.campaign.randomEvents.other.GrayMonday.isGrayMonday;
 import static mekhq.campaign.reputation.chaosReputation.ChaosReputation.STARTING_REPUTATION_SCORE;
 import static mekhq.campaign.unit.Unit.TECH_WORK_DAY;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.TORTUGA_DOMINIONS_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -125,6 +124,7 @@ import megamek.common.units.Mek;
 import megamek.common.units.UnitNameTracker;
 import megamek.common.util.BuildingBlock;
 import megamek.logging.MMLogger;
+import megamek.release.ReleaseChannel;
 import mekhq.MHQConstants;
 import mekhq.MHQOptions;
 import mekhq.MekHQ;
@@ -275,6 +275,8 @@ public class Campaign implements ITechManager {
 
     private UUID id;
     private Version version; // this is dynamically populated on load and doesn't need to be saved
+    // The release channel of the build that last saved this campaign; populated on load like version
+    private ReleaseChannel versionChannel;
     private final List<Version> pastVersions = new ArrayList<>();
 
     // we have three things to track: (1) teams, (2) units, (3) repair tasks
@@ -579,6 +581,18 @@ public class Campaign implements ITechManager {
         return version;
     }
 
+    /**
+     * @return the release channel of the build that last saved this campaign, or {@code null} when it was saved by a
+     *       development build or by a build that predates release channels
+     */
+    public @Nullable ReleaseChannel getVersionChannel() {
+        return versionChannel;
+    }
+
+    public void setVersionChannel(@Nullable ReleaseChannel versionChannel) {
+        this.versionChannel = versionChannel;
+    }
+
     public List<Version> getPastVersions() {
         return pastVersions;
     }
@@ -772,25 +786,17 @@ public class Campaign implements ITechManager {
                                               .getPayout(pid).isWasSacked();
 
                     if ((!wasKilled) && (!wasSacked)) {
-                        if (!person.getPermanentInjuries().isEmpty()) {
-                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
-                        }
-                        if (isBreakingContract(person,
-                              getLocalDate(),
-                              getCampaignOptions().get(CampaignOption.SERVICE_CONTRACT_DURATION))) {
-                            if (!getActiveContracts().isEmpty()) {
-                                int roll = randomInt(20);
+                        PersonnelStatus departureStatus = RetirementDefectionTracker.getDepartureStatus(
+                              RetirementDefectionTracker.hasMedicalDischargeInjuries(person),
+                              isBreakingContract(person,
+                                    getLocalDate(),
+                                    getCampaignOptions().get(CampaignOption.SERVICE_CONTRACT_DURATION)),
+                              !getActiveContracts().isEmpty(),
+                              person.getAge(getLocalDate()) >= RetirementDefectionTracker.RETIREMENT_AGE,
+                              randomInt(20) == 0);
 
-                                if (roll == 0) {
-                                    person.changeStatus(this, getLocalDate(), PersonnelStatus.DEFECTED);
-                                }
-                            } else {
-                                person.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
-                            }
-                        } else if (person.getAge(getLocalDate()) >= 50) {
-                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
-                        } else {
-                            person.changeStatus(this, getLocalDate(), PersonnelStatus.RESIGNED);
+                        if (departureStatus != null) {
+                            person.changeStatus(this, getLocalDate(), departureStatus);
                         }
                     }
 
@@ -800,11 +806,16 @@ public class Campaign implements ITechManager {
                     }
 
                     if (wasSacked) {
-                        if (person.getPermanentInjuries().isEmpty()) {
+                        if (!RetirementDefectionTracker.hasMedicalDischargeInjuries(person)) {
                             person.changeStatus(this, getLocalDate(), PersonnelStatus.SACKED);
                         } else {
                             person.changeStatus(this, getLocalDate(), PersonnelStatus.RETIRED);
                         }
+                    }
+
+                    // Characters who stayed (breaking contract mid-deployment without defecting) take nobody with them
+                    if (!person.getStatus().isDepartedUnit()) {
+                        continue;
                     }
 
                     // civilian spouses follow their partner in departing
@@ -822,7 +833,8 @@ public class Campaign implements ITechManager {
                     }
 
                     // non-civilian spouses may divorce the remaining partner
-                    if ((person.getAge(getLocalDate()) >= 50) && (!campaignOptions.get(CampaignOption.RANDOM_DIVORCE_METHOD).isNone())) {
+                    if (RetirementDefectionTracker.isDepartureDivorceCheckRequired(person.getStatus()) &&
+                              (!campaignOptions.get(CampaignOption.RANDOM_DIVORCE_METHOD).isNone())) {
                         if ((spouse != null) && (spouse.isDivorceable()) && (!spouse.getPrimaryRole().isCivilian())) {
                             if ((person.getStatus().isDefected()) || (randomInt(6) == 0)) {
                                 getPlayerForce().getHumanResources()
@@ -2333,13 +2345,26 @@ public class Campaign implements ITechManager {
                     }
 
                     if (shoppingItem.getDaysToWait() <= 0) {
-                        PartAcquisitionResult result = findContactForAcquisition(shoppingItem, person, system);
+                        AcquisitionContactResult contact = findContactForAcquisition(shoppingItem, person, system);
+                        PartAcquisitionResult result = contact.result();
                         if (result == PartAcquisitionResult.Success) {
                             int transitTime = calculatePartTransitTime(system);
 
                             PersonnelOptions options = person.getOptions();
                             double logisticianModifier = options.booleanOption(ADMIN_LOGISTICIAN) ? 0.9 : 1.0;
                             transitTime = (int) Math.round(transitTime * logisticianModifier);
+
+                            String deliveryReport = "";
+                            if (getCampaignOptions().get(CampaignOption.USE_MARGIN_OF_SUCCESS_DELIVERY)) {
+                                int deliveryMargin = contact.deliveryMarginOfSuccess();
+                                int reducedTransitTime = AcquisitionDeliveryTime.applyMarginOfSuccess(transitTime,
+                                      deliveryMargin);
+                                // Rounding can leave short deliveries unchanged, so only report a real reduction
+                                if (reducedTransitTime < transitTime) {
+                                    deliveryReport = AcquisitionDeliveryTime.getDeliveryReport(deliveryMargin);
+                                }
+                                transitTime = reducedTransitTime;
+                            }
 
                             int requestedQuantity = shoppingItem.getQuantity();
                             int totalQuantity = 0;
@@ -2363,7 +2388,8 @@ public class Campaign implements ITechManager {
                                                               system.getPrintableName(currentDate) +
                                                               ". Delivery in " +
                                                               transitTime +
-                                                              " days.</b></font>");
+                                                              " days.</b></font> " +
+                                                              deliveryReport);
                             }
                         } else if (result == PartAcquisitionResult.PartInherentFailure) {
                             shelvedItems.add(shoppingItem);
@@ -2471,9 +2497,9 @@ public class Campaign implements ITechManager {
      * @param system      The <code>PlanetarySystem</code> object where the acquisition is being attempted. This may be
      *                    null if the user is not using planetary acquisition.
      *
-     * @return The result of the rolls.
+     * @return The result of the rolls, with the Margin of Success that shortens the delivery time on a success.
      */
-    public PartAcquisitionResult findContactForAcquisition(IAcquisitionWork acquisition, Person person,
+    public AcquisitionContactResult findContactForAcquisition(IAcquisitionWork acquisition, Person person,
           PlanetarySystem system) {
         SkillCheck skillCheck = checkAcquisition(acquisition, person);
         boolean inherentFailure = skillCheck.getTargetNumber().isImpossible();
@@ -2486,13 +2512,14 @@ public class Campaign implements ITechManager {
                       ReportingUtilities.getNegativeColor(), person.getFullName(), acquisition.getAcquisitionName(),
                       system.getPrintableName(getLocalDate()), skillCheck.getTargetNumber().getDesc()));
             }
-            return inherentFailure ? PartAcquisitionResult.PartInherentFailure :
-                         PartAcquisitionResult.PlanetSpecificFailure;
+            return new AcquisitionContactResult(inherentFailure ? PartAcquisitionResult.PartInherentFailure :
+                                                      PartAcquisitionResult.PlanetSpecificFailure, 0);
         }
 
         // no roll can reach the target number, so don't roll; the verbose report still shows the failure and its TN
         boolean isOutOfReach = isOutOfReach(skillCheck);
-        boolean isSuccess = !isOutOfReach && skillCheck.resolve(false, null).isSuccess();
+        ActionCheckResult result = isOutOfReach ? null : skillCheck.resolve(false, null);
+        boolean isSuccess = result != null && result.isSuccess();
         if (getCampaignOptions().get(CampaignOption.PLANET_ACQUISITION_VERBOSE)) {
             SocioIndustrialData socioIndustrial = system.getPrimaryPlanet().getSocioIndustrial(getLocalDate());
             CampaignOptions options = getCampaignOptions();
@@ -2510,10 +2537,23 @@ public class Campaign implements ITechManager {
                   techBonus, industryBonus, outputsBonus));
         }
         if (isOutOfReach) {
-            return PartAcquisitionResult.OutOfReach;
+            return new AcquisitionContactResult(PartAcquisitionResult.OutOfReach, 0);
         }
-        return isSuccess ? PartAcquisitionResult.Success : PartAcquisitionResult.PlanetSpecificFailure;
+        if (!isSuccess) {
+            return new AcquisitionContactResult(PartAcquisitionResult.PlanetSpecificFailure, 0);
+        }
+        return new AcquisitionContactResult(PartAcquisitionResult.Success,
+              AcquisitionDeliveryTime.getDeliveryMarginOfSuccess(skillCheck, result));
     }
+
+    /**
+     * The outcome of a planetary acquisition contact roll.
+     *
+     * @param result                  whether a contact was found, or why not
+     * @param deliveryMarginOfSuccess the Margin of Success that shortens the delivery time when 'Margin of Success
+     *                                Affects Delivery' is on; 0 unless {@code result} is a success
+     */
+    public record AcquisitionContactResult(PartAcquisitionResult result, int deliveryMarginOfSuccess) {}
 
     /***
      * Attempt to acquire a given <code>IAcquisitionWork</code> object.
@@ -2656,10 +2696,24 @@ public class Campaign implements ITechManager {
                 appraisalReport = Appraisal.getAppraisalReport(valueChange, appraisalResult.getReportMargin());
             }
 
+            String deliveryReport = "";
             if (transitDays < 0) {
                 transitDays = calculatePartTransitTime(acquisition.getAvailability());
+                // Under Planetary Acquisition the contact roll has already set (and shortened) the delivery time
+                if (campaignOptions.get(CampaignOption.USE_MARGIN_OF_SUCCESS_DELIVERY)) {
+                    int deliveryMargin = AcquisitionDeliveryTime.getDeliveryMarginOfSuccess(skillCheck,
+                          skillCheckResult);
+                    int reducedTransitDays = AcquisitionDeliveryTime.applyMarginOfSuccess(transitDays,
+                          deliveryMargin);
+                    // Rounding can leave short deliveries unchanged, so only report a real reduction
+                    if (reducedTransitDays < transitDays) {
+                        deliveryReport = AcquisitionDeliveryTime.getDeliveryReport(deliveryMargin);
+                    }
+                    transitDays = reducedTransitDays;
+                }
             }
-            report = report + acquisition.find(transitDays, valueChange) + ' ' + appraisalReport;
+            report = report + acquisition.find(transitDays, valueChange) + ' ' + deliveryReport + ' ' +
+                           appraisalReport;
             found = true;
             // Infantry weapons and ammo ship as a single bulk order: this one successful roll supplies the rest of the
             // platoon's quantity too (while it can be paid for), counting as a single acquisition for the daily limit.
@@ -3393,10 +3447,9 @@ public class Campaign implements ITechManager {
      * Checks if a new mercenary organization is starting up in the current game year, and, if so, triggers a welcome
      * dialog introducing the organization's representative.
      *
-     * <p>This method examines a prioritized list of known mercenary-related factions for their respective founding
-     * (start) years matching the current year. The list is evaluated in the following order: Mercenary Review Board
-     * (MRB), Mercenary Review Bonding Commission (MRBC), Mercenary Bonding Authority (MBA), and Mercenary Guild (MG),
-     * with MG as the default fallback. If a matching faction is found (and is recognized as a mercenary organization),
+     * <p>This method looks for the mercenary organization founded in the current year, or, if
+     * {@code bypassStartYear} is set, the organization active this year ({@link Faction#getActiveMercenaryOrganization}),
+     * with the Mercenary Guild (MG) as the default fallback. If a matching faction is found (and is recognized as a mercenary organization),
      * it generates an appropriate speaker (as either a merchant or military liaison, depending on the faction) and
      * opens a welcome dialog for the player.</p>
      *
@@ -3412,20 +3465,15 @@ public class Campaign implements ITechManager {
     public void checkForNewMercenaryOrganizationStartUp(boolean bypassStartYear, boolean isStartUp) {
         Factions factions = Factions.getInstance();
         int currentYear = getGameYear();
-        Faction[] possibleFactions = new Faction[] {
-              factions.getFaction("MRB"),
-              factions.getFaction("MRBC"),
-              factions.getFaction("MBA"),
-              factions.getFaction("MG")
-        };
 
+        // Use the same organization that contracts update Regard with, so the two never disagree
         Faction chosenFaction = null;
-        for (Faction faction : possibleFactions) {
-            if (faction != null) {
-                boolean isValidInYear = bypassStartYear && faction.validIn(currentYear);
-                boolean isFoundedInYear = !bypassStartYear && faction.getStartYear() == currentYear;
-
-                if (isValidInYear || isFoundedInYear) {
+        if (bypassStartYear) {
+            chosenFaction = Faction.getActiveMercenaryOrganization(currentYear);
+        } else {
+            for (String code : Faction.MERCENARY_ORGANIZATION_CODES) {
+                Faction faction = factions.getFaction(code);
+                if ((faction != null) && (faction.getStartYear() == currentYear)) {
                     chosenFaction = faction;
                     break;
                 }
@@ -3696,6 +3744,10 @@ public class Campaign implements ITechManager {
      * Cleans incongruent data present in the campaign
      */
     public void cleanUp() {
+        // Repairs campaigns saved with a personnel market that does not match their options, such as those started from
+        // the New Player Quickstart, which left the campaign with the disabled market
+        NewPersonnelMarket.ensureMarketStyle(this, campaignOptions.get(CampaignOption.PERSONNEL_MARKET_STYLE));
+
         // Cleans non-existing spouses
         for (Person person : getPlayerForce().allPersonnel()) {
             if (person.getGenealogy().hasSpouse()) {
@@ -3768,7 +3820,7 @@ public class Campaign implements ITechManager {
      * @since 0.50.07
      */
     public boolean isPirateCampaign() {
-        return getPlayerForce().getFaction().getShortName().equals(PIRATE_FACTION_CODE);
+        return getPlayerForce().getFaction().isPirateOrBanditCaste();
     }
 
     /**
@@ -3892,6 +3944,11 @@ public class Campaign implements ITechManager {
         campaignOptions = options;
         // Keep the player force's ForceOptions pass-through pointed at the current campaign options.
         playerForce.getForceOptions().setCampaignOptions(options);
+        // Contracts hold their own reference to the options so their term getters can apply the per-term multipliers.
+        // Repoint them all, or they keep reading the replaced object: on load the contracts are read (inside <info>)
+        // before <campaignOptions>, so without this they would apply the default multipliers (issue #11104).
+        contractHistory.contractHistory().values().forEach(contract -> contract.setCampaignOptions(options));
+        playerForce.getContractMarket().setCampaignOptions(options);
 
         // If blob crew was disabled for a specific role, clear only that role's blob crew
         if (infantryWasEnabled && !options.get(CampaignOption.USE_BLOB_INFANTRY)) {
@@ -3981,14 +4038,29 @@ public class Campaign implements ITechManager {
         this.lifePathLibrary = lifePathLibrary;
     }
 
+    /**
+     * Builds the opening {@code campaign} tag of a save, recording the version and release channel that wrote it.
+     *
+     * @param version the version writing the save
+     * @param channel the release channel of the build writing the save, or {@code null} for a development build, in
+     *                which case the {@code channel} attribute is left out
+     *
+     * @return the tag, ending in a newline
+     */
+    static String campaignOpenTag(Version version, @Nullable ReleaseChannel channel) {
+        return "<campaign version=\"" + MHQXMLUtility.escape(version.toString()) + '"'
+              + ((channel == null) ? "" : " channel=\"" + channel.getKey() + '"') + ">\n";
+    }
+
     public void writeToXML(final PrintWriter writer, boolean isBugReportPrep) {
         int indent = 0;
 
         // File header
         writer.println("<?xml version=\"1.0\" encoding=\"UTF-8\"?>");
 
-        // Start the XML root.
-        MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "campaign", "version", MHQConstants.VERSION);
+        // Start the XML root. The release channel cannot be derived from the version, so it is saved alongside it.
+        writer.print(campaignOpenTag(MHQConstants.VERSION, Version.getBuildChannel()));
+        indent++;
         MHQXMLUtility.writeSimpleXMLOpenTag(writer, indent++, "pastVersions");
         for (final Version pastVersion : pastVersions) {
             MHQXMLUtility.writeSimpleXMLTag(writer, indent, "pastVersion", pastVersion.toString());
@@ -5647,9 +5719,9 @@ public class Campaign implements ITechManager {
             return Money.zero();
         }
 
-        Money routedPayout = mission.getRoutPayout();
-        if (routedPayout != null) {
-            return routedPayout;
+        Money finalPayout = mission.getFinalPayout();
+        if (finalPayout != null) {
+            return finalPayout;
         }
 
         return mission.getMonthlyPayOut().multipliedBy(mission.getMonthsLeft(getLocalDate()));
@@ -6408,6 +6480,15 @@ public class Campaign implements ITechManager {
         Factions factions = Factions.getInstance();
 
         final String CLAN_CODE = "CLAN";
+
+        // The Bandit Caste always begins at its capital (Strana Mechty); it has no territory to search for hiring
+        // halls and no use for the mercenary/pirate starting-location choices.
+        if (getPlayerForce().getFaction().isBanditCaste()) {
+            PlanetarySystem banditCasteCapital = getPlayerForce().getFaction().getStartingPlanet(this, currentDay);
+            if (banditCasteCapital != null) {
+                return banditCasteCapital.getPrimaryPlanet();
+            }
+        }
 
         if (isMercenaryCampaign() || isPirateCampaign()) {
             return getMercenaryOrPirateStartingPlanet(factions, choice);

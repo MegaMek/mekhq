@@ -37,7 +37,6 @@ package mekhq.gui.menus;
 import static mekhq.gui.CampaignGUI.MAX_QUANTITY_SPINNER;
 
 import java.awt.event.ActionListener;
-import java.awt.event.KeyEvent;
 import java.util.Arrays;
 import java.util.EnumMap;
 import java.util.List;
@@ -131,10 +130,8 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
     private final Map<PersonnelRole, JMenu> blobRoleMenus = new EnumMap<>(PersonnelRole.class);
 
     /**
-     * The Astech Pool menu uses the following Mnemonic keys as of 19-March-2020:
-     * B, E, F, H
-     * The Medic Pool menu uses the following Mnemonic keys as of 19-March-2020:
-     * B, E, H, R
+     * The items in these menus intentionally have no mnemonics, so they do not compete with the tab and top-level menu
+     * keys.
      */
     public TemporaryPersonnelManagementMenu(Campaign campaign, BiFunction<String, Integer, Integer> getUserIntInput) {
         super(getTextAt("menuTempPool.text"));
@@ -142,16 +139,13 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
         this.getUserIntInput = getUserIntInput;
 
 
-        JMenuItem miTempPoolFullStrength = createMenuItem("miTempPoolFullStrength.text", KeyEvent.VK_UNDEFINED,
-              evt -> bringAllTempCrewsToFullStrength());
+        JMenuItem miTempPoolFullStrength = createMenuItem("miTempPoolFullStrength.text", evt -> bringAllTempCrewsToFullStrength());
         add(miTempPoolFullStrength);
 
-        JMenuItem miTempPoolReleaseAll = createMenuItem("miTempPoolReleaseAll.text", KeyEvent.VK_UNDEFINED,
-              evt -> releaseAllTempCrews());
+        JMenuItem miTempPoolReleaseAll = createMenuItem("miTempPoolReleaseAll.text", evt -> releaseAllTempCrews());
         add(miTempPoolReleaseAll);
 
-        JMenuItem miTempPoolReleaseSurplus = createMenuItem("miTempPoolReleaseSurplus.text", KeyEvent.VK_UNDEFINED,
-              evt -> releaseSurplusTempCrews());
+        JMenuItem miTempPoolReleaseSurplus = createMenuItem("miTempPoolReleaseSurplus.text", evt -> releaseSurplusTempCrews());
         add(miTempPoolReleaseSurplus);
 
         addMenuListener(menuListenerFor(() -> {
@@ -179,7 +173,7 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
 
         addSeparator();
 
-        JMenu menuAstechPool = buildSupportPoolSubMenu("menuAstechPool.text", KeyEvent.VK_A,
+        JMenu menuAstechPool = buildSupportPoolSubMenu("menuAstechPool.text",
               "miHireAstechs.text", "popupHireAstechsNum.text", "miFireAstechs.text", "popupFireAstechsNum.text",
               "miFullStrengthAstechs.text", "miFireAllAstechs.text",
               "miFireAstechs.disabledTip", "miFullStrengthAstechs.disabledTip", "miFireAllAstechs.disabledTip",
@@ -198,7 +192,7 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
         );
         add(menuAstechPool);
 
-        JMenu menuMedicPool = buildSupportPoolSubMenu("menuMedicPool.text", KeyEvent.VK_M,
+        JMenu menuMedicPool = buildSupportPoolSubMenu("menuMedicPool.text",
               "miHireMedics.text", "popupHireMedicsNum.text", "miFireMedics.text", "popupFireMedicsNum.text",
               "miFullStrengthMedics.text", "miFireAllMedics.text",
               "miFireMedics.disabledTip", "miFullStrengthMedics.disabledTip", "miFireAllMedics.disabledTip",
@@ -241,7 +235,6 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
      * and dynamic enable/disable states.
      *
      * @param menuKey                    resource key for the menu title
-     * @param mnemonic                   keyEvent integer for the menu mnemonic
      * @param hireKey                    resource key for the "Hire" item text
      * @param popupHireKey               resource key for the "Hire" dialog prompt
      * @param fireKey                    resource key for the "Fire" item text
@@ -260,7 +253,7 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
      *
      * @return a {@link JMenu} for temporary personnel management
      */
-    private JMenu buildSupportPoolSubMenu(String menuKey, int mnemonic,
+    private JMenu buildSupportPoolSubMenu(String menuKey,
           String hireKey, String popupHireKey, String fireKey, String popupFireKey,
           String fullStrengthKey, String fireAllKey,
           String fireDisabledTipKey, String fullStrengthDisabledTipKey, String fireAllDisabledTipKey,
@@ -269,9 +262,8 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
           Runnable fullStrengthAction, Runnable emptyAction) {
 
         JMenu menu = new JMenu(getTextAt(menuKey));
-        menu.setMnemonic(mnemonic);
 
-        JMenuItem miHire = createMenuItem(hireKey, KeyEvent.VK_H, evt -> {
+        JMenuItem miHire = createMenuItem(hireKey, evt -> {
             int value = getUserIntInput.apply(getTextAt(popupHireKey), MAX_QUANTITY_SPINNER);
             if (value >= 0) {
                 increaseAction.accept(value);
@@ -279,7 +271,7 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
         });
         menu.add(miHire);
 
-        JMenuItem miFire = createMenuItem(fireKey, KeyEvent.VK_E, evt -> {
+        JMenuItem miFire = createMenuItem(fireKey, evt -> {
             int value = getUserIntInput.apply(getTextAt(popupFireKey), poolSupplier.get());
             if (value >= 0) {
                 decreaseAction.accept(value);
@@ -287,10 +279,10 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
         });
         menu.add(miFire);
 
-        JMenuItem miFullStrength = createMenuItem(fullStrengthKey, KeyEvent.VK_B, evt -> fullStrengthAction.run());
+        JMenuItem miFullStrength = createMenuItem(fullStrengthKey, evt -> fullStrengthAction.run());
         menu.add(miFullStrength);
 
-        JMenuItem miFireAll = createMenuItem(fireAllKey, KeyEvent.VK_R, evt -> emptyAction.run());
+        JMenuItem miFireAll = createMenuItem(fireAllKey, evt -> emptyAction.run());
         menu.add(miFireAll);
 
         menu.addMenuListener(menuListenerFor(() -> {
@@ -385,7 +377,7 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
                               .getHumanResources()
                               .isBlobCrewEnabled(role, campaign2.getCampaignOptions()));
 
-        JMenuItem miHire = createMenuItem(config.hireKey, KeyEvent.VK_UNDEFINED, evt -> {
+        JMenuItem miHire = createMenuItem(config.hireKey, evt -> {
             int value = getUserIntInput.apply(getTextAt(config.hirePopupKey), MAX_QUANTITY_SPINNER);
             if (value >= 0) {
                 getCampaign().increaseTempCrewPool(role, value);
@@ -393,7 +385,7 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
         });
         menu.add(miHire);
 
-        JMenuItem miFireSome = createMenuItem(config.fireKey, KeyEvent.VK_UNDEFINED, evt -> {
+        JMenuItem miFireSome = createMenuItem(config.fireKey, evt -> {
             Campaign campaign1 = getCampaign();
             int value = getUserIntInput.apply(getTextAt(config.firePopupKey),
                   campaign1.getPlayerForce().getHumanResources().getTempCrewPool(role));
@@ -403,7 +395,7 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
         });
         menu.add(miFireSome);
 
-        JMenuItem miFullStrength = createMenuItem(config.fullStrengthKey, KeyEvent.VK_UNDEFINED, evt -> {
+        JMenuItem miFullStrength = createMenuItem(config.fullStrengthKey, evt -> {
             getCampaign().resetTempCrewPoolForRole(role);
             Campaign campaign1 = getCampaign();
             campaign1.getPlayerForce()
@@ -413,8 +405,7 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
         });
         menu.add(miFullStrength);
 
-        JMenuItem miFireAll = createMenuItem(config.fireAllKey, KeyEvent.VK_UNDEFINED,
-              evt -> {
+        JMenuItem miFireAll = createMenuItem(config.fireAllKey, evt -> {
                   Campaign campaign1 = getCampaign();
                   campaign1.getPlayerForce().getHumanResources().setTempCrewPool(campaign1, role, 0);
               });
@@ -496,25 +487,21 @@ public class TemporaryPersonnelManagementMenu extends JMenu {
     }
 
     /**
-     * Creates and configures a {@link JMenuItem} with localized text, an optional keyboard mnemonic, and an action
+     * Creates and configures a {@link JMenuItem} with localized text, and an action
      * listener. Component's name is generated by removing {@code ".text"} suffix from {@code textKey} parameter.
      *
-     * @param textKey  the resource key with the menu item's localized display text, must end with {@code ".text"}
-     * @param mnemonic the keyboard shortcut or {@code KeyEvent.VK_UNDEFINED} if no mnemonic is required
-     * @param action   the {@link ActionListener} to trigger when the menu item is selected
+     * @param textKey the resource key with the menu item's localized display text, must end with {@code ".text"}
+     * @param action  the {@link ActionListener} to trigger when the menu item is selected
      *
      * @return the initialized {@code JMenuItem}
      */
-    private static JMenuItem createMenuItem(String textKey, int mnemonic, ActionListener action) {
+    private static JMenuItem createMenuItem(String textKey, ActionListener action) {
         if (!textKey.endsWith(MENU_ITEM_TEXT_SUFFIX)) {
             throw new IllegalArgumentException(String.format("Text key must end with '%s', actual: '%s'",
                   MENU_ITEM_TEXT_SUFFIX, textKey));
         }
         JMenuItem item = new JMenuItem(getTextAt(textKey));
         item.setName(textKey.substring(0, textKey.length() - MENU_ITEM_TEXT_SUFFIX.length()));
-        if (mnemonic != KeyEvent.VK_UNDEFINED) {
-            item.setMnemonic(mnemonic);
-        }
         item.addActionListener(action);
         return item;
     }

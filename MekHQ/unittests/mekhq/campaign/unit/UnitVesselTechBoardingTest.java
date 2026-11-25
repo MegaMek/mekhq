@@ -38,6 +38,7 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
 import static org.mockito.Mockito.spy;
@@ -52,6 +53,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.base.AbstractBase;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.unit.actions.ActivateUnitAction;
 import mekhq.campaign.unit.actions.MothballUnitAction;
 import org.junit.jupiter.api.BeforeEach;
@@ -81,6 +83,8 @@ class UnitVesselTechBoardingTest {
         when(carrier.isCarrier()).thenReturn(true);
 
         tech = mock(Person.class);
+
+        lenient().when(tech.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         when(tech.isTechLargeVessel()).thenReturn(true);
     }
 

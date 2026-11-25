@@ -44,12 +44,12 @@ import mekhq.campaign.randomEvents.other.RiotScenario;
  * The behavior of a scheduled parade: a public show of the employer's strength, placed in place of every point of
  * interest on a Retainer contract. Every scheduled parade is a strategic objective.
  *
- * <p>When any formation deploys onto its hex, the usual scenario roll is made - even against a routed enemy, since
- * civil unrest does not answer to the enemy's morale. If no scenario breaks out, the parade is held: its objective is
- * met and the contract's combat bonus is paid, standing in for the Essential scenarios such a contract does not get. If
- * one does, a riot breaks out, and the deploying formation is caught up in a {@value #SCENARIO_TEMPLATE} scenario, set
- * up as a riot's is (see {@link RiotScenario}). A disrupted parade is called off whatever the scenario's result: it
- * leaves the map and its objective is removed, neither met nor failed. (See
+ * <p>When any formation deploys onto its hex, the usual scenario roll is made - even while the contract is peaceful,
+ * between raids, since civil unrest does not answer to the enemy. If no scenario breaks out, the parade is held: its
+ * objective is met and the contract's combat bonus is paid, standing in for the Essential scenarios such a contract
+ * does not get. If one does, a riot breaks out, and the deploying formation is caught up in a
+ * {@value #SCENARIO_TEMPLATE} scenario, set up as a riot's is (see {@link RiotScenario}). A disrupted parade is called
+ * off whatever the scenario's result: it leaves the map and its objective is removed, neither met nor failed. (See
  * {@link StratConAmbushPointOfInterestBehavior} for the rules it shares.)</p>
  *
  * <p>Any formation can be caught up in a riot - an aerospace flyover included.</p>
@@ -87,8 +87,19 @@ public class StratConScheduledParadeBehavior extends StratConAmbushPointOfIntere
      * @since 0.51.01
      */
     @Override
-    protected boolean isScenarioPossibleWhileRouted() {
+    protected boolean isScenarioPossibleWhilePeaceful() {
         return true;
+    }
+
+    /**
+     * A riot at a parade is civil unrest, not the contract's enemy's fight, so the enemy's morale does not shape it.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Override
+    protected boolean isOpposedByContractEnemy() {
+        return false;
     }
 
     /**

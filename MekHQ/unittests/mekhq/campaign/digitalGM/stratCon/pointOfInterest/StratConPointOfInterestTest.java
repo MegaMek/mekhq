@@ -137,6 +137,24 @@ class StratConPointOfInterestTest {
     }
 
     @Test
+    void lastActiveDateIsTheDayBeforeExpiry() {
+        StratConPointOfInterest pointOfInterest = new StratConPointOfInterest(TEST_TYPE_ID, new StratConCoords(0, 0));
+        pointOfInterest.setExpiryDate(TODAY);
+
+        LocalDate lastActiveDate = pointOfInterest.getLastActiveDate();
+
+        assertEquals(TODAY.minusDays(1), lastActiveDate);
+        assertFalse(pointOfInterest.hasReachedExpiryDate(lastActiveDate));
+    }
+
+    @Test
+    void lastActiveDateIsNullWhenItNeverExpires() {
+        StratConPointOfInterest pointOfInterest = new StratConPointOfInterest(TEST_TYPE_ID, new StratConCoords(0, 0));
+
+        assertNull(pointOfInterest.getLastActiveDate());
+    }
+
+    @Test
     void alliedAndPlayerOwnersAreAlliedToPlayer() {
         StratConPointOfInterest pointOfInterest = new StratConPointOfInterest(TEST_TYPE_ID, new StratConCoords(0, 0));
 

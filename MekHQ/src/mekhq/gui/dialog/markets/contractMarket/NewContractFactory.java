@@ -92,6 +92,9 @@ public final class NewContractFactory {
         final String systemId = currentSystem == null ? null : currentSystem.getId();
 
         final AbstractContract contract = new ChaosContract();
+        // Inject the options so the term getters apply the configured per-term multipliers while the offer sits in the
+        // market, matching a generated offer (AbstractContractGeneration#createContract).
+        contract.setCampaignOptions(campaign.getCampaignOptions());
         contract.setContractId(UUID.randomUUID());
         contract.setContractName(getTextAt(RESOURCE_BUNDLE, "create.contractMarket.defaultName"));
         contract.setDescription("");
@@ -118,7 +121,10 @@ public final class NewContractFactory {
               ContractObjectiveType.UNDEFINED));
         contract.setContractFinanceData(new ContractFinanceData(Money.zero(), Money.zero(), Money.zero()));
         contract.setRentedFacilitiesData(new RentedFacilitiesData(0, 0, 0));
-        contract.setMoraleData(new MoraleData(ContractMoraleLevel.STALEMATE, null, Money.zero()));
+        // A new contract begins peaceful if its objective follows the garrison raid model. No final payout is set, so
+        // the remaining escrow is paid as normal if it ends early.
+        contract.setMoraleData(new MoraleData(ContractMoraleLevel.STALEMATE,
+              contract.getObjectiveType().isGarrisonType(), null));
 
         return contract;
     }

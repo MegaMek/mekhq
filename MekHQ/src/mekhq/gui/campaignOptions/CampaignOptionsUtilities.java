@@ -35,9 +35,7 @@ package mekhq.gui.campaignOptions;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -102,16 +100,10 @@ public class CampaignOptionsUtilities {
         return scaleForGUI(860);
     }
     /**
-     * Version marker for campaign options that existed before the metadata system was implemented and shouldn't have a
-     * version badge.
+     * Version marker for campaign options that predate MekHQ's first tagged release (0.3.24), so the release that added
+     * them cannot be determined. These options show no version badge.
      */
     public static final Version LEGACY_RULE_BEFORE_METADATA = null;
-
-    /**
-     * Version marker for campaign options that existed before the metadata system was implemented, but still since the
-     * most recent milestone. This variable should be deprecated once the next milestone is declared.
-     */
-    public static final Version MILESTONE_BEFORE_METADATA = new Version(0, 50, 10);
 
     /**
      * Cache for reusing CampaignOptionMetadata instances to avoid creating duplicate objects.
@@ -167,14 +159,7 @@ public class CampaignOptionsUtilities {
               settingsBadge(CampaignOptionFlag.DOCUMENTED),
               settingsBadge(CampaignOptionFlag.IMPORTANT),
               settingsBadge(CampaignOptionFlag.RECOMMENDED)));
-        entries.add(new SettingsBadge(
-              getTextAt(RESOURCE_BUNDLE, "badge.development.symbol").codePointAt(0),
-              Color.decode(getTextAt(RESOURCE_BUNDLE, "badge.development.color")),
-              getTextAt(RESOURCE_BUNDLE, "legend.development")));
-        entries.add(new SettingsBadge(
-              getTextAt(RESOURCE_BUNDLE, "badge.milestone.symbol").codePointAt(0),
-              Color.decode(getTextAt(RESOURCE_BUNDLE, "badge.milestone.color")),
-              getTextAt(RESOURCE_BUNDLE, "legend.milestone")));
+        entries.addAll(CampaignOptionsMetadata.addedSinceLegendEntries());
         return entries;
     }
 
@@ -325,11 +310,11 @@ public class CampaignOptionsUtilities {
      * The badges include:
      * <ul>
      *   <li>Special flag symbols (if any) - displayed first, uncolored</li>
-     *   <li>Added since badge - colored star indicating when the option was added</li>
+     *   <li>Added since badge - the version the option was added in</li>
      * </ul>
      *
      * <p>
-     * Development releases use a filled purple star (★), while milestone releases use a hollow green star (☆).
+     * The version is purple if the option was added after the last Core release, and blue otherwise.
      * </p>
      *
      * @param metadata the campaign option metadata, or null if no badges should be shown

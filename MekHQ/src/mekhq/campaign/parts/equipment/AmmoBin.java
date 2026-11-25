@@ -34,15 +34,13 @@
 package mekhq.campaign.parts.equipment;
 
 import static mekhq.utilities.MHQInternationalization.getTextAt;
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
 import static mekhq.utilities.ReportingUtilities.getPositiveColor;
-import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
 import java.util.EnumSet;
+import java.util.List;
 import java.util.Objects;
 
 import jakarta.annotation.Nullable;
@@ -66,8 +64,11 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PartDemand;
 import mekhq.campaign.parts.PartInventory;
+import mekhq.campaign.parts.StockCount;
 import mekhq.campaign.parts.enums.PartRepairType;
+import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -169,27 +170,36 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     }
 
     public int getFullShots() {
+        int fullShots = getFullShotsOfStandardMunitions();
+
+        // If ProtoMeks are using alternate munitions then cut in half
+        if (!oneShot && isProtoMekLoadedWithAlternateMunitions()) {
+            fullShots = fullShots / 2;
+        }
+
+        return fullShots;
+    }
+
+    /**
+     * @return the shots this bin holds when filled with standard rounds, before ProtoMeks halve alternate munitions
+     */
+    private int getFullShotsOfStandardMunitions() {
         if (oneShot) {
             return 1;
         }
 
-        int fullShots = getType().getShots();
-
         Mounted<?> mounted = getMounted();
-        if (mounted != null) {
-            if (mounted.getOriginalShots() > 0) {
-                fullShots = mounted.getOriginalShots();
-            }
-
-            if (unit.getEntity() instanceof ProtoMek) {
-                // If ProtoMeks are using alternate munitions then cut in half
-                if (!EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(getType().getMunitionType())) {
-                    fullShots = fullShots / 2;
-                }
-            }
+        if ((mounted != null) && (mounted.getOriginalShots() > 0)) {
+            return mounted.getOriginalShots();
         }
 
-        return fullShots;
+        return getType().getShots();
+    }
+
+    private boolean isProtoMekLoadedWithAlternateMunitions() {
+        return (getMounted() != null)
+                     && (unit.getEntity() instanceof ProtoMek)
+                     && !EnumSet.of(AmmoType.Munitions.M_STANDARD).containsAll(getType().getMunitionType());
     }
 
     protected int getCurrentShots() {
@@ -215,13 +225,84 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
     }
 
     protected int getShotsPerTon() {
-        AmmoType ammoType = getType();
-        if (ammoType.getKgPerShot() > 0) {
+        return getShotsPerTon(getType());
+    }
+
+    private static int getShotsPerTon(AmmoType ammoType) {
+        // Without a listed weight, getKgPerShot() is worked out from the shots, and dividing back out of it can lose a
+        // shot to rounding (15 shots a ton comes back as 14)
+        if (ammoType.hasCustomKgPerShot()) {
             return (int) Math.floor(1000.0 / ammoType.getKgPerShot());
         }
 
         // if not listed by kg per shot, we assume this is a single ton increment
-        return getType().getShots();
+        return ammoType.getShots();
+    }
+
+    /**
+     * The value of this bin filled to capacity with standard rounds, whatever munition it actually holds. CamOps prices
+     * peacetime training ammunition this way, since it is inexpensive training ammunition rather than the munitions
+     * carried into battle.
+     *
+     * @return the price of filling this bin with standard munitions
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Money getStandardMunitionCapacityValue() {
+        int shotsPerTon = getStandardMunitionShotsPerTon();
+        if (shotsPerTon <= 0) {
+            return Money.zero();
+        }
+
+        return getStandardMunitionPricePerTon().multipliedBy(getStandardMunitionCapacityShots()).dividedBy(shotsPerTon);
+    }
+
+    /**
+     * @return how many standard rounds fill this bin
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected int getStandardMunitionCapacityShots() {
+        // ProtoMeks fit half as many alternate rounds, so the bin holds the unhalved count of standard ones
+        return isProtoMekLoadedWithAlternateMunitions() ? getFullShotsOfStandardMunitions() : getFullShots();
+    }
+
+    /**
+     * @return the price of a ton of the standard munition of the ammunition this bin holds
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected Money getStandardMunitionPricePerTon() {
+        return Money.of(getStandardMunitionType().getRawCost());
+    }
+
+    /**
+     * @return how many standard rounds of the ammunition this bin holds make up a ton
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    protected int getStandardMunitionShotsPerTon() {
+        return getShotsPerTon(getStandardMunitionType());
+    }
+
+    /**
+     * Alternate munitions (Thunder, Artemis-capable, armor-piercing and so on) are built from a standard base type,
+     * which MegaMek keeps.
+     *
+     * @return the standard munition of the ammunition loaded in this bin
+     */
+    private AmmoType getStandardMunitionType() {
+        Mounted<?> mounted = getMounted();
+        // Use the ammo type on the existing entity, to avoid getting it wrong due to ammo swaps
+        AmmoType loadedType = ((mounted != null) && (mounted.getType() instanceof AmmoType mountedType))
+                                    ? mountedType
+                                    : getType();
+        AmmoType baseType = loadedType.getBaseAmmo();
+        return (baseType != null) ? baseType : loadedType;
     }
 
     @Override
@@ -235,7 +316,7 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
 
     @Override
     public Money getBuyCost() {
-        return getNewPart().getActualValue();
+        return getNewPart().getPurchaseCost();
     }
 
     public int getShotsNeeded() {
@@ -336,6 +417,9 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
             } finally {
                 manufacturing = false;
             }
+
+            setFabricating(false);
+            setFabricateUntilSuccess(false);
             return messageSurroundedBySpanWithColor(getPositiveColor(), " <b>fabricated</b>.");
         }
         return super.succeed();
@@ -741,43 +825,41 @@ public class AmmoBin extends EquipmentPart implements IAcquisitionWork, IFabrica
             return super.getDetails(includeRepairDetails);
         }
         if (null != unit) {
-            int shotsAvailable = getAmountAvailable();
-            PartInventory inventories = getPartInventory(getNewPart());
-
-            StringBuilder toReturn = new StringBuilder();
-            toReturn.append(getType().getDesc())
-                  .append(", ")
-                  .append(getShotsNeeded())
-                  .append(" shots needed")
-                  .append("<br/>");
-
-            if (shotsAvailable == 0) {
-                toReturn.append(messageSurroundedBySpanWithColor(getNegativeColor(), "None in stock"));
-            } else if (shotsAvailable < getShotsNeeded()) {
-                toReturn.append(spanOpeningWithCustomColor(getNegativeColor()))
-                      .append("Only ")
-                      .append(shotsAvailable)
-                      .append(" in stock")
-                      .append(CLOSING_SPAN_TAG);
-            } else {
-                toReturn.append(spanOpeningWithCustomColor(getPositiveColor()))
-                      .append(shotsAvailable)
-                      .append(" in stock")
-                      .append(CLOSING_SPAN_TAG);
-            }
-
-            String orderTransitString = inventories.getTransitOrderedDetails();
-            if (!orderTransitString.isEmpty()) {
-                toReturn.append(spanOpeningWithCustomColor(getWarningColor()))
-                      .append(" (")
-                      .append(orderTransitString)
-                      .append(")")
-                      .append(CLOSING_SPAN_TAG);
-            }
-            return toReturn.toString();
+            return getType().getDesc() + ", " + getShotsNeeded() + " shots needed<br/>" + countStock().describe();
         } else {
             return "";
         }
+    }
+
+    /**
+     * A bin on a unit shows the ammunition stock whether it is being reloaded or salvaged.
+     */
+    @Override
+    public @Nullable StockCount getShownStock() {
+        return (unit != null) ? countStock() : null;
+    }
+
+    /**
+     * Counts the spare ammunition this bin can use, in shots: with ammunition by type on, compatible ammunition is
+     * converted to this bin's shots. A reload is short when there are fewer shots here than the bin needs; salvaging
+     * needs none.
+     *
+     * @return the shots here now, the shots needed, and the shots on their way or on order
+     */
+    @Override
+    public StockCount countStock() {
+        int shotsToLoad = isSalvaging() ? 0 : Math.max(0, getShotsNeeded());
+        return new StockCount(getAmountAvailable(), shotsToLoad, getPartInventory(getNewPart()));
+    }
+
+    /**
+     * A salvaged bin is thrown away once unloaded, and a missing one is rebuilt for free, so no unit waits on it.
+     *
+     * @return {@link PartDemand#NONE}
+     */
+    @Override
+    public PartDemand countDemand(List<MissingPart> gaps) {
+        return PartDemand.NONE;
     }
 
     @Override

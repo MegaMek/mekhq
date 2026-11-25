@@ -36,8 +36,11 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.awt.Component;
+import java.awt.Container;
 import java.util.ArrayList;
 import java.util.List;
+import javax.swing.JLabel;
 
 import mekhq.gui.baseComponents.hud.HudFilterList.Item;
 import org.junit.jupiter.api.Test;
@@ -78,6 +81,32 @@ class HudFilterListTest {
         assertTrue(chosen.isEmpty());
         assertEquals("Mek", list.getSelected());
         assertEquals(3, list.getComponentCount());
+    }
+
+    @Test
+    void settingCountsChangesOnlyTheCountsShown() {
+        List<String> chosen = new ArrayList<>();
+        HudFilterList<String> list = new HudFilterList<>(chosen::add);
+        list.setItems(ITEMS);
+        list.setSelected("Mek");
+        List<Component> rows = List.of(list.getComponents());
+
+        list.setCounts(value -> value == null ? 12 : -1);
+
+        assertTrue(chosen.isEmpty());
+        assertEquals("Mek", list.getSelected());
+        assertEquals(rows, List.of(list.getComponents()));
+        assertEquals(List.of("All types", "12"), texts(rows.get(0)));
+        assertEquals(List.of("Mek", ""), texts(rows.get(1)));
+    }
+
+    /** The text of a row's labels, left to right. */
+    private static List<String> texts(Component row) {
+        List<String> texts = new ArrayList<>();
+        for (Component component : ((Container) row).getComponents()) {
+            texts.add(((JLabel) component).getText());
+        }
+        return texts;
     }
 
     @Test

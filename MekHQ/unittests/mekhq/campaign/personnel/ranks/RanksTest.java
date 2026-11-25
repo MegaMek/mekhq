@@ -32,7 +32,10 @@
  */
 package mekhq.campaign.personnel.ranks;
 
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.io.File;
@@ -41,6 +44,8 @@ import java.nio.file.Files;
 import java.nio.file.Path;
 import java.util.List;
 
+import mekhq.campaign.personnel.enums.RankSystemType;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.io.TempDir;
 
@@ -53,6 +58,44 @@ import org.junit.jupiter.api.io.TempDir;
  * @since 0.51.01
  */
 class RanksTest {
+    private static final String CUSTOM_CODE = "MYMERC";
+    private static final String COMBINE_CODE = "DCMS";
+
+    @BeforeAll
+    static void loadRankSystems() {
+        Ranks.initializeRankSystems();
+    }
+
+    @Test
+    void testGetRankSystemFromCode_FindsTheCampaignsOwnCustomSystem() {
+        // Issue 10867: a system imported in Campaign Options lives only on the campaign. The right-click menu sends
+        // its code, and looking that up in the global list fell back to the default system.
+        RankSystem custom = campaignOnlyRankSystem();
+        assertNotEquals(CUSTOM_CODE, Ranks.getRankSystemFromCode(CUSTOM_CODE).getCode(),
+              "this test is only meaningful while the global list does not hold the custom system");
+
+        assertSame(custom, Ranks.getRankSystemFromCode(CUSTOM_CODE, custom),
+              "the campaign's own system is returned, not the default");
+    }
+
+    @Test
+    void testGetRankSystemFromCode_OtherCodesStillComeFromTheGlobalList() {
+        RankSystem custom = campaignOnlyRankSystem();
+
+        assertSame(Ranks.getRankSystemFromCode(COMBINE_CODE), Ranks.getRankSystemFromCode(COMBINE_CODE, custom));
+        assertEquals(COMBINE_CODE, Ranks.getRankSystemFromCode(COMBINE_CODE, null).getCode(),
+              "without a campaign system the lookup is the global one");
+    }
+
+    /** A copy of a built-in system under a new code, stored only on the campaign, as a Campaign Options import is. */
+    private static RankSystem campaignOnlyRankSystem() {
+        RankSystem custom = new RankSystem(Ranks.getRankSystemFromCode(COMBINE_CODE));
+        custom.setCode(CUSTOM_CODE);
+        custom.setName("My Mercenaries");
+        custom.setType(RankSystemType.CAMPAIGN);
+        return custom;
+    }
+
     @Test
     void testExportRankSystemsToFile_WritesTheLicenceHeaderAndTheRootElement(@TempDir Path tempDir)
           throws IOException {

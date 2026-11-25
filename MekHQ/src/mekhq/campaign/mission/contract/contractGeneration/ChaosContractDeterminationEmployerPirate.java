@@ -33,7 +33,6 @@
 package mekhq.campaign.mission.contract.contractGeneration;
 
 import static megamek.common.compute.Compute.randomInt;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 
 import java.time.LocalDate;
 
@@ -84,7 +83,7 @@ public class ChaosContractDeterminationEmployerPirate extends AbstractContractDe
     @Override
     EmployerFactions determineEmployerFactions(ChaosEmployerType employerType, LocalDate currentDate,
           ILocation currentLocation, boolean covertViable, Faction playerFaction) {
-        Faction pirate = Factions.getInstance().getFaction(PIRATE_FACTION_CODE);
+        Faction pirate = Factions.getInstance().getFaction(Faction.getPirateFactionCodeFor(playerFaction));
 
         if (randomInt(SPONSORED_RAID_ODDS) == 0) {
             Faction sponsor = pickRegionalOwner(currentDate, currentLocation, null);

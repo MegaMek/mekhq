@@ -158,6 +158,22 @@ public class MHQXMLUtility extends MMXMLUtility {
                   .append(escape(tgtEnt.getCamouflage().getFilename()));
         }
 
+        if (!tgtEnt.getCamouflage().hasDefaultCategory()) {
+            retVal.append("\" " + MULParser.ATTR_CAMO_ROTATION + "=\"")
+                  .append(tgtEnt.getCamouflage().getRotationAngle())
+                  .append("\" " + MULParser.ATTR_CAMO_SCALE + "=\"")
+                  .append(tgtEnt.getCamouflage().getScale());
+        }
+
+        if (!tgtEnt.getCamouflage().hasDefaultOverlay()) {
+            retVal.append("\" " + MULParser.ATTR_CAMO_OVERLAY_STYLE + "=\"")
+                  .append(tgtEnt.getCamouflage().getOverlayStyle().name())
+                  .append("\" " + MULParser.ATTR_CAMO_OVERLAY_DIRECTION + "=\"")
+                  .append(tgtEnt.getCamouflage().getOverlayDirection().name())
+                  .append("\" " + MULParser.ATTR_CAMO_OVERLAY_COLOR + "=\"")
+                  .append(String.format("%06X", tgtEnt.getCamouflage().getOverlayColor().getRGB() & 0xFFFFFF));
+        }
+
         if (tgtEnt.getDeployRound() > 0) {
             retVal.append(String.format("\" %s=\"%d", MULParser.ATTR_DEPLOYMENT, tgtEnt.getDeployRound()));
         }

@@ -173,6 +173,8 @@ public class Refit extends Part implements IAcquisitionWork {
     private boolean customJob;
     private boolean isRefurbishing;
     private boolean isSavingFile;
+    /** The file the player chose for the new design, or {@code null} to use the default customs folder. */
+    private @Nullable File designFile;
     private boolean kitFound;
     private boolean replacingLocations;
     private final StringJoiner errorStrings;
@@ -827,7 +829,7 @@ public class Refit extends Part implements IAcquisitionWork {
                     Part replacement = newMissingPart.getNewPart();
                     // set entity for variable cost items
                     replacement.setUnit(newUnit);
-                    cost = cost.plus(replacement.getActualValue());
+                    cost = cost.plus(replacement.getPurchaseCost());
                     shoppingList.add(newPart);
                 }
 
@@ -984,7 +986,7 @@ public class Refit extends Part implements IAcquisitionWork {
             if (shotsNeeded > 0) {
                 ammoShotsToBuy.put(type, shotsNeeded);
                 // Priced like any ammunition bought for the campaign, so the campaign price multipliers apply
-                cost = cost.plus(new AmmoStorage(0, type, shotsNeeded, campaign).getActualValue());
+                cost = cost.plus(new AmmoStorage(0, type, shotsNeeded, campaign).getPurchaseCost());
             }
         }
 
@@ -1055,7 +1057,7 @@ public class Refit extends Part implements IAcquisitionWork {
             if (!isFoundInTheWarehouse((MissingPart) newHeatSinkPart, partQuantity, plannedReplacementParts)) {
                 // Heat sinks built into the engine are parts of the kit like any other: a double heat sink costs the
                 // same inside the engine as outside it (TM p.277)
-                cost = cost.plus(((MissingPart) newHeatSinkPart).getNewPart().getActualValue());
+                cost = cost.plus(((MissingPart) newHeatSinkPart).getNewPart().getPurchaseCost());
                 shoppingList.add(newHeatSinkPart);
             }
         }
@@ -2085,7 +2087,7 @@ public class Refit extends Part implements IAcquisitionWork {
         for (int sink = 0; sink < sinksToBuy; sink++) {
             shoppingList.add(new MissingAeroHeatSink(0, newSinkType, false, campaign));
         }
-        cost = cost.plus(new AeroHeatSink(0, newSinkType, false, campaign).getActualValue().multipliedBy(sinksToBuy));
+        cost = cost.plus(new AeroHeatSink(0, newSinkType, false, campaign).getPurchaseCost().multipliedBy(sinksToBuy));
         for (int sink = 0; sink < sinksToReturn; sink++) {
             oldIntegratedHeatSinks.add(new AeroHeatSink(0, oldSinkType, false, campaign));
         }
@@ -2623,7 +2625,25 @@ public class Refit extends Part implements IAcquisitionWork {
     }
 
     /**
-     * Writes the configuration for the new side of the refit to a .mtf or .blk file in the customs directory.
+     * @return {@code true} if beginning this refit writes the new design to a unit file, so the player should be asked
+     *       where to put it
+     */
+    public boolean isSavingNewDesign() {
+        return customJob && isSavingFile;
+    }
+
+    /**
+     * Sets the file the new design is written to when the refit begins.
+     *
+     * @param designFile the file the player chose, or {@code null} to use the default customs folder
+     */
+    public void setDesignFile(@Nullable File designFile) {
+        this.designFile = designFile;
+    }
+
+    /**
+     * Writes the configuration for the new side of the refit to a .mtf or .blk file. The file is the one the player
+     * chose, or, when none was chosen, a file in the customs directory.
      *
      * @throws IOException            if the file cannot be written, such as when a file with that name already exists;
      *                                its message is shown to the player
@@ -2635,29 +2655,35 @@ public class Refit extends Part implements IAcquisitionWork {
         String unitName = newEntity.getShortNameRaw();
         // A refit can be given any name, but the file needs one that is legal on every platform
         String fileName = MegaMekLabFileSaver.sanitizeFilename(unitName);
-        String sCustomsDir = String.join(File.separator, "data", "mekfiles", "customs"); // TODO : Remove inline file
-        // path
-        String sCustomsDirCampaign = sCustomsDir + File.separator + getCampaign().getPlayerForce().getName();
-        File customsDir = new File(sCustomsDir);
-        if (!customsDir.exists() && !customsDir.mkdir()) {
-            throw new IOException("Failed to create the customs folder " + sCustomsDir +
-                                        ", and therefore cannot save the unit.");
-        }
-        File customsDirCampaign = new File(sCustomsDirCampaign);
-        if (!customsDirCampaign.exists() && !customsDirCampaign.mkdir()) {
-            throw new IOException("Failed to create the campaign customs folder " + sCustomsDirCampaign +
-                                        ", and therefore cannot save the unit.");
-        }
+        String fileNameCampaign;
+        if (designFile != null) {
+            // The player picked this file and was asked before an existing one was replaced
+            fileNameCampaign = designFile.getPath();
+        } else {
+            String sCustomsDir = String.join(File.separator, "data", "mekfiles", "customs"); // TODO : Remove inline
+            // file path
+            String sCustomsDirCampaign = sCustomsDir + File.separator + getCampaign().getPlayerForce().getName();
+            File customsDir = new File(sCustomsDir);
+            if (!customsDir.exists() && !customsDir.mkdir()) {
+                throw new IOException("Failed to create the customs folder " + sCustomsDir +
+                                            ", and therefore cannot save the unit.");
+            }
+            File customsDirCampaign = new File(sCustomsDirCampaign);
+            if (!customsDirCampaign.exists() && !customsDirCampaign.mkdir()) {
+                throw new IOException("Failed to create the campaign customs folder " + sCustomsDirCampaign +
+                                            ", and therefore cannot save the unit.");
+            }
 
-        String fileExtension = newEntity instanceof Mek ? ".mtf" : ".blk";
-        String fileOutName = sCustomsDir + File.separator + fileName + fileExtension;
-        String fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + fileExtension;
+            String fileExtension = newEntity instanceof Mek ? ".mtf" : ".blk";
+            String fileOutName = sCustomsDir + File.separator + fileName + fileExtension;
+            fileNameCampaign = sCustomsDirCampaign + File.separator + fileName + fileExtension;
 
-        // if this file already exists then don't overwrite it, or we might break another unit
-        if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
-            throw new IOException("A file already exists with the custom name " +
-                                        fileNameCampaign +
-                                        ". Please choose a different name. (Unit name and/or model)");
+            // if this file already exists then don't overwrite it, or we might break another unit
+            if ((new File(fileOutName)).exists() || (new File(fileNameCampaign)).exists()) {
+                throw new IOException("A file already exists with the custom name " +
+                                            fileNameCampaign +
+                                            ". Please choose a different name. (Unit name and/or model)");
+            }
         }
 
         assignCustomUnitFileIdentity(newEntity);
@@ -3501,6 +3527,15 @@ public class Refit extends Part implements IAcquisitionWork {
      */
     @Override
     public Money getBuyCost() {
+        return getActualValue();
+    }
+
+    /**
+     * @return the refit kit's cost, which already sums each part's purchase cost, so no acquisition multiplier is
+     *       added on top
+     */
+    @Override
+    public Money getPurchaseCost() {
         return getActualValue();
     }
 

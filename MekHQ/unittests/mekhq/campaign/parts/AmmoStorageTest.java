@@ -111,6 +111,8 @@ public class AmmoStorageTest {
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS))
+              .thenReturn(false);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
         ammoStorage.setBrandNew(true);
@@ -134,6 +136,8 @@ public class AmmoStorageTest {
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS))
+              .thenReturn(false);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
         ammoStorage.setBrandNew(true);
@@ -164,6 +168,8 @@ public class AmmoStorageTest {
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS))
+              .thenReturn(false);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
         ammoStorage.setBrandNew(true);
@@ -194,6 +200,8 @@ public class AmmoStorageTest {
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS))
+              .thenReturn(false);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, ammoType, 2 * ammoType.getShots(), mockCampaign);
         ammoStorage.setBrandNew(true);
@@ -452,6 +460,8 @@ public class AmmoStorageTest {
         Campaign mockCampaign = mockCampaign();
         when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
         lenient().when(mockCampaignOptions.get(CampaignOption.INNER_SPHERE_PART_PRICE_MULTIPLIER)).thenReturn(0.0);
+        lenient().when(mockCampaignOptions.get(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS))
+              .thenReturn(false);
 
         AmmoStorage ammoStorage = new AmmoStorage(0, isAC5Ammo, 0, mockCampaign);
         ammoStorage.setBrandNew(true);

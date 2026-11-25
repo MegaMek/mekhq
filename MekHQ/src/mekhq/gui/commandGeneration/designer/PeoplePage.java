@@ -108,10 +108,15 @@ public final class PeoplePage {
 
     /** How assistants are generated. */
     enum AssistantMode {
-        POOL, PEOPLE, NONE
+        POOL, PEOPLE
     }
 
     private final Campaign campaign;
+    /** The estimate {@link #demandFor} last made, and the roll it was made for. */
+    private @Nullable SupportDemand cachedDemand;
+    private @Nullable ForceSummary cachedDemandSummary;
+    private @Nullable Integer vehiclesStillToCome;
+    private final Map<PersonnelRole, Integer> activeStaffByRole = new EnumMap<>(PersonnelRole.class);
     private final Supplier<ForceSummary> summary;
     private final Function<ForceDescriptor, String> formationNamer;
     private final Runnable onChanged;
@@ -156,7 +161,6 @@ public final class PeoplePage {
     private final HudChoice<ForceNamingMethod> naming;
     private final HudCheckBox numberRegiments = optionCheck("AlwaysNumberRegiments");
     private final HudCheckBox autoRanks = optionCheck("AutomaticallyAssignRanks");
-    private final HudCheckBox factionRanks = optionCheck("UseSpecifiedFactionToAssignRanks");
     private final HudCheckBox callsigns = optionCheck("AssignMekWarriorsCallSigns");
     private final HudCheckBox founders = optionCheck("AssignFounderFlag");
     private final HudCheckBox commanderFlag = optionCheck("AssignCompanyCommanderFlag");
@@ -225,6 +229,8 @@ public final class PeoplePage {
               value -> refreshOrigin());
         distanceScale = new HudStepper(1, 20, 1, value -> formatted("Designer.people.origin.scale.value",
               value / 10.0), 56, value -> { });
+        // Shown in tenths, so a typed "1.5" means 15.
+        distanceScale.setTypedValueDivisor(10);
         List<HudChoice.Choice<NeuralInterfaceMode>> neuralChoices = new ArrayList<>();
         for (NeuralInterfaceMode mode : NeuralInterfaceMode.values()) {
             neuralChoices.add(new HudChoice.Choice<>(mode, mode.optionValue()));
@@ -372,7 +378,7 @@ public final class PeoplePage {
         return stack(
               section(text("Designer.people.section.names"), null,
                     field(text("lblForceNamingMethod.text"), naming), numberRegiments, autoRanks,
-                    indented(factionRanks), callsigns, founders, commanderFlag),
+                    callsigns, founders, commanderFlag),
               section(text("Designer.people.section.origin"), text("Designer.people.section.origin.aside"),
                     randomizeOrigin, indented(dependents), indented(extraRandom), indented(clanOrigins),
                     indented(aroundPlanet), indented(specifiedSystem.getComponent()), scaleRow, radiusNote),
@@ -388,9 +394,9 @@ public final class PeoplePage {
         choice.setChoices(List.of(
               new HudChoice.Choice<>(AssistantMode.POOL, text("Designer.people.assistants.pool"),
                     text("Designer.people.assistants.pool.sub")),
+              // Named assistants are full personnel records, and a large command can have hundreds of them.
               new HudChoice.Choice<>(AssistantMode.PEOPLE, text("Designer.people.assistants.people"),
-                    text("Designer.people.assistants.people.sub")),
-              new HudChoice.Choice<>(AssistantMode.NONE, text("Designer.people.assistants.none"), null)),
+                    text("Designer.people.assistants.people.warning"), CAUTION)),
               AssistantMode.POOL);
         return choice;
     }
@@ -430,7 +436,6 @@ public final class PeoplePage {
     private void refreshEnablement() {
         commanderCombat.setEnabled(bestCommander.isSelected());
         officerCombat.setEnabled(bestOfficers.isSelected());
-        factionRanks.setEnabled(autoRanks.isSelected());
         reservePercent.setEnabled(reserve.isSelected());
         neuralMode.setEnabled(implants.isSelected());
         boolean simulation = runSimulation.isSelected();
@@ -468,23 +473,21 @@ public final class PeoplePage {
     // region Refresh
 
     private void changed() {
-        refresh();
+        // The designer's refresh, which runs once however many changes arrive, refreshes this page along with the
+        // tiles. Refreshing here as well did the page's work twice for every click.
         onChanged.run();
     }
 
     /** Recomputes everything this page shows that depends on the rolled command or on other choices here. */
     public void refresh() {
         ForceSummary rolled = summary.get();
-        Faction faction = campaign.getPlayerForce().getFaction();
-        int vehiclesToCome = (faction == null) ? 0 : SupportUnitGenerator.vehiclesStillToGenerate(campaign, faction);
-        SupportDemand demand = SupportPersonnelCalculator.estimate(campaign, rolled.getIncludedEntities(),
-              vehiclesToCome);
+        SupportDemand demand = demandFor(rolled);
         int techHires = 0;
         int doctorHires = 0;
         for (PersonnelRole role : SUPPORT_ROLES) {
             int need = needFor(demand, role);
             int target = SupportPersonnelCalculator.applyPercent(need, coverage.get(role).getValue());
-            int hire = Math.max(0, target - SupportPersonnelGenerator.countActiveByRole(campaign, role));
+            int hire = Math.max(0, target - activeStaff(role));
             hires.put(role, hire);
             needLabels.get(role).setText(Integer.toString(need));
             hireLabels.get(role).setText(Integer.toString(hire));
@@ -513,6 +516,49 @@ public final class PeoplePage {
         refreshAssistants();
         root.revalidate();
         root.repaint();
+    }
+
+    /**
+     * The support staff the rolled command needs, estimated once per roll. Every click on the page refreshes it, and
+     * the estimate walks the campaign's units and personnel, but it changes only when the roll does: the summary is
+     * a new object each time the board is rebuilt.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private SupportDemand demandFor(ForceSummary rolled) {
+        if ((cachedDemand == null) || (cachedDemandSummary != rolled)) {
+            cachedDemand = SupportPersonnelCalculator.estimate(campaign, rolled.getIncludedEntities(),
+                  vehiclesStillToCome());
+            cachedDemandSummary = rolled;
+        }
+        return cachedDemand;
+    }
+
+    /**
+     * The support vehicles the build will still add. Read from the campaign alone, which cannot change while the
+     * designer is open, so it is worked out once.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private int vehiclesStillToCome() {
+        if (vehiclesStillToCome == null) {
+            Faction faction = campaign.getPlayerForce().getFaction();
+            vehiclesStillToCome = (faction == null) ? 0 : SupportUnitGenerator.vehiclesStillToGenerate(campaign, faction);
+        }
+        return vehiclesStillToCome;
+    }
+
+    /**
+     * @return the campaign's active staff in a role, counted once for the same reason as the vehicles above
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private int activeStaff(PersonnelRole role) {
+        return activeStaffByRole.computeIfAbsent(role,
+              key -> SupportPersonnelGenerator.countActiveByRole(campaign, key));
     }
 
     private static int needFor(SupportDemand demand, PersonnelRole role) {
@@ -696,7 +742,6 @@ public final class PeoplePage {
         naming.setSelected(options.getForceNamingMethod());
         numberRegiments.setSelected(options.isAlwaysNumberRegiments());
         autoRanks.setSelected(options.isAutomaticallyAssignRanks());
-        factionRanks.setSelected(options.isUseSpecifiedFactionToAssignRanks());
         callsigns.setSelected(options.isAssignMekWarriorsCallSigns());
         founders.setSelected(options.isAssignFounderFlag());
         commanderFlag.setSelected(options.isAssignCompanyCommanderFlag());
@@ -716,9 +761,9 @@ public final class PeoplePage {
             SkillLevel level = options.getSupportPersonnelSkillLevels().get(role);
             skills.get(role).setSelected((level == null) ? SkillLevel.NONE : level);
         }
-        astechMode.setSelected(assistantMode(options.isGenerateAstechs(), options.isAstechsAsPersonnel()));
+        astechMode.setSelected(assistantMode(options.isAstechsAsPersonnel()));
         astechSkill.setSelected(options.getAstechSkillLevel());
-        medicMode.setSelected(assistantMode(options.isGenerateMedics(), options.isMedicsAsPersonnel()));
+        medicMode.setSelected(assistantMode(options.isMedicsAsPersonnel()));
         medicSkill.setSelected(options.getMedicSkillLevel());
         reserve.setSelected(options.isGenerateMedicalReserve());
         reservePercent.setValue(options.getMedicalReservePercent());
@@ -752,10 +797,7 @@ public final class PeoplePage {
         refresh();
     }
 
-    private static AssistantMode assistantMode(boolean generate, boolean asPersonnel) {
-        if (!generate) {
-            return AssistantMode.NONE;
-        }
+    private static AssistantMode assistantMode(boolean asPersonnel) {
         return asPersonnel ? AssistantMode.PEOPLE : AssistantMode.POOL;
     }
 
@@ -783,7 +825,6 @@ public final class PeoplePage {
         }
         options.setAlwaysNumberRegiments(numberRegiments.isSelected());
         options.setAutomaticallyAssignRanks(autoRanks.isSelected());
-        options.setUseSpecifiedFactionToAssignRanks(factionRanks.isSelected());
         options.setAssignMekWarriorsCallSigns(callsigns.isSelected());
         options.setAssignFounderFlag(founders.isSelected());
         options.setAssignCompanyCommanderFlag(commanderFlag.isSelected());
@@ -803,11 +844,11 @@ public final class PeoplePage {
             options.getSupportPersonnelSkillLevels().put(role, (level == null) ? SkillLevel.NONE : level);
         }
         AssistantMode astechs = astechMode.getSelected();
-        options.setGenerateAstechs(astechs != AssistantMode.NONE);
+        options.setGenerateAstechs(true);
         options.setAstechsAsPersonnel(astechs == AssistantMode.PEOPLE);
         options.setAstechSkillLevel(skillOrRandom(astechSkill));
         AssistantMode medics = medicMode.getSelected();
-        options.setGenerateMedics(medics != AssistantMode.NONE);
+        options.setGenerateMedics(true);
         options.setMedicsAsPersonnel(medics == AssistantMode.PEOPLE);
         options.setMedicSkillLevel(skillOrRandom(medicSkill));
         options.setGenerateMedicalReserve(reserve.isSelected());

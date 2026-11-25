@@ -33,11 +33,8 @@
  */
 package mekhq.campaign.parts.missing;
 
-import static mekhq.utilities.ReportingUtilities.CLOSING_SPAN_TAG;
 import static mekhq.utilities.ReportingUtilities.getNegativeColor;
-import static mekhq.utilities.ReportingUtilities.getWarningColor;
 import static mekhq.utilities.ReportingUtilities.messageSurroundedBySpanWithColor;
-import static mekhq.utilities.ReportingUtilities.spanOpeningWithCustomColor;
 
 import java.io.PrintWriter;
 import java.text.MessageFormat;
@@ -53,6 +50,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Availability;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PartInventory;
+import mekhq.campaign.parts.StockCount;
 import mekhq.campaign.parts.equipment.MissingAmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.skills.SkillType;
@@ -90,7 +88,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
 
     @Override
     public Money getBuyCost() {
-        return getNewPart().getActualValue();
+        return getNewPart().getPurchaseCost();
     }
 
     @Override
@@ -286,7 +284,6 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
 
     @Override
     public String getDetails(boolean includeRepairDetails) {
-        PartInventory inventories = getReplacementInventory();
         StringBuilder toReturn = new StringBuilder();
 
         String superDetails = super.getDetails(includeRepairDetails);
@@ -297,22 +294,30 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
             if (!superDetails.isEmpty()) {
                 toReturn.append(", ");
             }
-            if (isReplacementAvailable()) {
-                toReturn.append(inventories.getSupply()).append(" in stock");
-            } else {
-                toReturn.append(messageSurroundedBySpanWithColor(getNegativeColor(), "None in stock"));
-            }
-
-            String orderTransitString = inventories.getTransitOrderedDetails();
-            if (!orderTransitString.isEmpty()) {
-                toReturn.append(spanOpeningWithCustomColor(getWarningColor()))
-                      .append(" (")
-                      .append(orderTransitString)
-                      .append(")")
-                      .append(CLOSING_SPAN_TAG);
-            }
+            toReturn.append(countStock().describe());
         }
         return toReturn.toString();
+    }
+
+    /**
+     * A replacement task always shows the stock of replacements.
+     */
+    @Override
+    public @Nullable StockCount getShownStock() {
+        return countStock();
+    }
+
+    /**
+     * Counts the replacements for this part. A spare already taken for another job, such as one being worked on, is
+     * not one this job can use, so it is not counted as in stock.
+     *
+     * @return the replacements here now, the one this job needs, and those on their way or on order
+     */
+    @Override
+    public StockCount countStock() {
+        PartInventory inventory = getReplacementInventory();
+        int replacementsInStock = isReplacementAvailable() ? inventory.getSupply() : 0;
+        return new StockCount(replacementsInStock, 1, inventory);
     }
 
     @Override

@@ -42,7 +42,6 @@ import java.awt.Container;
 import java.awt.Desktop;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
-import java.awt.GridBagLayout;
 import java.io.File;
 import java.util.ResourceBundle;
 import javax.swing.*;
@@ -57,7 +56,6 @@ import megamek.logging.MMLogger;
 import mekhq.CampaignPreset;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
-import mekhq.campaign.campaignOptions.CampaignOptions;
 
 /**
  * The {@code CampaignOptionsDialog} class represents a dialog window for presenting and modifying the campaign options
@@ -312,13 +310,6 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
         wasCanceled = false;
         campaignOptionsPane.applyCampaignOptionsToCampaign(null, mode, false);
         dispose();
-
-        if (mode == CampaignOptionsDialogMode.STARTUP || mode == CampaignOptionsDialogMode.STARTUP_ABRIDGED) {
-            final CampaignOptions campaignOptions = campaign.getCampaignOptions();
-            if (campaignOptions.isUseStratCon()) {
-                showStratConNotice();
-            }
-        }
     }
 
     /**
@@ -478,47 +469,6 @@ public class CampaignOptionsDialog extends AbstractButtonDialog {
      */
     public void applyPreset(@Nullable CampaignPreset preset, boolean isStartup) {
         campaignOptionsPane.applyPreset(preset, isStartup);
-    }
-
-    /**
-     * Displays the StratCon promotional notice dialog, if applicable.
-     *
-     * <p>This method shows a modal dialog to present promotional information about the StratCon feature
-     * in the form of an image and a message. The notice is presented with a title, an optional image, and a descriptive
-     * message, ensuring users are informed of the feature's introduction or importance. The dialog also includes a
-     * single button for the user to acknowledge and dismiss the notice.</p>
-     */
-    private void showStratConNotice() {
-        ImageIcon imageIcon = new ImageIcon("data/images/stratcon/stratConPromo.png");
-        JLabel imageLabel = new JLabel(imageIcon);
-        JPanel imagePanel = new JPanel(new GridBagLayout());
-        imagePanel.add(imageLabel);
-
-        String title = getTextAt(getCampaignOptionsResourceBundle(), "stratConPromo.title");
-
-        String message = getTextAt(getCampaignOptionsResourceBundle(), "stratConPromo.message");
-        JLabel messageLabel = new JLabel(message);
-        JPanel messagePanel = new JPanel(new GridBagLayout());
-        messagePanel.add(messageLabel);
-
-        JPanel panel = new JPanel();
-        panel.setLayout(new BoxLayout(panel, BoxLayout.PAGE_AXIS));
-        panel.add(imagePanel);
-        panel.add(messagePanel);
-
-        Object[] options = { getTextAt(getCampaignOptionsResourceBundle(), "stratConPromo.button") };
-
-        // Shown after this dialog closes, while the startup screen is still hidden, so give the notice no owner window
-        // and the MekHQ icon to keep it in the Windows taskbar and Alt+Tab
-        final JDialog dialog = new JOptionPane(panel,
-              JOptionPane.INFORMATION_MESSAGE,
-              JOptionPane.DEFAULT_OPTION,
-              null,
-              options,
-              options[0]).createDialog(title);
-        AppIcons.applyToWindow(dialog, "mekhq");
-        dialog.setVisible(true);
-        dialog.dispose();
     }
 
     @Override

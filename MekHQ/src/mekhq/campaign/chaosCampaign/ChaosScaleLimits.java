@@ -23,6 +23,9 @@
  */
 package mekhq.campaign.chaosCampaign;
 
+import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.universe.PlanetarySystem;
 import mekhq.campaign.universe.enums.HiringHallLevel;
 
 /**
@@ -67,6 +70,33 @@ public final class ChaosScaleLimits {
             case QUESTIONABLE -> 4;
             case NONE -> 2;
         };
+    }
+
+    /**
+     * Caps a force's Scale at the largest job the Hiring Hall of the current system brokers, when
+     * {@link CampaignOption#CAP_CONTRACT_SCALE_BY_HIRING_HALL} is set. In transit there is no Hiring Hall to broker the
+     * job, so nothing is capped.
+     *
+     * @param campaign the campaign, for the option, the current system, and today's date
+     * @param scale    the force's exact (uncapped) Scale
+     *
+     * @return the exact Scale of the job the current Hiring Hall would broker for that force
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double capScaleByHiringHall(Campaign campaign, double scale) {
+        if (!campaign.getCampaignOptions().get(CampaignOption.CAP_CONTRACT_SCALE_BY_HIRING_HALL)) {
+            return scale;
+        }
+
+        PlanetarySystem currentSystem = campaign.getCurrentSystem();
+        if (currentSystem == null) {
+            return scale;
+        }
+
+        HiringHallLevel hiringHallLevel = currentSystem.getHiringHallLevel(campaign.getLocalDate());
+        return Math.min(scale, getMaximumContractScale(hiringHallLevel));
     }
 
     /**

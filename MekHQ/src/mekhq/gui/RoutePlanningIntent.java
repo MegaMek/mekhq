@@ -236,6 +236,62 @@ final class RoutePlanningIntent {
         return (system != null) && (jumpPath.getSystems().indexOf(system) > 0);
     }
 
+    /**
+     * Moves the start of the route to the system the fleet has travelled to, so the route keeps leading from where the
+     * fleet is. When the fleet is on the route, the systems it has already reached are dropped, and the route is
+     * finished and cleared once the fleet reaches its last requested stop. When the fleet has left the route, the
+     * remaining stops are plotted again from its new system, and the route is cleared if no course can be found.
+     *
+     * @param currentSystem the system the fleet is in now
+     * @param planner       plots a course between two systems
+     *
+     * @return {@link ChangeResult#CHANGED} if the route moved, or {@link ChangeResult#NO_CHANGE} if it already starts at
+     *       {@code currentSystem}
+     */
+    ChangeResult moveOriginTo(@Nullable PlanetarySystem currentSystem, SegmentPlanner planner) {
+        if ((currentSystem == null) || Objects.equals(origin, currentSystem)) {
+            return ChangeResult.NO_CHANGE;
+        }
+        if (jumpPath.isEmpty() || requestedStops.isEmpty()) {
+            clear(currentSystem);
+            return ChangeResult.CHANGED;
+        }
+
+        List<PlanetarySystem> systems = jumpPath.getSystems();
+        int currentIndex = systems.indexOf(currentSystem);
+        if (currentIndex < 0) {
+            if (!replace(currentSystem, requestedStops, jumpPath.getTargetPlanet(), planner).changed()) {
+                clear(currentSystem);
+            }
+            return ChangeResult.CHANGED;
+        }
+
+        List<PlanetarySystem> remainingStops = new ArrayList<>();
+        int searchFrom = 0;
+        for (PlanetarySystem requestedStop : requestedStops) {
+            int stopIndex = indexOf(systems, requestedStop, searchFrom);
+            if (stopIndex < 0) {
+                break;
+            }
+            if (stopIndex > currentIndex) {
+                remainingStops.add(requestedStop);
+            }
+            searchFrom = stopIndex + 1;
+        }
+        if (remainingStops.isEmpty()) {
+            clear(currentSystem);
+            return ChangeResult.CHANGED;
+        }
+
+        JumpPath remainingPath = new JumpPath();
+        remainingPath.addSystems(systems.subList(currentIndex, systems.size()));
+        remainingPath.setTargetPlanet(jumpPath.getTargetPlanet());
+        origin = currentSystem;
+        requestedStops = List.copyOf(remainingStops);
+        jumpPath = remainingPath;
+        return ChangeResult.CHANGED;
+    }
+
     void clear(@Nullable PlanetarySystem defaultOrigin) {
         origin = defaultOrigin;
         requestedStops = List.of();

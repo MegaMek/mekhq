@@ -37,7 +37,6 @@ import static megamek.common.compute.Compute.randomInt;
 import static mekhq.campaign.mission.utilities.RandomFactionCamouflage.pickRandomCamouflage;
 import static mekhq.campaign.universe.Faction.COMSTAR_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.REBEL_FACTION_CODE;
 import static mekhq.campaign.universe.Faction.WORD_OF_BLAKE_FACTION_CODE;
 
@@ -293,7 +292,7 @@ public abstract class AbstractContractDeterminationEmployer {
             case MERCENARY_SUBCONTRACT -> factions.getFaction(MERCENARY_FACTION_CODE);
             // An underworld contact operates out of pirate circles. Reached only if a non-pirate determination ever
             // rolls this type; the pirate determination overrides this hook (see ChaosContractDeterminationEmployerPirate).
-            case UNDERWORLD_CONTACT -> factions.getFaction(PIRATE_FACTION_CODE);
+            case UNDERWORLD_CONTACT -> factions.getFaction(Faction.getPirateFactionCodeFor(playerFaction));
         };
     }
 

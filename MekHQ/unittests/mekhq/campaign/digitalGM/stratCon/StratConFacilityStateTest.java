@@ -406,13 +406,13 @@ class StratConFacilityStateTest {
         }
 
         @Test
-        void holdingAnAlliedFacilityOnlyCostsItsGarrison() {
+        void winningAtAnAlliedFacilityCostsItNothing() {
             StratConFacility facility = mekBase(ForceAlignment.Allied);
 
             StratConRulesManager.processFacilityAftermath(facility, true, false);
 
             assertEquals(FacilityCondition.INTACT, facility.getCondition());
-            assertEquals(1, facility.getGarrison());
+            assertEquals(2, facility.getGarrison());
         }
 
         @Test
@@ -472,6 +472,39 @@ class StratConFacilityStateTest {
                 assertEquals(2, facility.getGarrison(), operation.name());
                 assertEquals(FacilityIntel.DETAILED, facility.getIntel(), operation.name());
             }
+        }
+
+        @Test
+        void aWonAssaultTakesTheFacilityWithoutObjectives() {
+            StratConFacility facility = mekBase(ForceAlignment.Opposing);
+
+            StratConRulesManager.processFacilityAftermath(facility, true, false, FacilityOperation.ASSAULT);
+
+            assertEquals(ForceAlignment.Allied, facility.getOwner());
+            assertEquals(FacilityCondition.INTACT, facility.getCondition());
+            assertEquals(2, facility.getGarrison());
+        }
+
+        @Test
+        void aLostOrDrawnAssaultLeavesTheFacilityHeldAtTheCostOfItsGarrison() {
+            for (boolean isDraw : List.of(false, true)) {
+                StratConFacility facility = mekBase(ForceAlignment.Opposing);
+
+                StratConRulesManager.processFacilityAftermath(facility, false, isDraw, FacilityOperation.ASSAULT);
+
+                assertEquals(ForceAlignment.Opposing, facility.getOwner(), "draw: " + isDraw);
+                assertEquals(FacilityCondition.INTACT, facility.getCondition(), "draw: " + isDraw);
+                assertEquals(1, facility.getGarrison(), "draw: " + isDraw);
+            }
+        }
+
+        @Test
+        void aWonRaidDoesNotTakeTheFacility() {
+            StratConFacility facility = mekBase(ForceAlignment.Opposing);
+
+            StratConRulesManager.processFacilityAftermath(facility, true, false, FacilityOperation.RAID);
+
+            assertEquals(ForceAlignment.Opposing, facility.getOwner());
         }
 
         @Test

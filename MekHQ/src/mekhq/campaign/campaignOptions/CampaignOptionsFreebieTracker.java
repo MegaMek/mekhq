@@ -122,6 +122,6 @@ public record CampaignOptionsFreebieTracker(boolean awardVeterancySPAs, boolean 
     }
 
     private static boolean isDiminishingContractPayRelevant(CampaignOptions options) {
-        return options.get(CampaignOption.USE_PEACETIME_COST) || options.get(CampaignOption.EQUIPMENT_CONTRACT_BASE);
+        return options.isAnyPeacetimeCostSelected() || options.get(CampaignOption.EQUIPMENT_CONTRACT_BASE);
     }
 }

@@ -16,28 +16,28 @@
 # affiliated with Microsoft.
 
 {
-  "name": "AMARIS_COUP",
-  "date": "2766-12-26",
-  "notes": "Represents the date when Stefan Amaris shot Richard Cameron II and caused the downfall of the Star League",
-  "affectedFactionCodes": [
-    "SL",
-    "TH"
-  ],
-  "sides": [
-    {
-      "id": "TH",
-      "name": "First Citizen Stefan Amaris",
-      "role": "NOBLE",
-      "factionCode": "TH"
-    },
-    {
-      "id": "SL",
-      "name": "General Aleksandr Kerensky",
-      "role": "MEKWARRIOR",
-      "factionCode": "SL"
-    }
-  ],
-  "dissenterPreference": "SL",
-  "isViolentTransition": true,
-  "divisiveness": 0
+  "name" : "AMARIS_COUP",
+  "date" : "2766-12-26",
+  "notes" : "Represents the date when Stefan Amaris shot Richard Cameron II and caused the downfall of the Star League",
+  "affectedFactionCodes" : [ "SL", "TH" ],
+  "sides" : [ {
+    "id" : "TH",
+    "name" : "First Citizen Stefan Amaris",
+    "role" : "NOBLE",
+    "factionCode" : "TH"
+  }, {
+    "id" : "SL",
+    "name" : "General Aleksandr Kerensky",
+    "role" : "MEKWARRIOR",
+    "factionCode" : "SL"
+  } ],
+  "dissenterPreference" : "SL",
+  "isViolentTransition" : true,
+  "divisiveness" : 0,
+  "isIntroducedByThirdParty" : false,
+  "hasNoDissent" : false,
+  "offersMercenary" : true,
+  "offersPirate" : true,
+  "offersBanditCaste" : false,
+  "hasSharedResult" : false
 }

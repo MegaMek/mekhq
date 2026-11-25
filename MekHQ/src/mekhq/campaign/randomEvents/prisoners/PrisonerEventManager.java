@@ -515,8 +515,8 @@ public class PrisonerEventManager {
      *
      * <p>If at least one breach occurs, the selected contract’s morale level is improved by the number of breaches,
      * and a corresponding {@link PrisonerIntelBreachDialog} is displayed to the user. Contracts at
-     * {@link ContractMoraleLevel#OVERWHELMING} or {@link ContractMoraleLevel#ROUTED} morale are excluded from
-     * selection.</p>
+     * {@link ContractMoraleLevel#OVERWHELMING} morale, and garrison-type contracts that are peaceful
+     * between raids (see {@link AbstractContract#isPeaceful()}), are excluded from selection.</p>
      *
      * @param campaign           the {@link Campaign} context in which the event occurs
      * @param freedPrisonerCount the total number of prisoners freed by the player
@@ -533,7 +533,7 @@ public class PrisonerEventManager {
         // Shell contracts have no morale to shift
         activeContracts.removeIf(contract -> contract instanceof ShellContract ||
                                                    contract.getMoraleLevel().isOverwhelming() ||
-                                                   contract.getMoraleLevel().isRouted());
+                                                   contract.isPeaceful());
         if (activeContracts.isEmpty()) {
             return; // No risk of event
         }
@@ -691,22 +691,24 @@ public class PrisonerEventManager {
      * @param executions The number of prisoners to be executed.
      * @param prisoners  The list of prisoners involved in the execution.
      */
-    private void processExecutions(int executions, List<Person> prisoners) {
+    void processExecutions(int executions, List<Person> prisoners) {
+        // Only the executed prisoners cost Regard, not everyone being held
+        List<Person> victims = new ArrayList<>(prisoners.subList(0, min(executions, prisoners.size())));
+
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         if (campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
             FactionStandings factionStandings = campaign.getPlayerForce().getFactionStandings();
             List<String> reports = factionStandings.executePrisonersOfWar(campaign.getPlayerForce()
                                                                                 .getFaction()
                                                                                 .getShortName(),
-                  prisoners, campaign.getGameYear(), campaignOptions.get(CampaignOption.REGARD_MULTIPLIER));
+                  victims, campaign.getGameYear(), campaignOptions.get(CampaignOption.REGARD_MULTIPLIER));
 
             for (String report : reports) {
                 campaign.addReport(POLITICS, report);
             }
         }
 
-        for (int i = 0; i < executions; i++) {
-            Person prisoner = prisoners.get(i);
+        for (Person prisoner : victims) {
             campaign.addReport(PERSONNEL,
                   getFormattedTextAt(RESOURCE_BUNDLE, "execute.report", prisoner.getFullName()));
             campaign.getPlayerForce().getHumanResources().removePerson(campaign, prisoner, false);

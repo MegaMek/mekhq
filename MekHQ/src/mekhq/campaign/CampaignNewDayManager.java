@@ -81,7 +81,6 @@ import static mekhq.campaign.randomEvents.other.GrayMonday.GRAY_MONDAY_EVENTS_BE
 import static mekhq.campaign.randomEvents.other.GrayMonday.GRAY_MONDAY_EVENTS_END;
 import static mekhq.campaign.randomEvents.prisoners.PrisonerStatus.BONDSMAN;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingUtilities.PIRACY_SUCCESS_INDEX_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -113,6 +112,7 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.digitalGM.stratCon.StratConCoords;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConGMs;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.DayEndingEvent;
 import mekhq.campaign.events.DeploymentChangedEvent;
@@ -133,8 +133,8 @@ import mekhq.campaign.market.PartsInUseManager;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ShellContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
-import mekhq.campaign.mission.contract.contractData.EnemyData;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosContractMarketAvailability;
+import mekhq.campaign.mission.contract.utilities.ContractBatchall;
 import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.mission.contract.utilities.ContractScore;
 import mekhq.campaign.mission.contract.utilities.EmployerLostPlanet;
@@ -206,8 +206,6 @@ import mekhq.campaign.universe.factionStanding.FactionAccoladeLevel;
 import mekhq.campaign.universe.factionStanding.FactionCensureEvent;
 import mekhq.campaign.universe.factionStanding.FactionCensureLevel;
 import mekhq.campaign.universe.factionStanding.FactionStandingUltimatum;
-import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
-import mekhq.campaign.universe.factionStanding.PerformBatchall;
 import mekhq.campaign.utilities.AutomatedPersonnelCleanUp;
 import mekhq.gui.CommandCenterTab;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogNotification;
@@ -514,6 +512,10 @@ public class CampaignNewDayManager {
 
         campaign.getPlayerForce().getHumanResources().resetAsTechMinutes(campaign.getCampaignOptions());
 
+        // Formations whose StratCon deployment ends today come home before the hangar is processed. Salvage from their
+        // battle arrives today too, and New Day Mass Repair must see their damaged units alongside it.
+        StratConGMs.processForceReturns(campaign);
+
         processNewDayUnits();
 
         processNewDayFormations();
@@ -590,6 +592,12 @@ public class CampaignNewDayManager {
         // clear above, as happened when this ran before the day was started).
         // When "no release" is also set, only hire to cover shortfalls (skip firing surplus).
         final MHQOptions mhqOptions = MekHQ.getMHQOptions();
+
+        // Return temp crew that units no longer have seats for (e.g. a temp who covered an injured crew member who has
+        // since recovered) to the pool first, so over-crewed units are fully crewed again and the fills below see the
+        // spare temp crew as available.
+        campaign.getPlayerForce().getHumanResources().returnSurplusTempCrewToPool(campaign);
+
         if (mhqOptions.getNewDayAsTechPoolFill()) {
             if (mhqOptions.getNewDayAsTechPoolNoRelease()) {
                 campaign.fillAsTechPool();
@@ -1285,13 +1293,18 @@ public class CampaignNewDayManager {
                 }
 
                 ContractMoraleLevel oldMorale = contract.getMoraleLevel();
+                boolean wasPeaceful = contract.isPeaceful();
 
-                MHQMorale.checkMorale(campaign, contract, true);
+                String setbackReport = MHQMorale.checkMorale(campaign, contract, true);
                 ContractMoraleLevel newMorale = contract.getMoraleLevel();
 
                 String report = "";
                 if (contract.isPeaceful()) {
-                    report = resources.getString("garrisonDutyRouted.text");
+                    report = resources.getString("garrisonPeaceful.text");
+                } else if (wasPeaceful) {
+                    report = String.format(resources.getString("garrisonRaid.text"),
+                          contract.getHyperlinkedName(),
+                          newMorale);
                 } else if (oldMorale != newMorale) {
                     report = String.format(resources.getString("contractMoraleReport.text"),
                           newMorale,
@@ -1301,6 +1314,11 @@ public class CampaignNewDayManager {
 
                 if (!report.isBlank()) {
                     campaign.addReport(GENERAL, report);
+                }
+
+                // Logged after the morale it follows from
+                if (setbackReport != null) {
+                    campaign.addReport(GENERAL, contract.getHyperlinkedName() + ": " + setbackReport);
                 }
 
                 ContractRandomEvent.processMonthlyEvent(campaign, contract);
@@ -1353,41 +1371,10 @@ public class CampaignNewDayManager {
                 continue;
             }
 
-            if (campaignOptions.get(CampaignOption.USE_GENERIC_BATTLE_VALUE) &&
-                      !contract.getObjectiveType().isGarrisonType() &&
-                      today.equals(contract.getStartDate())) {
-                // Batchalls
-                Faction enemyFaction = contract.getEnemyFaction();
-                String enemyFactionCode = contract.getEnemyFactionCode();
-
-                boolean allowBatchalls = true;
-                if (campaignOptions.isUseFactionStandingBatchallRestrictionsSafe()) {
-                    double regard = campaign.getPlayerForce()
-                                          .getFactionStandings()
-                                          .getRegardForFaction(enemyFactionCode, true);
-                    allowBatchalls = FactionStandingUtilities.isBatchallAllowed(regard);
-                }
-
-                if (enemyFaction.performsBatchalls() && allowBatchalls) {
-                    PerformBatchall batchallDialog = new PerformBatchall(campaign,
-                          contract.getEnemyData().opposingCommander(),
-                          contract.getEnemyFactionCode());
-
-                    boolean batchallAccepted = batchallDialog.isBatchallAccepted();
-                    contract.setEnemyData(new EnemyData(contract.getEnemyData(), batchallAccepted));
-
-                    if (!batchallAccepted && campaignOptions.get(CampaignOption.TRACK_FACTION_STANDING)) {
-                        List<String> reports = campaign.getPlayerForce().getFactionStandings()
-                                                     .processRefusedBatchall(faction.getShortName(),
-                                                           enemyFactionCode,
-                                                           today.getYear(),
-                                                           campaignOptions.get(CampaignOption.REGARD_MULTIPLIER));
-
-                        for (String report : reports) {
-                            campaign.addReport(POLITICS, report);
-                        }
-                    }
-                }
+            // Batchalls. Garrison-type contracts get none as they begin: the enemy issues one when it first raids
+            // instead (see MHQMorale#checkMorale)
+            if (!contract.getObjectiveType().isGarrisonType() && today.equals(contract.getStartDate())) {
+                ContractBatchall.offerBatchall(campaign, contract);
             }
 
             // Early Contract End (StratCon Only)
@@ -1764,9 +1751,18 @@ public class CampaignNewDayManager {
 
         // Coming of Age Events
         if (isBirthday && (person.getAge(today) == 16)) {
-            if (campaignOptions.get(CampaignOption.REWARD_COMING_OF_AGE_ABILITIES)) {
+            if (campaignOptions.get(CampaignOption.REWARD_COMING_OF_AGE_ABILITIES) &&
+                      campaignOptions.get(CampaignOption.USE_ABILITIES)) {
                 SingleSpecialAbilityGenerator singleSpecialAbilityGenerator = new SingleSpecialAbilityGenerator();
-                singleSpecialAbilityGenerator.rollSPA(campaign, person, true, true, false, false);
+                String spaGained = singleSpecialAbilityGenerator.rollSPA(campaign, person, true, true, false, false);
+                if (spaGained != null) {
+                    // We use warning as the ability can be a positive or negative one
+                    campaign.addReport(PERSONNEL, String.format(resources.getString("comingOfAgeAbility.text"),
+                          person.getHyperlinkedFullTitle(),
+                          spanOpeningWithCustomColor(ReportingUtilities.getWarningColor()),
+                          spaGained,
+                          CLOSING_SPAN_TAG));
+                }
             }
 
             if (campaignOptions.get(CampaignOption.REWARD_COMING_OF_AGE_RP_SKILLS)) {
@@ -1778,7 +1774,8 @@ public class CampaignNewDayManager {
             boolean hasDefaultPortrait = person.getPortrait().isDefault();
             if (campaignOptions.get(CampaignOption.CHILD_PORTRAITS_WHEN_COMING_OF_AGE) &&
                       isUsePortraitForRole &&
-                      hasDefaultPortrait) {
+                      hasDefaultPortrait &&
+                      ForceHumanResources.isRankEligibleForRandomPortrait(campaignOptions, person)) {
                 campaign.getPlayerForce().getHumanResources().assignRandomPortraitFor(campaign.getCampaignOptions(),
                       person);
             }
@@ -2102,7 +2099,7 @@ public class CampaignNewDayManager {
      */
     private void processResupply(AbstractContract contract) {
         boolean isGuerrilla = contract.getObjectiveType().isGuerrillaType()
-                                    || PIRATE_FACTION_CODE.equals(contract.getEmployerFactionCode());
+                                    || Faction.isPirateOrBanditCaste(contract.getEmployerFactionCode());
 
         if (!isGuerrilla || randomInt(4) == 0) {
             Resupply.ResupplyType resupplyType = isGuerrilla ?
@@ -2291,11 +2288,6 @@ public class CampaignNewDayManager {
                     campaign.addReport(GENERAL, "The start and end dates of " +
                                                       contract.getHyperlinkedName() +
                                                       " have been shifted to reflect the current ETA.");
-
-                    if (campaignOptions.isUseStratCon() && contract.getMoraleLevel().isRouted()) {
-                        LocalDate newRoutEndDate = contract.getStartDate().plusMonths(max(1, d6() - 3)).minusDays(1);
-                        contract.changeMorale(newRoutEndDate);
-                    }
                 }
 
                 continue;

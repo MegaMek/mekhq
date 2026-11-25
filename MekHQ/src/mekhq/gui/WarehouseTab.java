@@ -66,7 +66,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.AcquisitionEvent;
 import mekhq.campaign.events.AsTechPoolChangedEvent;
-import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.events.BulkGenerationCompletedEvent;
 import mekhq.campaign.events.OvertimeModeEvent;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.parts.PartModeChangedEvent;
@@ -109,6 +109,7 @@ import mekhq.service.enums.MRMSMode;
 public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel {
     private static final int TECH_ROW_HEIGHT = 75;
     private static final MMLogger LOGGER = MMLogger.create(WarehouseTab.class);
+    private static final String IN_USE_RECOUNT = "WarehouseTab.inUseRecount";
     private static final String RESOURCE_BUNDLE = "mekhq.resources.CampaignGUI";
 
     // parts views
@@ -402,7 +403,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
         techsModel = new TechTableModel(getCampaignGui(), this);
         techTable = new JTable(techsModel);
-        // Tall enough for a tech's name, skills, repair abilities and day
+        // The minimum row height; the renderer grows a row when its tech's description needs more lines
         techTable.setRowHeight(UIUtil.scaleForGUI(TECH_ROW_HEIGHT));
         techTable.getColumnModel().getColumn(0).setCellRenderer(techsModel.getRenderer());
         techTable.getSelectionModel().addListSelectionListener(ev -> {
@@ -650,7 +651,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
 
     private void refreshTechsList() {
         // Gathering techs walks the personnel roster, which a bulk generation grows off the EDT; the
-        // OrganizationChangedEvent fired when it completes reschedules this refresh.
+        // BulkGenerationCompletedEvent fired when it completes reschedules this refresh.
         if (getCampaign().isBulkGenerationInProgress()) {
             return;
         }
@@ -705,13 +706,33 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         btnOvertime.setSelected(getCampaign().isOvertimeAllowed());
     }
 
+    /**
+     * Recounts how many of each part the campaign's units carry, for the In Use column, and redraws the parts table so
+     * the column shows the new counts.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private void recountPartsInUse() {
+        // Held until the tab is shown, so this can run during a bulk generation; its completion event recounts
+        if (getCampaign().isBulkGenerationInProgress()) {
+            return;
+        }
+        PartsInUseManager partsInUseManager = new PartsInUseManager(getCampaign());
+        partsModel.setPartsInUse(partsInUseManager.getPartsInUse(true, false, QUALITY_A));
+        // Rows updated rather than data changed, so the selection survives a recount run when the tab is shown
+        if (partsModel.getRowCount() > 0) {
+            partsModel.fireTableRowsUpdated(0, partsModel.getRowCount() - 1);
+        }
+    }
+
     public void refreshPartsList() {
         // While a bulk generation is adding units/parts off the EDT, skip this refresh: the In Use
         // computation walks every part in the warehouse and asks each one what it would cost to
         // replace, which reads the part's owning unit. The worker is concurrently detaching parts
         // from units, so a part could pass its own "do I have a unit" check here and have lost it a
         // moment later, throwing NullPointerException out of the modal progress dialog's event pump.
-        // The generation fires an OrganizationChangedEvent when it completes, which reschedules this
+        // The generation fires a BulkGenerationCompletedEvent when it completes, which reschedules this
         // refresh against the finished, consistent campaign.
         if (getCampaign().isBulkGenerationInProgress()) {
             LOGGER.debug("[CompanyGen] warehouse refresh skipped - bulk generation in progress");
@@ -719,11 +740,11 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
         }
 
         // Recompute the In Use snapshot on every refresh. PartsTableModel renders the In Use column
-        // from a one-shot map; without this call it stays at whatever it was at construction time,
+        // from a one-shot map; without this it stays at whatever it was at construction time,
         // so a campaign that adds units after the WarehouseTab exists (force-generated or imported)
-        // reads 0 across the board even when units clearly carry the parts.
-        PartsInUseManager partsInUseManager = new PartsInUseManager(getCampaign());
-        partsModel.setPartsInUse(partsInUseManager.getPartsInUse(true, false, QUALITY_A));
+        // reads 0 across the board even when units clearly carry the parts. The recount walks every
+        // part in the campaign, so while the tab is hidden it waits until the tab is shown.
+        refreshWhenShown(IN_USE_RECOUNT, this::recountPartsInUse);
 
         LocationFilterItem locationFilter = getCampaignGui().getActiveLocation();
         // Reserved parts are listed too, but only the In Transit and Reserved views show them
@@ -875,7 +896,7 @@ public final class WarehouseTab extends CampaignGuiTab implements ITechWorkPanel
      * skipped during generation in the same way, so it is rescheduled here too.
      */
     @Subscribe
-    public void handle(OrganizationChangedEvent ev) {
+    public void handle(BulkGenerationCompletedEvent ev) {
         partsScheduler.schedule();
         techsScheduler.schedule();
     }

@@ -78,6 +78,7 @@ import megamek.client.ui.dialogs.abstractDialogs.AutoResolveProgressDialog;
 import megamek.client.ui.dialogs.gameConnectionDialogs.ConnectDialog;
 import megamek.client.ui.dialogs.gameConnectionDialogs.HostDialog;
 import megamek.client.ui.dialogs.helpDialogs.AutoResolveSimulationLogDialog;
+import megamek.client.ui.dialogs.releaseNotes.ReleaseNotes;
 import megamek.client.ui.preferences.PreferencesNode;
 import megamek.client.ui.preferences.SuitePreferences;
 import megamek.client.ui.util.UIUtil;
@@ -261,6 +262,7 @@ public class MekHQ implements GameListener {
         // Show licensing/welcome dialog after startup screen is visible
         LicensingDialog.showIfNeeded(null,
               "Welcome to " + MHQConstants.PROJECT_NAME + " " + MHQConstants.VERSION);
+        ReleaseNotes.rememberRunningVersion();
     }
 
     /**
@@ -607,7 +609,12 @@ public class MekHQ implements GameListener {
             return;
         }
         // Refactor this into a factory
-        var useExperimentalPacarGui = getCampaign().getCampaignOptions().get(CampaignOption.AUTO_RESOLVE_EXPERIMENTAL_PACAR_GUI_ENABLED);
+        boolean isStratConScenario = getCampaign().getCampaignOptions().isUseStratCon()
+                                           && (scenario instanceof AtBScenario);
+        // The Commander's Interface is only built by the StratCon game thread, so other scenarios use the full client
+        var useExperimentalPacarGui = isStratConScenario
+                                            && getCampaign().getCampaignOptions()
+                                                     .get(CampaignOption.AUTO_RESOLVE_EXPERIMENTAL_PACAR_GUI_ENABLED);
         if (autoResolveBehaviorSettings != null && useExperimentalPacarGui) {
             client = new HeadlessClient(playerName, LOCALHOST_IP, port);
         } else {
@@ -618,7 +625,7 @@ public class MekHQ implements GameListener {
         currentScenario = scenario;
 
         // Start the game thread - also refactor this into a factory
-        if (getCampaign().getCampaignOptions().isUseStratCon() && (scenario instanceof AtBScenario atBScenario)) {
+        if (isStratConScenario && (scenario instanceof AtBScenario atBScenario)) {
             gameThread = new AtBGameThread(playerName,
                   password,
                   client,
@@ -629,7 +636,8 @@ public class MekHQ implements GameListener {
                   useExperimentalPacarGui,
                   true);
         } else {
-            gameThread = new GameThread(playerName, password, client, this, meks, scenario);
+            gameThread = new GameThread(playerName, password, client, this, meks, scenario, true,
+                  autoResolveBehaviorSettings);
         }
         gameThread.start();
     }
@@ -947,7 +955,8 @@ public class MekHQ implements GameListener {
      */
     public void autoResolveConcluded(AutoResolveConcludedEvent autoResolveConcludedEvent, Scenario scenario) {
         try {
-            boolean control = playerHasFieldControl(currentScenario, autoResolveConcludedEvent.controlledScenario());
+            // ACAR never sets currentScenario, which belongs to games played in MegaMek
+            boolean control = playerHasFieldControl(scenario, autoResolveConcludedEvent.controlledScenario());
             ResolveScenarioTracker tracker = new ResolveScenarioTracker(scenario, getCampaign(), control);
             tracker.setClient(new SimulatedClient(autoResolveConcludedEvent.getGame()));
             tracker.setEvent(autoResolveConcludedEvent);

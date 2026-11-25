@@ -124,6 +124,7 @@ public class MedicalViewDialog extends JDialog {
             LOGGER.error("", e);
         }
 
+        setTitle(String.format(resourceMap.getString("title.format"), person.getFullName()));
         setPreferredSize(new Dimension(1024, 840));
         setDefaultCloseOperation(WindowConstants.DISPOSE_ON_CLOSE);
         setLocationRelativeTo(parent);

@@ -223,7 +223,7 @@ public class FinancialReport {
         Accountant accountant = campaign.getAccountant();
 
         if (campaignOptions.isChargingMaintenance()) {
-            financialReport.maintenance = accountant.getWeeklyMaintenanceCosts().multipliedBy(4);
+            financialReport.maintenance = accountant.getProjectedMonthlyMaintenanceCosts();
         }
         if (campaignOptions.get(CampaignOption.PAY_FOR_SALARIES)) {
             financialReport.salaries = accountant.getPayRoll();
@@ -234,9 +234,13 @@ public class FinancialReport {
         if (campaignOptions.get(CampaignOption.PAY_FOR_HOT_SPOTS_UPKEEP)) {
             financialReport.hotSpotsUpkeep = accountant.getHotSpotsUpkeepCosts();
         }
-        if (campaignOptions.isChargingPeacetimeCost()) {
+        if (campaignOptions.isChargingPeacetimeSpareParts()) {
             financialReport.coSpareParts = accountant.getMonthlySpareParts();
+        }
+        if (campaignOptions.isChargingPeacetimeTrainingMunitions()) {
             financialReport.coAmmo = accountant.getMonthlyAmmo();
+        }
+        if (campaignOptions.isChargingPeacetimeFuel()) {
             financialReport.coFuel = accountant.getMonthlyFuel();
         }
 

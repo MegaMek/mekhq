@@ -356,7 +356,9 @@ public class CapturePrisoners {
                     }
                     return;
                 }
-            } else if (capturingFaction != null && capturingFaction.getHonorRating(campaign) == HonorRating.NONE) {
+            } else if (isMekHQCaptureStyle && capturingFaction != null &&
+                             capturingFaction.getHonorRating(campaign) == HonorRating.NONE) {
+                // Bondsref is only a possible outcome under the MekHQ capture style, matching the Clan captor branch
                 if (bondsmanRoll == 1) {
                     if (isNPC) {
                         campaign.addReport(PERSONNEL, getFormattedTextAt(RESOURCE_BUNDLE,

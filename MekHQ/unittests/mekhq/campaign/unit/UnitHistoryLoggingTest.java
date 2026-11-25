@@ -40,6 +40,7 @@ import static org.mockito.Mockito.atLeast;
 import static org.mockito.Mockito.doNothing;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.eq;
+import static org.mockito.Mockito.lenient;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
@@ -59,6 +60,7 @@ import mekhq.campaign.log.LogEntry;
 import mekhq.campaign.log.UnitLogger;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.mockito.ArgumentCaptor;
@@ -91,6 +93,7 @@ class UnitHistoryLoggingTest {
 
     private Person mockPerson(String fullName) {
         Person person = mock(Person.class);
+        lenient().when(person.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
         UUID id = UUID.randomUUID();
         when(person.getId()).thenReturn(id);
         when(person.getFullName()).thenReturn(fullName);

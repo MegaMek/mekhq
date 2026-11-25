@@ -514,10 +514,11 @@ public class ScenarioObjectiveProcessor {
                         }
                     }
                 }
+                break;
             case FacilityRemains:
                 if ((tracker.getMission() != null) && (tracker.getScenario() instanceof AtBScenario)) {
                     if (dryRun) {
-                        return "This facility will not be captured.";
+                        return "This facility will stay with its current holder.";
                     } else {
                         StratConGMs.facility(campaign.getCampaignOptions()).updateFacilityForScenario((AtBScenario) tracker.getScenario(),
                               tracker.getMission(),
@@ -541,7 +542,7 @@ public class ScenarioObjectiveProcessor {
             case FacilityCaptured:
                 if (tracker.getMission() != null) {
                     if (dryRun) {
-                        return "Allied forces will control this facility.";
+                        return "This facility will change hands.";
                     } else {
                         StratConGMs.facility(campaign.getCampaignOptions()).updateFacilityForScenario((AtBScenario) tracker.getScenario(),
                               tracker.getMission(),

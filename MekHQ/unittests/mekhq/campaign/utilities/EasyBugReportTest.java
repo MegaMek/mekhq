@@ -44,9 +44,11 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.zip.GZIPOutputStream;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipInputStream;
 
+import megamek.common.util.BugReportRedactor;
 import mekhq.campaign.utilities.EasyBugReport.BugReportArchiveResult;
 import mekhq.campaign.utilities.EasyBugReport.BugReportCandidate;
 import mekhq.campaign.utilities.EasyBugReport.DropGroup;
@@ -279,6 +281,48 @@ class EasyBugReportTest {
         assertTrue(result.droppedEntries().isEmpty());
     }
 
+    @Test
+    void logsAreRedactedButTheCampaignIsCopiedUnchanged() throws IOException {
+        String planted = String.join("\n",
+              "Loading C:\\Users\\Dave Smith\\mekhq\\campaigns\\Ghost.cpnx.gz",
+              "s: hostname = 'DESKTOP-AB12CD' port = 2346",
+              "s: hosting on address = 192.168.1.20");
+        Files.writeString(new File(logDirectory, "mekhq.log").toPath(), planted, StandardCharsets.UTF_8);
+        // A campaign is XML, so redaction could break it; it must reach the archive byte for byte.
+        Files.writeString(campaignFile.toPath(), planted, StandardCharsets.UTF_8);
+
+        BugReportRedactor redactor = new BugReportRedactor("C:\\Users\\Dave Smith", "dsmith",
+              List.of("DESKTOP-AB12CD"));
+        BugReportArchiveResult result = EasyBugReport.createBugReportArchive(gather(logDirectory),
+              temporaryDirectory.resolve("report.zip").toFile(),
+              1_000_000L,
+              redactor);
+
+        String log = zipEntryText(result.parts().get(0), "logs/mekhq.log");
+        assertEquals(String.join("\n",
+              "Loading [home]\\mekhq\\campaigns\\Ghost.cpnx.gz",
+              "s: hostname = '[host]' port = 2346",
+              "s: hosting on address = [ip]"), log);
+        assertEquals(planted, zipEntryText(result.parts().get(0), campaignFile.getName()),
+              "the campaign must be copied unchanged");
+        assertEquals(1, redactor.pathCount());
+        assertEquals(1, redactor.hostNameCount());
+        assertEquals(1, redactor.ipAddressCount());
+    }
+
+    private static String zipEntryText(File archive, String entryName) throws IOException {
+        try (ZipInputStream zipInputStream = new ZipInputStream(new FileInputStream(archive),
+              StandardCharsets.UTF_8)) {
+            ZipEntry entry;
+            while ((entry = zipInputStream.getNextEntry()) != null) {
+                if (entry.getName().equals(entryName)) {
+                    return new String(zipInputStream.readAllBytes(), StandardCharsets.UTF_8);
+                }
+            }
+        }
+        throw new AssertionError("the archive should contain " + entryName);
+    }
+
     private List<BugReportCandidate> gather(File textLogDirectory) {
         return EasyBugReport.gatherCandidates(campaignFile,
               textLogDirectory,
@@ -296,12 +340,21 @@ class EasyBugReportTest {
         return gameDirectory;
     }
 
-    /** Writes incompressible content so the archive size follows the file size. */
+    /**
+     * Writes incompressible content so the archive size follows the file size. A rolled {@code .log.gz} is written
+     * as real gzip, as Log4j writes it, because the archive unpacks it to redact it and packs it again.
+     */
     private File writeFile(File directory, String fileName, int length) throws IOException {
         File file = new File(directory, fileName);
         byte[] content = new byte[length];
         random.nextBytes(content);
-        Files.write(file.toPath(), content);
+        if (fileName.endsWith(".log.gz")) {
+            try (GZIPOutputStream gzipOutputStream = new GZIPOutputStream(Files.newOutputStream(file.toPath()))) {
+                gzipOutputStream.write(content);
+            }
+        } else {
+            Files.write(file.toPath(), content);
+        }
         return file;
     }
 

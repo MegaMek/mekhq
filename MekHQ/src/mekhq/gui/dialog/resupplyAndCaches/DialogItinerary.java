@@ -54,6 +54,7 @@ import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 
 import java.awt.BorderLayout;
 import java.util.List;
+import java.util.Locale;
 import javax.swing.BorderFactory;
 import javax.swing.BoxLayout;
 import javax.swing.ImageIcon;
@@ -359,7 +360,7 @@ public class DialogItinerary {
                 ContractMoraleLevel morale = contract.getMoraleLevel();
 
                 yield getFormattedTextAt(RESOURCE_BUNDLE,
-                      morale.toString().toLowerCase() + "Supplies" + randomInt(20) + ".text",
+                      morale.name().toLowerCase(Locale.ROOT) + "Supplies" + randomInt(20) + ".text",
                       getFormattedTextAt(RESOURCE_BUNDLE,
                             "supplyCostFull.text",
                             resupply.getConvoyContentsValueCalculated().toAmountAndSymbolString(),

@@ -33,11 +33,11 @@
 package mekhq.gui.roleplay;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.baseComponents.hud.Hud.column;
+import static mekhq.gui.baseComponents.hud.Hud.scroll;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
-import static mekhq.gui.roleplay.AskPage.column;
 import static mekhq.gui.roleplay.AskPage.conceptTiles;
 import static mekhq.gui.roleplay.AskPage.rightButtonRow;
-import static mekhq.gui.roleplay.AskPage.scroll;
 import static mekhq.gui.roleplay.OracleConsole.RESOURCE_BUNDLE;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -470,11 +470,11 @@ class ThreadsPage implements ConsoleSection {
     private String tooltipFor(final PlotThread thread, final int number) {
         PlotThreadStep step = thread.getSteps().get(number - 1);
         String concepts = step.concepts().stream()
-                                .map(concept -> OracleConsole.escape(concept.table().getTableLabel() + ": "
+                                .map(concept -> Hud.escape(concept.table().getTableLabel() + ": "
                                                                            + (concept.meaning() == null ? ""
                                                                                     : concept.meaning())))
                                 .collect(Collectors.joining("<br>"));
-        return "<html><b>" + OracleConsole.escape(stepHeading(thread, step)) + "</b><br>" + concepts + "</html>";
+        return "<html><b>" + Hud.escape(stepHeading(thread, step)) + "</b><br>" + concepts + "</html>";
     }
 
     private void revealNext() {
@@ -488,7 +488,7 @@ class ThreadsPage implements ConsoleSection {
                                   : "OracleConsole.threads.banner.major";
             revelation.setVerdict(getTextAt(RESOURCE_BUNDLE, banner),
                   getFormattedTextAt(RESOURCE_BUNDLE, banner + ".reason",
-                        OracleConsole.escape(thread.getName()), step.number()),
+                        Hud.escape(thread.getName()), step.number()),
                   getFormattedTextAt(RESOURCE_BUNDLE, "OracleConsole.threads.banner.badge", step.number()),
                   step.conclusion() ? READY : AMBER);
             revelation.setVisible(true);

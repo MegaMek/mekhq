@@ -35,16 +35,22 @@ package mekhq.gui.campaignOptions;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
+import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+
+import java.awt.Color;
+import java.util.Collections;
+import java.util.EnumSet;
+import java.util.List;
 
 import megamek.SuiteConstants;
 import megamek.Version;
+import megamek.client.ui.settings.SettingsBadge;
 import org.junit.jupiter.api.Test;
 
-import java.util.Collections;
-import java.util.EnumSet;
-
 class CampaignOptionsMetadataTest {
+    private static final Color SINCE_LAST_CORE_COLOR = Color.decode("#C344C3");
+    private static final Color LAST_CORE_OR_EARLIER_COLOR = Color.decode("#4A9EE8");
 
     @Test
     void testConstructor_NullFlags() {
@@ -143,58 +149,74 @@ class CampaignOptionsMetadataTest {
     }
 
     @Test
-    void testGetAddedSinceBadgeHtml_CurrentVersion() {
-        // Version matching current running version should show development badge
-        CampaignOptionsMetadata metadata = new CampaignOptionsMetadata(
-            SuiteConstants.VERSION,
-            Collections.emptySet()
-        );
+    void testGetAddedSinceSettingsBadge_NullVersion() {
+        CampaignOptionsMetadata metadata = new CampaignOptionsMetadata(null, Collections.emptySet());
 
-        String result = metadata.getAddedSinceBadgeHtml();
-
-        // Should contain a colored Material Symbols font badge
-        if (!result.isEmpty()) {
-            assertTrue(result.contains("<font"));
-            assertTrue(result.contains("color="));
-            assertTrue(result.contains("</font>"));
-        }
+        assertNull(metadata.getAddedSinceSettingsBadge(new Version(0, 51, 0)));
     }
 
     @Test
-    void testGetAddedSinceBadgeHtml_AfterMilestone() {
-        // Version after last milestone should show milestone badge
-        Version afterMilestone = new Version(
-            SuiteConstants.LAST_MILESTONE.getMajor(),
-            SuiteConstants.LAST_MILESTONE.getMinor(),
-            SuiteConstants.LAST_MILESTONE.getPatch() + 1
-        );
+    void testGetAddedSinceSettingsBadge_AfterLastCoreIsPurpleVersion() {
+        CampaignOptionsMetadata metadata = new CampaignOptionsMetadata(new Version(0, 51, 1),
+              Collections.emptySet());
 
-        CampaignOptionsMetadata metadata = new CampaignOptionsMetadata(
-            afterMilestone,
-            Collections.emptySet()
-        );
+        SettingsBadge badge = metadata.getAddedSinceSettingsBadge(new Version(0, 51, 0));
 
-        String result = metadata.getAddedSinceBadgeHtml();
-
-        // Should contain a colored Material Symbols font badge
-        if (!result.isEmpty()) {
-            assertTrue(result.contains("<font"));
-            assertTrue(result.contains("color="));
-            assertTrue(result.contains("</font>"));
-        }
+        assertNotNull(badge);
+        assertEquals("0.51.01", badge.text());
+        assertEquals(SINCE_LAST_CORE_COLOR, badge.color());
     }
 
     @Test
-    void testGetAddedSinceBadgeHtml_OldVersion() {
-        // Old version (before last milestone) should return empty string
-        Version oldVersion = new Version(0, 49, 0);
+    void testGetAddedSinceSettingsBadge_LastCoreIsBlueVersion() {
+        CampaignOptionsMetadata metadata = new CampaignOptionsMetadata(new Version(0, 51, 0),
+              Collections.emptySet());
 
-        CampaignOptionsMetadata metadata = new CampaignOptionsMetadata(
-            oldVersion,
-            Collections.emptySet()
-        );
+        SettingsBadge badge = metadata.getAddedSinceSettingsBadge(new Version(0, 51, 0));
 
-        assertEquals("", metadata.getAddedSinceBadgeHtml());
+        assertNotNull(badge);
+        assertEquals("0.51.00", badge.text());
+        assertEquals(LAST_CORE_OR_EARLIER_COLOR, badge.color());
+    }
+
+    @Test
+    void testGetAddedSinceSettingsBadge_OlderVersionIsBlueVersion() {
+        CampaignOptionsMetadata metadata = new CampaignOptionsMetadata(new Version(0, 49, 0),
+              Collections.emptySet());
+
+        SettingsBadge badge = metadata.getAddedSinceSettingsBadge(new Version(0, 51, 0));
+
+        assertNotNull(badge);
+        assertEquals("0.49.00", badge.text());
+        assertEquals(LAST_CORE_OR_EARLIER_COLOR, badge.color());
+    }
+
+    @Test
+    void testGetAddedSinceBadgeHtml_ShowsVersionText() {
+        Version version = new Version(0, 49, 0);
+        CampaignOptionsMetadata metadata = new CampaignOptionsMetadata(version, Collections.emptySet());
+
+        String result = metadata.getAddedSinceBadgeHtml();
+
+        assertTrue(result.contains(">0.49.00</font>"), result);
+        assertFalse(result.contains("Material Symbols Rounded"), result);
+    }
+
+    @Test
+    void testAddedSinceLegendEntries_NameTheLastCoreRelease() {
+        List<SettingsBadge> entries = CampaignOptionsMetadata.addedSinceLegendEntries();
+
+        assertEquals(List.of(SINCE_LAST_CORE_COLOR, LAST_CORE_OR_EARLIER_COLOR),
+              entries.stream().map(SettingsBadge::color).toList());
+        for (SettingsBadge entry : entries) {
+            assertTrue(entry.isText());
+            // The legend names the last Core release by its number alone, without any PR or nightly build suffix
+            Version lastCore = SuiteConstants.LAST_MILESTONE;
+            String lastCoreNumber = String.format("%d.%02d.%02d", lastCore.getMajor(), lastCore.getMinor(),
+                  lastCore.getPatch());
+            assertTrue(entry.text().contains(lastCoreNumber), entry.text());
+            assertFalse(entry.text().contains(lastCoreNumber + "-"), entry.text());
+        }
     }
 
     @Test

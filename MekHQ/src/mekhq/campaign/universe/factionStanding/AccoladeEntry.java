@@ -60,8 +60,8 @@ public record AccoladeEntry(FactionAccoladeLevel level, LocalDate issueDate) {
     /**
      * Determines whether the accolade can be improved based on its recognition level and issue date.
      *
-     * <p>Improvement is possible if the recognition level has not reached the maximum allowed and at least six months
-     * have passed since issuance.</p>
+     * <p>Improvement is possible if the recognition level has not reached the maximum allowed, at least six months
+     * have passed since issuance, and the current Faction Standing meets the requirement of the next accolade.</p>
      *
      * @param today                  the current campaign date
      * @param currentFactionStanding the current Faction Standing held with the accolade giving faction
@@ -86,7 +86,10 @@ public record AccoladeEntry(FactionAccoladeLevel level, LocalDate issueDate) {
         }
 
         int currentStandingLevel = currentFactionStanding.getStandingLevel();
-        int requiredStandingLevel = level.getRequiredStandingLevel();
+        // The requirement belongs to the accolade being earned, not the one already held
+        FactionAccoladeLevel nextLevel = FactionAccoladeLevel.getAccoladeRecognitionFromRecognition(
+              level.getRecognition() + 1);
+        int requiredStandingLevel = nextLevel.getRequiredStandingLevel();
         boolean standingRequirementsMet = currentStandingLevel >= requiredStandingLevel;
         if (!standingRequirementsMet) {
             LOGGER.debug("Current standing level below required standing level");

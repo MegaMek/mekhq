@@ -32,6 +32,8 @@
  */
 package mekhq.campaign.digitalGM.stratCon.gm;
 
+import static mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConDeploymentOrderBehavior.isDeploymentOrder;
+
 import java.time.DayOfWeek;
 import java.time.LocalDate;
 import java.util.ArrayList;
@@ -48,6 +50,8 @@ import mekhq.campaign.digitalGM.stratCon.StratConReconnaissance;
 import mekhq.campaign.digitalGM.stratCon.StratConRulesManager;
 import mekhq.campaign.digitalGM.stratCon.StratConScenario;
 import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
+import mekhq.campaign.digitalGM.stratCon.StratConScheduledScenario;
+import mekhq.campaign.digitalGM.stratCon.StratConSpawnRates;
 import mekhq.campaign.digitalGM.stratCon.StratConTrackState;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterest;
 import mekhq.campaign.digitalGM.stratCon.pointOfInterest.StratConPointOfInterestDefinitions;
@@ -185,9 +189,11 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
 
     /**
      * The shared StratCon daily lifecycle. Runs the scenario-generation routine for every track attached to an active
-     * contract: cleaning up phantom scenarios, returning forces whose deployment has ended, applying facility effects,
-     * expiring ignored scenarios, scheduling ordinary scenarios (up front, or the coming week's in Single Drop play), and
-     * generating those due today.
+     * contract: applying facility effects, expiring ignored scenarios, rolling the week's normal scenarios once a week
+     * (or, in Single Drop play, scheduling the week's one scenario), and generating those due today.
+     *
+     * <p>Returning formations whose deployment has ended is not part of this. It runs earlier in the day, through
+     * {@link #processForceReturns(Campaign)}, so those formations are home before the hangar is processed.</p>
      *
      * @param event the new-day event (already enable-gated by {@link AbstractDigitalGM#onNewDay})
      */
@@ -211,11 +217,8 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                 continue;
             }
 
-            // Ordinary scenarios are scheduled up front, as the contract is accepted. A contract begun before that, or
-            // in Single Drop play, is scheduled from today the first time it runs outside Single Drop play.
-            if (!singleDrop && !campaignState.isNormalTempoScheduled()) {
-                StratConScenarioTempo.scheduleNormalScenarios(campaign, contract, campaignState, today);
-            }
+            // A contract accepted before StratCon recorded how its Scale is counted takes the option as it stands
+            StratConSpawnRates.recordSupportPointsFactoredIntoScale(campaign.getCampaignOptions(), campaignState);
 
             // Strategic-objective scenarios trickle in over the contract's months, paced by its scenario schedule,
             // rather than all being placed at contract start.
@@ -224,18 +227,13 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
             // Points of interest likewise appear over the contract's run, on days rolled when it was accepted.
             processScheduledPointsOfInterest(campaign, contract, campaignState, today);
 
-            // The enemy's own facility activity across the contract, such as engineers sent to build outposts.
+            // The enemy's own facility activity across the contract: engineers sent to build outposts, and attacks on
+            // the facilities held by the player and their employer.
             getFacilityStrategy().processEnemyActivity(campaign, contract, campaignState);
 
-            boolean hasAssignedSingleDropScenario = false;
             for (StratConTrackState track : campaignState.getTracks()) {
-                cleanupPhantomScenarios(track);
-
-                // check if some of the forces have finished deployment
-                // please do this before generating scenarios for track
-                // to avoid unintentionally cleaning out integrated force deployments on
-                // 0-deployment-length tracks
-                getScenarioLifecycleStrategy().processForceReturnDates(track, campaign);
+                // Formations whose deployment has ended were already sent home earlier in the day (see
+                // processForceReturns), before the hangar was processed.
 
                 // map-based play applies facility effects here; Mapless/Singles supply a no-op strategy
                 getFacilityStrategy().applyPeriodicEffects(track, campaignState, isStartOfMonth);
@@ -265,49 +263,47 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
                               campaign);
                     }
                 }
-
-                // Single Drop play schedules its one scenario each Monday - unless Essential-only play suppresses ambient
-                // scenarios. Other play schedules its ordinary scenarios up front (see StratConScenarioTempo).
-                if (!essentialScenariosOnly && isMonday && singleDrop && !hasAssignedSingleDropScenario) {
-                    getScenarioGenerationStrategy().generateWeeklyScenarioDates(campaign,
-                          campaignState,
-                          contract,
-                          track,
-                          singleDrop);
-                }
-
-                // Only one scenario/week for Single Drop
-                if (singleDrop) {
-                    hasAssignedSingleDropScenario = true;
-                }
             }
 
-            List<LocalDate> scheduledScenarioDates = campaignState.getScheduledScenarioDates();
+            // Once a week, ordinarily on Monday: Single Drop play schedules its one scenario of the week, and other play
+            // rolls the week's normal scenarios against each sector's threat - unless Essential-only play suppresses
+            // ambient scenarios. A contract that starts midweek, or a week whose Monday was skipped, rolls on the first
+            // day of the week processed. A contract still on the up-front schedule it was given before the weekly rolls
+            // keeps that instead. While a garrison is between raids the roll waits, rather than being made against no
+            // threat at all, so a raid that breaks out midweek rolls on its first day for the rest of the week. Single
+            // Drop play schedules regardless: its scenario is discarded on the day if the contract is still peaceful.
+            boolean isOnWeeklyRolls = singleDrop || !campaignState.isNormalTempoScheduled();
+            boolean isWeeklyRollPossible = singleDrop || !contract.isPeaceful();
+            if (!essentialScenariosOnly && isOnWeeklyRolls && isWeeklyRollPossible
+                      && StratConScenarioTempo.isWeeklyRollDue(campaignState, today)) {
+                getScenarioGenerationStrategy().generateWeeklyScenarioDates(campaign,
+                      campaignState,
+                      contract,
+                      singleDrop);
+                campaignState.setLastWeeklyRollDate(today);
+            }
 
-            if (!essentialScenariosOnly && scheduledScenarioDates.contains(today)) {
-                int scenarioCount = 0;
-                for (LocalDate date : scheduledScenarioDates) {
-                    if (date.equals(today)) {
-                        scenarioCount++;
-                    }
-                }
-                scheduledScenarioDates.removeIf(date -> date.equals(today));
+            // Every scenario due on or before today is taken off the schedule, so one scheduled for a day already
+            // processed (by a contract edit or extension) is caught up the next day rather than lost. Under
+            // Essential-only play they are taken off and discarded, so they do not pile up. Dates without a sector -
+            // Single Drop play's, and an up-front schedule's - go to a random sector.
+            List<StratConTrackState> scenarioSectors = new ArrayList<>();
+            int randomSectorCount = StratConScenarioTempo.takeDueScenarioDates(
+                  campaignState.getScheduledScenarioDates(), today);
+            for (int scenario = 0; scenario < randomSectorCount; scenario++) {
+                scenarioSectors.add(null);
+            }
+            for (StratConScheduledScenario scheduledScenario : StratConScenarioTempo.takeDueScheduledScenarios(
+                  campaignState.getScheduledScenarios(), today)) {
+                scenarioSectors.add(scheduledScenario.getSector(campaignState));
+            }
 
-                // If the OpFor is routed, we want to just discard any scheduled scenarios, clearly they've been
-                // canceled due to impending defeat
-                if (!contract.getMoraleLevel().isRouted()) {
-                    // Some may be counterattacks on facilities held by the player or their employer instead.
-                    scenarioCount -= getFacilityStrategy().launchCounterattacks(campaign,
-                          contract,
-                          campaignState,
-                          scenarioCount);
-                    if (scenarioCount > 0) {
-                        getScenarioGenerationStrategy().generateDailyScenarios(campaign,
-                              campaignState,
-                              contract,
-                              scenarioCount);
-                    }
-                }
+            // A garrison between raids sees no enemy activity, so any scheduled scenarios are simply discarded
+            if (!essentialScenariosOnly && !scenarioSectors.isEmpty() && !contract.isPeaceful()) {
+                getScenarioGenerationStrategy().generateDailyScenarios(campaign,
+                      campaignState,
+                      contract,
+                      scenarioSectors);
             }
         }
     }
@@ -339,8 +335,10 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
      * type is no longer defined (its data renamed or removed) can never be placed, so it is dropped at once. In mapless
      * play, where there is no map to place them on, due points of interest are simply dropped.
      *
-     * <p>Unlike strategic-objective scenarios, points of interest still appear while the enemy is routed: they are
-     * features of the ground, not attacks the enemy has to mount.</p>
+     * <p>Unlike strategic-objective scenarios, points of interest still appear while a garrison-type
+     * contract is peaceful, between raids: they are features of the ground, not attacks the enemy has to mount.
+     * Deployment Orders are the exception: with no enemy activity, the employer has no deployment to order, so a
+     * Deployment Order due while the contract is peaceful is dropped.</p>
      *
      * @author Illiani
      * @since 0.51.01
@@ -376,6 +374,15 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
             // Its type is gone from the data, so no day will ever place it; warned once, as it is dropped here.
             if (StratConPointOfInterestDefinitions.getDefinition(duePointOfInterest.getTypeId()) == null) {
                 LOGGER.warn("Dropping scheduled point of interest {} on contract {}: its type is not defined.",
+                      duePointOfInterest,
+                      contract.getName());
+                scheduledPointsOfInterest.remove(duePointOfInterest);
+                continue;
+            }
+
+            // With no enemy activity between raids, the employer has no deployment to order
+            if (contract.isPeaceful() && isDeploymentOrder(duePointOfInterest.getTypeId())) {
+                LOGGER.info("Dropping Deployment Order {} on contract {}: the contract is peaceful.",
                       duePointOfInterest,
                       contract.getName());
                 scheduledPointsOfInterest.remove(duePointOfInterest);
@@ -431,11 +438,40 @@ public abstract class AbstractStratConGM extends AbstractDigitalGM {
         spawnDates.removeIf(spawnDate -> !spawnDate.isAfter(today));
         int dueCount = before - spawnDates.size();
 
-        // The due dates are consumed above whatever happens. If the OpFor is routed, those scenarios are simply
-        // skipped rather than spawned - clearly the enemy is in no state to contest the objective - matching how the
-        // ambient weekly scenarios are discarded while routed.
-        if ((dueCount > 0) && !contract.getMoraleLevel().isRouted()) {
+        // The due dates are consumed above whatever happens. While a garrison-type contract is peaceful,
+        // between raids, those scenarios are simply skipped rather than spawned - there is no enemy activity to contest
+        // the objective - matching how the ambient weekly scenarios are discarded while peaceful.
+        if ((dueCount > 0) && !contract.isPeaceful()) {
             StratConContractInitializer.spawnScheduledStrategicScenarios(campaign, contract, dueCount);
+        }
+    }
+
+    /**
+     * Sends home every formation whose StratCon deployment has ended, on every track of every active contract, after
+     * first clearing out phantom scenarios.
+     *
+     * <p>The new day calls this before it processes the hangar, rather than from {@link #handleNewDay(NewDayEvent)},
+     * which only runs once the rest of the day is done. Salvage from a battle is delivered on the day the salvaging
+     * formations return, so if they came home last, New Day Mass Repair would only see the salvage and spend the
+     * techs' time on it while the formations' own damaged units still counted as deployed. It also still comes before
+     * scenario generation, so integrated force deployments on 0-deployment-length tracks are not cleaned out.</p>
+     *
+     * @param campaign the current campaign
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void processForceReturns(Campaign campaign) {
+        for (AbstractContract contract : campaign.getActiveContracts()) {
+            StratConCampaignState campaignState = contract.getStratConCampaignState();
+            if (campaignState == null) {
+                continue;
+            }
+
+            for (StratConTrackState track : campaignState.getTracks()) {
+                cleanupPhantomScenarios(track);
+                getScenarioLifecycleStrategy().processForceReturnDates(track, campaign);
+            }
         }
     }
 

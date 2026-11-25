@@ -161,7 +161,7 @@ public class AmmoStorage extends EquipmentPart implements IAcquisitionWork {
 
     @Override
     public Money getBuyCost() {
-        return getActualValue();
+        return getPurchaseCost();
     }
 
     @Override

@@ -484,8 +484,8 @@ public class Attributes {
                 yield modifier;
             }
             case BODY -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_BODY) ? 1 : 0;
-            case DEXTERITY -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_REFLEXES) ? 1 : 0;
-            case REFLEXES -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_DEXTERITY) ? 1 : 0;
+            case DEXTERITY -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_DEXTERITY) ? 1 : 0;
+            case REFLEXES -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_REFLEXES) ? 1 : 0;
             case INTELLIGENCE -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_INTELLIGENCE) ? 1 : 0;
             case WILLPOWER -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_WILLPOWER) ? 1 : 0;
             case CHARISMA -> options.booleanOption(EXCEPTIONAL_ATTRIBUTE_CHARISMA) ? 1 : 0;

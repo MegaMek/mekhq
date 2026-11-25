@@ -55,8 +55,9 @@ import mekhq.gui.baseComponents.SegmentedBar;
  * <p>
  * The bar has one segment per possible morale level, ordered from the morale scale's minimum to its maximum. The gauge
  * reads like the enemy's morale meter: the more segments that are lit, the higher the enemy's morale. The colors are
- * presented from the <em>player's</em> perspective: low enemy morale (a routed enemy) is green because it is favourable
- * for the player, climbing through orange and into red at the highest morale (a dangerous, fully-committed enemy).
+ * presented from the <em>player's</em> perspective: low enemy morale (a scattered enemy) is green because it is
+ * favourable for the player, climbing through orange and into red at the highest morale (a dangerous, fully-committed
+ * enemy).
  * Hovering a segment shows the name and description of that morale level.
  * </p>
  *
@@ -133,7 +134,8 @@ public class MoraleBar extends JPanel {
      * Builds a self-contained panel wrapping a {@link MoraleBar}, suitable for embedding in dialogs such as the
      * immersive "Morale Update" notification. The bar is given generous horizontal padding so it reads as a centered
      * gauge rather than spanning the full dialog width. The label beneath the active segment honours the contract's
-     * special "Peaceful" wording for routed garrison/retainer contracts, matching the briefing-room contract panel.
+     * special "Peaceful" wording for garrison-type contracts between raids, matching the briefing-room
+     * contract panel.
      *
      * @param contract the contract whose enemy morale should be displayed
      *
@@ -148,38 +150,39 @@ public class MoraleBar extends JPanel {
               horizontalPadding));
 
         final MoraleDisplay display = getMoraleDisplay(contract);
-        final MoraleBar moraleBar = new MoraleBar(contract.getMoraleLevel(), display.label());
+        final MoraleBar moraleBar = new MoraleBar(display.barLevel(), display.label());
         moraleBar.setToolTipText(wordWrap(display.tooltip()));
         panel.add(moraleBar, BorderLayout.CENTER);
         return panel;
     }
 
     /**
-     * The display text and tooltip used to describe a contract's enemy morale.
+     * The display text, tooltip, and gauge level used to describe a contract's enemy morale.
      *
-     * @param label   the short morale name to show (e.g. a morale level name, or "Peaceful")
-     * @param tooltip the descriptive tooltip for that morale state
+     * @param label    the short morale name to show (e.g. a morale level name, or "Peaceful")
+     * @param tooltip  the descriptive tooltip for that morale state
+     * @param barLevel the morale level the gauge is filled to
      */
-    public record MoraleDisplay(@Nonnull String label, @Nonnull String tooltip) {
+    public record MoraleDisplay(@Nonnull String label, @Nonnull String tooltip, @Nonnull ContractMoraleLevel barLevel) {
     }
 
     /**
-     * Computes the morale label and tooltip for a contract, applying the special "Peaceful" wording used for routed
-     * garrison-duty and retainer contracts. This is the single source of truth shared by the briefing-room contract
-     * panel and the morale dialog so the two never diverge.
+     * Computes the morale label, tooltip, and gauge level for a contract. A garrison-type contract between
+     * raids (see {@link AbstractContract#isPeaceful()}) reads "Peaceful", with the gauge at its lowest; the enemy's
+     * morale is held for the next raid but not shown. This is the single source of truth shared by the briefing-room
+     * contract panel and the morale dialog so the two never diverge.
      *
      * @param contract the contract whose enemy morale should be described
      *
-     * @return the label and tooltip to display
+     * @return the label, tooltip, and gauge level to display
      */
     public static @Nonnull MoraleDisplay getMoraleDisplay(@Nonnull final AbstractContract contract) {
         final ContractMoraleLevel level = contract.getMoraleLevel();
-        if ((contract.getObjectiveType().isGarrisonDuty() || contract.getObjectiveType().isRetainer()) &&
-                  level.isRouted()) {
-            return new MoraleDisplay(getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.text"),
-                  getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoraleRouted.tooltip"));
+        if (contract.isPeaceful()) {
+            return new MoraleDisplay(getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoralePeaceful.text"),
+                  getTextAt(RESOURCE_BUNDLE, "txtGarrisonMoralePeaceful.tooltip"),
+                  ContractMoraleLevel.SCATTERED);
         }
-        return new MoraleDisplay(level.toString(), level.getToolTipText());
+        return new MoraleDisplay(level.toString(), level.getToolTipText(), level);
     }
 }
-

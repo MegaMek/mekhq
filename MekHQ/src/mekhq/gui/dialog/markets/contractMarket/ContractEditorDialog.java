@@ -101,7 +101,6 @@ import mekhq.gui.FactionComboBox;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudCheckBox;
-import mekhq.gui.baseComponents.hud.HudDateField;
 import mekhq.gui.baseComponents.hud.HudModeSelector;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
@@ -144,7 +143,6 @@ public class ContractEditorDialog extends JDialog {
     private static final MMLogger LOGGER = MMLogger.create(ContractEditorDialog.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.ChaosContractMarketDialog";
 
-    private static final int MONEY_STEP = 1000;
     private static final double FRACTIONAL_SCALE_STEP = 0.1;
     private static final int LABEL_WIDTH = 120;
     private static final int PREVIEW_WIDTH = 300;
@@ -292,9 +290,8 @@ public class ContractEditorDialog extends JDialog {
 
     // Morale
     private HudSegmentedControl<ContractMoraleLevel> moralePicker;
-    private HudDateField routEndDateField;
-    private JSpinner routedPayoutSpinner;
-    private boolean routFieldsEditable;
+    private JSpinner finalPayoutSpinner;
+    private boolean finalPayoutEditable;
 
     // Personnel - edit mode wraps the existing NPCs; create mode captures overrides applied to NPCs generated on
     // save.
@@ -313,7 +310,7 @@ public class ContractEditorDialog extends JDialog {
      * The preview's content, refilled on every edit inside one long-lived scroll pane, so the preview keeps its scroll
      * position while the GM types.
      */
-    private final JPanel previewContent = MarketHud.column();
+    private final JPanel previewContent = Hud.column();
     private final List<Tracked> tracked = new ArrayList<>();
     private HudModeSelector<Section> sectionSelector;
     private Section buildingSection = Section.OFFER;
@@ -412,7 +409,7 @@ public class ContractEditorDialog extends JDialog {
         previewHolder.setPreferredSize(new Dimension(scaleForGUI(PREVIEW_WIDTH), 0));
         previewContent.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(14), scaleForGUI(16),
               scaleForGUI(14)));
-        previewHolder.add(MarketHud.scroll(previewContent, GROUND), BorderLayout.CENTER);
+        previewHolder.add(Hud.scroll(previewContent, GROUND), BorderLayout.CENTER);
         body.add(previewHolder, BorderLayout.EAST);
         content.add(body, BorderLayout.CENTER);
         content.add(buildFooter(), BorderLayout.SOUTH);
@@ -468,7 +465,7 @@ public class ContractEditorDialog extends JDialog {
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
               BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(14), scaleForGUI(10), scaleForGUI(14))));
 
-        JPanel identity = MarketHud.column();
+        JPanel identity = Hud.column();
         identity.add(leftAligned(Hud.eyebrow(getTextAt(RESOURCE_BUNDLE,
               createMode ? "create.contractMarket.eyebrow" : "edit.contractMarket.eyebrow"))));
         identity.add(Box.createVerticalStrut(scaleForGUI(2)));
@@ -576,13 +573,13 @@ public class ContractEditorDialog extends JDialog {
     /** Builds a tab's page, scrolling on its own, and adds it to the tab pages under the tab's name. */
     private void addSection(Section section, Consumer<JPanel> builder) {
         buildingSection = section;
-        JPanel panel = MarketHud.column();
+        JPanel panel = Hud.column();
         panel.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(16), scaleForGUI(18), scaleForGUI(40),
               scaleForGUI(18)));
         panel.add(leftAligned(Hud.sectionHeading(section.label())));
         panel.add(Box.createVerticalStrut(scaleForGUI(4)));
         builder.accept(panel);
-        pageHolder.add(MarketHud.scroll(panel, SURFACE_DEEP), section.name());
+        pageHolder.add(Hud.scroll(panel, SURFACE_DEEP), section.name());
     }
 
     // endregion Layout
@@ -883,25 +880,15 @@ public class ContractEditorDialog extends JDialog {
         refreshBatchallEnabled();
         grid.add(batchallRow);
 
-        // A rout only begins once the contract is accepted (and even then only for certain objectives), so the rout
-        // fields are only editable for an accepted contract - one with a status. On an unstarted offer they are
-        // disabled, never hidden.
-        routFieldsEditable = contract.getStatus() != null;
-        String routNote = routFieldsEditable ? null : getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.note.rout");
-        routEndDateField = new HudDateField(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.date.placeholder"),
-              this::onEdited);
-        LocalDate routEnd = contract.getRoutEndDate();
-        routEndDateField.setText(routEnd == null ? "" : routEnd.toString());
-        routEndDateField.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.date.tooltip")));
-        routEndDateField.setEnabled(routFieldsEditable);
-        // The date field already refreshes the form on every change, so it is not watched a second time.
-        grid.add(trackedRow("edit.contractMarket.field.routEndDate", routEndDateField, routNote,
-              routEndDateField::getText));
-
-        routedPayoutSpinner = moneySpinner(contract.getRoutPayout());
-        routedPayoutSpinner.setEnabled(routFieldsEditable);
-        grid.add(trackedRow("edit.contractMarket.field.routedPayout", routedPayoutSpinner, routNote,
-              routedPayoutSpinner::getValue, routedPayoutSpinner));
+        // A final payout is only set when an accepted contract ends early, so it is only editable for an accepted
+        // contract - one with a status. On an unstarted offer it is disabled, never hidden.
+        finalPayoutEditable = contract.getStatus() != null;
+        String finalPayoutNote = finalPayoutEditable ? null : getTextAt(RESOURCE_BUNDLE,
+              "edit.contractMarket.note.finalPayout");
+        finalPayoutSpinner = EditorHud.moneySpinner(contract.getFinalPayout());
+        finalPayoutSpinner.setEnabled(finalPayoutEditable);
+        grid.add(trackedRow("edit.contractMarket.field.finalPayout", finalPayoutSpinner, finalPayoutNote,
+              finalPayoutSpinner::getValue, finalPayoutSpinner));
         section.add(leftAligned(grid.panel));
 
         section.add(leftAligned(subHeading("edit.contractMarket.sub.people")));
@@ -963,14 +950,14 @@ public class ContractEditorDialog extends JDialog {
         Money monthlyPay = finance == null ? Money.zero() : finance.monthlyPay();
         Money combatPay = finance == null ? Money.zero() : finance.combatPay();
 
-        monthlyPaySpinner = moneySpinner(monthlyPay);
+        monthlyPaySpinner = EditorHud.moneySpinner(monthlyPay);
         monthlyPayAutomatic = financeAutomatic(monthlyPaySpinner);
         grid.add(trackedRow("edit.contractMarket.field.monthlyPay",
               withAutomatic(monthlyPaySpinner, monthlyPayAutomatic), null,
               () -> List.of(monthlyPaySpinner.getValue(), monthlyPayAutomatic.isSelected()), monthlyPaySpinner,
               monthlyPayAutomatic));
 
-        transportPaySpinner = moneySpinner(transport);
+        transportPaySpinner = EditorHud.moneySpinner(transport);
         transportPaySpinner.setToolTipText(wordWrap(getTextAt(RESOURCE_BUNDLE,
               "edit.contractMarket.field.transportPay.tooltip")));
         transportPayAutomatic = financeAutomatic(transportPaySpinner);
@@ -979,7 +966,7 @@ public class ContractEditorDialog extends JDialog {
               () -> List.of(transportPaySpinner.getValue(), transportPayAutomatic.isSelected()), transportPaySpinner,
               transportPayAutomatic));
 
-        combatPaySpinner = moneySpinner(combatPay);
+        combatPaySpinner = EditorHud.moneySpinner(combatPay);
         combatPayAutomatic = financeAutomatic(combatPaySpinner);
         grid.add(trackedRow("edit.contractMarket.field.combatPay",
               withAutomatic(combatPaySpinner, combatPayAutomatic), null,
@@ -1255,7 +1242,7 @@ public class ContractEditorDialog extends JDialog {
         preview.add(leftAligned(previewCard()));
         preview.add(Box.createVerticalStrut(scaleForGUI(14)));
 
-        JPanel terms = MarketHud.section(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.terms"));
+        JPanel terms = Hud.section(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.terms"));
         previewTerm(terms, "edit.contractMarket.field.payRate", payRateTrack, TermEffect.PAY_RATE,
               payNonNegotiableCheck);
         previewTerm(terms, "edit.contractMarket.field.support", supportTrack, TermEffect.SUPPORT,
@@ -1269,7 +1256,7 @@ public class ContractEditorDialog extends JDialog {
         preview.add(leftAligned(terms));
         preview.add(Box.createVerticalStrut(scaleForGUI(12)));
 
-        JPanel intel = MarketHud.section(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.intel"));
+        JPanel intel = Hud.section(getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.intel"));
         previewIntel(intel, "dossier.contractMarket.intel.alliedCommand",
               forcesText(employerSkillCombo, employerEquipmentPicker), obfuscateAlliedCommandCheckbox);
         previewIntel(intel, "dossier.contractMarket.intel.opposition", enemyLabel(), obfuscateOppositionCheckbox);
@@ -1282,7 +1269,7 @@ public class ContractEditorDialog extends JDialog {
         List<JComponent> badges = new ArrayList<>();
         characteristicCheckboxes.forEach((characteristic, chip) -> {
             if (chip.isSelected()) {
-                badges.add(MarketHud.badge(characteristic.getName(), polarityColor(characteristic),
+                badges.add(Hud.badge(characteristic.getName(), polarityColor(characteristic),
                       characteristic.getToolTipText()));
             }
         });
@@ -1326,12 +1313,12 @@ public class ContractEditorDialog extends JDialog {
         }
         parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "card.contractMarket.months", lengthValue()));
         StringBuilder html = new StringBuilder("<html><b style='color:").append(HudStyle.hex(TEXT)).append("'>")
-                                   .append(MarketHud.escape(nameField.getText().isBlank()
+                                   .append(Hud.escape(nameField.getText().isBlank()
                                                                   ? contract.getName()
                                                                   : nameField.getText().trim()))
                                    .append("</b><br><span style='color:")
                                    .append(HudStyle.hex(TEXT_MUTED)).append("'>")
-                                   .append(MarketHud.escape(String.join(separator, parts))).append("</span>");
+                                   .append(Hud.escape(String.join(separator, parts))).append("</span>");
         List<String> tags = previewTags();
         if (!tags.isEmpty()) {
             html.append("<br><span><b>").append(String.join(separator, tags))
@@ -1375,7 +1362,7 @@ public class ContractEditorDialog extends JDialog {
     }
 
     private static String tag(String text, Color color) {
-        return "<span style='color:" + HudStyle.hex(color) + "'>" + MarketHud.escape(text.toUpperCase(Locale.ROOT))
+        return "<span style='color:" + HudStyle.hex(color) + "'>" + Hud.escape(text.toUpperCase(Locale.ROOT))
                      + "</span>";
     }
 
@@ -1384,7 +1371,9 @@ public class ContractEditorDialog extends JDialog {
         if (monthlyPayAutomatic.isSelected() || transportPayAutomatic.isSelected()) {
             return getTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.total.auto");
         }
-        Money total = moneyValue(monthlyPaySpinner).multipliedBy(lengthValue()).plus(moneyValue(transportPaySpinner));
+        Money total = EditorHud.moneyValue(monthlyPaySpinner)
+                            .multipliedBy(lengthValue())
+                            .plus(EditorHud.moneyValue(transportPaySpinner));
         return ContractMarketFormatting.compactMoney(total);
     }
 
@@ -1393,12 +1382,12 @@ public class ContractEditorDialog extends JDialog {
         if (lock.isSelected()) {
             value = getFormattedTextAt(RESOURCE_BUNDLE, "edit.contractMarket.preview.locked", value);
         }
-        MarketHud.addRow(terms, getTextAt(RESOURCE_BUNDLE, labelKey), value, null, null, false);
+        Hud.addRow(terms, getTextAt(RESOURCE_BUNDLE, labelKey), value, null, null, false);
     }
 
     private void previewIntel(JPanel intel, String labelKey, String value, JCheckBox hidden) {
         boolean isHidden = hidden.isSelected();
-        MarketHud.addRow(intel, getTextAt(RESOURCE_BUNDLE, labelKey),
+        Hud.addRow(intel, getTextAt(RESOURCE_BUNDLE, labelKey),
               isHidden ? getTextAt(RESOURCE_BUNDLE, "dossier.contractMarket.intel.obfuscated") : value,
               isHidden ? AMBER : null, null, false);
     }
@@ -1443,7 +1432,7 @@ public class ContractEditorDialog extends JDialog {
 
     /** A tab's label, with how many of its rows have changed beside it once there are any. */
     private static String sectionLabel(Section section, int changes) {
-        String label = MarketHud.escape(section.label().toUpperCase(Locale.ROOT));
+        String label = Hud.escape(section.label().toUpperCase(Locale.ROOT));
         return changes == 0 ? "<html>" + label + "</html>"
                      : "<html>" + label + "&nbsp;&nbsp;<span style='color:" + hex(AMBER) + "'>" + changes
                              + "</span></html>";
@@ -1642,15 +1631,15 @@ public class ContractEditorDialog extends JDialog {
 
     // region Batchall
 
-    /** Whether the player's batchall acceptance is editable: an accepted contract fought against a Clan enemy. */
+    /** Whether the player's batchall acceptance is editable: an accepted contract fought against an enemy that performs Batchalls. */
     private boolean batchallEditable() {
         return contract.getStatus() != null && isEnemyClan();
     }
 
-    /** Whether the enemy faction currently selected in the combo is a Clan. */
+    /** Whether the enemy faction currently selected in the combo performs Batchalls (a Clan, but not the Bandit Caste). */
     private boolean isEnemyClan() {
         Faction faction = factionOf(enemyFactionCombo);
-        return faction != null && faction.isClan();
+        return faction != null && faction.performsBatchalls();
     }
 
     /** Enables the batchall checkbox only when it is editable, with a note saying why when it is not. */
@@ -1666,9 +1655,9 @@ public class ContractEditorDialog extends JDialog {
 
     /**
      * Writes every edited field back onto the contract, then closes. The player's chosen negotiator is preserved
-     * untouched. If the contract's scale, track count, dates, command rights, or employer changed, its StratCon schedule
-     * is rolled again (see {@link StratConScenarioTempo#regenerateSchedules}). A market offer that has not been
-     * accepted has only its Essential scenario schedule rolled again (see
+     * untouched. If the contract's scale, track count, intensity, dates, command rights, or employer changed, its
+     * StratCon schedule is rolled again (see {@link StratConScenarioTempo#regenerateSchedules}). A market offer that has
+     * not been accepted has only its Essential scenario schedule rolled again (see
      * {@link AbstractContractGeneration#rollScenarioSchedule}), and a newly created offer always has one rolled.
      *
      * @author Illiani
@@ -1676,8 +1665,12 @@ public class ContractEditorDialog extends JDialog {
      */
     private void saveAction() {
         // What StratCon's pre-rolled schedule was rolled from, so an edit to any of it rolls the schedule again below.
-        int previousScale = contract.getScale();
+        // The exact Scale, not the rounded one: how many of each thing a contract brings is the exact Scale times a
+        // rate, rounded afterward (see StratConSpawnRates), so even an edit within the same whole Scale can change it.
+        double previousExactScale = contract.getExactScale();
         int previousTrackCount = contract.getTrackCount();
+        // The intensity characteristic steps the Scale the schedule is counted against
+        ContractCharacteristic previousIntensity = contract.getCharacteristic(ContractCharacteristic.Category.INTENSITY);
         LocalDate previousStartDate = contract.getStartDate();
         LocalDate previousEndDate = contract.getEndingDate();
         int previousLengthInMonths = contract.getLengthInMonths();
@@ -1687,8 +1680,11 @@ public class ContractEditorDialog extends JDialog {
 
         // Identity
         String name = nameField.getText().trim();
-        if (!name.isBlank()) {
+        if (!name.isBlank() && !name.equals(contract.getName())) {
             contract.setContractName(name);
+            // A hand-typed name may well name the opposition, so it no longer counts as an opposition-free operation
+            // codename (which the market would otherwise show even while the opposition is hidden).
+            contract.setNameOperationCodename(false);
         }
         contract.setDescription(descriptionArea.getText());
         // Only write status back when the field was editable; otherwise leave the contract's status as-is (an offer's
@@ -1722,8 +1718,7 @@ public class ContractEditorDialog extends JDialog {
                   campaign.getPlayerForce().getForceDetachment().getHangar(), contract)
                                     : getEditedScale());
             contract.setTrackCount(trackCountAutomatic.isSelected()
-                                         ? ContractCharacteristics.bakeTrackCount(
-                  AbstractContractGeneration.determineTrackCount(contract), contract)
+                                         ? AbstractContractGeneration.determineTrackCount(contract)
                                          : intValue(trackCountSpinner));
             contract.setRequiredVictoryPoints(victoryPointsAutomatic.isSelected()
                                                     ? ContractCharacteristics.bakeRequiredVictoryPoints(
@@ -1810,6 +1805,7 @@ public class ContractEditorDialog extends JDialog {
               salvageNonNegotiableCheck.isSelected(), commandNonNegotiableCheck.isSelected()));
 
         // Objectives
+        final ContractObjectiveType previousObjectiveType = contract.getObjectiveType();
         contract.setObjectiveData(new ContractObjectiveData(objectiveValue(playerObjectiveCombo),
               objectiveValue(opposingObjectiveCombo)));
 
@@ -1818,17 +1814,17 @@ public class ContractEditorDialog extends JDialog {
         // spinner value is used.
         Money transportPay = transportPayAutomatic.isSelected()
                                    ? AbstractContractGeneration.determineTransportPay(campaign, contract)
-                                   : moneyValue(transportPaySpinner);
+                                   : EditorHud.moneyValue(transportPaySpinner);
         // On "Automatic" the base is recomputed from the generator, then the pay / combat-pay characteristic is baked
         // on top - recomputing each commit keeps the multiplier idempotent. A manual spinner value is left untouched.
         Money monthlyPayValue = monthlyPayAutomatic.isSelected()
                                       ? ContractCharacteristics.bakeMonthlyPay(
               AbstractContractGeneration.determineMonthlyPay(campaign, contract), contract)
-                                      : moneyValue(monthlyPaySpinner);
+                                      : EditorHud.moneyValue(monthlyPaySpinner);
         Money combatPayValue = combatPayAutomatic.isSelected()
                                      ? ContractCharacteristics.bakeCombatPay(
               AbstractContractGeneration.determineCombatPay(campaign, contract), contract)
-                                     : moneyValue(combatPaySpinner);
+                                     : EditorHud.moneyValue(combatPaySpinner);
         contract.setContractFinanceData(new ContractFinanceData(transportPay, monthlyPayValue, combatPayValue));
         // The salvage taper follows the contract's (possibly edited) Scale
         contract.setSalvageTaperMultiplier(AbstractContractDeterminationPay.forCampaign(campaign)
@@ -1844,19 +1840,20 @@ public class ContractEditorDialog extends JDialog {
         contract.setRentedFacilitiesData(new RentedFacilitiesData(intValue(hospitalBedsSpinner),
               intValue(kitchensSpinner), intValue(holdingCellsSpinner)));
 
-        // Morale. The rout fields are only written when editable (an accepted contract); on an unstarted offer they
-        // are disabled and the contract's existing rout values (an absent end date, an unset payout) are preserved. A
-        // zero payout from the spinner means none has been set, so the remaining escrow is paid as normal.
-        LocalDate routEndDate = routFieldsEditable
-                                      ? parseDate(routEndDateField, contract.getRoutEndDate())
-                                      : contract.getRoutEndDate();
-        Money routPayout = contract.getRoutPayout();
-        if (routFieldsEditable) {
-            Money spinnerPayout = moneyValue(routedPayoutSpinner);
-            routPayout = spinnerPayout.isZero() ? null : spinnerPayout;
+        // Morale. The final payout is only written when editable (an accepted contract); on an unstarted offer it is
+        // disabled and the contract's existing payout is preserved. A zero payout from the spinner means none has been
+        // set, so the remaining escrow is paid as normal. Whether a garrison is between raids is left to the monthly
+        // raid roll, unless the objective changed: then it starts afresh, as a new contract with that objective would.
+        Money finalPayout = contract.getFinalPayout();
+        if (finalPayoutEditable) {
+            Money spinnerPayout = EditorHud.moneyValue(finalPayoutSpinner);
+            finalPayout = spinnerPayout.isZero() ? null : spinnerPayout;
         }
-        contract.setMoraleData(new MoraleData(selectedOr(moralePicker, contract.getMoraleLevel()),
-              routEndDate, routPayout));
+        boolean isPeaceful = (contract.getObjectiveType() == previousObjectiveType)
+                                   ? contract.getMoraleData().peaceful()
+                                   : contract.getObjectiveType().isGarrisonType();
+        contract.setMoraleData(new MoraleData(selectedOr(moralePicker, contract.getMoraleLevel()), isPeaceful,
+              finalPayout));
 
         // Personnel. Create mode generates the NPCs now (from the just-applied factions) and layers the GM's overrides
         // on top; edit mode mutates the existing NPCs in place (their references are preserved by the rebuilds above).
@@ -1879,8 +1876,9 @@ public class ContractEditorDialog extends JDialog {
         // what StratCon spawns the Essential scenarios from once the offer is accepted. A created offer has never had
         // one rolled, so it is always rolled here; an edited offer is rolled again only when its inputs changed.
         StratConCampaignState campaignState = contract.getStratConCampaignState();
-        boolean isScheduleChanged = (contract.getScale() != previousScale)
+        boolean isScheduleChanged = (Double.compare(contract.getExactScale(), previousExactScale) != 0)
                                           || (contract.getTrackCount() != previousTrackCount)
+                                          || (contract.getCharacteristic(ContractCharacteristic.Category.INTENSITY) != previousIntensity)
                                           || !Objects.equals(contract.getStartDate(), previousStartDate)
                                           || !Objects.equals(contract.getEndingDate(), previousEndDate)
                                           || (contract.getLengthInMonths() != previousLengthInMonths)
@@ -2023,10 +2021,10 @@ public class ContractEditorDialog extends JDialog {
         JLabel effectLabel = new JLabel();
         effectLabel.setFont(hudFont(Font.BOLD, 0.9f, 0.0f));
         effectLabel.setForeground(TEXT);
-        Runnable showEffect = () -> effectLabel.setText("<html>" + MarketHud.escape(termEffectText(effect,
+        Runnable showEffect = () -> effectLabel.setText("<html>" + Hud.escape(termEffectText(effect,
               track.getSelected())) + "<br><span style='font-weight:normal; color:"
                                                               + HudStyle.hex(TEXT_FAINT) + "'>"
-                                                              + MarketHud.escape(getFormattedTextAt(RESOURCE_BUNDLE,
+                                                              + Hud.escape(getFormattedTextAt(RESOURCE_BUNDLE,
               "edit.contractMarket.stepLabel", track.getSelected().stepValue())) + "</span></html>");
         showEffect.run();
         // Sized only once its two lines are set: an empty label measures no height at all, which would clip them.
@@ -2163,17 +2161,6 @@ public class ContractEditorDialog extends JDialog {
         return automatic == null ? field : EditorHud.line(field, automatic);
     }
 
-    private static JSpinner moneySpinner(Money money) {
-        double amount = money == null ? 0.0 : money.getAmount().doubleValue();
-        JSpinner spinner = new JSpinner(new SpinnerNumberModel(amount, 0.0, Double.MAX_VALUE, MONEY_STEP));
-        // Without this the editor sizes itself to fit Double.MAX_VALUE, blowing the row far past the viewport.
-        if (spinner.getEditor() instanceof JSpinner.NumberEditor editor) {
-            editor.getTextField().setColumns(12);
-        }
-        EditorHud.styleSpinner(spinner);
-        return spinner;
-    }
-
     /**
      * An "Automatic" pill for a finance field. Finance determination is deterministic (derived from scale, terms, and
      * the journey to the target), so unlike the parameter automatics it is offered in both modes - defaulting on for a
@@ -2201,7 +2188,12 @@ public class ContractEditorDialog extends JDialog {
           ToDoubleFunction<ChaosContractStepsTable> multiplier) {
         // The figure per unit of multiplier, or NaN until it has stood at a non-zero multiplier
         double[] perMultiplier = { Double.NaN };
+        // The link's own figures are rounded to whole C-bills, so anchoring on them would drift with every step change
+        boolean[] isLinkSetting = { false };
         Runnable anchor = () -> {
+            if (isLinkSetting[0]) {
+                return;
+            }
             double currentMultiplier = multiplier.applyAsDouble(track.getSelected());
             if (currentMultiplier != 0) {
                 perMultiplier[0] = ((Number) spinner.getValue()).doubleValue() / currentMultiplier;
@@ -2218,7 +2210,9 @@ public class ContractEditorDialog extends JDialog {
                 spinner.setEnabled(false);
                 return;
             }
-            spinner.setValue(perMultiplier[0] * multiplier.applyAsDouble(track.getSelected()));
+            isLinkSetting[0] = true;
+            spinner.setValue(Math.round(perMultiplier[0] * multiplier.applyAsDouble(track.getSelected())));
+            isLinkSetting[0] = false;
         });
     }
 
@@ -2527,10 +2521,6 @@ public class ContractEditorDialog extends JDialog {
         return ((Number) spinner.getValue()).intValue();
     }
 
-    private static Money moneyValue(JSpinner spinner) {
-        return Money.of(((Number) spinner.getValue()).doubleValue());
-    }
-
     private static <E> E enumValue(JComboBox<E> combo, E fallback) {
         int index = combo.getSelectedIndex();
         return index < 0 ? fallback : combo.getItemAt(index);
@@ -2568,19 +2558,6 @@ public class ContractEditorDialog extends JDialog {
     /** Trimmed field text (never null; blank stays blank). */
     private static String text(JTextField field) {
         return field.getText().trim();
-    }
-
-    /** Parses an ISO date from a field, treating blank as {@code null} and an unparseable value as {@code fallback}. */
-    private static @Nullable LocalDate parseDate(JTextField field, LocalDate fallback) {
-        String value = field.getText().trim();
-        if (value.isEmpty()) {
-            return null;
-        }
-        try {
-            return LocalDate.parse(value);
-        } catch (Exception ex) {
-            return fallback;
-        }
     }
 
     private static String orEmpty(String value) {
@@ -2760,7 +2737,7 @@ public class ContractEditorDialog extends JDialog {
 
     /** An NPC card: the portrait (and, in create mode, its pill) beside the fields. */
     private static JPanel personCard(JButton portrait, @Nullable JCheckBox portraitAutomatic, JComponent fields) {
-        JPanel portraitColumn = MarketHud.column();
+        JPanel portraitColumn = Hud.column();
         portrait.setAlignmentX(Component.LEFT_ALIGNMENT);
         portraitColumn.add(portrait);
         if (portraitAutomatic != null) {
@@ -2773,8 +2750,8 @@ public class ContractEditorDialog extends JDialog {
         card.setBackground(GROUND);
         card.setBorder(BorderFactory.createCompoundBorder(BorderFactory.createLineBorder(BORDER, scaleForGUI(1)),
               BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(8), scaleForGUI(8), scaleForGUI(8))));
-        card.add(MarketHud.topAligned(portraitColumn), BorderLayout.WEST);
-        card.add(MarketHud.topAligned(fields), BorderLayout.CENTER);
+        card.add(Hud.topAligned(portraitColumn), BorderLayout.WEST);
+        card.add(Hud.topAligned(fields), BorderLayout.CENTER);
         return card;
     }
 

@@ -168,6 +168,7 @@ class MHQOptionsModel {
     boolean autosaveMonthly;
     boolean autosaveYearly;
     boolean autosaveBeforeScenarios;
+    boolean autosaveAfterScenarios;
     boolean autosaveBeforeMissionEnd;
     int maximumNumberOfAutoSaves;
     // endregion Autosave
@@ -339,6 +340,7 @@ class MHQOptionsModel {
         autosaveMonthly = options.getAutosaveMonthlyValue();
         autosaveYearly = options.getAutosaveYearlyValue();
         autosaveBeforeScenarios = options.getAutosaveBeforeScenariosValue();
+        autosaveAfterScenarios = options.getAutosaveAfterScenariosValue();
         autosaveBeforeMissionEnd = options.getAutosaveBeforeMissionEndValue();
         maximumNumberOfAutoSaves = options.getMaximumNumberOfAutoSavesValue();
 
@@ -539,6 +541,7 @@ class MHQOptionsModel {
         options.setAutosaveMonthlyValue(autosaveMonthly);
         options.setAutosaveYearlyValue(autosaveYearly);
         options.setAutosaveBeforeScenariosValue(autosaveBeforeScenarios);
+        options.setAutosaveAfterScenariosValue(autosaveAfterScenarios);
         options.setAutosaveBeforeMissionEndValue(autosaveBeforeMissionEnd);
         options.setMaximumNumberOfAutoSavesValue(maximumNumberOfAutoSaves);
 

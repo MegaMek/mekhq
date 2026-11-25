@@ -33,30 +33,42 @@
 package mekhq.campaign.universe.commandGeneration.ratgen;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNotSame;
 import static org.junit.jupiter.api.Assertions.assertSame;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.util.List;
+
 import megamek.common.equipment.EquipmentType;
+import megamek.common.loaders.MekSummary;
+import megamek.common.loaders.MekSummaryCache;
+import megamek.common.units.Entity;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationLevel;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.enums.RankSystemType;
+import mekhq.campaign.personnel.ranks.Rank;
+import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.Factions;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
+import org.junit.jupiter.api.Assumptions;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
 
 /**
  * Covers who the rank pass promotes when Assign Best Company Commander and Assign Best Officers are on: the best
- * person leads the command wherever the roll seated them, and each lance is led by the best of what is left.
+ * person leads the command wherever the roll seated them, and each lance is led by the best of what is left. Also
+ * covers which rank system they are ranked on: always the one set in Campaign Options.
  */
 class RulesetRankAssignerSelectionTest {
 
@@ -163,6 +175,84 @@ class RulesetRankAssignerSelectionTest {
         assertSame(first, result.rootCommander(), "the company's commander commands, the root has no rank");
         assertEquals(FormationLevel.COMPANY, result.officers().get(first));
         assertEquals(1, result.officers().size(), "the company commander leads its only lance too");
+    }
+
+    @Test
+    void everyoneRankedStaysOnTheCampaignsCustomRankSystem() {
+        // Issue 10867: the rank pass moved everyone it ranked onto the faction's rank system, overriding the custom
+        // one the player had chosen in Campaign Options.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        RankSystem custom = new RankSystem(Ranks.getRankSystemFromCode("DCMS"));
+        custom.setCode("MYMERC");
+        custom.setName("My Mercenaries");
+        custom.setType(RankSystemType.CAMPAIGN);
+        campaign.getPlayerForce().setRankSystem(custom);
+        assertSame(custom, campaign.getPlayerForce().getRankSystem(), "the campaign is on the custom system");
+        Formation firstLance = lance(campaign, "First Lance");
+        Person commander = pilot(campaign, mekIn(campaign, firstLance), 5);
+        Person lancemate = pilot(campaign, mekIn(campaign, firstLance), 3);
+
+        RulesetRankAssigner.applyAndReport(campaign, companyOptions());
+
+        for (Person person : java.util.List.of(commander, lancemate)) {
+            assertSame(custom, person.getRankSystem(), person.getFullName() + " is ranked on the custom system");
+            assertTrue(person.getRankNumeric() > 0, person.getFullName() + " is given a rank");
+        }
+    }
+
+    @Test
+    void aShipAddedAfterTheRankPassHasItsCrewRanked() {
+        // Issue 10899: the troopships the lift top-up adds arrive after the rank pass, so nobody aboard had a rank.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Unit troopship = crewedDropShip(campaign);
+        Person captain = troopship.getCommander();
+        assertNotNull(captain, "the DropShip arrives with a captain");
+
+        int ranked = RulesetRankAssigner.rankLateShipCrews(campaign, companyOptions(), List.of(troopship));
+
+        assertTrue(ranked > 1, "the captain and the rest of the crew are ranked, not just one person");
+        assertTrue(captain.getRankNumeric() > Rank.RWO_MAX, "the captain holds an officer's rank");
+        assertTrue(captain.getRankNumeric() <= RulesetRankAssigner.LATE_SHIP_CAPTAIN_RANK_INDEX,
+              "and no more than a company commander's, not a Vice Admiral's");
+        for (Person person : troopship.getCrew()) {
+            assertTrue(person.getRankNumeric() > 0, person.getFullName() + " is given a rank");
+            assertSame(campaign.getPlayerForce().getRankSystem(), person.getRankSystem(),
+                  person.getFullName() + " is ranked on the campaign's rank system");
+        }
+    }
+
+    @Test
+    void aShipAddedAfterTheRankPassIsLeftAloneWhenRanksAreOff() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Unit troopship = crewedDropShip(campaign);
+        CommandGenerationOptions options = companyOptions();
+        options.setAutomaticallyAssignRanks(false);
+
+        assertEquals(0, RulesetRankAssigner.rankLateShipCrews(campaign, options, List.of(troopship)));
+        for (Person person : troopship.getCrew()) {
+            assertEquals(0, person.getRankNumeric(), person.getFullName() + " keeps no rank");
+        }
+    }
+
+    @Test
+    void aNullShipListRanksNobody() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+
+        assertEquals(0, RulesetRankAssigner.rankLateShipCrews(campaign, companyOptions(), null));
+    }
+
+    /** A Union DropShip added and crewed the way the generator's lift stages add theirs. */
+    private static Unit crewedDropShip(Campaign campaign) {
+        MekSummary union = MekSummaryCache.getInstance().getMek("Union (2708)");
+        Assumptions.assumeTrue(union != null, "the unit cache does not hold the Union (2708)");
+        Entity entity = union.loadEntity();
+        assertNotNull(entity, "the Union (2708) loads");
+        Unit ship = campaign.addNewUnit(entity, true, 0, PartQuality.QUALITY_D);
+        assertFalse(ship.getCrew().isEmpty(), "the DropShip arrives crewed");
+        for (Person person : ship.getCrew()) {
+            assertEquals(0, person.getRankNumeric(), "this test is only meaningful while the crew have no rank");
+        }
+        return ship;
     }
 
     private static CommandGenerationOptions companyOptions() {

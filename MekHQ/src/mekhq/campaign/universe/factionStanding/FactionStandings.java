@@ -34,7 +34,6 @@ package mekhq.campaign.universe.factionStanding;
 
 import static mekhq.campaign.universe.Faction.DEFAULT_CODE;
 import static mekhq.campaign.universe.Faction.MERCENARY_FACTION_CODE;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_0;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_6;
 import static mekhq.campaign.universe.factionStanding.FactionStandingLevel.STANDING_LEVEL_8;
@@ -631,7 +630,7 @@ public class FactionStandings {
      * @since 0.50.07
      */
     private static String convertSpecialFaction(String factionCode, int gameYear) {
-        if (factionCode.equals(PIRATE_FACTION_CODE)) {
+        if (Faction.isPirateOrBanditCaste(factionCode)) {
             factionCode = PIRACY_SUCCESS_INDEX_FACTION_CODE;
         } else if (factionCode.equals(MERCENARY_FACTION_CODE)) {
             Faction mercenaryOrganization = Faction.getActiveMercenaryOrganization(gameYear);
@@ -1309,7 +1308,7 @@ public class FactionStandings {
             if (!report.isBlank()) {
                 regardChangeReports.add(report);
             }
-        } else if (campaignFactionCode.equals(PIRATE_FACTION_CODE)) {
+        } else if (Faction.isPirateOrBanditCaste(campaignFactionCode)) {
             report = changeRegardForFaction(campaignFactionCode,
                   PIRACY_SUCCESS_INDEX_FACTION_CODE,
                   regardDeltaEmployer,
@@ -1342,19 +1341,8 @@ public class FactionStandings {
     /**
      * Updates the regard for relevant mercenary organizations upon the completion of a contract.
      *
-     * <p>This method checks for the presence and temporal validity (for the given game year) of several distinct
-     * mercenary authority factions, including:</p>
-     *
-     * <ul>
-     *     <li>The Mercenary Guild (MG)</li>
-     *     <li>The Mercenary Review Board (MRB)</li>
-     *     <li>The Mercenary Review and Bonding Commission (MRBC)</li>
-     *     <li>The Mercenary Bonding Authority (MBA)</li>
-     * </ul>
-     *
-     * <p></p>It updates the regard value for the first valid authority found for the specified year and adjusts the
-     * campaign's standing with that mercenary organization by the supplied delta value. If no valid organization is
-     * found, no changes occur and warnings are logged as appropriate.</p>
+     * <p>This method adjusts the campaign's standing with the mercenary organization active in the given year (see
+     * {@link Faction#getActiveMercenaryOrganization(int)}) by the supplied delta value.</p>
      *
      * @param gameYear            the current game year, used to determine each organization's validity
      * @param campaignFactionCode the short code for the campaign's faction whose standing is to be updated
@@ -1368,54 +1356,8 @@ public class FactionStandings {
      */
     private String processMercenaryOrganizationRegardUpdate(int gameYear, String campaignFactionCode,
           double regardDeltaEmployer, double regardMultiplier) {
-        final String MERCENARY_GUILD = "MG";
-        final String MERCENARY_REVIEW_BOARD = "MRB";
-        final String MERCENARY_REVIEW_AND_BONDING_COMMISSION = "MRBC";
-        final String MERCENARY_BONDING_AUTHORITY = "MBA";
-
-        Factions factions = Factions.getInstance();
-        Faction mercenaryGuild = factions.getFaction(MERCENARY_GUILD);
-        if (mercenaryGuild == null) {
-            LOGGER.warn("Faction {} did not return valid faction data for Mercenary Guild. Skipping. This " +
-                              "needs to be investigated. The most likely cause is that we have changed the faction " +
-                              "code for this faction.",
-                  MERCENARY_GUILD);
-        }
-
-        Faction mercenaryReviewBoard = factions.getFaction(MERCENARY_REVIEW_BOARD);
-        if (mercenaryReviewBoard == null) {
-            LOGGER.warn("Faction {} did not return valid faction data for Mercenary Review Board. Skipping." +
-                              " This needs to be investigated. The most likely cause is that we have changed the " +
-                              "faction code for this faction.",
-                  MERCENARY_REVIEW_BOARD);
-        }
-
-        Faction mercenaryReviewBondingCommission = factions.getFaction(MERCENARY_REVIEW_AND_BONDING_COMMISSION);
-        if (mercenaryReviewBondingCommission == null) {
-            LOGGER.warn("Faction {} did not return valid faction data for Mercenary Review and Bonding " +
-                              "Commission. Skipping. This needs to be investigated. The most likely cause is that we " +
-                              "have changed the faction code for this faction.",
-                  MERCENARY_REVIEW_AND_BONDING_COMMISSION);
-        }
-
-        Faction mercenaryBondingAssociation = factions.getFaction(MERCENARY_BONDING_AUTHORITY);
-        if (mercenaryBondingAssociation == null) {
-            LOGGER.warn("Faction {} did not return valid faction data for Mercenary Bonding Association. " +
-                              "Skipping. This needs to be investigated. The most likely cause is that we have changed" +
-                              " the faction code for this faction.",
-                  MERCENARY_BONDING_AUTHORITY);
-        }
-
-        String mercenaryAuthority = "";
-        if (mercenaryGuild != null && mercenaryGuild.validIn(gameYear)) {
-            mercenaryAuthority = mercenaryGuild.getShortName();
-        } else if (mercenaryReviewBoard != null && mercenaryReviewBoard.validIn(gameYear)) {
-            mercenaryAuthority = mercenaryReviewBoard.getShortName();
-        } else if (mercenaryReviewBondingCommission != null && mercenaryReviewBondingCommission.validIn(gameYear)) {
-            mercenaryAuthority = mercenaryReviewBondingCommission.getShortName();
-        } else if (mercenaryBondingAssociation != null && mercenaryBondingAssociation.validIn(gameYear)) {
-            mercenaryAuthority = mercenaryBondingAssociation.getShortName();
-        }
+        Faction mercenaryOrganization = Faction.getActiveMercenaryOrganization(gameYear);
+        String mercenaryAuthority = mercenaryOrganization == null ? "" : mercenaryOrganization.getShortName();
 
         String report = "";
         if (!mercenaryAuthority.isBlank()) {

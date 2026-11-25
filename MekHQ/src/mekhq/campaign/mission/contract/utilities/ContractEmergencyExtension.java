@@ -47,9 +47,6 @@ import mekhq.campaign.digitalGM.stratCon.StratConScenarioTempo;
 import mekhq.campaign.events.missions.MissionChangedEvent;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractMoraleLevel;
-import mekhq.campaign.universe.Faction;
-import mekhq.campaign.universe.Factions;
-import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 
 public class ContractEmergencyExtension {
@@ -62,17 +59,7 @@ public class ContractEmergencyExtension {
             return false;
         }
 
-        Factions factions = Factions.getInstance();
-        // We use anchor faction to allow for the breadth of faction political interactions
-        Faction employerFaction = factions.getFaction(contract.getEmployerData().anchorFactionCode());
-        // An enemy fielded by a covert sponsor fights that sponsor's war, so check against the sponsor when there is
-        // one; otherwise against the enemy itself.
-        Faction enemySponsor = contract.getEnemySponsorFaction();
-        Faction enemyFaction = enemySponsor == null ? contract.getEnemyFaction() : enemySponsor;
-        LocalDate localDate = campaign.getLocalDate();
-        final String warName = RandomFactionGenerator.getInstance()
-                                     .getFactionHints()
-                                     .getCurrentWar(employerFaction, enemyFaction, localDate);
+        final String warName = ContractWar.getCurrentWar(contract, campaign.getLocalDate());
         if (warName == null) {
             return false;
         }
@@ -91,6 +78,12 @@ public class ContractEmergencyExtension {
         LocalDate endingDate = contract.getEndingDate();
         if (endingDate == null) {
             return false;
+        }
+
+        // Recorded before the end date moves, since moving it also recomputes the length: nothing else would remember
+        // where the agreed term ended. A second extension keeps the first one's start.
+        if (contract.getEmergencyExtensionStartDate() == null) {
+            contract.setEmergencyExtensionStartDate(endingDate.plusDays(1));
         }
 
         LocalDate newEndDate = endingDate.plusMonths(extension);
@@ -113,10 +106,22 @@ public class ContractEmergencyExtension {
         roll = d6(2) / 2;
         moraleOrdinal = min(moraleOrdinal + roll, OVERWHELMING.ordinal());
         contract.changeMorale(ContractMoraleLevel.values()[moraleOrdinal]);
+        // The enemy surge that prompts the clause ends any peace a garrison-type contract was enjoying. On
+        // such a contract the surge counts as a raid, so if the enemy has not raided yet, it brings the Batchall the
+        // first raid would have.
+        contract.setPeaceful(false);
+        boolean isFirstRaid = contract.getObjectiveType().isGarrisonType() && !contract.hasBeenRaided();
+        if (isFirstRaid) {
+            contract.setHasBeenRaided(true);
+        }
 
         MekHQ.triggerEvent(new MissionChangedEvent(contract));
 
         triggerDialog(campaign, contract, extension, warName);
+
+        if (isFirstRaid) {
+            ContractBatchall.offerBatchall(campaign, contract);
+        }
 
         return true;
     }

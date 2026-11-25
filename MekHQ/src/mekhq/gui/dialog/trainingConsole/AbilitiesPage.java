@@ -255,9 +255,11 @@ final class AbilitiesPage {
         if (needsChoice) {
             card.addToBody(choicePicker(console, ability, stats, selection));
         }
-        if (tally.ready() > 0) {
+        if (tally.hasCostText()) {
             card.addToBody(ConsoleWidgets.label(tally.costText("abilities.cost.single", "abilities.cost.range"),
                   0.84f, TEXT_MUTED));
+        }
+        if (tally.ready() > 0) {
             if (!tally.fees().isZero()) {
                 card.addToBody(ConsoleWidgets.label(getFormattedTextAt(RESOURCE_BUNDLE, "abilities.fees",
                       tally.fees().toAmountAndSymbolString()), 0.84f, AMBER));

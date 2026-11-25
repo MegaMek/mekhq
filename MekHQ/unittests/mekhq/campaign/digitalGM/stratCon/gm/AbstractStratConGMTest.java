@@ -34,6 +34,7 @@ package mekhq.campaign.digitalGM.stratCon.gm;
 
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
+import static org.mockito.ArgumentMatchers.argThat;
 import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.never;
@@ -150,6 +151,7 @@ class AbstractStratConGMTest {
         StratConCampaignState campaignState = mock(StratConCampaignState.class);
         when(campaignState.getTracks()).thenReturn(tracks);
         when(campaignState.getScheduledScenarioDates()).thenReturn(scheduledScenarioDates);
+        when(campaignState.getScheduledScenarios()).thenReturn(new ArrayList<>());
         return campaignState;
     }
 
@@ -172,7 +174,7 @@ class AbstractStratConGMTest {
     }
 
     @Test
-    void mondayDoesNotRollWeeklyDatesWhenNotSingleDrop() {
+    void mondayRollsTheWeeksNormalScenariosOncePerContract() {
         StratConTrackState track1 = trackWith();
         StratConTrackState track2 = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track1, track2), new ArrayList<>());
@@ -181,31 +183,23 @@ class AbstractStratConGMTest {
 
         gm.handleNewDay(newDay(MONDAY, contract));
 
-        // Outside Single Drop play, ordinary scenarios are scheduled up front rather than rolled each Monday
-        verify(gm.generation, never()).generateWeeklyScenarioDates(any(), any(), any(), any(), anyBoolean());
+        // Outside Single Drop play, each Monday rolls the week's normal scenarios against each sector's threat
+        verify(gm.generation, times(1)).generateWeeklyScenarioDates(any(), eq(campaignState), eq(contract),
+              eq(false));
+        verify(campaignState).setLastWeeklyRollDate(MONDAY);
     }
 
     @Test
-    void aContractWithoutUpFrontScenariosIsScheduledFromToday() {
+    void aContractOnItsUpFrontScheduleGetsNoWeeklyRolls() {
         StratConTrackState track = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        when(campaignState.isNormalTempoScheduled()).thenReturn(true);
         AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
-        when(contract.getStartDate()).thenReturn(TUESDAY.minusMonths(1));
-        when(contract.getEndingDate()).thenReturn(TUESDAY.plusMonths(2));
-        when(contract.getLengthInMonths()).thenReturn(3);
-        when(contract.getTrackCount()).thenReturn(1);
-        when(contract.getScale()).thenReturn(1);
         TestGM gm = new TestGM(false);
 
-        NewDayEvent event = newDay(TUESDAY, contract);
-        CampaignOptions options = event.getCampaign().getCampaignOptions();
-        when(options.get(CampaignOption.MULTIPLY_TRACK_INTENSITY_BY_SCALE)).thenReturn(true);
-        when(options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION)).thenReturn(false);
-        when(options.get(CampaignOption.SCENARIO_TEMPO_MULTIPLIER)).thenReturn(1.0);
+        gm.handleNewDay(newDay(MONDAY, contract));
 
-        gm.handleNewDay(event);
-
-        verify(campaignState).setNormalTempoScheduled(true);
+        verify(gm.generation, never()).generateWeeklyScenarioDates(any(), any(), any(), anyBoolean());
     }
 
     @Test
@@ -221,7 +215,7 @@ class AbstractStratConGMTest {
     }
 
     @Test
-    void mondayGeneratesWeeklyDatesForOnlyFirstTrackWhenSingleDrop() {
+    void mondaySchedulesSingleDropsOneScenarioOncePerContract() {
         StratConTrackState track1 = trackWith();
         StratConTrackState track2 = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track1, track2), new ArrayList<>());
@@ -230,25 +224,78 @@ class AbstractStratConGMTest {
 
         gm.handleNewDay(newDay(MONDAY, contract));
 
-        // Single-drop caps the campaign to one scenario/week: only the first track schedules
-        verify(gm.generation).generateWeeklyScenarioDates(any(), any(), any(), eq(track1), eq(true));
-        verify(gm.generation, never()).generateWeeklyScenarioDates(any(), any(), any(), eq(track2), anyBoolean());
+        // Single-drop caps the campaign to one scenario/week, whatever the number of sectors
+        verify(gm.generation, times(1)).generateWeeklyScenarioDates(any(), eq(campaignState), eq(contract),
+              eq(true));
     }
 
     @Test
-    void nonMondayDoesNotGenerateWeeklyDates() {
+    void aWeekAlreadyRolledIsNotRolledAgain() {
         StratConTrackState track = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        when(campaignState.getLastWeeklyRollDate()).thenReturn(MONDAY);
         AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
         TestGM gm = new TestGM(false);
 
         gm.handleNewDay(newDay(TUESDAY, contract));
 
-        verify(gm.generation, never()).generateWeeklyScenarioDates(any(), any(), any(), any(), anyBoolean());
+        verify(gm.generation, never()).generateWeeklyScenarioDates(any(), any(), any(), anyBoolean());
     }
 
     @Test
-    void getFacilityStrategyEffectsAndForceReturnsRunForEveryTrack() {
+    void aWeekWhoseMondayWasMissedIsRolledOnItsFirstDayProcessed() {
+        StratConTrackState track = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        when(campaignState.getLastWeeklyRollDate()).thenReturn(MONDAY.minusWeeks(1));
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        TestGM gm = new TestGM(false);
+
+        gm.handleNewDay(newDay(TUESDAY, contract));
+
+        verify(gm.generation, times(1)).generateWeeklyScenarioDates(any(), eq(campaignState), eq(contract),
+              eq(false));
+        verify(campaignState).setLastWeeklyRollDate(TUESDAY);
+    }
+
+    @Test
+    void aPeacefulWeekWaitsForTheRaidBeforeRolling() {
+        StratConTrackState track = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        when(contract.isPeaceful()).thenReturn(true);
+        TestGM gm = new TestGM(false);
+
+        gm.handleNewDay(newDay(MONDAY, contract));
+
+        // Between raids the week is not rolled, nor counted as rolled
+        verify(gm.generation, never()).generateWeeklyScenarioDates(any(), any(), any(), anyBoolean());
+        verify(campaignState, never()).setLastWeeklyRollDate(any());
+
+        // The raid breaks out midweek: the week is rolled on its first day
+        when(contract.isPeaceful()).thenReturn(false);
+        gm.handleNewDay(newDay(TUESDAY, contract));
+
+        verify(gm.generation, times(1)).generateWeeklyScenarioDates(any(), eq(campaignState), eq(contract),
+              eq(false));
+        verify(campaignState).setLastWeeklyRollDate(TUESDAY);
+    }
+
+    @Test
+    void singleDropSchedulesItsScenarioEvenWhilePeaceful() {
+        StratConTrackState track = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        when(contract.isPeaceful()).thenReturn(true);
+        TestGM gm = new TestGM(true);
+
+        gm.handleNewDay(newDay(MONDAY, contract));
+
+        verify(gm.generation, times(1)).generateWeeklyScenarioDates(any(), eq(campaignState), eq(contract),
+              eq(true));
+    }
+
+    @Test
+    void getFacilityStrategyEffectsRunForEveryTrack() {
         StratConTrackState track1 = trackWith();
         StratConTrackState track2 = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track1, track2), new ArrayList<>());
@@ -259,8 +306,60 @@ class AbstractStratConGMTest {
 
         // The loop always calls facility(); skipping in Mapless/Singles is handled by wiring a NoOpFacilityStrategy
         verify(gm.facility, times(2)).applyPeriodicEffects(any(), eq(campaignState), anyBoolean());
+    }
+
+    @Test
+    void handleNewDayLeavesForceReturnsToTheEarlierStep() {
+        StratConTrackState track = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        TestGM gm = new TestGM(false);
+
+        gm.handleNewDay(newDay(TUESDAY, contract));
+
+        // Returns run before the hangar is processed (processForceReturns); running them again here would roll patrol
+        // returns twice
+        verify(gm.lifecycle, never()).processForceReturnDates(any(), any());
+    }
+
+    @Test
+    void processForceReturnsRunsForEveryTrack() {
+        StratConTrackState track1 = trackWith();
+        StratConTrackState track2 = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track1, track2), new ArrayList<>());
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        TestGM gm = new TestGM(false);
+
+        gm.processForceReturns(newDay(TUESDAY, contract).getCampaign());
+
         verify(gm.lifecycle).processForceReturnDates(eq(track1), any());
         verify(gm.lifecycle).processForceReturnDates(eq(track2), any());
+    }
+
+    @Test
+    void processForceReturnsSkipsContractsWithoutStratCon() {
+        AbstractContract contract = contractWith(null, ContractMoraleLevel.STALEMATE);
+        TestGM gm = new TestGM(false);
+
+        gm.processForceReturns(newDay(TUESDAY, contract).getCampaign());
+
+        verifyNoInteractions(gm.lifecycle);
+    }
+
+    @Test
+    void processForceReturnsClearsPhantomScenariosFirst() {
+        StratConScenario phantom = scenario(null, false);
+        StratConScenario strategicObjective = scenario(null, false);
+        when(strategicObjective.isStrategicObjective()).thenReturn(true);
+        StratConTrackState track = trackWith(phantom, strategicObjective);
+        StratConCampaignState campaignState = campaignStateWith(List.of(track), new ArrayList<>());
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        TestGM gm = new TestGM(false);
+
+        gm.processForceReturns(newDay(TUESDAY, contract).getCampaign());
+
+        verify(track).removeScenario(phantom);
+        verify(track, never()).removeScenario(strategicObjective);
     }
 
     @Test
@@ -281,7 +380,7 @@ class AbstractStratConGMTest {
     }
 
     @Test
-    void dailyScenariosGeneratedWhenScheduledTodayAndNotRouted() {
+    void dailyScenariosGeneratedWhenScheduledTodayAndNotPeaceful() {
         StratConTrackState track = trackWith();
         // today scheduled twice -> scenarioCount == 2
         StratConCampaignState campaignState = campaignStateWith(List.of(track),
@@ -291,23 +390,36 @@ class AbstractStratConGMTest {
 
         gm.handleNewDay(newDay(TUESDAY, contract));
 
-        verify(gm.generation).generateDailyScenarios(any(), eq(campaignState), eq(contract), eq(2));
+        verify(gm.generation).generateDailyScenarios(any(), eq(campaignState), eq(contract),
+              argThat(scenarioSectors -> scenarioSectors.size() == 2));
     }
 
     @Test
-    void dailyScenariosSkippedWhenOpForRouted() {
+    void dailyScenariosSkippedWhileTheContractIsPeaceful() {
         StratConTrackState track = trackWith();
         StratConCampaignState campaignState = campaignStateWith(List.of(track),
               new ArrayList<>(List.of(TUESDAY)));
-        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.ROUTED);
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.STALEMATE);
+        when(contract.isPeaceful()).thenReturn(true);
         TestGM gm = new TestGM(false);
 
         gm.handleNewDay(newDay(TUESDAY, contract));
 
-        verify(gm.generation, never()).generateDailyScenarios(any(),
-              any(),
-              any(),
-              org.mockito.ArgumentMatchers.anyInt());
+        verify(gm.generation, never()).generateDailyScenarios(any(), any(), any(), any());
+    }
+
+    @Test
+    void dailyScenariosStillGeneratedAgainstAScatteredEnemy() {
+        StratConTrackState track = trackWith();
+        StratConCampaignState campaignState = campaignStateWith(List.of(track),
+              new ArrayList<>(List.of(TUESDAY)));
+        AbstractContract contract = contractWith(campaignState, ContractMoraleLevel.SCATTERED);
+        TestGM gm = new TestGM(false);
+
+        gm.handleNewDay(newDay(TUESDAY, contract));
+
+        verify(gm.generation).generateDailyScenarios(any(), eq(campaignState), eq(contract),
+              argThat(scenarioSectors -> scenarioSectors.size() == 1));
     }
 
     @Test
@@ -321,12 +433,9 @@ class AbstractStratConGMTest {
 
         gm.handleNewDay(newDay(MONDAY, contract, true));
 
-        verify(gm.generation, never()).generateWeeklyScenarioDates(any(), any(), any(), any(),
+        verify(gm.generation, never()).generateWeeklyScenarioDates(any(), any(), any(),
               org.mockito.ArgumentMatchers.anyBoolean());
-        verify(gm.generation, never()).generateDailyScenarios(any(),
-              any(),
-              any(),
-              org.mockito.ArgumentMatchers.anyInt());
+        verify(gm.generation, never()).generateDailyScenarios(any(), any(), any(), any());
     }
 
     @Test

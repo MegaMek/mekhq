@@ -44,9 +44,8 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
-import mekhq.campaign.parts.PartInventory;
+import mekhq.campaign.parts.StockCount;
 import mekhq.utilities.MHQXMLUtility;
-import mekhq.utilities.ReportingUtilities;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
@@ -202,17 +201,6 @@ public class LargeCraftAmmoBin extends AmmoBin {
         double designCapacity = Math.ceil((double) designShots / getType().getShots()) * ammoTonnage;
         boolean hasDesignCapacity = Math.abs(getCapacity() - designCapacity) < CAPACITY_TOLERANCE;
         return hasDesignCapacity ? designShots : 0;
-    }
-
-    @Override
-    public Money getValueNeeded() {
-        if ((getShotsPerTon() <= 0) || (shotsNeeded <= 0)) {
-            return Money.zero();
-        }
-
-        return adjustCostsForCampaignOptions(getPricePerTon().multipliedBy(getCapacity())
-                                                   .multipliedBy(shotsNeeded)
-                                                   .dividedBy(getShotsPerTon()));
     }
 
     @Override
@@ -427,6 +415,17 @@ public class LargeCraftAmmoBin extends AmmoBin {
         return 0.0;
     }
 
+    /**
+     * Removing excess shots needs no stock, so that task shows none.
+     */
+    @Override
+    public @Nullable StockCount getShownStock() {
+        if (!isSalvaging() && (shotsNeeded < 0)) {
+            return null;
+        }
+        return super.getShownStock();
+    }
+
     @Override
     public String getDesc() {
         if (shotsNeeded >= 0) {
@@ -455,25 +454,7 @@ public class LargeCraftAmmoBin extends AmmoBin {
             return getType().getDesc() + ", " + (-shotsNeeded) + " shots to remove";
         }
         if (null != unit) {
-            String availability = "";
-            int shotsAvailable = getAmountAvailable();
-            PartInventory inventories = getPartInventory(getNewPart());
-            if (shotsAvailable == 0) {
-                availability = "<br><font color='" +
-                                     ReportingUtilities.getNegativeColor() +
-                                     "'>No ammo (" +
-                                     inventories.getTransitOrderedDetails() +
-                                     ")</font>";
-            } else if (shotsAvailable < shotsNeeded) {
-                availability = "<br><font color='" +
-                                     ReportingUtilities.getNegativeColor() +
-                                     "'>Only " +
-                                     shotsAvailable +
-                                     " available (" +
-                                     inventories.getTransitOrderedDetails() +
-                                     ")</font>";
-            }
-            return getType().getDesc() + ", " + shotsNeeded + " shots needed" + availability;
+            return getType().getDesc() + ", " + shotsNeeded + " shots needed<br/>" + countStock().describe();
         } else {
             return "";
         }

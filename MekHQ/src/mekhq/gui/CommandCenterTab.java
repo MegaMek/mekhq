@@ -72,9 +72,9 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.dailyReportLog.DailyReportLog;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.AcquisitionEvent;
+import mekhq.campaign.events.BulkGenerationCompletedEvent;
 import mekhq.campaign.events.NewDayEvent;
 import mekhq.campaign.events.OptionsChangedEvent;
-import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.events.ProcurementEvent;
 import mekhq.campaign.events.ReportEvent;
 import mekhq.campaign.events.TransitCompleteEvent;
@@ -330,10 +330,6 @@ public final class CommandCenterTab extends CampaignGuiTab {
         panInfo.add(lblRatingHead, gridBagConstraints);
         lblRating = new ClickableLabel(evt -> {
             if (getCampaignOptions().get(CampaignOption.USE_CHAOS_REPUTATION)) {
-                if (getCampaignOptions().get(CampaignOption.CAMPAIGN_LEVEL_CHAOS_REPUTATION)) {
-                    // Campaign-level tracking surfaces its breakdown via the rating tooltip, not a report dialog.
-                    return;
-                }
                 new ChaosReputationReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true);
             } else {
                 new ReputationReportDialog(getCampaignGui().getFrame(), getCampaign()).setVisible(true);
@@ -821,8 +817,11 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         RoundedJButton btnNeededParts = new RoundedJButton(resourceMap.getString("btnNeededParts.text"));
         btnNeededParts.setToolTipText(resourceMap.getString("btnNeededParts.toolTipText"));
-        btnNeededParts.addActionListener(evt -> new AcquisitionsDialog(getFrame(), true, getCampaignGui()).setVisible(
-              true));
+        btnNeededParts.addActionListener(evt -> {
+            AcquisitionsDialog acquisitionsDialog = new AcquisitionsDialog(getFrame(), true, getCampaignGui());
+            acquisitionsDialog.setTitle(resourceMap.getString("btnNeededParts.text"));
+            acquisitionsDialog.setVisible(true);
+        });
         panProcurementButtons.add(btnNeededParts);
 
         RoundedJButton btnPartsReport = new RoundedJButton(resourceMap.getString("btnPartsReport.text"));
@@ -984,7 +983,7 @@ public final class CommandCenterTab extends CampaignGuiTab {
         // While a bulk generation is adding units/parts off the EDT, skip this refresh: the summary
         // computation walks the campaign's hangar and location tree, which the worker is concurrently
         // mutating - reading it here threw ConcurrentModificationException from the modal progress
-        // dialog's event pump. The generation fires an OrganizationChangedEvent when it completes,
+        // dialog's event pump. The generation fires a BulkGenerationCompletedEvent when it completes,
         // which reschedules this refresh against the finished, consistent campaign.
         if (campaign.isBulkGenerationInProgress()) {
             return;
@@ -1295,8 +1294,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
     }
 
     @Subscribe
-    public void handle(OrganizationChangedEvent evt) {
-        // Fired once after a bulk force generation completes (among other org changes); reschedules the
+    public void handle(BulkGenerationCompletedEvent evt) {
+        // Fired once after a bulk force generation completes; reschedules the
         // basic-info/cargo refresh that refreshBasicInfo skipped while the generation was in progress.
         basicInfoScheduler.schedule();
     }

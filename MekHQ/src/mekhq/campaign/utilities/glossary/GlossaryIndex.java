@@ -72,9 +72,9 @@ public final class GlossaryIndex {
             return document.title();
         }
 
-        /** @return the version the entry was added or last updated in */
+        /** @return the version the entry was last significantly updated in, or added in if never updated since */
         public Version version() {
-            return entry.getVersionAddedOrLastUpdated();
+            return entry.getVersionLastUpdated();
         }
     }
 
@@ -107,7 +107,7 @@ public final class GlossaryIndex {
                                                        .toList();
             GlossarySearch.Document document = new GlossarySearch.Document(entry.getLookUpName(), entry.getTitle(),
                   GlossaryText.plainText(definition));
-            items.put(entry, new Item(entry, document, classifier.apply(entry.getVersionAddedOrLastUpdated()),
+            items.put(entry, new Item(entry, document, classifier.apply(entry.getVersionLastUpdated()),
                   seeAlso, documents));
             for (GlossaryEntry linked : seeAlso) {
                 referencedBy.computeIfAbsent(linked, key -> new ArrayList<>()).add(entry);

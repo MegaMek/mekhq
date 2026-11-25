@@ -281,4 +281,18 @@ class FactionStandingUltimatumEditorDialogTest {
         assertEquals(5, rows.size());
         assertEquals("FactionStandingUltimatumDialog.NO_SIDES_TEST.rogue.pirate.pitch", rows.get(4).key());
     }
+
+    @Test
+    @DisplayName("Pirates need the .pirate key and the Bandit Caste needs the .banditCaste key")
+    void testTextKeyRowsUseEachRogueKindsOwnKey() {
+        FactionStandingUltimatumData ultimatum = new FactionStandingUltimatumData("ROGUE_KEYS_TEST", "3057-09-18",
+              null, List.of("FC"), List.of(LYRAN_SIDE), "LA", false, 0, false, false, false, true, true, false);
+
+        List<FactionStandingUltimatumEditorDialog.TextKeyRow> rows =
+              FactionStandingUltimatumEditorDialog.buildTextKeyRows(ultimatum);
+
+        assertEquals(7, rows.size());
+        assertEquals("FactionStandingUltimatumDialog.ROGUE_KEYS_TEST.rogue.pirate.pitch", rows.get(5).key());
+        assertEquals("FactionStandingUltimatumDialog.ROGUE_KEYS_TEST.rogue.banditCaste.pitch", rows.get(6).key());
+    }
 }

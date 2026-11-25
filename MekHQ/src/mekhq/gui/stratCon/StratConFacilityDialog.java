@@ -57,6 +57,7 @@ import mekhq.campaign.digitalGM.stratCon.facility.*;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacility.FacilityIntel;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityAdvisor.OrderOption;
 import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilityEffectStatus.SupportRules;
+import mekhq.campaign.digitalGM.stratCon.facility.StratConFacilitySupply.SupplyStatus;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
 import mekhq.gui.baseComponents.roundedComponents.RoundedJButton;
@@ -206,10 +207,10 @@ public class StratConFacilityDialog extends JDialog {
         }
 
         if (StratConFacilitySupply.isSupplyLinesActive(campaign)) {
-            html.append(getTextAt(STRATCON_BUNDLE,
-                  StratConFacilitySupply.isCutOff(track, coords) ?
-                        "stratConTab.hexInfo.supplyCut" :
-                        "stratConTab.hexInfo.supplyConnected"));
+            String supplyStatusKey = getSupplyStatusKey(StratConFacilitySupply.getSupplyStatus(track, coords));
+            if (supplyStatusKey != null) {
+                html.append(getTextAt(STRATCON_BUNDLE, supplyStatusKey));
+            }
         }
         int besiegerCount = StratConFacilitySiege.getSieges(track, coords).size();
         if (besiegerCount > 0) {
@@ -292,6 +293,24 @@ public class StratConFacilityDialog extends JDialog {
             return "player";
         }
         return StratConFacilityDefinition.isAlliedToPlayer(owner) ? "employer" : "enemy";
+    }
+
+    /**
+     * @param supplyStatus a facility's standing on its side's supply lines
+     *
+     * @return the {@code AtBStratCon} resource key for the facility's supply line, or {@code null} when there is
+     *       nothing to show, because the sector has no supply lines
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static @Nullable String getSupplyStatusKey(SupplyStatus supplyStatus) {
+        return switch (supplyStatus) {
+            case NONE -> null;
+            case CUT -> "stratConTab.hexInfo.supplyCut";
+            case SOURCE -> "stratConTab.hexInfo.supplySource";
+            case CONNECTED -> "stratConTab.hexInfo.supplyConnected";
+        };
     }
 
     private JComponent createOrdersPanel() {

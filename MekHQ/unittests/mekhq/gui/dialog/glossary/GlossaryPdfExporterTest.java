@@ -162,7 +162,7 @@ class GlossaryPdfExporterTest {
         List<Entry> entries = new ArrayList<>();
         for (GlossaryEntry glossaryEntry : GlossaryEntry.values()) {
             entries.add(new Entry(glossaryEntry.getLookUpName(), glossaryEntry.getTitle(),
-                  glossaryEntry.getVersionAddedOrLastUpdated().toString(), glossaryEntry.getDefinition(), List.of()));
+                  glossaryEntry.getVersionLastUpdated().toString(), glossaryEntry.getDefinition(), List.of()));
         }
 
         try (PDDocument document = Loader.loadPDF(export(entries, Options.defaults()))) {

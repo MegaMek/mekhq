@@ -44,6 +44,7 @@ import java.util.Objects;
 import jakarta.annotation.Nullable;
 import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.JumpDriveProfile;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
@@ -169,23 +170,86 @@ public class ContractUtilities {
     public static int getTravelDays(Campaign campaign, AbstractContract abstractContract,
           AbstractLocation currentLocation, boolean isOverridingCommandCircuitRequirements,
           FactionStandings factionStandings) {
-        boolean isGM = campaign.isGM();
+        return getTravelDays(campaign, campaign.getLocalDate(), abstractContract, currentLocation,
+              isOverridingCommandCircuitRequirements, campaign.isGM(), factionStandings);
+    }
+
+    /**
+     * Estimates, in whole days, how long the force at {@code currentLocation} needs to reach the contract's target
+     * world, caching the jump path on the contract as {@link #getJumpPath} does.
+     *
+     * <p>Command Circuit access is judged exactly as it is for the journey itself: by the regard of the faction whose
+     * standing the contract answers to ({@link AbstractContract#getStandingEmployerFactionCode()}), and only when the
+     * campaign uses Faction Standing for Command Circuits. Otherwise a contract's start date and the fleet's actual
+     * arrival would disagree.</p>
+     *
+     * @param campaign                               the campaign
+     * @param currentDate                            the date the journey starts
+     * @param abstractContract                       the contract being travelled to
+     * @param currentLocation                        the force's location
+     * @param isOverridingCommandCircuitRequirements whether the GM is overriding Command Circuit requirements
+     * @param isGM                                   whether GM mode is enabled
+     * @param factionStandings                       the player's faction standings
+     *
+     * @return the travel time in days, rounded up; {@code 0} when no route can be measured
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static int getTravelDays(Campaign campaign, LocalDate currentDate, AbstractContract abstractContract,
+          AbstractLocation currentLocation, boolean isOverridingCommandCircuitRequirements, boolean isGM,
+          FactionStandings factionStandings) {
         boolean isUseCommandCircuit = FactionStandingUtilities.isUseCommandCircuit(
               isOverridingCommandCircuitRequirements,
               isGM,
+              campaign.getCampaignOptions().isUseFactionStandingCommandCircuitSafe(),
               factionStandings,
-              abstractContract.getEmployerFactionCode());
+              abstractContract.getStandingEmployerFactionCode());
 
         JumpPath jumpPath = getJumpPath(campaign, abstractContract, currentLocation);
 
         if (jumpPath != null) {
-            LocalDate currentDate = campaign.getLocalDate();
-            double transitTime = currentLocation.getTransitTime();
-            return (int) ceil(jumpPath.getTotalTime(currentDate, transitTime, isUseCommandCircuit,
+            return (int) ceil(getRemainingJourneyTime(jumpPath, currentDate, currentLocation, isUseCommandCircuit,
                   campaign.getJumpDriveProfile(currentLocation)));
         }
 
         return 0;
+    }
+
+    /**
+     * The journey time still ahead of a force at {@code currentLocation} following {@code jumpPath}, in days.
+     *
+     * <p>A single-system path that is not an in-system transfer means the force is already in the target system with
+     * no jump left to make, so all that remains is the rest of the inbound leg to the target world - none at all if it
+     * is already on that world. {@link JumpPath#getTotalTime} instead prices such a path as a flight out to the jump
+     * point and back in, which would push a contract's start well past the day the force actually lands.</p>
+     *
+     * @param jumpPath            the path to the contract's target world
+     * @param currentDate         the date the journey starts, for recharge times
+     * @param currentLocation     the force's location
+     * @param isUseCommandCircuit whether Command Circuits are used along the way
+     * @param jumpDriveProfile    the fleet's jump drive profile
+     *
+     * @return the remaining journey time in days
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    static double getRemainingJourneyTime(JumpPath jumpPath, LocalDate currentDate, AbstractLocation currentLocation,
+          boolean isUseCommandCircuit, @Nullable JumpDriveProfile jumpDriveProfile) {
+        if ((jumpPath.size() == 1) && !jumpPath.isInSystemTransfer()) {
+            if (currentLocation.isOnPlanet()) {
+                return 0.0;
+            }
+
+            // The share of the inbound leg still to fly, applied to the transit to the target world (which may differ
+            // from the world the force's own course is currently measured against)
+            double remainingShare = Math.clamp(1.0 - currentLocation.getPercentageTransit(), 0.0, 1.0);
+            return remainingShare * jumpPath.getEndTime();
+        }
+
+        return jumpPath.getTotalTime(currentDate, currentLocation.getTransitTime(), isUseCommandCircuit,
+              jumpDriveProfile);
     }
 
     public static @Nullable JumpPath getJumpPath(Campaign campaign, AbstractContract abstractContract,

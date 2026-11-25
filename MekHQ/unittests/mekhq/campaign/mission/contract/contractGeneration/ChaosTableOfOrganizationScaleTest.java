@@ -58,12 +58,12 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 
 /**
- * Tests the whole-TO&amp;E Scale used by Hot Spots upkeep:
+ * Tests the whole-TO&amp;E Scale used by Hot Spots upkeep and the Command Center:
  * {@link ChaosContractDeterminationScale#generateScaleForTableOfOrganization} and its per-day cache,
  * {@link ChaosContractDeterminationScale#getScaleForTableOfOrganization}.
  *
- * <p>Unlike the contract Scale, every unit in a formation counts whatever the formation's type or role; only units
- * outside the TO&amp;E and mothballed units are left out.</p>
+ * <p>It counts the same units as the contract Scale: units in STANDARD formations with a Frontline or Maneuver role.
+ * Units outside the TO&amp;E, units in other roles or formation types, and mothballed units are left out.</p>
  */
 class ChaosTableOfOrganizationScaleTest {
     /** Per-Scale Battle Value without the battlefield support point conversion */
@@ -73,6 +73,9 @@ class ChaosTableOfOrganizationScaleTest {
 
     private static final int FORMATION_ID = 7;
     private static final int OTHER_FORMATION_ID = 8;
+    private static final int RESERVE_FORMATION_ID = 9;
+    private static final int PATROL_FORMATION_ID = 10;
+    private static final int FRONTLINE_SUPPORT_FORMATION_ID = 11;
     private static final int UNASSIGNED_FORMATION_ID = -1;
 
     private PlayerForce playerForce;
@@ -86,10 +89,26 @@ class ChaosTableOfOrganizationScaleTest {
         units = new ArrayList<>();
         when(hangar.getUnits()).thenAnswer(invocation -> new ArrayList<>(units));
 
-        Formation reserveSupport = mock(Formation.class);
-        when(reserveSupport.getCombatRoleInMemory()).thenReturn(CombatRole.RESERVE);
-        when(reserveSupport.isFormationType(FormationType.STANDARD)).thenReturn(false);
-        when(playerForce.getFormation(FORMATION_ID)).thenReturn(reserveSupport);
+        Formation frontline = mock(Formation.class);
+        when(frontline.getCombatRoleInMemory()).thenReturn(CombatRole.FRONTLINE);
+        when(frontline.isFormationType(FormationType.STANDARD)).thenReturn(true);
+        when(playerForce.getFormation(FORMATION_ID)).thenReturn(frontline);
+
+        // Every formation starts out Frontline, and changing its type does not change that role
+        Formation frontlineSupport = mock(Formation.class);
+        when(frontlineSupport.getCombatRoleInMemory()).thenReturn(CombatRole.FRONTLINE);
+        when(frontlineSupport.isFormationType(FormationType.STANDARD)).thenReturn(false);
+        when(playerForce.getFormation(FRONTLINE_SUPPORT_FORMATION_ID)).thenReturn(frontlineSupport);
+
+        Formation reserve = mock(Formation.class);
+        when(reserve.getCombatRoleInMemory()).thenReturn(CombatRole.RESERVE);
+        when(reserve.isFormationType(FormationType.STANDARD)).thenReturn(true);
+        when(playerForce.getFormation(RESERVE_FORMATION_ID)).thenReturn(reserve);
+
+        Formation patrol = mock(Formation.class);
+        when(patrol.getCombatRoleInMemory()).thenReturn(CombatRole.PATROL);
+        when(patrol.isFormationType(FormationType.STANDARD)).thenReturn(true);
+        when(playerForce.getFormation(PATROL_FORMATION_ID)).thenReturn(patrol);
 
         Formation maneuver = mock(Formation.class);
         when(maneuver.getCombatRoleInMemory()).thenReturn(CombatRole.MANEUVER);
@@ -175,9 +194,33 @@ class ChaosTableOfOrganizationScaleTest {
             assertEquals(1, scale(false));
         }
 
-        /** Upkeep covers the whole TO&amp;E, so reserve and non-standard formations count, unlike contract Scale. */
+        /** A Support, Convoy, Security or Salvage formation left on its default Frontline role does not count. */
         @Test
-        void reserveAndNonStandardFormationsCount() {
+        void nonStandardFormationsDoNotCount() {
+            addUnit(FRONTLINE_SUPPORT_FORMATION_ID, false, BATTLE_VALUE_PER_SCALE * 10);
+            addUnit(FORMATION_ID, false, BATTLE_VALUE_PER_SCALE);
+
+            assertEquals(1, scale(false));
+        }
+
+        /** The Command Center figure and the contract market's figure come from the same rule. */
+        @Test
+        void matchesTheContractScaleForTheSameHangar() {
+            addUnit(FORMATION_ID, false, BATTLE_VALUE_PER_SCALE * 2);
+            addUnit(OTHER_FORMATION_ID, false, BATTLE_VALUE_PER_SCALE / 3);
+            addUnit(FRONTLINE_SUPPORT_FORMATION_ID, false, BATTLE_VALUE_PER_SCALE);
+            addUnit(RESERVE_FORMATION_ID, false, BATTLE_VALUE_PER_SCALE);
+            addUnit(FORMATION_ID, true, BATTLE_VALUE_PER_SCALE);
+            addUnit(UNASSIGNED_FORMATION_ID, false, BATTLE_VALUE_PER_SCALE);
+
+            assertEquals(ChaosContractDeterminationScale.generateScaleForDetachment(playerForce, hangar, false),
+                  exactScale(false), 0.000001);
+        }
+
+        @Test
+        void reserveAndPatrolFormationsDoNotCount() {
+            addUnit(RESERVE_FORMATION_ID, false, BATTLE_VALUE_PER_SCALE * 10);
+            addUnit(PATROL_FORMATION_ID, false, BATTLE_VALUE_PER_SCALE * 10);
             addUnit(FORMATION_ID, false, BATTLE_VALUE_PER_SCALE);
 
             assertEquals(1, scale(false));
@@ -312,6 +355,8 @@ class ChaosTableOfOrganizationScaleTest {
             when(otherUnit.getEntity()).thenReturn(otherEntity);
             when(otherUnit.getFormationId()).thenReturn(FORMATION_ID);
             Formation otherFormation = mock(Formation.class);
+            when(otherFormation.getCombatRoleInMemory()).thenReturn(CombatRole.FRONTLINE);
+            when(otherFormation.isFormationType(FormationType.STANDARD)).thenReturn(true);
             when(otherForce.getFormation(FORMATION_ID)).thenReturn(otherFormation);
             List<Unit> otherUnits = List.of(otherUnit);
             when(otherHangar.getUnits()).thenReturn(otherUnits);

@@ -62,6 +62,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
@@ -428,6 +429,7 @@ class CargoCapacityTest {
 
         while (!unit.isFullyCrewed()) {
             Person crewMember = mock(Person.class);
+            lenient().when(crewMember.getStatus()).thenReturn(PersonnelStatus.ACTIVE);
             when(mockCampaign.getCampaignOptions()).thenReturn(mockCampaignOptions);
             lenient().when(mockCampaignOptions.get(CampaignOption.USE_ABILITIES)).thenReturn(false);
             lenient().when(mockCampaignOptions.get(CampaignOption.USE_EDGE)).thenReturn(false);

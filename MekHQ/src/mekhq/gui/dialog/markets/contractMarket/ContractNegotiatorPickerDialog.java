@@ -42,7 +42,6 @@ import java.awt.CardLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Dimension;
-import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
@@ -83,11 +82,13 @@ import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.Skill;
 import mekhq.campaign.personnel.skills.SkillModifierData;
 import mekhq.campaign.personnel.skills.SkillType;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 import mekhq.gui.baseComponents.hud.Hud;
 import mekhq.gui.baseComponents.hud.HudButton;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl;
 import mekhq.gui.baseComponents.hud.HudSegmentedControl.Segment;
-import mekhq.gui.utilities.WrapLayout;
+import mekhq.gui.baseComponents.hud.HudWrapPanel;
+import mekhq.gui.baseComponents.hud.HudWrappingLabel;
 
 /**
  * A modal dialog for choosing the officer who will represent the player at a contract's negotiation table, drawn as a
@@ -184,8 +185,10 @@ public class ContractNegotiatorPickerDialog extends JDialog {
         this.activeNegotiators = campaign.getCampaignOptions().get(CampaignOption.USE_ACTIVE_NEGOTIATORS);
         this.useEdge = campaign.getCampaignOptions().get(CampaignOption.USE_EDGE);
         if (activeNegotiators) {
+            int standingModifier = FactionStandingUtilities.getNegotiationModifier(campaign, contract);
             for (Person candidate : candidates) {
-                odds.put(candidate, NegotiatorProfile.odds(campaign, candidate, employerNegotiator, scale));
+                odds.put(candidate, NegotiatorProfile.odds(campaign, candidate, employerNegotiator, scale,
+                      standingModifier));
             }
         }
 
@@ -326,7 +329,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
               BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, BORDER),
               BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(14), scaleForGUI(10), scaleForGUI(14))));
 
-        JPanel identity = MarketHud.column();
+        JPanel identity = Hud.column();
         String scaleText = ChaosContractDeterminationScale.formatScale(contract.getExactScale(),
               campaign.getCampaignOptions().get(CampaignOption.USE_FRACTIONAL_SCALE));
         identity.add(leftAligned(Hud.eyebrow(getFormattedTextAt(RESOURCE_BUNDLE, "negotiate.contractMarket.eyebrow",
@@ -344,7 +347,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
             JPanel across = MarketHud.readout(getTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.across"),
                   getFormattedTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.across.value",
                         employerNegotiator.getFullTitle(), targetText(employerNegotiator)), TEXT, SURFACE_DEEP);
-            across.setToolTipText(MarketHud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
+            across.setToolTipText(Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
                   "picker.contractMarket.negotiator.across.tooltip")));
             readouts.add(across);
             readouts.add(Box.createHorizontalStrut(scaleForGUI(6)));
@@ -368,13 +371,13 @@ public class ContractNegotiatorPickerDialog extends JDialog {
                     BorderFactory.createMatteBorder(0, scaleForGUI(3), 0, 0, AMBER),
                     BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(12), scaleForGUI(8),
                           scaleForGUI(12)))));
-        JLabel text = new MarketHud.WrappingLabel();
+        JLabel text = new HudWrappingLabel();
         text.setForeground(TEXT);
         text.setFont(hudFont(Font.PLAIN, 0.92f, 0.0f));
         text.setText("<html><b style='color:" + hex(AMBER) + "'>"
-                           + MarketHud.escape(getTextAt(RESOURCE_BUNDLE,
+                           + Hud.escape(getTextAt(RESOURCE_BUNDLE,
               "picker.contractMarket.negotiator.fallback.title")) + "</b> "
-                           + MarketHud.escape(getTextAt(RESOURCE_BUNDLE,
+                           + Hud.escape(getTextAt(RESOURCE_BUNDLE,
               "picker.contractMarket.negotiator.fallback.text")) + "</html>");
         banner.add(text, BorderLayout.CENTER);
         JPanel holder = new JPanel(new BorderLayout());
@@ -434,7 +437,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
                                       .toUpperCase(Locale.ROOT)), BorderLayout.WEST);
         rankingRow.add(rankingControl, BorderLayout.CENTER);
 
-        JPanel head = MarketHud.column();
+        JPanel head = Hud.column();
         head.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(10), scaleForGUI(12), scaleForGUI(8),
               scaleForGUI(12)));
         head.add(leftAligned(searchField));
@@ -502,12 +505,12 @@ public class ContractNegotiatorPickerDialog extends JDialog {
               BorderFactory.createEmptyBorder(scaleForGUI(8), scaleForGUI(14), scaleForGUI(8), scaleForGUI(14))));
 
         // The hint wraps onto a second line rather than being cut short beside the buttons.
-        JLabel hint = new MarketHud.WrappingLabel();
+        JLabel hint = new HudWrappingLabel();
         hint.setForeground(TEXT_MUTED);
         hint.setFont(hudFont(Font.PLAIN, 0.88f, 0.0f));
         String hintKey = isFallback() ? "picker.contractMarket.negotiator.footer.fallback"
                                : "picker.contractMarket.negotiator.intro";
-        hint.setText("<html>" + MarketHud.escape(getTextAt(RESOURCE_BUNDLE, hintKey)) + "</html>");
+        hint.setText("<html>" + Hud.escape(getTextAt(RESOURCE_BUNDLE, hintKey)) + "</html>");
         footer.add(hint, BorderLayout.CENTER);
 
         HudButton cancel = new HudButton(getTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.cancel")
@@ -572,7 +575,9 @@ public class ContractNegotiatorPickerDialog extends JDialog {
         Person highlight = keep != null && shown.contains(keep) ? keep : (shown.isEmpty() ? null : shown.getFirst());
         updatingList = true;
         listModel.clear();
-        shown.forEach(listModel::addElement);
+        // Added all at once: while the first row is the lead, adding rows one by one makes the list measure every card
+        // again for each row, which takes seconds on a full list.
+        listModel.addAll(shown);
         if (highlight != null) {
             list.setSelectedValue(highlight, true);
         }
@@ -623,7 +628,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
         private static final String WIDEST_TARGET = targetNumberText(12);
         private static final String WIDEST_CHANCE = percent(1.0);
 
-        private final JLabel portrait = MarketHud.portrait(null, scaleForGUI(PORTRAIT_SIZE));
+        private final JLabel portrait = Hud.portrait(null, scaleForGUI(PORTRAIT_SIZE));
         private final JLabel text = new JLabel();
         private final JLabel target = new JLabel();
         private final JLabel targetKey = new JLabel();
@@ -673,7 +678,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
             JPanel figureHolder = Hud.transparentPanel(new BorderLayout());
             figureHolder.add(figure, BorderLayout.NORTH);
 
-            add(MarketHud.topAligned(portrait), BorderLayout.WEST);
+            add(Hud.topAligned(portrait), BorderLayout.WEST);
             add(text, BorderLayout.CENTER);
             add(figureHolder, BorderLayout.EAST);
         }
@@ -682,7 +687,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
         public Component getListCellRendererComponent(JList<? extends Person> source, Person person, int index,
               boolean isSelected, boolean cellHasFocus) {
             portrait.setIcon(portraits.computeIfAbsent(person,
-                  key -> MarketHud.portrait(key, scaleForGUI(PORTRAIT_SIZE)).getIcon()));
+                  key -> Hud.portrait(key, scaleForGUI(PORTRAIT_SIZE)).getIcon()));
 
             Skill skill = person.getSkill(SkillType.S_NEGOTIATION);
             String role = person.getPrimaryRole().toString();
@@ -690,9 +695,9 @@ public class ContractNegotiatorPickerDialog extends JDialog {
                                : getFormattedTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.role.skill",
                                      role, skill.getTotalSkillLevel(person.getSkillModifierData()));
             StringBuilder html = new StringBuilder("<html><b style='color:").append(hex(TEXT)).append("'>")
-                                       .append(MarketHud.escape(person.getFullTitle())).append("</b><br>")
+                                       .append(Hud.escape(person.getFullTitle())).append("</b><br>")
                                        .append("<span style='color:").append(hex(TEXT_FAINT))
-                                       .append("'>").append(MarketHud.escape(sub)).append("</span>");
+                                       .append("'>").append(Hud.escape(sub)).append("</span>");
             List<String> tags = new ArrayList<>();
             if (person.equals(currentSelection)) {
                 tags.add(tag(getTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.tag.current"), AMBER));
@@ -737,7 +742,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
         }
 
         private static String tag(String text, Color color) {
-            return "<span style='color:" + hex(color) + "'>" + MarketHud.escape(text.toUpperCase(Locale.ROOT))
+            return "<span style='color:" + hex(color) + "'>" + Hud.escape(text.toUpperCase(Locale.ROOT))
                          + "</span>";
         }
 
@@ -777,7 +782,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
             chooseButton.setText(getTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.select")
                                        .toUpperCase(Locale.ROOT));
         } else {
-            detailHolder.add(MarketHud.scroll(buildDetail(person), GROUND), BorderLayout.CENTER);
+            detailHolder.add(Hud.scroll(buildDetail(person), GROUND), BorderLayout.CENTER);
             chooseButton.setArmed(true);
             chooseButton.setText(getFormattedTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.choose",
                   person.getFullName()).toUpperCase(Locale.ROOT));
@@ -787,7 +792,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
     }
 
     private JPanel buildDetail(Person person) {
-        JPanel detail = MarketHud.column();
+        JPanel detail = Hud.column();
         detail.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(14), scaleForGUI(18), scaleForGUI(18),
               scaleForGUI(18)));
         detail.add(leftAligned(buildPersonHeader(person)));
@@ -806,10 +811,10 @@ public class ContractNegotiatorPickerDialog extends JDialog {
     /** Portrait beside the name, role, and Negotiation skill, Edge and natural aptitude. */
     private JPanel buildPersonHeader(Person person) {
         JPanel header = Hud.transparentPanel(new BorderLayout(scaleForGUI(14), 0));
-        header.add(MarketHud.topAligned(MarketHud.portrait(person, scaleForGUI(DETAIL_PORTRAIT_SIZE))),
+        header.add(Hud.topAligned(Hud.portrait(person, scaleForGUI(DETAIL_PORTRAIT_SIZE))),
               BorderLayout.WEST);
 
-        JPanel text = MarketHud.column();
+        JPanel text = Hud.column();
         JLabel name = new JLabel(person.getFullTitle());
         name.setForeground(TEXT);
         name.setFont(hudFont(Font.BOLD, 1.15f, 0.0f));
@@ -820,7 +825,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
         text.add(leftAligned(role));
         text.add(Box.createVerticalStrut(scaleForGUI(8)));
 
-        JPanel stats = Hud.transparentPanel(new WrapLayout(FlowLayout.LEFT, scaleForGUI(6), scaleForGUI(4)));
+        JPanel stats = new HudWrapPanel(scaleForGUI(6), scaleForGUI(4));
         Skill skill = person.getSkill(SkillType.S_NEGOTIATION);
         if (skill == null) {
             stats.add(stat(getFormattedTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.stat.untrained",
@@ -864,7 +869,7 @@ public class ContractNegotiatorPickerDialog extends JDialog {
     private JPanel buildTableSection(Person person) {
         NegotiatorProfile profile = NegotiatorProfile.of(person, scale);
         NegotiatorProfile base = NegotiatorProfile.of(null, scale);
-        JPanel section = MarketHud.section(getTextAt(RESOURCE_BUNDLE,
+        JPanel section = Hud.section(getTextAt(RESOURCE_BUNDLE,
               "picker.contractMarket.negotiator.section.table"));
 
         String capReason = profile.raiseCap() == base.raiseCap()
@@ -919,11 +924,11 @@ public class ContractNegotiatorPickerDialog extends JDialog {
     private static void tableRow(JPanel section, String labelKey, String value, int comparedToBase,
           @Nullable String reason) {
         Color color = comparedToBase > 0 ? READY : (comparedToBase < 0 ? DANGER : null);
-        MarketHud.addRow(section, getTextAt(RESOURCE_BUNDLE, labelKey), value, color, null, false);
+        Hud.addRow(section, getTextAt(RESOURCE_BUNDLE, labelKey), value, color, null, false);
         if (reason != null) {
             JTextArea note = MarketHud.wrappedText(reason, TEXT_FAINT, Font.PLAIN, 0.8f);
             note.setBorder(BorderFactory.createEmptyBorder(0, 0, scaleForGUI(4), 0));
-            MarketHud.addSpanning(section, note, 2);
+            Hud.addSpanning(section, note, 2);
         }
     }
 
@@ -933,9 +938,9 @@ public class ContractNegotiatorPickerDialog extends JDialog {
                                ? getTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.section.odds.generic")
                                : getFormattedTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.section.odds",
                                      employerNegotiator.getFullTitle());
-        JPanel section = MarketHud.section(heading);
-        MarketHud.addSpanning(section, oddsRow("negotiate.contractMarket.odds.haggle", tableOdds.haggle()), 0);
-        MarketHud.addSpanning(section, oddsRow("negotiate.contractMarket.odds.exception", tableOdds.exception()), 0);
+        JPanel section = Hud.section(heading);
+        Hud.addSpanning(section, oddsRow("negotiate.contractMarket.odds.haggle", tableOdds.haggle()), 0);
+        Hud.addSpanning(section, oddsRow("negotiate.contractMarket.odds.exception", tableOdds.exception()), 0);
 
         String separator = getTextAt(RESOURCE_BUNDLE, "value.contractMarket.separator");
         StringBuilder legend = new StringBuilder("<html>")
@@ -952,19 +957,19 @@ public class ContractNegotiatorPickerDialog extends JDialog {
                                       "picker.contractMarket.negotiator.legend.them.edge", target, edge)
                                 : getFormattedTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.legend.them",
                                       target);
-            legend.append(separator).append(MarketHud.escape(them));
+            legend.append(separator).append(Hud.escape(them));
         }
-        JLabel legendLabel = new MarketHud.WrappingLabel();
+        JLabel legendLabel = new HudWrappingLabel();
         legendLabel.setForeground(TEXT_FAINT);
         legendLabel.setFont(hudFont(Font.PLAIN, 0.8f, 0.0f));
         legendLabel.setText(legend.append("</html>").toString());
-        MarketHud.addSpanning(section, legendLabel, 6);
+        Hud.addSpanning(section, legendLabel, 6);
         return section;
     }
 
     private static String legendEntry(Color color, String key) {
         return "<span style='color:" + hex(color) + "'>&#9632;</span>&nbsp;"
-                     + MarketHud.escape(getTextAt(RESOURCE_BUNDLE, key));
+                     + Hud.escape(getTextAt(RESOURCE_BUNDLE, key));
     }
 
     /** One re-negotiation: its name, a bar split into you prevail / stalemate / they prevail, and the chance. */
@@ -1003,18 +1008,18 @@ public class ContractNegotiatorPickerDialog extends JDialog {
 
     /** Each negotiation trait the candidate carries, its name over what it does at the table. */
     private JPanel buildTraitsSection(Person person) {
-        JPanel section = MarketHud.section(getTextAt(RESOURCE_BUNDLE,
+        JPanel section = Hud.section(getTextAt(RESOURCE_BUNDLE,
               "picker.contractMarket.negotiator.detail.traits"));
         List<String> traits = traits(person);
         if (traits.isEmpty()) {
             JLabel none = new JLabel(getTextAt(RESOURCE_BUNDLE, "picker.contractMarket.negotiator.detail.noTraits"));
             none.setForeground(TEXT_FAINT);
             none.setFont(hudFont(Font.PLAIN, 0.88f, 0.0f));
-            MarketHud.addSpanning(section, none, 2);
+            Hud.addSpanning(section, none, 2);
             return section;
         }
         for (String trait : traits) {
-            JPanel row = MarketHud.column();
+            JPanel row = Hud.column();
             row.setBorder(BorderFactory.createCompoundBorder(
                   BorderFactory.createMatteBorder(0, 0, scaleForGUI(1), 0, DIVIDER),
                   BorderFactory.createEmptyBorder(scaleForGUI(6), 0, scaleForGUI(6), 0)));
@@ -1028,11 +1033,11 @@ public class ContractNegotiatorPickerDialog extends JDialog {
             row.add(leftAligned(effect));
             IOption option = person.getOptions().getOption(trait);
             if (option != null && option.getDescription() != null) {
-                String toolTip = MarketHud.wrapToolTip(option.getDescription());
+                String toolTip = Hud.wrapToolTip(option.getDescription());
                 name.setToolTipText(toolTip);
                 effect.setToolTipText(toolTip);
             }
-            MarketHud.addSpanning(section, row, 0);
+            Hud.addSpanning(section, row, 0);
         }
         return section;
     }

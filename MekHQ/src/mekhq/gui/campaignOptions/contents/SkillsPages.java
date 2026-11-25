@@ -32,6 +32,7 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.*;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.campaignOptionsPageContentWidth;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getCampaignOptionsResourceBundle;
@@ -412,10 +413,10 @@ public class SkillsPages {
      * @return a {@link JPanel} containing the Edge and Attribute cost controls.
      */
     private @Nonnull JPanel createEdgeCostPanel() {
-        JLabel lblEdgeCost = new CampaignOptionsLabel("EdgeCost");
+        JLabel lblEdgeCost = new CampaignOptionsLabel("EdgeCost", getMetadata(new Version("0.43.05")));
         spnEdgeCost = new CampaignOptionsSpinner("EdgeCost", 100, 0, 500, 1);
 
-        JLabel lblAttributeCost = new CampaignOptionsLabel("AttributeCost", getMetadata(new Version(0, 51, 0)));
+        JLabel lblAttributeCost = new CampaignOptionsLabel("AttributeCost", getMetadata(new Version("0.50.10")));
         spnAttributeCost = new CampaignOptionsSpinner("AttributeCost", 100, 0, 500, 1);
 
         // Borderless content panel with both cost controls side by side
@@ -858,7 +859,7 @@ public class SkillsPages {
             FontMetrics fontMetrics = getFontMetrics(getFont());
             int textWidth = fontMetrics.stringWidth(text) + insets.left + insets.right;
             int columnWidth = table.getColumnModel().getColumn(column).getWidth();
-            setToolTipText(textWidth > columnWidth ? text : null);
+            setToolTipText(textWidth > columnWidth ? wordWrap(text) : null);
             return this;
         }
     }

@@ -70,6 +70,7 @@ import megamek.common.units.Entity;
 import megamek.logging.MMLogger;
 import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.scenarios.Scenario;
@@ -213,6 +214,9 @@ public class SalvageRecoveryConsole extends JDialog {
         this.session = session;
 
         ownedUnitCounts = OwnedUnitCounts.of(campaign.getPlayerForce().getHangar().getUnits());
+        if (isCarefulSalvageOffered()) {
+            session.setCarefulSalvage(SalvageRecoveryPreferences.getInstance().isCarefulSalvage());
+        }
         buildWindow(scenario);
         focused = session.getRecoveries().isEmpty() ? null : session.getRecoveries().getFirst();
         refreshAll();
@@ -270,12 +274,15 @@ public class SalvageRecoveryConsole extends JDialog {
         HudButton guideButton = new HudButton("?  " + guideText("button").toUpperCase(Locale.ROOT), false, true);
         guideButton.setToolTipText(guideText("button.toolTipText"));
         guideButton.addActionListener(event -> openGuide());
-        JPanel titleControls = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(8), 0));
-        titleControls.add(buildConditionChips());
-        titleControls.add(guideButton);
-        titleRow.add(titleControls, BorderLayout.EAST);
+        titleRow.add(guideButton, BorderLayout.EAST);
         commandBar.add(leftAligned(titleRow));
         commandBar.add(Box.createVerticalStrut(scaleForGUI(6)));
+
+        JComponent conditionChips = buildConditionChips();
+        if (conditionChips.getComponentCount() > 0) {
+            commandBar.add(leftAligned(conditionChips));
+            commandBar.add(Box.createVerticalStrut(scaleForGUI(6)));
+        }
         commandBar.add(leftAligned(Hud.hint(instructions())));
         return commandBar;
     }
@@ -306,7 +313,7 @@ public class SalvageRecoveryConsole extends JDialog {
      * them).
      */
     private JComponent buildConditionChips() {
-        JPanel chipsRow = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, scaleForGUI(6), 0));
+        JPanel chipsRow = Hud.transparentPanel(new FlowLayout(FlowLayout.LEFT, 0, 0));
         RecoveryTimeData conditions = representativeConditions();
         if (conditions == null) {
             return chipsRow;
@@ -321,7 +328,7 @@ public class SalvageRecoveryConsole extends JDialog {
         double total = 1.0 + conditions.weatherMultiplier() + conditions.windMultiplier() +
                              conditions.temperatureMultiplier() + conditions.gravityMultiplier() +
                              conditions.atmosphereMultiplier() + conditions.lightMultiplier();
-        chipsRow.add(conditionChip(formatted("condition.total", total), ACCENT_BRIGHT, BORDER_CYAN));
+        addChip(chipsRow, conditionChip(formatted("condition.total", total), ACCENT_BRIGHT, BORDER_CYAN));
         return chipsRow;
     }
 
@@ -345,9 +352,20 @@ public class SalvageRecoveryConsole extends JDialog {
 
     private void addConditionChip(JPanel chipsRow, String conditionKey, double multiplier) {
         if (multiplier > 0.0) {
-            chipsRow.add(conditionChip(formatted("condition.chip", text("condition." + conditionKey), multiplier),
+            addChip(chipsRow, conditionChip(formatted("condition.chip", text("condition." + conditionKey), multiplier),
                   TEXT_MUTED, BORDER));
         }
+    }
+
+    /**
+     * Adds a chip to the row, spaced from the one before it. The gap goes only between chips (not before the first),
+     * so the row's left edge lines up with the title above it.
+     */
+    private static void addChip(JPanel chipsRow, JComponent chip) {
+        if (chipsRow.getComponentCount() > 0) {
+            chipsRow.add(Box.createHorizontalStrut(scaleForGUI(6)));
+        }
+        chipsRow.add(chip);
     }
 
     private static JLabel conditionChip(String text, Color foreground, Color border) {
@@ -574,6 +592,10 @@ public class SalvageRecoveryConsole extends JDialog {
         if (requireSession().isUsingSalvageOperations()) {
             buttons.add(Hud.hint(text("footer")), BorderLayout.WEST);
 
+            if (isCarefulSalvageOffered()) {
+                actions.add(buildCarefulSalvageCheckBox());
+            }
+
             HudButton autoAssignButton = new HudButton(text("button.autoAssign").toUpperCase(Locale.ROOT), false);
             autoAssignButton.addActionListener(event -> {
                 requireSession().autoAssign();
@@ -601,6 +623,43 @@ public class SalvageRecoveryConsole extends JDialog {
         actions.add(confirmButton);
         buttons.add(actions, BorderLayout.EAST);
         return buttons;
+    }
+
+    /**
+     * Whether the player can have their techs work carefully. Careful salvage only makes accidents rarer, so it is
+     * offered only when the techs spend time recovering wrecks and risky salvage is on.
+     *
+     * @return {@code true} if the careful salvage checkbox is shown
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private boolean isCarefulSalvageOffered() {
+        return requireSession().isUsingSalvageOperations() &&
+                     campaign.getCampaignOptions().get(CampaignOption.IS_USE_RISKY_SALVAGE);
+    }
+
+    /**
+     * Builds the checkbox that has the salvage techs work carefully. Its state is remembered between salvage
+     * operations.
+     *
+     * @return the checkbox
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private JComponent buildCarefulSalvageCheckBox() {
+        HudCheckBox carefulSalvage = new HudCheckBox(text("button.carefulSalvage"));
+        carefulSalvage.setToolTipText(formatted("button.carefulSalvage.tooltip",
+              SalvageRecoverySession.CAREFUL_SALVAGE_TIME_MULTIPLIER));
+        carefulSalvage.setSelected(requireSession().isCarefulSalvage());
+        carefulSalvage.addActionListener(event -> {
+            boolean isSelected = carefulSalvage.isSelected();
+            SalvageRecoveryPreferences.getInstance().setCarefulSalvage(isSelected);
+            requireSession().setCarefulSalvage(isSelected);
+            refreshAll();
+        });
+        return carefulSalvage;
     }
 
     /**
@@ -846,7 +905,7 @@ public class SalvageRecoveryConsole extends JDialog {
         }
         dossierSub.setText(sub);
         RecoveryTimeData timeData = session.getRecoveryTimeData(recovery);
-        dossierSub.setToolTipText((timeData == null) ? null : timeData.getRecoveryTimeBreakdownString(true));
+        dossierSub.setToolTipText((timeData == null) ? null : recoveryTimeTooltip(session, recovery, timeData));
 
         if (session.isUsingSalvageOperations()) {
             firstSlot = refreshSlot(firstSlotRow, firstSlot, recovery, recovery.getFirstUnit(),
@@ -869,6 +928,22 @@ public class SalvageRecoveryConsole extends JDialog {
         statusLabel.setForeground(statusColor(recovery));
 
         refreshClaim(recovery);
+    }
+
+    /**
+     * Builds the tooltip breaking down a wreck's recovery time, including the careful salvage multiplier if it applies.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static String recoveryTimeTooltip(SalvageRecoverySession session, WreckRecovery recovery,
+          RecoveryTimeData timeData) {
+        String breakdown = timeData.getRecoveryTimeBreakdownString(false);
+        if (session.isCarefulSalvage()) {
+            breakdown += formatted("dossier.carefulSalvage", SalvageRecoverySession.CAREFUL_SALVAGE_TIME_MULTIPLIER,
+                  session.getRecoveryMinutes(recovery));
+        }
+        return "<html>" + breakdown + "</html>";
     }
 
     /**

@@ -42,17 +42,15 @@ import static org.mockito.Mockito.spy;
 import static org.mockito.Mockito.verify;
 
 import java.util.List;
-import java.util.Set;
-import java.util.UUID;
 
 import megamek.common.equipment.EquipmentType;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.ContractExpenseProjection;
+import mekhq.campaign.finances.Loan;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.financialInstitutions.FinancialInstitutions;
 import mekhq.campaign.parts.enums.PartQuality;
 import mekhq.campaign.personnel.skills.SkillType;
-import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.UnitTestUtilities;
 import mekhq.campaign.universe.commandGeneration.CommandGenerationOptions;
 import org.junit.jupiter.api.BeforeAll;
@@ -62,8 +60,8 @@ import testUtilities.MHQTestUtilities;
 
 /**
  * Verifies {@link CommandGenerator#processStartingCash}: the generated command is granted free and the campaign is
- * credited working capital equal to the configured number of months of the command's running costs, with the
- * pay-for debits pricing only units created after the pre-build hangar snapshot.
+ * credited working capital equal to the configured number of months of the command's running costs, never less than
+ * the minimum starting cash, and optionally doubled by a starting loan for the same amount.
  */
 class CommandGeneratorStartingCashTest {
 
@@ -74,39 +72,22 @@ class CommandGeneratorStartingCashTest {
     static void initializeTypes() {
         EquipmentType.initializeTypes();
         SkillType.initializeTypes();
-        // The starting-loan path names a random financial institution on the Loan it creates.
+        // The starting loan names a random financial institution on the Loan it creates.
         FinancialInstitutions.initializeFinancialInstitutions();
     }
 
     private static CommandGenerationOptions optionsWithMonths(int months) {
         CommandGenerationOptions options = new CommandGenerationOptions();
-        options.setProcessFinances(true);
         options.setStartingCashMonths(months);
-        options.setRandomizeStartingCash(false);
-        options.setPayForSetup(false);
-        // These cases assert the months arithmetic itself, so the float must not floor it.
-        options.setMinimumStartingFloat(0);
         return options;
-    }
-
-    /** Pay for Initial Setup with only the unit-purchase debit, so the debit is exactly the new units' cost. */
-    private static void payForUnitsOnly(CommandGenerationOptions options) {
-        options.setPayForSetup(true);
-        options.setPayForPersonnel(false);
-        options.setPayForUnits(true);
-        options.setPayForParts(false);
-        options.setPayForArmour(false);
-        options.setPayForAmmunition(false);
-    }
-
-    private static void processWithKnownExpenses(Campaign campaign, CommandGenerationOptions options,
-          Set<UUID> preExisting, Money monthlyExpenses) {
-        CommandGenerator.processStartingCash(campaign, options, preExisting, List.of(),
-              CommandGenerator.SpareCosts.zero(), monthlyExpenses);
     }
 
     private static Money balance(Campaign campaign) {
         return campaign.getPlayerForce().getFinances().getBalance();
+    }
+
+    private static List<Loan> loans(Campaign campaign) {
+        return campaign.getPlayerForce().getFinances().getLoans();
     }
 
     /**
@@ -120,167 +101,127 @@ class CommandGeneratorStartingCashTest {
         return reportCaptor.getValue();
     }
 
-    /** A dice-rolled starting cash must not be reported as months of running costs (#10475). */
     @Test
-    void randomizedStartingCash_reportsTheDiceRolledNotMonths() {
-        Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
-        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
-        campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
-
-        CommandGenerationOptions options = optionsWithMonths(6);
-        options.setRandomizeStartingCash(true);
-        options.setRandomStartingCashDiceCount(18);
-        processWithKnownExpenses(campaign, options, preExisting, MONTHLY_EXPENSES);
-
-        String report = lastFinancesReport(campaign);
-        assertTrue(report.contains("18d6 million C-bills"), "the report names the dice rolled: " + report);
-        assertFalse(report.contains("months"), "the report does not mention the unused months: " + report);
+    void minimumStartingCash_defaultsToTenMillion() {
+        assertEquals(10_000_000L, new CommandGenerationOptions().getMinimumStartingCash());
     }
 
     @Test
     void creditsConfiguredMonthsOfRunningCosts() {
         Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
-        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
         campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
         Money balanceBefore = balance(campaign);
 
-        processWithKnownExpenses(campaign, optionsWithMonths(6), preExisting, MONTHLY_EXPENSES);
+        // Twelve months of a million C-bills is above the minimum, so the months are granted as they are.
+        CommandGenerator.processStartingCash(campaign, optionsWithMonths(12), MONTHLY_EXPENSES);
 
-        assertEquals(MONTHLY_EXPENSES.multipliedBy(6), balance(campaign).minus(balanceBefore),
-              "starting cash should be six months of running costs");
+        assertEquals(MONTHLY_EXPENSES.multipliedBy(12), balance(campaign).minus(balanceBefore),
+              "starting cash should be twelve months of running costs");
         String report = lastFinancesReport(campaign);
-        assertTrue(report.contains("(6 months of running costs at " + MONTHLY_EXPENSES.toAmountAndSymbolString()
+        assertTrue(report.contains("(12 months of running costs at " + MONTHLY_EXPENSES.toAmountAndSymbolString()
                                          + " a month)"), "the report names the months and the monthly cost: " + report);
-        assertFalse(report.contains("setup costs"), "nothing was deducted, so none is reported: " + report);
     }
 
     /** The public entry point measures the running costs with the off-contract expense projection. */
     @Test
     void projectsTheCampaignsRunningCosts() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
-        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
         campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
-        Money expected = ContractExpenseProjection.getMonthlyOffContractExpenses(campaign).round()
-                               .multipliedBy(6).round();
+        CommandGenerationOptions options = optionsWithMonths(12);
+        Money months = ContractExpenseProjection.getMonthlyOffContractExpenses(campaign).round()
+                             .multipliedBy(12).round();
+        Money minimum = Money.of(options.getMinimumStartingCash());
+        Money expected = months.isGreaterOrEqualThan(minimum) ? months : minimum;
         Money balanceBefore = balance(campaign);
 
-        CommandGenerator.processStartingCash(campaign, optionsWithMonths(6), preExisting, List.of(),
-              CommandGenerator.SpareCosts.zero());
+        CommandGenerator.processStartingCash(campaign, options);
 
         assertEquals(expected, balance(campaign).minus(balanceBefore),
-              "starting cash should be six months of the projected running costs");
+              "starting cash should be twelve months of the projected running costs, floored at the minimum");
     }
 
     @Test
-    void payForSetupWithCoveringBase_reportsTheDeductedCosts() {
+    void baseBelowMinimum_creditsAndReportsTheMinimum() {
         Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
-        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
-        Unit generated = campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
+        Money balanceBefore = balance(campaign);
 
-        // A thousand months of a million C-bills covers any single unit.
-        CommandGenerationOptions options = optionsWithMonths(1000);
-        payForUnitsOnly(options);
-        processWithKnownExpenses(campaign, options, preExisting, MONTHLY_EXPENSES);
+        // Three months of a million C-bills is below the default minimum, so the minimum is what the command gets.
+        CommandGenerator.processStartingCash(campaign, optionsWithMonths(3), MONTHLY_EXPENSES);
 
+        assertEquals(Money.of(10_000_000), balance(campaign).minus(balanceBefore),
+              "cash floors at the minimum starting cash");
         String report = lastFinancesReport(campaign);
-        assertTrue(report.contains("1000 months of running costs") || report.contains("1,000 months of running costs"),
-              "the report names the base: " + report);
-        assertTrue(report.contains("less " + generated.getBuyCost().toAmountAndSymbolString() + " in setup costs"),
-              "the report names the setup costs deducted from the base: " + report);
-    }
-
-    @Test
-    void payForSetupWithCoveringBase_deductsCostsFromCash() {
-        Campaign campaign = MHQTestUtilities.getTestCampaign();
-        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
-        Unit generated = campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
-        Money balanceBefore = balance(campaign);
-
-        CommandGenerationOptions options = optionsWithMonths(1000);
-        payForUnitsOnly(options);
-        processWithKnownExpenses(campaign, options, preExisting, MONTHLY_EXPENSES);
-
-        Money expected = MONTHLY_EXPENSES.multipliedBy(1000).minus(generated.getBuyCost()).round();
-        assertEquals(expected, balance(campaign).minus(balanceBefore),
-              "setup costs are deducted from the covering base");
-    }
-
-    @Test
-    void payForUnits_excludesUnitsPresentBeforeTheSnapshot() {
-        Campaign campaign = MHQTestUtilities.getTestCampaign();
-        campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
-
-        // Snapshot AFTER the first unit: only the unit added below may be paid for.
-        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
-        Unit generated = campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
-        Money balanceBefore = balance(campaign);
-
-        CommandGenerationOptions options = optionsWithMonths(1000);
-        payForUnitsOnly(options);
-        processWithKnownExpenses(campaign, options, preExisting, MONTHLY_EXPENSES);
-
-        Money expected = MONTHLY_EXPENSES.multipliedBy(1000).minus(generated.getBuyCost()).round();
-        assertEquals(expected, balance(campaign).minus(balanceBefore),
-              "pre-existing units must not be paid for again");
-    }
-
-    @Test
-    void baseBelowMinimumFloat_reportsTheMinimumFloat() {
-        Campaign campaign = spy(MHQTestUtilities.getTestCampaign());
-        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
-        campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
-        Money balanceBefore = balance(campaign);
-
-        // Zero months is below the float, so the float is what the command starts with.
-        CommandGenerationOptions options = optionsWithMonths(0);
-        options.setMinimumStartingFloat(1_000_000);
-        processWithKnownExpenses(campaign, options, preExisting, MONTHLY_EXPENSES);
-
-        assertEquals(Money.of(1_000_000), balance(campaign).minus(balanceBefore),
-              "cash floors at the minimum float");
-        String report = lastFinancesReport(campaign);
-        assertTrue(report.contains("minimum starting float"), "the report says the float was used: " + report);
+        assertTrue(report.contains("minimum starting cash"), "the report says the minimum was used: " + report);
         assertFalse(report.contains("months"), "the report does not claim months were granted: " + report);
     }
 
     @Test
-    void payForUnits_debitsUnitCostAndTakesLoanForTheShortfall() {
+    void customMinimum_isTheFloor() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
-        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
-        Unit generated = campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
         Money balanceBefore = balance(campaign);
-        int loansBefore = campaign.getPlayerForce().getFinances().getLoans().size();
 
-        // One month of a thousand C-bills cannot cover the unit: cash floors at the minimum float (zero) and the
-        // shortfall becomes a starting loan.
-        Money smallMonthlyExpenses = Money.of(1_000);
-        CommandGenerationOptions options = optionsWithMonths(1);
-        payForUnitsOnly(options);
-        options.setStartingLoan(true);
-        processWithKnownExpenses(campaign, options, preExisting, smallMonthlyExpenses);
+        CommandGenerationOptions options = optionsWithMonths(12);
+        options.setMinimumStartingCash(25_000_000);
+        CommandGenerator.processStartingCash(campaign, options, MONTHLY_EXPENSES);
 
-        assertEquals(Money.zero(), balance(campaign).minus(balanceBefore),
-              "cash floors at the minimum float when costs exceed the base");
-        assertEquals(loansBefore + 1, campaign.getPlayerForce().getFinances().getLoans().size(),
-              "the shortfall is taken as a starting loan");
-        Money expectedLoan = generated.getBuyCost().minus(smallMonthlyExpenses).round();
-        assertEquals(expectedLoan,
-              campaign.getPlayerForce().getFinances().getLoans().get(loansBefore).getPrincipal(),
-              "loan principal covers costs minus the pre-loan cash");
+        assertEquals(Money.of(25_000_000), balance(campaign).minus(balanceBefore),
+              "twelve million is below the chosen minimum, so the minimum is credited");
     }
 
     @Test
-    void processFinancesOff_creditsNothing() {
+    void zeroMinimumAndNoRunningCosts_creditsNothing() {
         Campaign campaign = MHQTestUtilities.getTestCampaign();
-        Set<UUID> preExisting = CommandGenerator.snapshotHangarUnitIds(campaign);
-        campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
         Money balanceBefore = balance(campaign);
 
-        CommandGenerationOptions options = optionsWithMonths(6);
-        options.setProcessFinances(false);
-        processWithKnownExpenses(campaign, options, preExisting, MONTHLY_EXPENSES);
+        CommandGenerationOptions options = optionsWithMonths(12);
+        options.setMinimumStartingCash(0);
+        CommandGenerator.processStartingCash(campaign, options, Money.zero());
 
-        assertEquals(Money.zero(), balance(campaign).minus(balanceBefore),
-              "no starting cash when Process Finances is off");
+        assertEquals(Money.zero(), balance(campaign).minus(balanceBefore), "nothing to grant");
+    }
+
+    @Test
+    void noStartingLoan_byDefault() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        campaign.addNewUnit(UnitTestUtilities.getLocustLCT1V(), false, 0, PartQuality.QUALITY_D);
+        int loansBefore = loans(campaign).size();
+
+        CommandGenerator.processStartingCash(campaign, optionsWithMonths(12), MONTHLY_EXPENSES);
+
+        assertEquals(loansBefore, loans(campaign).size(), "the command is granted free unless a loan is asked for");
+    }
+
+    @Test
+    void startingLoan_doublesTheStartingCash_withTheExtraHalfBorrowed() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Money balanceBefore = balance(campaign);
+        int loansBefore = loans(campaign).size();
+
+        CommandGenerationOptions options = optionsWithMonths(12);
+        options.setStartingLoan(true);
+        CommandGenerator.processStartingCash(campaign, options, MONTHLY_EXPENSES);
+
+        Money startingCash = MONTHLY_EXPENSES.multipliedBy(12);
+        assertEquals(startingCash.multipliedBy(2), balance(campaign).minus(balanceBefore),
+              "the starting cash is doubled");
+        assertEquals(loansBefore + 1, loans(campaign).size(), "the extra half is a loan");
+        assertEquals(startingCash, loans(campaign).get(loansBefore).getPrincipal(),
+              "the loan is for the same amount as the starting cash");
+    }
+
+    @Test
+    void startingLoan_doublesTheMinimumWhenTheMinimumApplies() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Money balanceBefore = balance(campaign);
+        int loansBefore = loans(campaign).size();
+
+        CommandGenerationOptions options = optionsWithMonths(3);
+        options.setStartingLoan(true);
+        CommandGenerator.processStartingCash(campaign, options, MONTHLY_EXPENSES);
+
+        assertEquals(Money.of(20_000_000), balance(campaign).minus(balanceBefore),
+              "the ten million minimum is doubled to twenty");
+        assertEquals(Money.of(10_000_000), loans(campaign).get(loansBefore).getPrincipal(),
+              "ten million of it is borrowed");
     }
 }

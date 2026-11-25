@@ -39,17 +39,21 @@ import java.util.ArrayList;
 import java.util.List;
 
 import megamek.common.event.Subscribe;
+import mekhq.campaign.events.BulkGenerationCompletedEvent;
 import mekhq.campaign.events.OrganizationChangedEvent;
 import org.junit.jupiter.api.Test;
 
 /**
  * A force generation runs off the event dispatch thread and sets a flag that makes several tabs skip their refreshes,
  * because refreshing against a half-built campaign crashed them. The flag is the easy half. The hard half is refreshing
- * once generation finishes, and generation signs off by firing exactly one event: {@link OrganizationChangedEvent}.
+ * once generation finishes, and generation signs off by firing exactly one event: {@link BulkGenerationCompletedEvent}.
  *
  * <p>A tab that skips during generation and does not subscribe to that event never refreshes at all. That is what left
  * the Warehouse tab empty after a build while the log showed the warehouse holding twenty million C-Bills of spares, and
  * the Finances tab is wired the same way for the starting simulation's ten years of transactions.</p>
+ *
+ * <p>The same tabs must not listen to every {@link OrganizationChangedEvent}: one fires on each TO&amp;E change, and
+ * rebuilding all of them after every unit move froze a large campaign for half a minute at a time.</p>
  */
 class BulkGenerationRefreshTest {
 
@@ -58,7 +62,8 @@ class BulkGenerationRefreshTest {
      * generation ends. Add a tab here when you add the skip guard to it.
      */
     private static final List<Class<?>> TABS_THAT_SKIP_DURING_GENERATION =
-          List.of(WarehouseTab.class, FinancesTab.class, CommandCenterTab.class);
+          List.of(WarehouseTab.class, FinancesTab.class, CommandCenterTab.class, RepairTab.class, PersonnelTab.class,
+                InfirmaryTab.class);
 
     @Test
     void everyTabThatSkipsDuringGenerationRefreshesWhenItEnds() {
@@ -75,7 +80,26 @@ class BulkGenerationRefreshTest {
     }
 
     /**
-     * Whether a tab has a {@link Subscribe} handler the event bus would deliver an {@link OrganizationChangedEvent} to.
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Test
+    void tabsThatOnlyCatchUpAfterGenerationIgnoreOrdinaryTOEChanges() {
+        List<String> rebuildingOnEveryChange = new ArrayList<>();
+        for (Class<?> tab : TABS_THAT_SKIP_DURING_GENERATION) {
+            if (subscribesTo(tab, OrganizationChangedEvent.class)) {
+                rebuildingOnEveryChange.add(tab.getSimpleName());
+            }
+        }
+
+        assertTrue(rebuildingOnEveryChange.isEmpty(),
+              "these tabs rebuild on every TO&E change instead of only when a bulk generation finishes: "
+                    + rebuildingOnEveryChange);
+    }
+
+    /**
+     * Whether a tab has a {@link Subscribe} handler the event bus would deliver a {@link BulkGenerationCompletedEvent}
+     * to.
      *
      * <p>That is any handler whose parameter is the event type or a supertype of it, not the exact type alone.
      * {@code EventBus.trigger} walks every superclass of the fired event up to {@code MMEvent} and fires the listeners
@@ -87,12 +111,26 @@ class BulkGenerationRefreshTest {
      * @return {@code true} if the tab is told when a generation finishes
      */
     private static boolean subscribesToGenerationFinished(Class<?> tab) {
+        return subscribesTo(tab, BulkGenerationCompletedEvent.class);
+    }
+
+    /**
+     * @param tab       the tab class to inspect
+     * @param eventType the event type fired
+     *
+     * @return {@code true} if a {@link Subscribe} handler declared on the tab takes that event type or a supertype of
+     *       it, so the event bus would deliver the event to it
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static boolean subscribesTo(Class<?> tab, Class<?> eventType) {
         for (Method method : tab.getDeclaredMethods()) {
             if (!method.isAnnotationPresent(Subscribe.class)) {
                 continue;
             }
             Class<?>[] parameters = method.getParameterTypes();
-            if ((parameters.length == 1) && parameters[0].isAssignableFrom(OrganizationChangedEvent.class)) {
+            if ((parameters.length == 1) && parameters[0].isAssignableFrom(eventType)) {
                 return true;
             }
         }

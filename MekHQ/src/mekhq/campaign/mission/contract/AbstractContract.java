@@ -35,7 +35,6 @@ package mekhq.campaign.mission.contract;
 import static mekhq.MHQConstants.BATTLE_OF_TUKAYYID;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MAXIMUM_MORALE_LEVEL;
 import static mekhq.campaign.mission.contract.contractData.ContractMoraleLevel.MINIMUM_MORALE_LEVEL;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.time.LocalDate;
@@ -117,6 +116,18 @@ public abstract class AbstractContract {
      * would otherwise recommend. {@code null} when the contract's performance decides.
      */
     private @Nullable MissionStatus mandatedCompletionStatus;
+    /**
+     * The first day of the contract's emergency extension (see
+     * {@link mekhq.campaign.mission.contract.utilities.ContractEmergencyExtension}), or {@code null} if it has never
+     * been extended. An extension moves the end date and recomputes the length, so this is the only record of where the
+     * agreed term ended. Extended more than once, it keeps the first.
+     */
+    private @Nullable LocalDate emergencyExtensionStartDate;
+    /**
+     * Whether the enemy has raided this garrison-type contract yet (see
+     * {@link mekhq.campaign.mission.contract.utilities.MHQMorale#checkMorale}). The first raid brings a Batchall.
+     */
+    private boolean hasBeenRaided = false;
     private ContractScheduleData scheduleData;
     private SystemsTargetData systemsTargetData;
 
@@ -429,6 +440,47 @@ public abstract class AbstractContract {
     }
 
     /**
+     * @return the first day of the contract's emergency extension, or {@code null} if it has never been extended
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable LocalDate getEmergencyExtensionStartDate() {
+        return emergencyExtensionStartDate;
+    }
+
+    /**
+     * @param emergencyExtensionStartDate the first day of the contract's emergency extension, or {@code null} if it has
+     *                                    never been extended
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setEmergencyExtensionStartDate(@Nullable LocalDate emergencyExtensionStartDate) {
+        this.emergencyExtensionStartDate = emergencyExtensionStartDate;
+    }
+
+    /**
+     * @return {@code true} if the enemy has raided this garrison-type contract yet
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public boolean hasBeenRaided() {
+        return hasBeenRaided;
+    }
+
+    /**
+     * @param hasBeenRaided whether the enemy has raided this garrison-type contract yet
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setHasBeenRaided(boolean hasBeenRaided) {
+        this.hasBeenRaided = hasBeenRaided;
+    }
+
+    /**
      * @return the player's pending response to their employer losing control of this contract's planet, or
      *       {@code null} when there is none
      *
@@ -513,32 +565,34 @@ public abstract class AbstractContract {
         this.moraleData = moraleData;
     }
 
+    /**
+     * Sets the enemy's morale level. Whether the contract is peaceful, and any final payout already set, are left
+     * untouched.
+     *
+     * @param newMoraleLevel the new morale level
+     */
     public void changeMorale(ContractMoraleLevel newMoraleLevel) {
-        setMoraleData(new MoraleData(newMoraleLevel, null, null));
+        setMoraleData(moraleData.withMoraleLevel(newMoraleLevel));
     }
 
-    public void changeMorale(ContractMoraleLevel newMoraleLevel, @Nullable LocalDate newRoutEndDate) {
-        setMoraleData(new MoraleData(newMoraleLevel, newRoutEndDate, null));
-    }
-
-    public void changeMorale(ContractMoraleLevel newMoraleLevel, @Nullable LocalDate newRoutEndDate,
-          @Nullable Money newRoutPayout) {
-        setMoraleData(new MoraleData(newMoraleLevel, newRoutEndDate, newRoutPayout));
-    }
-
-    public void changeMorale(LocalDate newRoutEndDate) {
-        setMoraleData(new MoraleData(moraleData.moraleLevel(), newRoutEndDate, null));
-    }
-
-    public void changeMorale(LocalDate newRoutEndDate, Money newRoutPayout) {
-        setMoraleData(new MoraleData(moraleData.moraleLevel(), newRoutEndDate, newRoutPayout));
+    /**
+     * Sets whether this contract is between raids, with no enemy activity in the Area of Operations. Only has an effect
+     * on garrison-type contracts (see {@link #isPeaceful()}).
+     *
+     * @param isPeaceful {@code true} if the contract is now between raids
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setPeaceful(boolean isPeaceful) {
+        setMoraleData(moraleData.withPeaceful(isPeaceful));
     }
 
     /**
      * Ends this contract early by moving its end date to {@code newEndDate} and storing the final payout that will be
      * paid on completion in place of the remaining monthly payments.
      *
-     * <p>The morale level and rout end date are left untouched, and the contract length is preserved so that
+     * <p>The morale level and peaceful state are left untouched, and the contract length is preserved so that
      * length-based calculations are not affected by the early finish.</p>
      *
      * @param newEndDate  the day the contract should now end
@@ -548,7 +602,7 @@ public abstract class AbstractContract {
      * @since 0.51.01
      */
     public void endContractEarly(LocalDate newEndDate, Money finalPayout) {
-        setMoraleData(new MoraleData(moraleData.moraleLevel(), moraleData.routEndDate(), finalPayout));
+        setMoraleData(moraleData.withFinalPayout(finalPayout));
         setScheduleData(new ContractScheduleData(scheduleData.startDate(), newEndDate, scheduleData.lengthInMonths()));
     }
 
@@ -612,12 +666,12 @@ public abstract class AbstractContract {
         return moraleData.moraleLevel();
     }
 
-    public @Nullable LocalDate getRoutEndDate() {
-        return moraleData.routEndDate();
-    }
-
-    public @Nullable Money getRoutPayout() {
-        return moraleData.routedPayout();
+    /**
+     * @return the lump sum paid on a successful completion in place of the remaining escrow, or {@code null} when the
+     *       remaining escrow is paid as normal (see {@link #endContractEarly(LocalDate, Money)})
+     */
+    public @Nullable Money getFinalPayout() {
+        return moraleData.finalPayout();
     }
 
     public @Nullable NegotiationData getNegotiationData() {
@@ -888,6 +942,19 @@ public abstract class AbstractContract {
 
     public String getEmployerFactionCode() {
         return employerData.factionCode();
+    }
+
+    /**
+     * The code of the faction whose Faction Standing governs this contract's employer side - and so whose regard
+     * decides perks such as Command Circuit access. This is the covert sponsor when there is one (for a false flag
+     * operation, the real backer rather than the front), otherwise the employer.
+     *
+     * @return the employer's sponsor code when one exists, otherwise the employer's faction code
+     *
+     * @see #getStandingEmployerFaction()
+     */
+    public String getStandingEmployerFactionCode() {
+        return employerData.standingFactionCode();
     }
 
     public Faction getEmployerFaction() {
@@ -1233,7 +1300,7 @@ public abstract class AbstractContract {
 
     private boolean isPirateBackedPirateRaid() {
         return getObjectiveType().isPirateRaid() &&
-                     PIRATE_FACTION_CODE.equals(getStandingEmployerFaction().getShortName());
+                     Faction.isPirateOrBanditCaste(getStandingEmployerFaction().getShortName());
     }
 
     /**
@@ -1356,8 +1423,20 @@ public abstract class AbstractContract {
         return Math.max(0, monthsLeft);
     }
 
+    /**
+     * A contract that follows the garrison raid model (see {@link ContractObjectiveType#isGarrisonType()}) is
+     * peaceful between raids: there is no enemy activity in the Area of Operations. Each month there is a chance of a
+     * raid (see
+     * {@link mekhq.campaign.mission.contract.utilities.MHQMorale#checkMorale(Campaign, AbstractContract, boolean)}).
+     *
+     * @return {@code true} if this is a garrison-type contract between raids
+     */
     public boolean isPeaceful() {
-        return getObjectiveType().isGarrisonType() && getMoraleLevel().isRouted();
+        // The flag is checked first: most contracts are never peaceful, and some have no objective data to read
+        return moraleData.peaceful()
+                     && (objectiveData != null)
+                     && (objectiveData.playerObjectiveType() != null)
+                     && objectiveData.playerObjectiveType().isGarrisonType();
     }
 
     /**

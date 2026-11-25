@@ -49,6 +49,7 @@ import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
 import mekhq.campaign.mission.contract.contractData.ContractObjectiveType;
 import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.universe.PlanetarySystem;
+import mekhq.campaign.universe.factionStanding.FactionStandingUtilities;
 
 /**
  * Base class for the contract pay schemes: given a generated contract, each scheme decides how much the employer pays
@@ -131,15 +132,18 @@ public abstract class AbstractContractDeterminationPay {
     public abstract @Nonnull Money getCombatPay(Campaign campaign, AbstractContract contract);
 
     /**
-     * The monthly retainer actually owed for this contract: the active scheme's {@link #getMonthlyPay monthly pay}, plus
-     * the false flag deniability premium. Prefer this over {@link #getMonthlyPay} wherever a contract's real retainer is
+     * The monthly retainer actually owed for this contract: the active scheme's {@link #getMonthlyPay monthly pay},
+     * scaled by the campaign's Faction Standing with the employer (if enabled), plus the false flag deniability
+     * premium. Prefer this over {@link #getMonthlyPay} wherever a contract's real retainer is
      * computed, so the premium holds on every path (generation, the GM editor, and negotiation).
      *
      * @author Illiani
      * @since 0.51.01
      */
     public @Nonnull Money getContractMonthlyPay(Campaign campaign, AbstractContract contract) {
-        return applyFalseFlagPremium(contract, getMonthlyPay(campaign, contract));
+        Money monthlyPay = getMonthlyPay(campaign, contract)
+                                 .multipliedBy(FactionStandingUtilities.getContractPayMultiplier(campaign, contract));
+        return applyFalseFlagPremium(contract, monthlyPay);
     }
 
     /**

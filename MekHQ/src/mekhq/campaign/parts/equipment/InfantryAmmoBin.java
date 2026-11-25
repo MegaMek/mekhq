@@ -215,12 +215,36 @@ public class InfantryAmmoBin extends AmmoBin {
 
     @Override
     protected Money getPricePerTon() {
-        return Money.of(getWeaponType().getAmmoCost() / getWeaponType().getAmmoWeight());
+        double ammoWeight = getWeaponType().getAmmoWeight();
+        // A weapon with no ammo weight (e.g. a custom unit) would divide by zero and produce an Infinity/NaN that
+        // Money cannot represent, so treat it as free rather than throwing.
+        if (ammoWeight <= 0) {
+            return Money.zero();
+        }
+        return Money.of(getWeaponType().getAmmoCost() / ammoWeight);
+    }
+
+    /**
+     * Infantry ammunition is priced from its weapon rather than from the munition in the bin, which is already the
+     * ordinary price.
+     */
+    @Override
+    protected Money getStandardMunitionPricePerTon() {
+        return getPricePerTon();
+    }
+
+    @Override
+    protected int getStandardMunitionShotsPerTon() {
+        return getShotsPerTon();
     }
 
     @Override
     protected int getShotsPerTon() {
-        return (int) Math.floor(getWeaponType().getShots() / getWeaponType().getAmmoWeight());
+        double ammoWeight = getWeaponType().getAmmoWeight();
+        if (ammoWeight <= 0) {
+            return 0;
+        }
+        return (int) Math.floor(getWeaponType().getShots() / ammoWeight);
     }
 
     /**

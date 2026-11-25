@@ -32,7 +32,6 @@
  */
 package mekhq.gui.campaignOptions.contents;
 
-import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.LEGACY_RULE_BEFORE_METADATA;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.createTipPanelUpdater;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getImageDirectory;
 import static mekhq.gui.campaignOptions.CampaignOptionsUtilities.getMetadata;
@@ -44,9 +43,10 @@ import javax.swing.JSpinner;
 
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
+import megamek.Version;
+import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.CampaignOptionFlag;
 import mekhq.gui.campaignOptions.components.CampaignOptionsCheckBox;
-import megamek.client.ui.settings.SettingsFormPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsHeaderPanel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsLabel;
 import mekhq.gui.campaignOptions.components.CampaignOptionsPagePanel;
@@ -112,31 +112,33 @@ class EducationPage {
         educationHeader = new CampaignOptionsHeaderPanel("EducationPage", imageAddress);
 
         // Contents
-        chkUseEducationModule = new CampaignOptionsCheckBox("UseEducationModule");
+        chkUseEducationModule = new CampaignOptionsCheckBox("UseEducationModule", getMetadata(new Version("0.49.20")));
         chkUseEducationModule.addMouseListener(createTipPanelUpdater("UseEducationModule"));
 
-        lblCurriculumXpRate = new CampaignOptionsLabel("CurriculumXpRate");
+        lblCurriculumXpRate = new CampaignOptionsLabel("CurriculumXpRate", getMetadata(new Version("0.49.20")));
         lblCurriculumXpRate.addMouseListener(createTipPanelUpdater("CurriculumXpRate"));
         spnCurriculumXpRate = new CampaignOptionsSpinner("CurriculumXpRate", 3, 1, 10, 1);
         spnCurriculumXpRate.addMouseListener(createTipPanelUpdater("CurriculumXpRate"));
 
-        lblMaximumJumpCount = new CampaignOptionsLabel("MaximumJumpCount");
+        lblMaximumJumpCount = new CampaignOptionsLabel("MaximumJumpCount", getMetadata(new Version("0.49.20")));
         lblMaximumJumpCount.addMouseListener(createTipPanelUpdater("MaximumJumpCount"));
         spnMaximumJumpCount = new CampaignOptionsSpinner("MaximumJumpCount", 5, 1, 200, 1);
         spnMaximumJumpCount.addMouseListener(createTipPanelUpdater("MaximumJumpCount"));
 
-        chkUseReeducationCamps = new CampaignOptionsCheckBox("UseReeducationCamps");
+        chkUseReeducationCamps = new CampaignOptionsCheckBox("UseReeducationCamps",
+              getMetadata(new Version("0.49.20")));
         chkUseReeducationCamps.addMouseListener(createTipPanelUpdater("UseReeducationCamps"));
 
         chkEnableOverrideRequirements = new CampaignOptionsCheckBox("EnableOverrideRequirements",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.49.20"), CampaignOptionFlag.IMPORTANT));
         chkEnableOverrideRequirements.addMouseListener(createTipPanelUpdater("EnableOverrideRequirements"));
 
-        chkShowIneligibleAcademies = new CampaignOptionsCheckBox("ShowIneligibleAcademies");
+        chkShowIneligibleAcademies = new CampaignOptionsCheckBox("ShowIneligibleAcademies",
+              getMetadata(new Version("0.49.20")));
         chkShowIneligibleAcademies.addMouseListener(createTipPanelUpdater("ShowIneligibleAcademies"));
 
         lblEntranceExamBaseTargetNumber = new CampaignOptionsLabel("EntranceExamBaseTargetNumber",
-                getMetadata(LEGACY_RULE_BEFORE_METADATA, CampaignOptionFlag.IMPORTANT));
+                getMetadata(new Version("0.50.00"), CampaignOptionFlag.IMPORTANT));
         lblEntranceExamBaseTargetNumber.addMouseListener(createTipPanelUpdater("EntranceExamBaseTargetNumber"));
         spnEntranceExamBaseTargetNumber = new CampaignOptionsSpinner("EntranceExamBaseTargetNumber", 14, 0, 20, 1);
         spnEntranceExamBaseTargetNumber.addMouseListener(createTipPanelUpdater("EntranceExamBaseTargetNumber"));
@@ -191,11 +193,14 @@ class EducationPage {
      * @return A {@code JPanel} containing the Enable Standard Sets UI components.
      */
     private @Nonnull JPanel createEnableStandardSetsPanel() {
-        chkEnableLocalAcademies = new CampaignOptionsCheckBox("EnableLocalAcademies");
+        chkEnableLocalAcademies = new CampaignOptionsCheckBox("EnableLocalAcademies",
+              getMetadata(new Version("0.49.20")));
         chkEnableLocalAcademies.addMouseListener(createTipPanelUpdater("EnableLocalAcademies"));
-        chkEnablePrestigiousAcademies = new CampaignOptionsCheckBox("EnablePrestigiousAcademies");
+        chkEnablePrestigiousAcademies = new CampaignOptionsCheckBox("EnablePrestigiousAcademies",
+              getMetadata(new Version("0.49.20")));
         chkEnablePrestigiousAcademies.addMouseListener(createTipPanelUpdater("EnablePrestigiousAcademies"));
-        chkEnableUnitEducation = new CampaignOptionsCheckBox("EnableUnitEducation");
+        chkEnableUnitEducation = new CampaignOptionsCheckBox("EnableUnitEducation",
+              getMetadata(new Version("0.50.00")));
         chkEnableUnitEducation.addMouseListener(createTipPanelUpdater("EnableUnitEducation"));
 
         final SettingsFormPanel panel = new SettingsFormPanel("EnableStandardSetsPanel",
@@ -222,10 +227,10 @@ class EducationPage {
      */
     private @Nonnull JPanel createXpAndSkillBonusesPanel() {
         // Contents
-        chkEnableBonuses = new CampaignOptionsCheckBox("EnableBonuses");
+        chkEnableBonuses = new CampaignOptionsCheckBox("EnableBonuses", getMetadata(new Version("0.49.20")));
         chkEnableBonuses.addMouseListener(createTipPanelUpdater("EnableBonuses"));
 
-        lblFacultyXpMultiplier = new CampaignOptionsLabel("FacultyXpMultiplier");
+        lblFacultyXpMultiplier = new CampaignOptionsLabel("FacultyXpMultiplier", getMetadata(new Version("0.50.00")));
         lblFacultyXpMultiplier.addMouseListener(createTipPanelUpdater("FacultyXpMultiplier"));
         spnFacultyXpMultiplier = new CampaignOptionsSpinner("FacultyXpMultiplier", 1.00, 0.00, 10.00, 0.01);
         spnFacultyXpMultiplier.addMouseListener(createTipPanelUpdater("FacultyXpMultiplier"));
@@ -253,12 +258,13 @@ class EducationPage {
      */
     private @Nonnull JPanel createDropoutChancePanel() {
         // Contents
-        lblAdultDropoutChance = new CampaignOptionsLabel("AdultDropoutChance");
+        lblAdultDropoutChance = new CampaignOptionsLabel("AdultDropoutChance", getMetadata(new Version("0.49.20")));
         lblAdultDropoutChance.addMouseListener(createTipPanelUpdater("AdultDropoutChance"));
         spnAdultDropoutChance = new CampaignOptionsSpinner("AdultDropoutChance", 1000, 0, 100000, 1);
         spnAdultDropoutChance.addMouseListener(createTipPanelUpdater("AdultDropoutChance"));
 
-        lblChildrenDropoutChance = new CampaignOptionsLabel("ChildrenDropoutChance");
+        lblChildrenDropoutChance = new CampaignOptionsLabel("ChildrenDropoutChance",
+              getMetadata(new Version("0.49.20")));
         lblChildrenDropoutChance.addMouseListener(createTipPanelUpdater("ChildrenDropoutChance"));
         spnChildrenDropoutChance = new CampaignOptionsSpinner("ChildrenDropoutChance", 10000, 0, 100000, 1);
         spnChildrenDropoutChance.addMouseListener(createTipPanelUpdater("ChildrenDropoutChance"));
@@ -288,10 +294,11 @@ class EducationPage {
      */
     private @Nonnull JPanel createAccidentsAndEventsPanel() {
         // Contents
-        chkAllAges = new CampaignOptionsCheckBox("AllAges");
+        chkAllAges = new CampaignOptionsCheckBox("AllAges", getMetadata(new Version("0.49.20")));
         chkAllAges.addMouseListener(createTipPanelUpdater("AllAges"));
 
-        lblMilitaryAcademyAccidents = new CampaignOptionsLabel("MilitaryAcademyAccidents");
+        lblMilitaryAcademyAccidents = new CampaignOptionsLabel("MilitaryAcademyAccidents",
+              getMetadata(new Version("0.49.20")));
         lblMilitaryAcademyAccidents.addMouseListener(createTipPanelUpdater("MilitaryAcademyAccidents"));
         spnMilitaryAcademyAccidents = new CampaignOptionsSpinner("MilitaryAcademyAccidents", 10000, 0, 100000, 1);
         spnMilitaryAcademyAccidents.addMouseListener(createTipPanelUpdater("MilitaryAcademyAccidents"));

@@ -33,9 +33,11 @@
 package mekhq.gui.roleplay;
 
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
+import static mekhq.gui.baseComponents.hud.Hud.column;
+import static mekhq.gui.baseComponents.hud.Hud.escape;
+import static mekhq.gui.baseComponents.hud.Hud.scroll;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.gui.roleplay.OracleConsole.RESOURCE_BUNDLE;
-import static mekhq.gui.roleplay.OracleConsole.escape;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
@@ -46,7 +48,6 @@ import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.GridLayout;
-import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.ArrayList;
@@ -566,55 +567,6 @@ class AskPage implements ConsoleSection {
     // endregion Concepts
 
     // region Layout helpers
-
-    static JPanel column() {
-        JPanel column = Hud.transparentPanel(null);
-        column.setLayout(new BoxLayout(column, BoxLayout.Y_AXIS));
-        return column;
-    }
-
-    static JScrollPane scroll(final JComponent content, final Color background) {
-        JPanel holder = new WidthTrackingPanel();
-        holder.setOpaque(true);
-        holder.setBackground(background);
-        holder.add(content, BorderLayout.NORTH);
-        JScrollPane scroll = new JScrollPane(holder);
-        scroll.setHorizontalScrollBarPolicy(JScrollPane.HORIZONTAL_SCROLLBAR_NEVER);
-        Hud.styleScroll(scroll, background, false);
-        return scroll;
-    }
-
-    /** A scroll pane's content that always fits the pane's width, so only vertical scrolling is ever needed. */
-    private static final class WidthTrackingPanel extends JPanel implements Scrollable {
-        private WidthTrackingPanel() {
-            super(new BorderLayout());
-        }
-
-        @Override
-        public Dimension getPreferredScrollableViewportSize() {
-            return getPreferredSize();
-        }
-
-        @Override
-        public int getScrollableUnitIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return scaleForGUI(16);
-        }
-
-        @Override
-        public int getScrollableBlockIncrement(Rectangle visibleRect, int orientation, int direction) {
-            return visibleRect.height;
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportWidth() {
-            return true;
-        }
-
-        @Override
-        public boolean getScrollableTracksViewportHeight() {
-            return false;
-        }
-    }
 
     /**
      * A section heading with a hover-help mark beside it.

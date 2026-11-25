@@ -39,12 +39,12 @@ import mekhq.MekHQ;
 import mekhq.gui.preferences.PreferenceFlags;
 
 /**
- * The crew assignment dialog's tutorial settings: whether each page's guide has been seen, and whether guides open by
- * themselves on a page's first visit.
+ * The crew assignment dialog's per-player settings: whether each page's guide has been seen, whether guides open by
+ * themselves on a page's first visit, and whether the filter rail is hidden.
  *
  * <p>They are stored per player in MekHQ's preferences file ({@code mmconf/mhq.preferences}), under this class's node,
  * so they follow the MekHQ install rather than a campaign. Deleting this class's entry from that file (while MekHQ is
- * closed) resets every guide.</p>
+ * closed) resets every guide and shows the filter rail again.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -52,6 +52,7 @@ import mekhq.gui.preferences.PreferenceFlags;
 final class CrewAssignmentGuidePreferences {
     static final String GUIDE_AUTO_OPEN = "guideAutoOpen";
     static final String GUIDE_SEEN_PREFIX = "guideSeen.";
+    static final String FILTERS_HIDDEN = "filtersHidden";
 
     private static CrewAssignmentGuidePreferences instance;
 
@@ -60,6 +61,7 @@ final class CrewAssignmentGuidePreferences {
     CrewAssignmentGuidePreferences(final PreferencesNode node) {
         flags = new PreferenceFlags(node);
         flags.register(GUIDE_AUTO_OPEN, true);
+        flags.register(FILTERS_HIDDEN, false);
         for (CrewAssignmentPage page : CrewAssignmentPage.values()) {
             flags.register(seenKey(page), false);
         }
@@ -91,5 +93,25 @@ final class CrewAssignmentGuidePreferences {
 
     void setGuideSeen(final CrewAssignmentPage page, final boolean seen) {
         flags.set(seenKey(page), seen);
+    }
+
+    /**
+     * @return {@code true} if the player hid the filter rail; it is shown until they do
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    boolean isFiltersHidden() {
+        return flags.get(FILTERS_HIDDEN);
+    }
+
+    /**
+     * @param hidden {@code true} to hide the filter rail on every page, now and the next time the dialog opens
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    void setFiltersHidden(final boolean hidden) {
+        flags.set(FILTERS_HIDDEN, hidden);
     }
 }

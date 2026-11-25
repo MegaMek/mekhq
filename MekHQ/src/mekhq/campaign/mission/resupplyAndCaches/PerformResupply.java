@@ -49,7 +49,6 @@ import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_AMMO_TO
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.RESUPPLY_ARMOR_TONNAGE;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_CONTRACT_END;
 import static mekhq.campaign.mission.resupplyAndCaches.Resupply.ResupplyType.RESUPPLY_LOOT;
-import static mekhq.campaign.universe.Faction.PIRATE_FACTION_CODE;
 import static mekhq.gui.dialog.ResupplyConvoyChoice.ConvoyResponseType.CANCEL;
 import static mekhq.gui.dialog.ResupplyConvoyChoice.ConvoyResponseType.PLAYER;
 import static mekhq.gui.dialog.resupplyAndCaches.DialogItinerary.itineraryDialog;
@@ -91,6 +90,7 @@ import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.universe.Faction;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.ResupplyConvoyChoice;
 import mekhq.gui.dialog.resupplyAndCaches.DialogResupplyFocus;
@@ -166,7 +166,7 @@ public class PerformResupply {
 
         final boolean isIndependent = contract.getCommandRights().isIndependent();
         final boolean isGuerrilla = contract.getObjectiveType().isGuerrillaType();
-        final boolean isPirate = PIRATE_FACTION_CODE.equals(contract.getEmployerFactionCode());
+        final boolean isPirate = Faction.isPirateOrBanditCaste(contract.getEmployerFactionCode());
         final ResupplyType resupplyType = resupply.getResupplyType();
 
         // If appropriate, prompt the player to use their own convoys
@@ -212,7 +212,7 @@ public class PerformResupply {
 
         double totalTonnage = 0;
         for (Part part : resupply.getConvoyContents()) {
-            if (part instanceof AmmoBin) {
+            if (part instanceof AmmoBin || part instanceof AmmoStorage) {
                 totalTonnage += RESUPPLY_AMMO_TONNAGE;
             } else if (part instanceof Armor) {
                 totalTonnage += RESUPPLY_ARMOR_TONNAGE;
@@ -339,7 +339,7 @@ public class PerformResupply {
                 double tonnage = part.getTonnage();
                 tonnage = tonnage == 0 ? RESUPPLY_MINIMUM_PART_WEIGHT : tonnage;
 
-                if (part instanceof AmmoBin) {
+                if (part instanceof AmmoBin || part instanceof AmmoStorage) {
                     tonnage = RESUPPLY_AMMO_TONNAGE;
                 } else if (part instanceof Armor) {
                     tonnage = RESUPPLY_ARMOR_TONNAGE;
@@ -382,8 +382,9 @@ public class PerformResupply {
         // First, we need to identify whether the convoy has been intercepted.
         ContractMoraleLevel morale = contract.getMoraleLevel();
 
-        // There isn't any chance of an interception if the enemy is Routed, so early-exit
-        if (morale.isRouted()) {
+        // There isn't any chance of an interception while a garrison-type contract is peaceful, so
+        // early-exit
+        if (contract.isPeaceful()) {
             completeSuccessfulDelivery(resupply, convoyContents);
             return;
         }
@@ -477,6 +478,11 @@ public class PerformResupply {
                       commanderAddress);
             } else {
                 int roll = randomInt(2);
+
+                // There is no Scattered text: a Scattered enemy reads as a Critical one
+                if (morale.isScattered()) {
+                    morale = CRITICAL;
+                }
 
                 if (morale.isAdvancing() || morale.isWeakened()) {
                     morale = roll == 0 ? (morale.isAdvancing() ? DOMINATING : CRITICAL) : STALEMATE;

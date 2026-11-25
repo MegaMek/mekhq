@@ -37,8 +37,6 @@ import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -55,6 +53,7 @@ import mekhq.campaign.force.FormationType;
 import mekhq.campaign.mission.scenarios.salvage.SalvageSystem;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.personnel.ranks.RankSystem;
 import mekhq.campaign.personnel.ranks.Ranks;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -303,6 +302,66 @@ class AddSupportUnitsToTOETest {
         assertEquals(FormationLevel.COMPANY, recovery.getFormationLevel(), "six vehicles in two lances is a company");
     }
 
+    @Test
+    void arrangeIntoLances_convoyLancesUnderAStandardParent() {
+        // A Logistics company split into lances is a Standard formation holding Convoys, not a Convoy holding Convoys.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation logistics = groupWithVehicles(campaign, "Logistics", 8);
+        logistics.setFormationType(FormationType.CONVOY, true);
+
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, logistics, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.CONVOY);
+
+        assertTrue(logistics.isFormationType(FormationType.STANDARD), "the parent becomes a Standard formation");
+        assertEquals(2, logistics.getSubFormations().size());
+        for (Formation lance : logistics.getSubFormations()) {
+            assertTrue(lance.isFormationType(FormationType.CONVOY), lance.getName() + " is a Convoy");
+        }
+    }
+
+    @Test
+    void arrangeIntoLances_keepsTheLancesTypeWhenAskedAgainWithTheStandardParentsType() {
+        // Support Command re-lances by passing each formation's own type, which for a split Logistics company is
+        // now Standard; its lances must stay Convoys.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation logistics = groupWithVehicles(campaign, "Logistics", 8);
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, logistics, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.CONVOY);
+
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, logistics, 4, AddSupportUnitsToTOETest::lanceName,
+              logistics.getFormationType());
+
+        assertTrue(logistics.isFormationType(FormationType.STANDARD));
+        for (Formation lance : logistics.getSubFormations()) {
+            assertTrue(lance.isFormationType(FormationType.CONVOY), lance.getName() + " is still a Convoy");
+        }
+    }
+
+    @Test
+    void arrangeIntoLances_leavesASupportParentAlone() {
+        // Support formations may hold Support formations, so a Medical company keeps its type.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation medical = groupWithVehicles(campaign, "Medical", 8);
+        medical.setFormationType(FormationType.SUPPORT, true);
+
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, medical, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.SUPPORT);
+
+        assertTrue(medical.isFormationType(FormationType.SUPPORT));
+    }
+
+    @Test
+    void arrangeIntoLances_aSingleLanceWorthStaysTheConvoy() {
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Formation logistics = groupWithVehicles(campaign, "Logistics", 4);
+        logistics.setFormationType(FormationType.CONVOY, true);
+
+        AddSupportUnitsToTOE.arrangeIntoLances(campaign, logistics, 4, AddSupportUnitsToTOETest::lanceName,
+              FormationType.CONVOY);
+
+        assertTrue(logistics.isFormationType(FormationType.CONVOY), "a formation of one lance is itself the convoy");
+    }
+
     private static String lanceName(int position) {
         return "Lance " + position;
     }
@@ -393,7 +452,7 @@ class AddSupportUnitsToTOETest {
         SupportPersonnelToTOE.addCapabilityVehicles(campaign, company,
               new SupportPersonnelToTOE.VehicleSpec(vehicleName, 2), newStaff(campaign, PersonnelRole.DOCTOR, 1), 0,
               campaign.getPlayerForce().getFaction());
-        SupportPersonnelToTOE.fillShortCrews(campaign, company, campaign.getPlayerForce().getFaction());
+        SupportPersonnelToTOE.fillShortCrews(campaign, company);
 
         assertEquals(2, company.getUnits().size(), "both vehicles are built although the staff ran out");
         for (Unit vehicle : unitsNamedLike(campaign, "APC")) {
@@ -416,16 +475,16 @@ class AddSupportUnitsToTOETest {
         assertTrue(vehicle.getTotalCrewSize() < vehicle.getFullCrewSize(),
               "this test is only meaningful while the vehicle is short of crew");
 
-        SupportPersonnelToTOE.fillShortCrews(campaign, company, campaign.getPlayerForce().getFaction());
+        SupportPersonnelToTOE.fillShortCrews(campaign, company);
 
         assertEquals(vehicle.getFullCrewSize(), vehicle.getTotalCrewSize(), "the empty seats are covered");
         assertTrue(vehicle.getTotalTempCrew() > 0, "by the temporary crew pool, not by new hires");
     }
 
     @Test
-    void fillShortCrews_newHiresGoOnTheCommandFactionsRankSystem() {
-        // Issue 10756: the hires were left on the campaign's rank system while every other person the Command
-        // Generator made had been put on the faction's, so the roster offered them a different rank system.
+    void fillShortCrews_newHiresStayOnTheCampaignsRankSystem() {
+        // Issue 10867: the hires were moved to the faction's rank system, overriding the one the player chose in
+        // Campaign Options. Every person the Command Generator makes now stays on the campaign's.
         Campaign campaign = MHQTestUtilities.getTestCampaign();
         campaign.getCampaignOptions().set(CampaignOption.USE_BLOB_VEHICLE_CREW_GROUND, false);
         UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
@@ -436,15 +495,17 @@ class AddSupportUnitsToTOETest {
         campaign.getPlayerForce().addUnitToFormation(vehicle, company.getId(), campaign);
         assertTrue(vehicle.getTotalCrewSize() < vehicle.getFullCrewSize(),
               "this test is only meaningful while the vehicle is short of crew");
-        Faction combine = mock(Faction.class);
-        when(combine.getRankSystem()).thenReturn(Ranks.getRankSystemFromCode("DCMS"));
+        RankSystem combineRanks = Ranks.getRankSystemFromCode("DCMS");
+        campaign.getPlayerForce().setRankSystem(combineRanks);
+        assertEquals("DCMS", campaign.getPlayerForce().getRankSystem().getCode(),
+              "this test is only meaningful once the campaign is on a rank system other than the default");
 
-        SupportPersonnelToTOE.fillShortCrews(campaign, company, combine);
+        SupportPersonnelToTOE.fillShortCrews(campaign, company);
 
         assertEquals(vehicle.getFullCrewSize(), vehicle.getTotalCrewSize(), "the empty seats are filled with hires");
         for (Person hire : vehicle.getCrew()) {
             assertEquals("DCMS", hire.getRankSystem().getCode(),
-                  hire.getFullName() + " is on the Combine's rank table like the rest of the command");
+                  hire.getFullName() + " is on the rank system set in Campaign Options");
         }
     }
 
@@ -604,6 +665,35 @@ class AddSupportUnitsToTOETest {
 
         assertEquals(1, specs.size());
         assertEquals(expected, specs.get(0).unitName());
+    }
+
+    @Test
+    void addSupportUnitsToTOE_filesTheLiftAsSupportNotConvoy() {
+        // Issue 10899: the Troopship Command was a Convoy formation, so Resupply sent its DropShips out as a supply
+        // run and the player got a Convoy Rescue mission for two Overlords and a Condor. The JumpShips had the same
+        // type. Both now file as Support, under a Transport Command that stays Standard.
+        Campaign campaign = MHQTestUtilities.getTestCampaign();
+        Unit troopship = UnitTestUtilities.addAndGetUnit(campaign, UnitTestUtilities.getHeavyTrackedApcStandard());
+
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, List.of(troopship),
+              SupportTOEFormationTypes.TRANSPORT_COMMAND, SupportTOEFormationTypes.TROOPSHIP_COMMAND);
+        AddSupportUnitsToTOE.addSupportUnitsToTOE(campaign, List.of(),
+              SupportTOEFormationTypes.TRANSPORT_COMMAND, SupportTOEFormationTypes.JUMPSHIP_COMMAND);
+
+        Formation troopshipCommand = formationOf(campaign, troopship);
+        assertEquals(FormationType.SUPPORT, troopshipCommand.getFormationType(),
+              "the Troopship Command is a Support formation");
+        Formation transportCommand = troopshipCommand.getParentFormation();
+        assertNotNull(transportCommand);
+        Formation jumpShipCommand = null;
+        for (Formation child : transportCommand.getSubFormations()) {
+            if (child.getName().equalsIgnoreCase(SupportTOEFormationTypes.JUMPSHIP_COMMAND.getLabel())) {
+                jumpShipCommand = child;
+            }
+        }
+        assertNotNull(jumpShipCommand, "the JumpShip Command is filed under the Transport Command");
+        assertEquals(FormationType.SUPPORT, jumpShipCommand.getFormationType(),
+              "the JumpShip Command is a Support formation");
     }
 
     @Test

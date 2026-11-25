@@ -158,7 +158,8 @@ public final class DeploymentEvaluator {
         }
 
         int total = perForce * forceCount;
-        int targetNumberModifier = (chosenSupportPoints * SUPPORT_POINTS_MODIFIER) / forceCount;
+        // Each force pays for its own extra points and makes its own roll, so each gets the full modifier
+        int targetNumberModifier = chosenSupportPoints * SUPPORT_POINTS_MODIFIER;
         return new ReinforcementCost(perForce, total, targetNumberModifier);
     }
 

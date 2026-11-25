@@ -56,6 +56,7 @@ import mekhq.campaign.events.OrganizationChangedEvent;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.unit.Unit;
 import mekhq.gui.CampaignGUI;
+import mekhq.gui.utilities.StaticChecks;
 
 public class TOETransferHandler extends TransferHandler {
     private static final MMLogger LOGGER = MMLogger.create(TOETransferHandler.class);
@@ -94,7 +95,7 @@ public class TOETransferHandler extends TransferHandler {
             // Carry every selected unit, not just the lead selection, so multi-unit drags move the whole selection
             StringBuilder transferData = new StringBuilder("UNIT");
             for (Unit unit : getSelectedUnits(tree)) {
-                if (unit.isDeployed()) {
+                if (StaticChecks.isUnitLockedByDeployment(unit)) {
                     showCannotMoveDialog(c, unit.getEntity().getShortName());
                     return null;
                 }
@@ -102,7 +103,7 @@ public class TOETransferHandler extends TransferHandler {
             }
             return new StringSelection(transferData.toString());
         } else if (node instanceof Formation formation) {
-            if (formation.isDeployed()) {
+            if (StaticChecks.isFormationLockedByDeployment(gui.getCampaign(), formation)) {
                 showCannotMoveDialog(c, formation.toString());
                 return null;
             }
@@ -175,6 +176,11 @@ public class TOETransferHandler extends TransferHandler {
             superFormation = campaign.getPlayerForce().getFormation(id);
         }
 
+        // A deployed formation can't take on new units or sub-formations until it returns
+        if ((superFormation != null) && StaticChecks.isFormationLockedByDeployment(gui.getCampaign(), superFormation)) {
+            return false;
+        }
+
         // Extract transfer data.
         // FIXME : Unit does not work
         @SuppressWarnings(value = "unused")
@@ -224,7 +230,7 @@ public class TOETransferHandler extends TransferHandler {
                 // Validate the whole selection before moving anything, so a bad drop doesn't leave it half-moved
                 while (st.hasMoreTokens()) {
                     Unit unit = gui.getCampaign().getUnit(UUID.fromString(st.nextToken()));
-                    if (unit == null || unit.isDeployed()) {
+                    if (unit == null || StaticChecks.isUnitLockedByDeployment(unit)) {
                         return false;
                     }
                     units.add(unit);
@@ -233,7 +239,7 @@ public class TOETransferHandler extends TransferHandler {
             if (type.equals("FORCE")) {
                 Campaign campaign = gui.getCampaign();
                 formation = campaign.getPlayerForce().getFormation(Integer.parseInt(st.nextToken()));
-                if (formation == null || formation.isDeployed()) {
+                if (formation == null || StaticChecks.isFormationLockedByDeployment(campaign, formation)) {
                     return false;
                 }
             }

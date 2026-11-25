@@ -101,6 +101,33 @@ public class ImmersiveDialogSimple extends ImmersiveDialogCore {
     }
 
     /**
+     * Constructs an {@code ImmersiveDialogSimple} that opens with keyboard focus on a chosen button, so pressing Space
+     * picks it. Closing the dialog with X still returns the first button, so a safe choice such as Cancel can stay
+     * first while the choice the player most likely wants has focus.
+     *
+     * <p>The remaining parameters inherit the contracts documented by the adjacent constructor.</p>
+     *
+     * @param focusedButtonIndex the index in {@code buttonLabels} of the button to focus
+     */
+    public ImmersiveDialogSimple(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
+          String centerMessage, @Nullable List<String> buttonLabels, @Nullable String outOfCharacterMessage,
+          @Nullable ImageIcon imageIcon, boolean useVerticalLayout, int focusedButtonIndex) {
+        super(campaign,
+              leftSpeaker,
+              rightSpeaker,
+              centerMessage,
+              createButtons(buttonLabels),
+              outOfCharacterMessage,
+              null,
+              useVerticalLayout,
+              null,
+              imageIcon,
+              TransmissionSignalQualityResolver.resolve(campaign, leftSpeaker, rightSpeaker),
+              focusedButtonIndex,
+              true);
+    }
+
+    /**
      * Constructs a {@code GenericImmersiveMessageDialog} with the specified campaign, message details, and optional
      * image and layout configuration.
      *
@@ -127,7 +154,7 @@ public class ImmersiveDialogSimple extends ImmersiveDialogCore {
      *                              visual cue.
      * @param useVerticalLayout     A boolean flag indicating whether to use a vertical layout. If {@code true}, the
      *                              buttons are stacked vertically; otherwise, they are arranged side-by-side.
-     * @param width                 A {@link ImmersiveDialogWidth} object used to dictate non-default widths
+     * @param width                A {@link ImmersiveDialogWidth} object used to dictate non-default widths
      */
     public ImmersiveDialogSimple(Campaign campaign, @Nullable Person leftSpeaker, @Nullable Person rightSpeaker,
           String centerMessage, @Nullable List<String> buttonLabels, @Nullable String outOfCharacterMessage,

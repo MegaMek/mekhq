@@ -55,6 +55,7 @@ import javax.swing.RowSorter.SortKey;
 import javax.swing.table.TableColumn;
 import javax.swing.table.TableRowSorter;
 
+import jakarta.annotation.Nullable;
 import megamek.client.ratgenerator.RATGenerator;
 import megamek.client.ui.models.XTableColumnModel;
 import megamek.client.ui.preferences.JComboBoxPreference;
@@ -720,42 +721,11 @@ public class RetirementDefectionDialog extends JDialog {
                 continue;
             }
 
-            Money payout = rdTracker.getPayout(id).getPayoutAmount();
-
-            /*
-             * If no unit is required as part of the payout, the unit is part or all of the
-             * final payout.
-             */
-            if ((rdTracker.getPayout(id).getWeightClass() == 0) &&
-                      (unitAssignments.get(id) != null) &&
-                      (hqView.getCampaign().getUnit(unitAssignments.get(id)) != null)) {
-                payout = payout.minus(hqView.getCampaign().getUnit(unitAssignments.get(id)).getSellValue());
-            }
-
-            // If the person is still under contract, we don't care that they're owed a unit
             Campaign campaign = hqView.getCampaign();
-            if (!isBreakingContract(campaign.getPlayerForce().getHumanResources().getPerson(id),
-                  hqView.getCampaign().getLocalDate(),
-                  hqView.getCampaign().getCampaignOptions().get(CampaignOption.SERVICE_CONTRACT_DURATION))) {
-                // If the unit given in payment is of lower quality than required, pay an
-                // additional 3M C-bills per class.
-                // If the person is breaking contract, they waive this compensation
-                if (null != unitAssignments.get(id)) {
-                    payout = payout.plus(getShortfallAdjustment(rdTracker.getPayout(id).getWeightClass(),
-                          RetirementDefectionDialog.weightClassIndex(hqView.getCampaign()
-                                                                           .getUnit(unitAssignments.get(id)))));
-                }
-
-                // if a unit is required, but none given, pay an additional 3M c-bills per class
-                if (unitAssignments.get(id) == null) {
-                    payout = payout.plus(getShortfallAdjustment(rdTracker.getPayout(id).getWeightClass(), 0));
-                }
-            }
-
-            // If the payout is negative, set it to zero
-            if (payout.isNegative()) {
-                payout = Money.zero();
-            }
+            Money payout = getIndividualPayout(campaign,
+                  campaign.getPlayerForce().getHumanResources().getPerson(id),
+                  rdTracker.getPayout(id),
+                  unitAssignments.get(id));
 
             retVal = retVal.plus(payout);
         }
@@ -818,6 +788,49 @@ public class RetirementDefectionDialog extends JDialog {
         } else {
             return Money.of((required - actual) * 3000000);
         }
+    }
+
+    /**
+     * Calculates what one departing character is actually paid, after any unit given to them.
+     *
+     * <p>This is used both for the total payout and for each character's row in the results table, so the two
+     * always agree.</p>
+     *
+     * <ul>
+     *     <li>If the character isn't owed a unit (weight class 0) but is given one, its sell value comes off their
+     *     payout.</li>
+     *     <li>If the character is owed a unit and isn't breaking contract, they are paid 3,000,000 C-bills for each
+     *     class the unit they are given falls short, or for each class owed if they aren't given one.</li>
+     *     <li>The result never goes below zero.</li>
+     * </ul>
+     *
+     * @param campaign       the current campaign
+     * @param person         the departing character
+     * @param payout         the character's payout record
+     * @param assignedUnitId the unit given to the character, or {@code null} if none
+     *
+     * @return the amount paid to the character
+     */
+    public static Money getIndividualPayout(final Campaign campaign, final Person person,
+          final RetirementDefectionTracker.Payout payout,
+          final @Nullable UUID assignedUnitId) {
+        Money result = payout.getPayoutAmount();
+        Unit assignedUnit = (assignedUnitId == null) ? null : campaign.getUnit(assignedUnitId);
+
+        // If no unit is required as part of the payout, the unit is part or all of the final payout.
+        if ((payout.getWeightClass() == 0) && (assignedUnit != null)) {
+            result = result.minus(assignedUnit.getSellValue());
+        }
+
+        // If the person is breaking contract, they waive any unit compensation
+        if (!isBreakingContract(person,
+              campaign.getLocalDate(),
+              campaign.getCampaignOptions().get(CampaignOption.SERVICE_CONTRACT_DURATION))) {
+            int providedClass = (assignedUnit == null) ? 0 : weightClassIndex(assignedUnit);
+            result = result.plus(getShortfallAdjustment(payout.getWeightClass(), providedClass));
+        }
+
+        return result.isNegative() ? Money.zero() : result;
     }
 
     public Map<UUID, UUID> getUnitAssignments() {

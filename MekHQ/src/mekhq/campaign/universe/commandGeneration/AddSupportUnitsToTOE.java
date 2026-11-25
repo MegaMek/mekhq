@@ -94,25 +94,6 @@ public class AddSupportUnitsToTOE {
     }
 
     /**
-     * Creates a new {@link Formation} populated with the given units.
-     *
-     * <p>The formation is assigned the provided {@code label} as its display name and configured with the given
-     * {@link FormationType}. Each unit's ID is then registered with the formation. The formation type is largely
-     * presentational for support formations and does not affect gameplay calculations.</p>
-     *
-     * @param campaign    the campaign context, used to register the units with the formation
-     * @param label       the display name for the new formation
-     * @param type        the {@link FormationType} to assign to the formation
-     * @param units       the list of {@link Unit} objects whose IDs will be added to the formation; must not be
-     *                    {@code null}, but may be empty
-     * @param hqFormation the HQ {@link Formation} to attach the new formation to; must not be {@code null}
-     *
-     * @return a fully populated, non-{@code null} {@link Formation} ready to be registered with the campaign
-     *
-     * @author Illiani
-     * @since 0.51.0
-     */
-    /**
      * Adds units to a formation nested one level deeper than {@link #addSupportUnitsToTOE}, so related
      * sub-commands can be grouped under a shared parent rather than sitting as siblings directly under
      * the HQ.
@@ -183,11 +164,16 @@ public class AddSupportUnitsToTOE {
      * nothing in it is removed. Support carriers - the squads and platoons that carry the support staff - are never
      * moved.</p>
      *
+     * <p>Once a formation is split into lances, the lances do its job: they take the formation's type, and for a
+     * type MekHQ only gives to the formation that does the work - Convoy, Salvage, Security - the formation above
+     * them becomes a Standard one, as it would if the player had built the lances by hand. A Logistics company of
+     * two lances is therefore a Standard formation holding two Convoys, rather than a Convoy holding Convoys.</p>
+     *
      * @param campaign  the campaign that owns the TOE
      * @param group     the formation whose vehicles are arranged
      * @param lanceSize vehicles in a full lance; zero or less leaves the formation as it is
      * @param namer     the name of the lance at a given position, counting from one
-     * @param type      the formation type to give a new lance
+     * @param type      the formation type to give the lances
      *
      * @return the lances created; empty when none were needed
      */
@@ -198,6 +184,7 @@ public class AddSupportUnitsToTOE {
             return created;
         }
         removeEmptyLances(campaign, group, namer);
+        FormationType lanceType = lanceTypeFor(group, namer, type);
 
         List<Unit> looseVehicles = new ArrayList<>();
         for (UUID unitId : group.getUnits()) {
@@ -214,6 +201,7 @@ public class AddSupportUnitsToTOE {
             }
         }
         if (looseVehicles.isEmpty() || (!hasLances && (looseVehicles.size() <= lanceSize))) {
+            typeLances(group, namer, lanceType);
             return created;
         }
 
@@ -222,7 +210,8 @@ public class AddSupportUnitsToTOE {
             before.add(child.getId());
         }
         for (Unit vehicle : looseVehicles) {
-            Formation lance = nextSubFormationWithRoom(campaign, group, namer, lanceSize, type, looseVehicles.size());
+            Formation lance = nextSubFormationWithRoom(campaign, group, namer, lanceSize, lanceType,
+                  looseVehicles.size());
             campaign.getPlayerForce().addUnitToFormation(vehicle, lance.getId(), campaign);
         }
         for (Formation child : group.getSubFormations()) {
@@ -232,7 +221,61 @@ public class AddSupportUnitsToTOE {
         }
         LOGGER.info("[SupportTOE] '{}': {} vehicle(s) filed into lances of {}, {} new lance(s)", group.getName(),
               looseVehicles.size(), lanceSize, created.size());
+        typeLances(group, namer, lanceType);
         return created;
+    }
+
+    /**
+     * The type a formation's lances should have. A formation already split into lances may have been made Standard by
+     * {@link #typeLances}, so its lances, not the formation, say what job they do.
+     *
+     * @param group the formation whose lances are typed
+     * @param namer the name of the lance at a given position, counting from one
+     * @param type  the type asked for
+     *
+     * @return {@code type}, unless it is Standard and the formation already has lances of another type
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static FormationType lanceTypeFor(Formation group, IntFunction<String> namer, FormationType type) {
+        if (!type.isStandard()) {
+            return type;
+        }
+        for (Formation child : group.getSubFormations()) {
+            if (isLanceName(child.getName(), namer) && !child.getFormationType().isStandard()) {
+                return child.getFormationType();
+            }
+        }
+        return type;
+    }
+
+    /**
+     * Gives a formation's lances their type and, when that type is one MekHQ keeps off the formations above it -
+     * Convoy, Salvage, Security - makes the formation itself Standard. A formation with no lances is left as it is,
+     * because it is itself the lance.
+     *
+     * @param group     the formation whose lances are typed
+     * @param namer     the name of the lance at a given position, counting from one
+     * @param lanceType the type the lances do their job as
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void typeLances(Formation group, IntFunction<String> namer, FormationType lanceType) {
+        boolean hasLances = false;
+        for (Formation child : group.getSubFormations()) {
+            if (isLanceName(child.getName(), namer)) {
+                child.setFormationType(lanceType, true);
+                hasLances = true;
+            }
+        }
+        if (hasLances && !lanceType.isStandard() && lanceType.shouldStandardizeParents()
+                  && !group.isFormationType(FormationType.STANDARD)) {
+            LOGGER.info("[SupportTOE] '{}': its lances are {} formations, so it becomes a Standard one",
+                  group.getName(), lanceType);
+            group.setFormationType(FormationType.STANDARD, false);
+        }
     }
 
     /** Removes the lances under {@code group} that no longer hold anything. */
@@ -315,6 +358,23 @@ public class AddSupportUnitsToTOE {
         return created;
     }
 
+    /**
+     * Adds the given units to a sub-{@link Formation} of the HQ formation, creating it if it does not already exist.
+     *
+     * <p>A new formation is assigned the provided {@code label} as its display name and configured with the given
+     * {@link FormationType}. Each unit's ID is then registered with the formation. The formation type is largely
+     * presentational for support formations and does not affect gameplay calculations.</p>
+     *
+     * @param campaign    the campaign context, used to register the units with the formation
+     * @param label       the display name of the sub-formation
+     * @param type        the {@link FormationType} to assign to the formation, if it is created
+     * @param units       the list of {@link Unit} objects whose IDs will be added to the formation; must not be
+     *                    {@code null}, but may be empty
+     * @param hqFormation the HQ {@link Formation} the sub-formation sits under; must not be {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     private static void createSubFormation(Campaign campaign, String label, FormationType type,
           List<Unit> units, Formation hqFormation) {
         // Reuse an existing sub-formation of this label under the HQ, so a top-up generation (for
@@ -357,20 +417,6 @@ public class AddSupportUnitsToTOE {
         return null;
     }
 
-    /**
-     * Retrieves the campaign's HQ {@link Formation}, creating it if one does not already exist.
-     *
-     * <p>All existing formations are searched for a name that matches {@link SupportTOEFormationTypes#HQ_FORMATION}'s
-     * label (case-insensitive). If a match is found, it is returned immediately. Otherwise, a new HQ formation is
-     * created, attached to the campaign's origin formation ({@link Formation#FORMATION_ORIGIN}), and returned.</p>
-     *
-     * @param campaign the active {@link Campaign} whose formation list is searched and potentially modified
-     *
-     * @return the existing or newly created HQ {@link Formation}; never {@code null}
-     *
-     * @author Illiani
-     * @since 0.51.0
-     */
     /**
      * The formation a campaign already keeps its support under, if it has one.
      *
@@ -434,6 +480,20 @@ public class AddSupportUnitsToTOE {
                      || formation.isFormationType(FormationType.SECURITY);
     }
 
+    /**
+     * Retrieves the campaign's HQ {@link Formation}, creating it if one does not already exist.
+     *
+     * <p>All existing formations are searched for a name that matches {@link SupportTOEFormationTypes#HQ_FORMATION}'s
+     * label (case-insensitive). If a match is found, it is returned immediately. Otherwise, a new HQ formation is
+     * created, attached to the campaign's origin formation ({@link Formation#FORMATION_ORIGIN}), and returned.</p>
+     *
+     * @param campaign the active {@link Campaign} whose formation list is searched and potentially modified
+     *
+     * @return the existing or newly created HQ {@link Formation}; never {@code null}
+     *
+     * @author Illiani
+     * @since 0.51.0
+     */
     static @Nonnull Formation getHqFormation(Campaign campaign) {
         final Formation ORIGIN_FORMATION = campaign.getPlayerForce().getFormation(Formation.FORMATION_ORIGIN);
 

@@ -88,7 +88,9 @@ class UnableToAffordExpensesNagLogicTest {
         //TODO: This won't work once we support multiple warehouse. Method separated from getWarehouse() for future
         when(campaign.getPlayerForce().getWarehouse()).thenReturn(warehouse);
         when(campaign.getCampaignOptions()).thenReturn(campaignOptions);
-        lenient().when(campaignOptions.get(CampaignOption.USE_PEACETIME_COST)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_PEACETIME_SPARE_PARTS)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_TRAINING_MUNITIONS)).thenReturn(false);
+        lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_PEACETIME_FUEL)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_OVERHEAD)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_SALARIES)).thenReturn(false);
         lenient().when(campaignOptions.get(CampaignOption.PAY_FOR_MAINTAIN)).thenReturn(false);
