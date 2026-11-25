@@ -33,6 +33,7 @@
 package mekhq.campaign.personnel.education;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
 import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertNull;
@@ -51,6 +52,7 @@ import static org.mockito.Mockito.when;
 import static testUtilities.MHQTestUtilities.mockCampaign;
 
 import java.time.LocalDate;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.UUID;
@@ -900,6 +902,182 @@ class EducationControllerTest {
             assertTrue(person.getEduTagAlongs().isEmpty());
             assertEquals(PersonnelStatus.ACTIVE, spouse.getStatus());
             assertEquals(PersonnelStatus.ACTIVE, child.getStatus());
+        }
+    }
+
+    /**
+     * Mocks the {@link AcademyFactory} singleton so {@link EducationController#getAcademy} finds {@code academy}.
+     */
+    static MockedStatic<AcademyFactory> mockAcademyFactory(Academy academy) {
+        MockedStatic<AcademyFactory> mockedFactory = mockStatic(AcademyFactory.class);
+        AcademyFactory factory = mock(AcademyFactory.class);
+        mockedFactory.when(AcademyFactory::getInstance).thenReturn(factory);
+        when(factory.getAllSetNames()).thenReturn(List.of(ACADEMY_SET));
+        when(factory.getAllAcademiesForSet(ACADEMY_SET)).thenReturn(List.of(academy));
+        return mockedFactory;
+    }
+
+    static PlanetarySystem mockSystem(String systemId, long population) {
+        PlanetarySystem system = mock(PlanetarySystem.class);
+        when(system.getId()).thenReturn(systemId);
+        when(system.getPopulation(any())).thenReturn(population);
+        return system;
+    }
+
+    /**
+     * Regression tests for issue #11164: a local-academy student re-enrolled after dropping out kept their queued trip
+     * home, ended up back with the unit while still studying, and on reload had their campus guessed to be in the
+     * (depopulated) system the campaign was in, so the academy was "destroyed".
+     */
+    @Nested
+    class ReEnrollPerson {
+
+        static final String KAFR_SILIM_ACADEMY_NAME = "Kafr Silim University of Higher Learning";
+
+        Campaign campaign;
+        CampaignLocationManager locationManager;
+        AcademyCampusLocation campus;
+        Person person;
+
+        @BeforeEach
+        void setUp() {
+            campaign = buildMinimalCampaignMock();
+            locationManager = campaign.getCampaignLocationManager();
+            campus = new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME);
+            when(locationManager.getOrCreateCampusLocation(any(), any(), any(), any())).thenReturn(campus);
+
+            PlanetarySystem kafrSilim = mockSystem("Kafr Silim", 325_000_000L);
+            PlanetarySystem sichuan = mockSystem("Sichuan", 0L);
+            when(campaign.getSystems()).thenReturn(new ArrayList<>(List.of(kafrSilim, sichuan)));
+            when(campaign.getSystemById("Kafr Silim")).thenReturn(kafrSilim);
+            when(campaign.getSystemById("Sichuan")).thenReturn(sichuan);
+            when(campaign.getCurrentSystem()).thenReturn(sichuan);
+
+            person = buildStudentPerson();
+            person.setEduAcademySet(ACADEMY_SET);
+            person.setEduAcademyNameInSet(ACADEMY_NAME);
+            person.setEduAcademyName(KAFR_SILIM_ACADEMY_NAME);
+            person.setEduCourseIndex(0);
+            person.setEduEducationStage(EducationStage.JOURNEY_FROM_CAMPUS);
+        }
+
+        @Test
+        void localStudentStillAtCampus_cancelsQueuedTripHomeAndRestartsEducation() {
+            Academy academy = buildAcademy(false, true);
+            person.setParent(campus.getPersonnel());
+
+            EducationController.reEnrollPerson(campaign, person, academy);
+
+            verify(locationManager).cancelPendingTravel(person);
+            verify(locationManager, never()).queueTravel(any(), any());
+            assertEquals(EducationStage.EDUCATION, person.getEduEducationStage());
+            assertSame(campus.getPersonnel(), person.getParentLocation());
+        }
+
+        @Test
+        void localStudentAwayFromCampus_isSentBackToCampusInAcademySystem() {
+            Academy academy = buildAcademy(false, true);
+
+            try (MockedStatic<AcademyFactory> ignored = mockAcademyFactory(academy)) {
+                EducationController.reEnrollPerson(campaign, person, academy);
+            }
+
+            assertEquals(EducationStage.JOURNEY_TO_CAMPUS, person.getEduEducationStage());
+            verify(locationManager).getOrCreateCampusLocation(campaign, ACADEMY_SET, ACADEMY_NAME, "Kafr Silim");
+            verify(locationManager).queueTravel(List.of(person), campus);
+        }
+
+        @Test
+        void remoteStudent_cancelsQueuedTripHome() {
+            Academy academy = buildAcademy(false, false);
+            person.setParent(campus.getPersonnel());
+
+            EducationController.reEnrollPerson(campaign, person, academy);
+
+            verify(locationManager).cancelPendingTravel(person);
+            assertEquals(EducationStage.JOURNEY_TO_CAMPUS, person.getEduEducationStage());
+        }
+
+        @Test
+        void resolveAcademySystemId_localAcademyUsesSystemInNameOverCampaignLocation() {
+            Academy academy = buildAcademy(false, true);
+
+            String resolvedSystemId;
+            try (MockedStatic<AcademyFactory> ignored = mockAcademyFactory(academy)) {
+                resolvedSystemId = EducationController.resolveAcademySystemId(campaign, person);
+            }
+
+            assertEquals("Kafr Silim", resolvedSystemId);
+        }
+
+        @Test
+        void resolveAcademySystemId_localAcademyWithUnrecognizedNameFallsBackToCampaignLocation() {
+            Academy academy = buildAcademy(false, true);
+            person.setEduAcademyName("Nowhere University of Higher Learning");
+
+            String resolvedSystemId;
+            try (MockedStatic<AcademyFactory> ignored = mockAcademyFactory(academy)) {
+                resolvedSystemId = EducationController.resolveAcademySystemId(campaign, person);
+            }
+
+            assertEquals("Sichuan", resolvedSystemId);
+        }
+
+        @Test
+        void isLocalCampusSystemPopulated_checksAcademySystemNotCampaignLocation() {
+            assertTrue(EducationController.isLocalCampusSystemPopulated(campaign, person));
+        }
+
+        @Test
+        void isLocalCampusSystemPopulated_falseWhenAcademySystemDepopulated() {
+            person.setEduAcademyName("Sichuan University of Higher Learning");
+
+            assertFalse(EducationController.isLocalCampusSystemPopulated(campaign, person));
+        }
+    }
+
+    /** Tests for {@link EducationController#findSystemIdInLocalAcademyName}. */
+    @Nested
+    class FindSystemIdInLocalAcademyName {
+
+        Campaign campaign;
+
+        @BeforeEach
+        void setUp() {
+            campaign = buildMinimalCampaignMock();
+            when(campaign.getSystems()).thenReturn(new ArrayList<>(List.of(mockSystem("Kafr", 1L),
+                  mockSystem("Kafr Silim", 1L),
+                  mockSystem("Sian", 1L))));
+        }
+
+        @Test
+        void systemAtStartOfName_isFound() {
+            assertEquals("Sian",
+                  EducationController.findSystemIdInLocalAcademyName(campaign, "Sian College of Science"));
+        }
+
+        @Test
+        void systemAtEndOfName_isFound() {
+            assertEquals("Sian",
+                  EducationController.findSystemIdInLocalAcademyName(campaign, "Combat Academy of Sian"));
+        }
+
+        @Test
+        void longestMatchingSystem_wins() {
+            assertEquals("Kafr Silim",
+                  EducationController.findSystemIdInLocalAcademyName(campaign,
+                        "Kafr Silim University of Higher Learning"));
+        }
+
+        @Test
+        void systemInMiddleOfName_isIgnored() {
+            assertNull(EducationController.findSystemIdInLocalAcademyName(campaign,
+                  "War Sian Academy of Advanced Studies"));
+        }
+
+        @Test
+        void partialWordMatch_isIgnored() {
+            assertNull(EducationController.findSystemIdInLocalAcademyName(campaign, "Siany College of Science"));
         }
     }
 

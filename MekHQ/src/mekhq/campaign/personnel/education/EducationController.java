@@ -471,6 +471,10 @@ public class EducationController {
         person.setEduEducationTime(academy.getDurationDays());
         person.setEduDaysOfTravel(0);
 
+        // Ending the previous course queued the student's trip back to the unit. Re-enrolling supersedes that trip;
+        // left in place it would carry the student away from campus while they are still marked as studying.
+        campaign.getCampaignLocationManager().cancelPendingTravel(person);
+
         if (academy.isHomeSchool()) {
             person.setEduEducationStage(EducationStage.EDUCATION);
             IPlace homeBase = findHomeLocation(person, campaign);
@@ -478,8 +482,16 @@ public class EducationController {
                   academy.getSet(), academy.getName(), homeBase);
             person.setParent(campusLocation.getPersonnel());
         } else if (academy.isLocal()) {
-            // already at the local campus — restart EDUCATION directly
-            person.setEduEducationStage(EducationStage.EDUCATION);
+            if (isAtAcademyCampus(person)) {
+                // still at the local campus — restart EDUCATION directly
+                person.setEduEducationStage(EducationStage.EDUCATION);
+            } else {
+                // The student has already set off home, so send them back. Mid-transit students are landed at the
+                // campus by the JOURNEY_TO_CAMPUS stage processing once their current trip ends.
+                person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
+                person.setEduJourneyTime(2);
+                queueTravelBackToLocalCampus(campaign, person);
+            }
         } else {
             // Person is already at the campus — keep them there and restart the course.
             // The 2-day JOURNEY_TO_CAMPUS stage fires landAtCampus via the day-counter fallback
@@ -495,6 +507,52 @@ public class EducationController {
               person.getEduAcademyName(),
               academy.getQualifications().get(person.getEduCourseIndex()));
         MekHQ.triggerEvent(new PersonChangedEvent(person));
+    }
+
+    /**
+     * Checks whether {@code person} is currently located at an academy campus, i.e. whether an
+     * {@link AcademyCampusLocation} is among their location ancestors.
+     *
+     * @param person the person to check
+     *
+     * @return {@code true} if the person is at a campus, otherwise {@code false}
+     */
+    static boolean isAtAcademyCampus(Person person) {
+        for (ILocation cursor = person.getParentLocation(); cursor != null; cursor = cursor.getParentLocation()) {
+            if (cursor instanceof AcademyCampusLocation) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    /**
+     * Queues a re-enrolled local-academy student who has left campus to travel back to it. Students already in transit
+     * are left alone; their JOURNEY_TO_CAMPUS stage processing lands them at the campus when their current trip ends.
+     *
+     * @param campaign the campaign the student belongs to
+     * @param person   the re-enrolled student
+     */
+    private static void queueTravelBackToLocalCampus(Campaign campaign, Person person) {
+        if (person.getCurrentLocation() instanceof AbstractMobileLocation) {
+            return;
+        }
+
+        String campusSystemId = resolveAcademySystemId(campaign, person);
+        if (campusSystemId == null) {
+            LOGGER.warn("reEnrollPerson: could not resolve the campus system for {}; they will be landed at campus by"
+                              + " the journey fallback", person.getFullTitle());
+            return;
+        }
+
+        AcademyCampusLocation campusLocation = campaign.getCampaignLocationManager()
+                                                     .getOrCreateCampusLocation(campaign,
+                                                           person.getEduAcademySet(),
+                                                           person.getEduAcademyNameInSet(),
+                                                           campusSystemId);
+        if (campusLocation != null) {
+            campaign.getCampaignLocationManager().queueTravel(List.of(person), campusLocation);
+        }
     }
 
     /**
@@ -1133,6 +1191,18 @@ public class EducationController {
 
         }
 
+        // Local academy names are generated around the id of the system the campus sits in (see generateName), so
+        // recover the system from the name before resorting to the campaign's location, which is wrong whenever the
+        // campaign has moved since enrollment.
+        if (academy != null && academy.isLocal()) {
+            systemId = findSystemIdInLocalAcademyName(campaign, academyName);
+            if (systemId != null) {
+                LOGGER.info("Resolved Academy System ID for person {} from local academy name '{}': {}",
+                      person, academyName, systemId);
+                return systemId;
+            }
+        }
+
         if (academy != null && campaign.getCurrentSystem() != null) {
             systemId = campaign.getCurrentSystem().getId();
             LOGGER.warn("Could not resolve Academy System ID for person {}. for homeschool, " +
@@ -1153,6 +1223,54 @@ public class EducationController {
         String systemName = academyName.substring(lastOpen + 1, lastClose).trim();
         PlanetarySystem system = campaign.getSystemByName(systemName);
         return system != null ? system.getId() : null;
+    }
+
+    /**
+     * Finds the planetary system a local academy's generated name was built around. {@link #generateName} always places
+     * the campus system id at the very start or very end of the name, separated by a space.
+     *
+     * @param campaign    the campaign whose systems are searched
+     * @param academyName the generated local academy name, e.g. "Kafr Silim University of Higher Learning"
+     *
+     * @return the id of the matching system, preferring the longest match, or {@code null} if no system matches
+     */
+    static @Nullable String findSystemIdInLocalAcademyName(Campaign campaign, String academyName) {
+        String matchedSystemId = null;
+        for (PlanetarySystem system : campaign.getSystems()) {
+            String candidateSystemId = system.getId();
+            if (candidateSystemId == null || candidateSystemId.isBlank()) {
+                continue;
+            }
+            boolean isNameMatch = academyName.startsWith(candidateSystemId + ' ')
+                                        || academyName.endsWith(' ' + candidateSystemId);
+            if (isNameMatch && (matchedSystemId == null || candidateSystemId.length() > matchedSystemId.length())) {
+                matchedSystemId = candidateSystemId;
+            }
+        }
+        return matchedSystemId;
+    }
+
+    /**
+     * Checks whether the system hosting a student's local academy campus is still populated. The campus system is
+     * taken from the location tree, then from the generated academy name, and only as a last resort from the
+     * campaign's current location.
+     *
+     * @param campaign the campaign the student belongs to
+     * @param person   the student enrolled at a local academy
+     *
+     * @return {@code true} if the campus system has a population greater than zero
+     */
+    public static boolean isLocalCampusSystemPopulated(Campaign campaign, Person person) {
+        String campusSystemId = person.getEduAcademySystem();
+        if (campusSystemId == null && person.getEduAcademyName() != null) {
+            campusSystemId = findSystemIdInLocalAcademyName(campaign, person.getEduAcademyName());
+        }
+
+        PlanetarySystem campusSystem = (campusSystemId == null) ? null : campaign.getSystemById(campusSystemId);
+        if (campusSystem == null) {
+            campusSystem = campaign.getCurrentSystem();
+        }
+        return (campusSystem != null) && (campusSystem.getPopulation(campaign.getLocalDate()) > 0);
     }
 
     /**
