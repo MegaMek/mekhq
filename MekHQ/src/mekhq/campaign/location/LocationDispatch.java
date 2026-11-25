@@ -200,24 +200,29 @@ public final class LocationDispatch {
      * with the campaign. The node has {@code transitTime = 0}, so {@code isOnPlanet()} is
      * immediately {@code true} and {@link IPlace#processArrivals} will land all carried items on
      * its next call.
+     *
+     * <p>Returns an empty {@link Optional}, without registering anything, when the node can't be parented under
+     * {@code destination}: arrivals are only processed for nodes under a place, so the items would never land.</p>
      */
-    private static CurrentLocation buildArrivedNode(PlanetarySystem system, ILocation destination,
+    private static Optional<CurrentLocation> buildArrivedNode(PlanetarySystem system, ILocation destination,
           CampaignLocationManager locationManager, String logContext) {
         CurrentLocation arrivedLocation = new CurrentLocation(system, 0.0);
         if (!arrivedLocation.setParent(destination)) {
-            LOGGER.warn("{}: setParent failed for arrivedLocation → {}",
+            LOGGER.warn("{}: setParent failed for arrivedLocation → {}; landing directly",
                   logContext, destination.getClass().getSimpleName());
+            return Optional.empty();
         }
         locationManager.addLocation(arrivedLocation);
-        return arrivedLocation;
+        return Optional.of(arrivedLocation);
     }
 
     /**
      * Builds a cross-system travel node from {@code fromSystem} toward {@code destinationSystem},
      * parented under {@code destination}, and registers it with the campaign.
      *
-     * <p>Returns an empty {@link Optional} (without modifying state) when no path exists or the
-     * path is empty — callers should fall back to direct placement in that case.</p>
+     * <p>Returns an empty {@link Optional} (without modifying state) when no path exists, the
+     * path is empty, or the node can't be parented under {@code destination} — callers should fall
+     * back to direct placement in that case.</p>
      */
     private static Optional<CurrentLocation> buildTravelNode(PlanetarySystem fromSystem,
           PlanetarySystem destinationSystem, ILocation destination, Campaign campaign, String logContext) {
@@ -229,9 +234,9 @@ public final class LocationDispatch {
         CurrentLocation travelNode = new CurrentLocation(fromSystem, startTransit);
         travelNode.setJumpPath(path);
         if (!travelNode.setParent(destination)) {
-            LOGGER.warn("{}: setParent failed for travelNode → {}; "
-                  + "items may display as Main Force after save/load",
+            LOGGER.warn("{}: setParent failed for travelNode → {}; landing directly",
                   logContext, destination.getClass().getSimpleName());
+            return Optional.empty();
         }
         campaign.getCampaignLocationManager().addLocation(travelNode);
         return Optional.of(travelNode);
@@ -241,17 +246,20 @@ public final class LocationDispatch {
      * Builds an on-planet overland travel node at {@code system} (a fixed {@link #GROUND_TRANSIT_DAYS}
      * day journey, no jump path), parented under {@code destination}, and registers it with the
      * campaign. Used for same-planet moves to a different root location.
+     *
+     * <p>Returns an empty {@link Optional}, without registering anything, when the node can't be parented under
+     * {@code destination}.</p>
      */
-    private static GroundTransitLocation buildGroundTransitNode(PlanetarySystem system, ILocation destination,
-          Campaign campaign, String logContext) {
+    private static Optional<GroundTransitLocation> buildGroundTransitNode(PlanetarySystem system,
+          ILocation destination, Campaign campaign, String logContext) {
         GroundTransitLocation groundNode = new GroundTransitLocation(system, GROUND_TRANSIT_DAYS);
         if (!groundNode.setParent(destination)) {
-            LOGGER.warn("{}: setParent failed for groundTransitNode → {}; "
-                  + "items may display as Main Force after save/load",
+            LOGGER.warn("{}: setParent failed for groundTransitNode → {}; landing directly",
                   logContext, destination.getClass().getSimpleName());
+            return Optional.empty();
         }
         campaign.getCampaignLocationManager().addLocation(groundNode);
-        return groundNode;
+        return Optional.of(groundNode);
     }
 
     /**
@@ -279,7 +287,11 @@ public final class LocationDispatch {
      * @param campaign    the active campaign; must not be {@code null}
      */
     private static void dispatchToLocation(Collection<Person> people, ILocation destination, Campaign campaign) {
-        dispatch(people, destination, campaign, LOG_DISPATCH_PERSONS, destination, null);
+        // People belong in the place's personnel list, not directly under the place, or they drop off its roster
+        ILocation landingTarget = destination instanceof IPlace place && place.getPersonnel() != null
+                                        ? place.getPersonnel()
+                                        : destination;
+        dispatch(people, destination, campaign, LOG_DISPATCH_PERSONS, landingTarget, null);
     }
 
     /**
@@ -436,8 +448,14 @@ public final class LocationDispatch {
                           campaign.getCampaignLocationManager(), logMarker);
                 }
                 if (!needGroundTransit.isEmpty()) {
-                    GroundTransitLocation groundNode = buildGroundTransitNode(system, destination, campaign, logMarker);
-                    needGroundTransit.forEach(item -> reparent(item, groundNode));
+                    Optional<GroundTransitLocation> groundNode = buildGroundTransitNode(system, destination, campaign,
+                          logMarker);
+                    if (groundNode.isPresent()) {
+                        needGroundTransit.forEach(item -> reparent(item, groundNode.get()));
+                    } else {
+                        land(needGroundTransit, destination, directLandingTarget, system,
+                              campaign.getCampaignLocationManager(), logMarker);
+                    }
                 }
                 continue;
             }
@@ -456,16 +474,21 @@ public final class LocationDispatch {
 
     /**
      * Lands {@code group} at {@code destination}: bases receive an arrived {@link CurrentLocation}
-     * node so arrival accounting still runs; anywhere else the group is parented directly under
-     * {@code directLandingTarget}.
+     * node so arrival accounting still runs; anywhere else, or when that node can't be attached, the group is parented
+     * directly under {@code directLandingTarget}.
      */
     private static void land(List<? extends ILocation> group, ILocation destination, ILocation directLandingTarget,
           PlanetarySystem system, CampaignLocationManager locationManager, String logMarker) {
+        ILocation target = directLandingTarget;
         if (destination instanceof AbstractBase) {
-            CurrentLocation arrivedLocation = buildArrivedNode(system, destination, locationManager, logMarker);
-            group.forEach(item -> reparent(item, arrivedLocation));
-        } else {
-            group.forEach(item -> reparent(item, directLandingTarget));
+            Optional<CurrentLocation> arrivedLocation = buildArrivedNode(system, destination, locationManager,
+                  logMarker);
+            if (arrivedLocation.isPresent()) {
+                target = arrivedLocation.get();
+            }
+        }
+        for (ILocation item : group) {
+            reparent(item, target);
         }
     }
 

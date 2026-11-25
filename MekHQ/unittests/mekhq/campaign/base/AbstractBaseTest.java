@@ -51,6 +51,7 @@ import mekhq.campaign.FixedLocation;
 import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.LocalWarehouse;
+import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.parts.Armor;
 import mekhq.campaign.parts.PartInventory;
 import mekhq.campaign.parts.meks.MekSensor;
@@ -252,6 +253,24 @@ public class AbstractBaseTest {
             assertTrue(traveler.setParent(travel), "traveler should attach under the travel node");
 
             assertFalse(base.isEmpty(campaign));
+        }
+
+        @Test
+        void withStudentAtCampusUnderBase_isNotEmpty() {
+            AcademyCampusLocation campus = new AcademyCampusLocation("TestSet", "Test Academy");
+            assertTrue(campus.setParent(base), "campus should attach under the base");
+            Person student = new Person("First", "Last", null, "MERC");
+            assertTrue(student.setParent(campus.getPersonnel()), "student should attach to the campus personnel");
+
+            assertFalse(base.isEmpty(campaign));
+        }
+
+        @Test
+        void withEmptyCampusUnderBase_isEmpty() {
+            AcademyCampusLocation campus = new AcademyCampusLocation("TestSet", "Test Academy");
+            assertTrue(campus.setParent(base), "campus should attach under the base");
+
+            assertTrue(base.isEmpty(campaign));
         }
 
         @Test

@@ -459,24 +459,34 @@ public class BaseSettingsDialog extends JDialog {
         }
 
         Planet selectedPlanet = cboPlanet.getSelectedItem() instanceof Planet p ? p : null;
-
-        FixedLocation fixedLocation = new FixedLocation(system);
-        PlayerBase base = existingBase != null ? existingBase : new PlayerBase(fixedLocation);
-        if (existingBase != null) {
-            base.setParent(fixedLocation);
-        }
-
-        base.setDisplayName(displayName);
         String displayType = txtDisplayType.getText().trim();
-        base.setDisplayType(displayType.isEmpty() ? null : displayType);
-        base.setPlanetId(selectedPlanet != null ? selectedPlanet.getId() : null);
+
+        result = saveBase(campaign, existingBase, system, selectedPlanet, displayName,
+              displayType.isEmpty() ? null : displayType);
+        dispose();
+    }
+
+    /**
+     * Renames {@code existingBase}, or creates a base at {@code system} and registers it with the campaign.
+     *
+     * <p>An existing base keeps its location, since the dialog locks the system and planet when editing. Moving it
+     * under a new {@link FixedLocation} would detach it from the campaign's registered locations, and its units and
+     * parts would stop getting daily processing.</p>
+     *
+     * @return the saved base
+     */
+    static PlayerBase saveBase(Campaign campaign, @Nullable PlayerBase existingBase, PlanetarySystem system,
+          @Nullable Planet planet, String displayName, @Nullable String displayType) {
+        PlayerBase base = existingBase != null ? existingBase : new PlayerBase(new FixedLocation(system));
+        base.setDisplayName(displayName);
+        base.setDisplayType(displayType);
 
         if (existingBase == null) {
+            base.setPlanetId(planet != null ? planet.getId() : null);
+            // Registering fires the event that shows the base, so it comes last
             campaign.getCampaignLocationManager().addPlayerBase(base);
         }
-
-        result = base;
-        dispose();
+        return base;
     }
 
     public Optional<PlayerBase> getResult() {

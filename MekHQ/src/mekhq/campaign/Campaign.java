@@ -1949,13 +1949,15 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Travel nodes are registered locations that also hang under the place they travel to, so a set keeps anything in
+     * transit from being counted twice.
+     *
      * @return All player's units in {@code campaign}, not just the ones located with the main force.
      */
     public Collection<Unit> getAllUnits() {
-        List<Unit> units = new ArrayList<>();
+        Set<Unit> units = new LinkedHashSet<>();
         for (AbstractLocation location : getCampaignLocationManager().getLocations()) {
-            Set<Unit> found = location.fetchUnitsAtLocation();
-            units.addAll(found);
+            units.addAll(location.fetchUnitsAtLocation());
         }
         return units;
     }
@@ -2106,13 +2108,14 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Like {@link #getAllUnits()}, a set keeps spares in transit from being counted twice.
+     *
      * @return All player's parts in {@code campaign}, not just the ones located with the main force.
      */
     public Collection<Part> getAllParts() {
-        List<Part> parts = new ArrayList<>();
+        Set<Part> parts = new LinkedHashSet<>();
         for (AbstractLocation location : getCampaignLocationManager().getLocations()) {
-            Set<Part> found = location.fetchPartsAtLocation();
-            parts.addAll(found);
+            parts.addAll(location.fetchPartsAtLocation());
         }
         return parts;
     }

@@ -52,6 +52,7 @@ import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalPersonnel;
 import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.force.Detachment;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
@@ -141,6 +142,54 @@ class LocationDispatchTest {
 
             assertNull(registeredGroundTransit());
             assertInstanceOf(CurrentLocation.class, person.getCurrentLocation());
+        }
+    }
+
+    /** People landing at a place go into its personnel list, not directly under the place. */
+    @Nested
+    class LandingAtPlace {
+        @Test
+        void personAtSameRoot_landsInPlacePersonnel() {
+            FixedLocation root = new FixedLocation(system);
+            Detachment detachment = new Detachment();
+            assertTrue(detachment.setParent(root));
+            Person person = newPerson();
+            assertTrue(person.setParent(root));
+
+            LocationDispatch.dispatchTravelers(List.of(person), detachment, campaign);
+
+            assertSame(detachment.getPersonnel(), person.getParentLocation());
+            assertTrue(detachment.getPersonnel().containsKey(person.getId()));
+        }
+
+        @Test
+        void personAlreadyInPlacePersonnel_staysThere() {
+            FixedLocation root = new FixedLocation(system);
+            Detachment detachment = new Detachment();
+            assertTrue(detachment.setParent(root));
+            Person person = newPerson();
+            assertTrue(person.setParent(detachment.getPersonnel()));
+
+            LocationDispatch.dispatchTravelers(List.of(person), detachment, campaign);
+
+            assertSame(detachment.getPersonnel(), person.getParentLocation());
+        }
+    }
+
+    /** A travel node that can't attach under its destination is never registered. */
+    @Nested
+    class UnattachableDestination {
+        @Test
+        void detachedBase_registersNoTravelNode() {
+            PlayerBase base = new PlayerBase(new FixedLocation(system));
+            assertTrue(base.setParent(null));
+            Person person = newPerson();
+            person.setParent(new FixedLocation(system));
+            int registeredBefore = locationManager.getLocations().size();
+
+            LocationDispatch.dispatchTravelers(List.of(person), base, campaign);
+
+            assertEquals(registeredBefore, locationManager.getLocations().size());
         }
     }
 

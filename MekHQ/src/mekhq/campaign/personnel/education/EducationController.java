@@ -885,10 +885,18 @@ public class EducationController {
         person.setEduEducationStage(EducationStage.JOURNEY_FROM_CAMPUS);
     }
 
+    /**
+     * Returns the place a home-schooled student studies at and returns to: the nearest place above them that is not a
+     * campus. A player base that has since been deleted no longer counts, so the student goes to the main force.
+     */
     private static IPlace findHomeLocation(Person person, Campaign campaign) {
         ILocation current = person.getParentLocation();
         while (current != null) {
             if (current instanceof IPlace place && !(place instanceof AcademyCampusLocation)) {
+                if (place instanceof PlayerBase base
+                          && !campaign.getCampaignLocationManager().getPlayerBases().contains(base)) {
+                    break;
+                }
                 return place;
             }
             current = current.getParentLocation();
