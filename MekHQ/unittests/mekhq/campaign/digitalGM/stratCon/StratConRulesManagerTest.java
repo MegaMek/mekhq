@@ -102,6 +102,7 @@ import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.CsvSource;
+import org.junit.jupiter.params.provider.EnumSource;
 import org.junit.jupiter.params.provider.ValueSource;
 import org.mockito.MockedConstruction;
 import org.mockito.MockedStatic;
@@ -2675,6 +2676,7 @@ class StratConRulesManagerTest {
         private Campaign campaign;
         private StratConScenario scenario;
         private Unit auxiliaryUnit;
+        private CombatTeam auxiliaryTeam;
 
         private Unit mockMekUnit(int formationId) {
             Entity entity = mock(Entity.class);
@@ -2704,15 +2706,15 @@ class StratConRulesManagerTest {
             when(primary.getAllUnits(true)).thenReturn(new Vector<>(List.of(primaryUnitId)));
             when(campaign.getPlayerForce().getFormation(PRIMARY_ID)).thenReturn(primary);
 
-            // Another frontline lance holding the candidate auxiliary Mek.
+            // An Auxiliary lance holding the candidate leadership Mek.
             auxiliaryUnit = mockMekUnit(AUXILIARY_LANCE_ID);
             Formation auxiliaryLance = mock(Formation.class);
             when(auxiliaryLance.getId()).thenReturn(AUXILIARY_LANCE_ID);
             when(auxiliaryLance.isCombatTeam()).thenReturn(true);
             when(campaign.getPlayerForce().getFormation(AUXILIARY_LANCE_ID)).thenReturn(auxiliaryLance);
 
-            CombatTeam auxiliaryTeam = mock(CombatTeam.class);
-            when(auxiliaryTeam.getRole()).thenReturn(CombatRole.FRONTLINE);
+            auxiliaryTeam = mock(CombatTeam.class);
+            when(auxiliaryTeam.getRole()).thenReturn(CombatRole.AUXILIARY);
             when(auxiliaryTeam.getContract(campaign)).thenReturn(contract);
             Hashtable<Integer, CombatTeam> combatTeamsMap = new Hashtable<>();
             combatTeamsMap.put(AUXILIARY_LANCE_ID, auxiliaryTeam);
@@ -2737,6 +2739,20 @@ class StratConRulesManagerTest {
             setUp();
 
             assertTrue(StratConRulesManager.getEligibleLeadershipUnits(campaign, scenario, 3).isEmpty());
+        }
+
+        /**
+         * Only Auxiliary combat teams supply leadership units; a unit in any other non-Reserve role must not be
+         * offered.
+         */
+        @ParameterizedTest
+        @EnumSource(value = CombatRole.class, names = { "AUXILIARY" }, mode = EnumSource.Mode.EXCLUDE)
+        void nonAuxiliaryTeamsOfferNoLeadershipUnits(CombatRole combatRole) {
+            setUp();
+            when(auxiliaryTeam.getRole()).thenReturn(combatRole);
+
+            assertTrue(StratConRulesManager.getEligibleLeadershipUnits(campaign, scenario, 3, List.of(PRIMARY_ID))
+                             .isEmpty());
         }
     }
 }
