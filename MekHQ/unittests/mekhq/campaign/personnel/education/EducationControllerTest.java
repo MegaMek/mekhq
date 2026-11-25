@@ -60,6 +60,7 @@ import java.util.UUID;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CampaignLocationManager;
 import mekhq.campaign.CurrentLocation;
+import mekhq.campaign.FixedLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalWarehouse;
 import mekhq.campaign.base.PlayerBase;
@@ -68,6 +69,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.location.AcademyCampusLocation;
+import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.FamilialRelationshipType;
@@ -943,11 +945,16 @@ class EducationControllerTest {
         void setUp() {
             campaign = buildMinimalCampaignMock();
             locationManager = campaign.getCampaignLocationManager();
-            campus = new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME);
-            when(locationManager.getOrCreateCampusLocation(any(), any(), any(), any())).thenReturn(campus);
 
             PlanetarySystem kafrSilim = mockSystem("Kafr Silim", 325_000_000L);
             PlanetarySystem sichuan = mockSystem("Sichuan", 0L);
+
+            // The campus must hang off a real location: people can only be parented into a tree rooted at an
+            // AbstractLocation, so a free-floating campus would silently refuse the student.
+            campus = new AcademyCampusLocation(ACADEMY_SET, ACADEMY_NAME);
+            LocationNode.LocationManager.setLocation(campus, new FixedLocation(kafrSilim));
+            when(locationManager.getOrCreateCampusLocation(any(), any(), any(), any())).thenReturn(campus);
+
             when(campaign.getSystems()).thenReturn(new ArrayList<>(List.of(kafrSilim, sichuan)));
             when(campaign.getSystemById("Kafr Silim")).thenReturn(kafrSilim);
             when(campaign.getSystemById("Sichuan")).thenReturn(sichuan);
@@ -1045,9 +1052,11 @@ class EducationControllerTest {
         @BeforeEach
         void setUp() {
             campaign = buildMinimalCampaignMock();
-            when(campaign.getSystems()).thenReturn(new ArrayList<>(List.of(mockSystem("Kafr", 1L),
+            // Build the systems before stubbing getSystems(): mocking them inside thenReturn(...) nests a stubbing
+            ArrayList<PlanetarySystem> systems = new ArrayList<>(List.of(mockSystem("Kafr", 1L),
                   mockSystem("Kafr Silim", 1L),
-                  mockSystem("Sian", 1L))));
+                  mockSystem("Sian", 1L)));
+            when(campaign.getSystems()).thenReturn(systems);
         }
 
         @Test
