@@ -563,7 +563,10 @@ final class CrewRowRenderers {
             int before = change.before().values().stream().mapToInt(Integer::intValue).sum();
             int after = change.after().values().stream().mapToInt(Integer::intValue).sum();
             setLink(list, index, from, getFormattedTextAt(RESOURCE_BUNDLE, "row.tempCrewCount", before), null);
-            setLink(list, index, to, getFormattedTextAt(RESOURCE_BUNDLE, "row.tempCrewCount", after), null);
+            int hired = change.totalHired();
+            setLink(list, index, to, (hired > 0) ?
+                                           getFormattedTextAt(RESOURCE_BUNDLE, "row.tempCrewCountHired", after, hired) :
+                                           getFormattedTextAt(RESOURCE_BUNDLE, "row.tempCrewCount", after), null);
             seat.setText("");
             showKind("row.kind.tempCrew", ACCENT);
             return plan.problemWith(change);
