@@ -3047,6 +3047,7 @@ public class PersonViewPanel extends JScrollablePanel {
         boolean doctorsUseAdmin = campaignOptions.get(CampaignOption.DOCTORS_USE_ADMINISTRATION);
         boolean techsUseAdmin = campaignOptions.get(CampaignOption.TECHS_USE_ADMINISTRATION);
         boolean isUseArtillery = campaignOptions.get(CampaignOption.USE_ARTILLERY);
+        Familiarity familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         PersonnelRole primaryProfession = person.getPrimaryRole();
         List<String> primaryProfessionSkills = primaryProfession.getSkillsForProfession(adminsHaveNegotiation,
               doctorsUseAdmin,
@@ -3063,12 +3064,12 @@ public class PersonViewPanel extends JScrollablePanel {
         // Calculate how many rows per column for even distribution
         double numColumns = 3.0;
         int skillsPerColumn = (int) ceil(relevantSkills.size() / numColumns);
-        for (int i = 0; i < relevantSkills.size(); i++) {
-            int column = i / skillsPerColumn; // 0, 1, 2
-            int row = i % skillsPerColumn;
+        for (int skillIndex = 0; skillIndex < relevantSkills.size(); skillIndex++) {
+            int column = skillIndex / skillsPerColumn; // 0, 1, 2
+            int row = skillIndex % skillsPerColumn;
             int gridX = column * 2; // Each column takes 2 grid positions: name + value
 
-            String skillName = relevantSkills.get(i);
+            String skillName = relevantSkills.get(skillIndex);
             Skill skill = person.getSkill(skillName);
 
             // Skills with a Natural Aptitude carry a marker after their name; the tooltip explains it
@@ -3102,13 +3103,17 @@ public class PersonViewPanel extends JScrollablePanel {
             int spaModifier = skill.getSPAModifiers(options, adjustedReputation);
             int injuryModifier = Skill.getTotalInjuryModifier(skillModifierData, skill.getType());
             int bonus = skill.getBonus();
-            String adjustment = getSkillAdjustment(attributeModifier, spaModifier, injuryModifier, bonus);
+            // Combat skills show the target number the character fights their assigned unit with, so they agree with
+            // the TOE and with what MegaMek is given
+            int familiarityBonus = person.getChassisFamiliarityCombatBonus(familiarityMode, skillName);
+            String adjustment = getSkillAdjustment(attributeModifier, spaModifier, injuryModifier, bonus,
+                  familiarityBonus);
 
             JLabel lblValue = new JLabel(String.format("<html>%s%s</html>",
-                  skill.toString(skillModifierData),
+                  skill.toString(skillModifierData, familiarityBonus),
                   adjustment));
             lblName.setLabelFor(lblValue);
-            String tooltip = wordWrap(skill.getTooltip(skillModifierData));
+            String tooltip = wordWrap(skill.getTooltip(skillModifierData, familiarityBonus));
             lblName.setToolTipText(tooltip);
             lblValue.setToolTipText(tooltip);
 
@@ -3197,8 +3202,9 @@ public class PersonViewPanel extends JScrollablePanel {
         return pnlProgressHide;
     }
 
-    private static String getSkillAdjustment(int attributeModifier, int spaModifier, int injuryModifier, int bonus) {
-        int totalModifier = attributeModifier + spaModifier + injuryModifier + bonus;
+    private static String getSkillAdjustment(int attributeModifier, int spaModifier, int injuryModifier, int bonus,
+          int familiarityBonus) {
+        int totalModifier = attributeModifier + spaModifier + injuryModifier + bonus + familiarityBonus;
 
         String color = "";
         String icon = "";

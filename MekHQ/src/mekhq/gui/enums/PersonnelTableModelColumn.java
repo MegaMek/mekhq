@@ -74,6 +74,7 @@ import mekhq.campaign.personnel.enums.GenderDescriptors;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
 import mekhq.campaign.personnel.enums.education.EducationLevel;
+import mekhq.campaign.personnel.familiarity.Familiarity;
 import mekhq.campaign.personnel.familyTree.Genealogy;
 import mekhq.campaign.personnel.quartermaster.ArmorKitCatalog;
 import mekhq.campaign.personnel.skills.InfantryGunnerySkills;
@@ -878,8 +879,12 @@ public enum PersonnelTableModelColumn implements MHQTableColumn {
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         SkillModifierData skillModifierData = person.getSkillModifierData(
               campaignOptions.get(CampaignOption.USE_AGE_EFFECTS), campaign.getPlayerForce().isClanForce(), campaign.getLocalDate(), true);
+        // Combat skills include the chassis familiarity modifier for the person's assigned unit, so the table agrees
+        // with the person view, the TOE, and what MegaMek is given. Skills not used in that unit are unaffected.
+        Familiarity familiarityMode = campaignOptions.get(CampaignOption.CHASSIS_FAMILIARITY_MODE);
         return skillName -> (skillName == null) || !person.hasSkill(skillName) ? null :
-                                  person.getSkill(skillName).getFinalSkillValue(skillModifierData);
+                                  person.getSkill(skillName).getFinalSkillValue(skillModifierData,
+                                        person.getChassisFamiliarityCombatBonus(familiarityMode, skillName));
     }
 
     private static @Nonnull Function<String, String> getStringSkillValue(Person person, Campaign campaign) {

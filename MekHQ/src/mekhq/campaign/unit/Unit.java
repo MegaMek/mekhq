@@ -6317,6 +6317,55 @@ public class Unit implements ITechnology, ILocatable {
     }
 
     /**
+     * The piloting skills this unit is driven with, and so the skills its chassis familiarity piloting bonus applies
+     * to. A LAM is flown in fighter mode as well as walked, so it is driven with both MekWarrior and aerospace piloting.
+     *
+     * @return the skill names, empty when the unit has no entity
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Set<String> getChassisFamiliarityPilotingSkills() {
+        if (entity == null) {
+            return Set.of();
+        }
+
+        Set<String> pilotingSkills = new HashSet<>();
+        pilotingSkills.add(SkillType.getDrivingSkillFor(entity));
+        if (entity instanceof LandAirMek) {
+            pilotingSkills.add(S_PILOT_AERO);
+        }
+        return pilotingSkills;
+    }
+
+    /**
+     * The gunnery skills the given person fights this unit with, and so the skills the chassis familiarity gunnery
+     * bonus applies to: the unit's gunnery skill (for conventional infantry, the person's own best infantry weapon
+     * skill), aerospace gunnery as well for a LAM, and Artillery.
+     *
+     * @param person the person crewing this unit
+     *
+     * @return the skill names, empty when the unit has no entity
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public Set<String> getChassisFamiliarityGunnerySkills(Person person) {
+        if (entity == null) {
+            return Set.of();
+        }
+
+        Set<String> gunnerySkills = new HashSet<>();
+        gunnerySkills.add(entity.isConventionalInfantry() ? getInfantryGunnerySkill(person) :
+                                SkillType.getGunnerySkillFor(entity));
+        if (entity instanceof LandAirMek) {
+            gunnerySkills.add(S_GUN_AERO);
+        }
+        gunnerySkills.add(SkillType.S_ARTILLERY);
+        return gunnerySkills;
+    }
+
+    /**
      * @return {@code true} if the person exists, has the named skill, and has a Natural Aptitude in it
      *
      * @author Illiani
