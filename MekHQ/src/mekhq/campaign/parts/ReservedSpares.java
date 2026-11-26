@@ -84,9 +84,9 @@ public final class ReservedSpares {
      */
     public static int releaseOrphanedReservations(Campaign campaign) {
         Set<Part> heldSpares = Collections.newSetFromMap(new IdentityHashMap<>());
-        campaign.getPlayerForce().getHangar().forEachUnit(unit -> collectHeldSpares(unit, heldSpares));
+        campaign.getPlayerForce().allUnits().forEach(unit -> collectHeldSpares(unit, heldSpares));
         List<LocalWarehouse> warehouses = new ArrayList<>();
-        warehouses.add(campaign.getPlayerForce().getWarehouse());
+        warehouses.addAll(campaign.getPlayerForce().allWarehouses());
         for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
             base.getBaseHangar().forEachUnit(unit -> collectHeldSpares(unit, heldSpares));
             warehouses.add(base.getBaseWarehouse());
