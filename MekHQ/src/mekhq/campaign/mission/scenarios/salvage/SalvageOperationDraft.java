@@ -68,6 +68,12 @@ import mekhq.campaign.unit.Unit;
 public class SalvageOperationDraft {
     /** Below this many minutes of tech time, few wrecks can be recovered, so the player is warned. */
     public static final int LOW_TECH_MINUTES = 360;
+    /**
+     * The recommended minimum if the techs will work carefully after the battle: careful salvage makes every recovery
+     * take {@value SalvageRecoverySession#CAREFUL_SALVAGE_TIME_MULTIPLIER} times as long.
+     */
+    public static final int CAREFUL_LOW_TECH_MINUTES =
+          LOW_TECH_MINUTES * SalvageRecoverySession.CAREFUL_SALVAGE_TIME_MULTIPLIER;
 
     private final Campaign campaign;
     private final Scenario scenario;
