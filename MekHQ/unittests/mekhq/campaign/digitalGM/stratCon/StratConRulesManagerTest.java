@@ -2786,7 +2786,8 @@ class StratConRulesManagerTest {
             when(formation.getAllUnits(false)).thenReturn(new Vector<>());
             when(formation.getUnits()).thenReturn(new Vector<>());
             when(formation.getSubFormations()).thenReturn(new Vector<>());
-            when(formation.getAllUnitsAsUnits(any(), eq(false))).thenReturn(List.of(mock(Unit.class)));
+            when(formation.getAllUnitsAsUnits(any(mekhq.campaign.LocalHangar.class), eq(false)))
+                  .thenReturn(List.of(mock(Unit.class)));
             when(campaign.getPlayerForce().getFormation(FORMATION_ID)).thenReturn(formation);
 
             combatTeam = mock(CombatTeam.class);
