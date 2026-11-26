@@ -50,6 +50,7 @@ import megamek.logging.MMLogger;
 import megamek.utilities.xml.MMXMLUtility;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.io.RemovedEquipmentNames;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
@@ -599,6 +600,7 @@ public class MHQXMLUtility extends MMXMLUtility {
     public static @Nullable Entity parseSingleEntityMul(final Element element,
           final @Nullable Campaign campaign)
           throws IllegalArgumentException {
+        RemovedEquipmentNames.replaceRemovedEquipmentInEntity(element);
         final List<Entity> entities = new MULParser(element, ((campaign == null) ? null : campaign.getGameOptions()))
                                             .getEntities();
 
