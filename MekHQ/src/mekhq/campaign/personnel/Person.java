@@ -7699,6 +7699,37 @@ public class Person implements ILocatable {
         return isGunnery ? mode.getGunneryRepairBonus(familiarity) : mode.getPilotingMaintenanceBonus(familiarity);
     }
 
+    /**
+     * The combat chassis familiarity bonus this character gets to one skill in their assigned unit: the gunnery bonus
+     * for a skill they fight the unit with, the piloting bonus for a skill they drive it with, and nothing for any
+     * other skill. A pilot assigned to an aerospace fighter is not helped or hindered with Piloting/VTOL by how well
+     * they know the fighter.
+     *
+     * @param mode      the campaign's chassis familiarity mode; {@code null} is treated as disabled
+     * @param skillName the name of the skill
+     *
+     * @return the signed bonus; negative for a penalty, {@code 0} when the skill is unaffected or the character has no
+     *       unit
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public int getChassisFamiliarityCombatBonus(Familiarity mode, String skillName) {
+        if ((unit == null) || (skillName == null) || (mode == null) || !mode.isEnabled()) {
+            return 0;
+        }
+
+        if (unit.getChassisFamiliarityGunnerySkills(this).contains(skillName)) {
+            return getChassisFamiliarityCombatBonus(mode, true);
+        }
+
+        if (unit.getChassisFamiliarityPilotingSkills().contains(skillName)) {
+            return getChassisFamiliarityCombatBonus(mode, false);
+        }
+
+        return 0;
+    }
+
     public int getChassisFamiliarityTechBonus(Familiarity mode, @Nullable Entity entity, boolean isRepair) {
         if (!mode.isEnabled() ||
                   entity == null ||
