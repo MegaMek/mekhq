@@ -102,6 +102,7 @@ import mekhq.gui.baseComponents.hud.HudGuideDrawer.Step;
 import mekhq.gui.baseComponents.hud.HudGuideDrawer.Term;
 import mekhq.gui.baseComponents.hud.HudModeSelector;
 import mekhq.gui.baseComponents.hud.HudStatTile;
+import mekhq.gui.baseComponents.hud.HudStatTile.MeterMark;
 import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.dialog.glossary.GlossaryConsole;
 import mekhq.gui.utilities.PersonnelStateColors;
@@ -133,6 +134,12 @@ public class SalvageOperationPlanner extends JDialog {
     private static final Dimension DEFAULT_SIZE = scaleForGUI(1100, 740);
     /** The tech-time meter reads full at twice the low-time warning, or the crew's total if that is larger. */
     private static final int TECH_TIME_METER_SCALE = SalvageOperationDraft.LOW_TECH_MINUTES * 2;
+    /**
+     * With risky salvage on, the meter also marks the careful-salvage minimum, so it reads full one low-time warning
+     * past that mark, or at the crew's total if that is larger.
+     */
+    private static final int CAREFUL_TECH_TIME_METER_SCALE =
+          SalvageOperationDraft.CAREFUL_LOW_TECH_MINUTES + SalvageOperationDraft.LOW_TECH_MINUTES;
 
     private final transient Campaign campaign;
     // The jobs each tech is in the middle of, taken when the planner opens
@@ -870,9 +877,20 @@ public class SalvageOperationPlanner extends JDialog {
         techTimeTile.setSub(isLow ?
                                   formatted("tile.techTime.low.sub", techs, SalvageOperationDraft.LOW_TECH_MINUTES) :
                                   formatted("tile.techTime.sub", techs));
-        int scale = Math.max(TECH_TIME_METER_SCALE, minutes);
-        techTimeTile.setMeter((double) minutes / scale, color,
-              (double) SalvageOperationDraft.LOW_TECH_MINUTES / scale);
+        boolean isCarefulSalvageOffered = campaign.getCampaignOptions().get(CampaignOption.IS_USE_RISKY_SALVAGE);
+        int scale = Math.max(isCarefulSalvageOffered ? CAREFUL_TECH_TIME_METER_SCALE : TECH_TIME_METER_SCALE, minutes);
+        List<MeterMark> marks = new ArrayList<>();
+        marks.add(new MeterMark((double) SalvageOperationDraft.LOW_TECH_MINUTES / scale, ACCENT_BRIGHT));
+        if (isCarefulSalvageOffered) {
+            marks.add(new MeterMark((double) SalvageOperationDraft.CAREFUL_LOW_TECH_MINUTES / scale, AMBER));
+        }
+        techTimeTile.setMeterWithMarks((double) minutes / scale, color, marks);
+        techTimeTile.setToolTipText(isCarefulSalvageOffered ?
+                                          formatted("tile.techTime.marks.tooltip",
+                                                SalvageOperationDraft.LOW_TECH_MINUTES,
+                                                SalvageOperationDraft.CAREFUL_LOW_TECH_MINUTES) :
+                                          formatted("tile.techTime.mark.tooltip",
+                                                SalvageOperationDraft.LOW_TECH_MINUTES));
     }
 
     private String instructionsText() {
