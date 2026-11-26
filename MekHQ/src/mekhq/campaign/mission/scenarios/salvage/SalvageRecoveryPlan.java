@@ -282,7 +282,7 @@ public class SalvageRecoveryPlan {
         }
 
         Entity targetEntity = recovery.getWreck().getEntity();
-        double targetWeight = (targetEntity == null) ? 0.0 : targetEntity.getWeight();
+        double targetWeight = CamOpsSalvageUtilities.getSalvageWeight(targetEntity);
 
         if (isInSpace && (targetEntity != null)) {
             if (isLargeVessel(targetEntity)) {
@@ -375,7 +375,7 @@ public class SalvageRecoveryPlan {
         }
 
         Unit unit = recoveryUnits.getFirst();
-        double targetWeight = targetEntity.getWeight();
+        double targetWeight = CamOpsSalvageUtilities.getSalvageWeight(targetEntity);
         double cargoCapacity = getCargoCapacity(unit);
         if (cargoCapacity >= targetWeight) {
             return RecoveryMethod.CARRY;
@@ -427,7 +427,7 @@ public class SalvageRecoveryPlan {
             }
         }
 
-        double targetWeight = targetEntity.getWeight();
+        double targetWeight = CamOpsSalvageUtilities.getSalvageWeight(targetEntity);
         boolean canCarry = getCargoCapacity(carrier) >= targetWeight;
         boolean isDragChosen = recovery.recoveryMethod == RecoveryMethod.DRAG;
         if (canCarry && !isDragChosen) {
@@ -563,7 +563,7 @@ public class SalvageRecoveryPlan {
             return hasBaysFor(carrier, vesselsCarried, smallCraftCarried);
         }
 
-        double cargoTonsUsed = targetEntity.getWeight();
+        double cargoTonsUsed = CamOpsSalvageUtilities.getSalvageWeight(targetEntity);
         for (WreckRecovery carriedRecovery : carriedRecoveries) {
             cargoTonsUsed += carriedRecovery.carryLoad.cargoTons();
         }
