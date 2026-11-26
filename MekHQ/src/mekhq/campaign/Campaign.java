@@ -3723,20 +3723,11 @@ public class Campaign implements ITechManager {
 
         getPlayerForce().getShoppingList().restore();
 
-        if (getCampaignOptions().isUseStratCon()) {
-            RandomFactionGenerator.getInstance().startup(this);
+        RandomFactionGenerator.getInstance().startup(this);
 
-            int loops = 0;
-            while (!RandomUnitGenerator.getInstance().isInitialized()) {
-                try {
-                    Thread.sleep(50);
-                    if (++loops > 20) {
-                        // Wait for up to a second
-                        break;
-                    }
-                } catch (InterruptedException ignore) {
-                }
-            }
+        if (getCampaignOptions().isUseStratCon()) {
+            // Starts loading the RATs in the background; RandomUnitGenerator#generate waits for them itself
+            RandomUnitGenerator.getInstance();
         }
     }
 
@@ -6132,13 +6123,6 @@ public class Campaign implements ITechManager {
 
         setAtBConfig(AtBConfiguration.loadFromXml());
         RandomFactionGenerator.getInstance().startup(this);
-    }
-
-    /**
-     * Stop processing AtB events and release memory.
-     */
-    public void shutdownAtB() {
-        RandomFactionGenerator.getInstance().dispose();
     }
 
     /**

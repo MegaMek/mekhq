@@ -1063,28 +1063,16 @@ public class MekHQMenuBar extends JMenuBar {
             getCampaign().getUnitMarket().setOffers(unitMarket.getOffers());
         }
 
-        if (atb != newOptions.isUseStratCon()) {
-            if (newOptions.isUseStratCon()) {
-                getCampaign().initAtB(false);
-                // refresh lance assignment table
-                MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(),
-                      getCampaign().getPlayerForce().getFormations()));
-            }
-            if (newOptions.isUseStratCon()) {
-                int loops = 0;
-                while (!RandomUnitGenerator.getInstance().isInitialized()) {
-                    try {
-                        Thread.sleep(50);
-                        if (++loops > 20) {
-                            // Wait for up to a second
-                            break;
-                        }
-                    } catch (InterruptedException ignore) {
-                    }
-                }
-            } else {
-                getCampaign().shutdownAtB();
-            }
+        // Disabling StratCon leaves the faction border tracker running, as contract and unit market generation still
+        // need it
+        if ((atb != newOptions.isUseStratCon()) && newOptions.isUseStratCon()) {
+            getCampaign().initAtB(false);
+            // refresh lance assignment table
+            MekHQ.triggerEvent(new OrganizationChangedEvent(getCampaign(),
+                  getCampaign().getPlayerForce().getFormations()));
+
+            // Starts loading the RATs in the background; RandomUnitGenerator#generate waits for them itself
+            RandomUnitGenerator.getInstance();
         }
 
         getCampaign().initTurnover();
