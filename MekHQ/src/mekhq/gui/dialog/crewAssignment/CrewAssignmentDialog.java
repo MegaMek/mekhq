@@ -1146,7 +1146,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     public void autoFill() {
         List<Person> candidates = new ArrayList<>();
         for (PersonEntry entry : data.people()) {
-            if (CrewAssignmentData.isAutoFillCandidate(entry.person())) {
+            if (CrewAssignmentData.isAutoFillCandidate(entry)) {
                 candidates.add(entry.person());
             }
         }
