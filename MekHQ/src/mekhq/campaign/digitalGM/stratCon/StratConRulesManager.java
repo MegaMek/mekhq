@@ -207,8 +207,7 @@ public class StratConRulesManager {
         REGULAR,
 
         /**
-         * The Combat Team's deployment orders are "Frontline" or "Auxiliary". We pay a support point and make an
-         * enhanced roll
+         * The Combat Team's deployment orders are "Maneuver". We pay a support point and make an enhanced roll
          */
         AUXILIARY
     }
@@ -2693,7 +2692,7 @@ public class StratConRulesManager {
         // Make the roll
         int roll = d6(2);
 
-        // If the formation is set to Maneuver or Auxiliary, use the highest of two rolls
+        // If the formation is set to Maneuver, use the highest of two rolls
         String maneuverRoleReport = "";
         if (reinforcementType == AUXILIARY) {
             int secondRoll = d6(2);
@@ -4200,11 +4199,10 @@ public class StratConRulesManager {
                 continue;
             }
 
-            if (formation.getRole().isReserve()) {
-                continue;
-            }
-
-            if (formation.getRole().isAuxiliary() && !reinforcements) {
+            // Reserve and Auxiliary Combat Teams are never deployed as formations, either as the primary force or as
+            // reinforcements. Auxiliary teams only supply individual Leadership units.
+            CombatRole combatRole = formation.getRole();
+            if (combatRole.isReserve() || combatRole.isAuxiliary()) {
                 continue;
             }
 
@@ -4752,7 +4750,7 @@ public class StratConRulesManager {
             }
 
             if (campaignState.getSupportPoints() > 0 || campaign.isGM()) {
-                if (formation.getRole().isManeuver() || formation.getRole().isAuxiliary()) {
+                if (formation.getRole().isManeuver()) {
                     return AUXILIARY;
                 } else {
                     return ReinforcementEligibilityType.REGULAR;

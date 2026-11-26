@@ -2755,4 +2755,79 @@ class StratConRulesManagerTest {
                              .isEmpty());
         }
     }
+
+    /**
+     * Auxiliary Combat Teams only supply individual Leadership units. They must never be offered as a formation, either
+     * as the primary force or as reinforcements, and only Maneuver teams get the improved reinforcement roll.
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Nested
+    class AuxiliaryTeamsAreNotDeployable {
+        private static final int FORMATION_ID = 4;
+
+        private Campaign campaign;
+        private StratConTrackState currentTrack;
+        private StratConCampaignState campaignState;
+        private CombatTeam combatTeam;
+
+        private void setUp(CombatRole combatRole) {
+            campaign = MHQTestUtilities.mockCampaign();
+            when(campaign.getActiveContracts()).thenReturn(new ArrayList<>());
+            currentTrack = mock(StratConTrackState.class);
+            campaignState = mock(StratConCampaignState.class);
+            when(campaignState.getSupportPoints()).thenReturn(1);
+
+            Formation formation = mock(Formation.class);
+            when(formation.getId()).thenReturn(FORMATION_ID);
+            when(formation.getPrimaryUnitType(campaign)).thenReturn(UnitType.MEK);
+            // Mockito returns null, not an empty Vector, for these unstubbed calls.
+            when(formation.getAllUnits(false)).thenReturn(new Vector<>());
+            when(formation.getUnits()).thenReturn(new Vector<>());
+            when(formation.getSubFormations()).thenReturn(new Vector<>());
+            when(formation.getAllUnitsAsUnits(any(), eq(false))).thenReturn(List.of(mock(Unit.class)));
+            when(campaign.getPlayerForce().getFormation(FORMATION_ID)).thenReturn(formation);
+
+            combatTeam = mock(CombatTeam.class);
+            when(combatTeam.getFormationId()).thenReturn(FORMATION_ID);
+            when(combatTeam.getRole()).thenReturn(combatRole);
+            Hashtable<Integer, CombatTeam> combatTeamsMap = new Hashtable<>();
+            combatTeamsMap.put(FORMATION_ID, combatTeam);
+            when(campaign.getPlayerForce().getCombatTeamsAsMap(campaign)).thenReturn(combatTeamsMap);
+        }
+
+        private List<Integer> availableForceIds(boolean reinforcements) {
+            return StratConRulesManager.getAvailableForceIDsForManualDeployment(
+                  ScenarioForceTemplate.SPECIAL_UNIT_TYPE_ATB_MIX, campaign, currentTrack, reinforcements, null,
+                  campaignState, false);
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = { false, true })
+        void maneuverTeamIsOffered(boolean reinforcements) {
+            setUp(CombatRole.MANEUVER);
+
+            assertEquals(List.of(FORMATION_ID), availableForceIds(reinforcements));
+        }
+
+        @ParameterizedTest
+        @ValueSource(booleans = { false, true })
+        void auxiliaryTeamIsNeverOffered(boolean reinforcements) {
+            setUp(CombatRole.AUXILIARY);
+
+            assertTrue(availableForceIds(reinforcements).isEmpty());
+        }
+
+        @Test
+        void onlyManeuverGetsTheImprovedReinforcementRoll() {
+            setUp(CombatRole.MANEUVER);
+            assertEquals(StratConRulesManager.ReinforcementEligibilityType.AUXILIARY,
+                  StratConRulesManager.getReinforcementType(FORMATION_ID, currentTrack, campaign, campaignState));
+
+            when(combatTeam.getRole()).thenReturn(CombatRole.AUXILIARY);
+            assertEquals(StratConRulesManager.ReinforcementEligibilityType.REGULAR,
+                  StratConRulesManager.getReinforcementType(FORMATION_ID, currentTrack, campaign, campaignState));
+        }
+    }
 }
