@@ -208,7 +208,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     /**
      * Opens the dialog for the location of the given units or people. A single person is opened already selected,
      * ready to be assigned; several people are opened as the only people listed, so they can be unassigned together,
-     * and units as the only cards listed, until the player clears that filter.
+     * until the player clears that filter. The units, and the units the people crew, are opened pinned: their cards
+     * come first whatever the filters, until the player unpins them.
      *
      * @param frame    the main window
      * @param campaign the campaign
@@ -252,7 +253,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             state.peopleQuery = text;
             refresh();
         }, new CrewRowRenderers.PersonRow(plan, this::isSelected, this::isTechsPage, () -> state.selectedUnit,
-                    () -> state.skill, state::familiarityChassis),
+                    () -> state.skill, state::rowPrimarySkillGroup, state::familiarityChassis),
               PERSON_ROW_HEIGHT,
               this::onPersonRow);
         // A click on a Review row does nothing by itself; its links open the unit or person it names
@@ -341,15 +342,20 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             state.pinnedPeople.addAll(peopleHere);
             state.assignment = state.startingAssignment(state.page);
         }
-        for (Unit unit : units) {
+        // The units opened for, and the units the people opened for crew, start pinned: listed first however well
+        // they are crewed, with the first one's card open, so the player can work on them straight away
+        List<Unit> unitsToPin = new ArrayList<>(units);
+        for (Person person : peopleHere) {
+            if (person.getUnit() != null) {
+                unitsToPin.add(person.getUnit());
+            }
+        }
+        for (Unit unit : unitsToPin) {
             if (data.entryFor(unit) != null) {
                 state.pinnedUnits.add(unit);
             }
         }
         if (!state.pinnedUnits.isEmpty()) {
-            // Opened for these units: list only them, however well they are crewed, with the first one's card open
-            state.unitStatus = UnitStatus.ALL;
-            state.techStatus = TechStatus.ALL;
             state.selectedUnit = state.pinnedUnits.iterator().next();
         }
     }
@@ -581,6 +587,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
                 shown.add(entry);
             }
         }
+        shown = state.pinnedFirst(shown);
         shownUnits = List.copyOf(shown);
         CrewUnitBoard.Work work = CrewUnitBoard.Work.of(shown, plan, isTechsPage());
         state.settleAutoFillTarget(work.openBySeat().keySet(), work.needTech(), isTechsPage());
@@ -611,12 +618,14 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             }
         }
         if (!state.pinnedUnits.isEmpty()) {
+            // Unpins every unit at once; each card's pin unpins one
             HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "units.pinned",
                   state.pinnedUnits.size()), () -> {
                 state.pinnedUnits.clear();
                 refresh();
             });
             chip.setActive(true);
+            chip.setToolTipText(getTextAt(RESOURCE_BUNDLE, "units.pinned.toolTipText"));
             chips.add(chip);
         }
         board.refresh(state, data, shown, work, chips);
@@ -1181,8 +1190,14 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         Unit unit = plan.plannedUnitOf(occupant);
         if ((unit != null) && plan.stageReplacement(newcomer, occupant)) {
             state.selectedPerson = null;
-            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.replaced", occupant.getFullTitle(),
-                  newcomer.getFullTitle(), unit.getName()), false);
+            Unit swapUnit = plan.plannedUnitOf(occupant);
+            if (swapUnit == null) {
+                setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.replaced", occupant.getFullTitle(),
+                      newcomer.getFullTitle(), unit.getName()), false);
+            } else {
+                setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.swapped", occupant.getFullTitle(),
+                      newcomer.getFullTitle(), unit.getName(), swapUnit.getName()), false);
+            }
         } else {
             setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.replaceRefused", occupant.getFullTitle()), true);
         }
@@ -1335,6 +1350,16 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         refresh();
     }
 
+    @Override
+    public void togglePin(Unit unit) {
+        if (!state.pinnedUnits.remove(unit)) {
+            state.pinnedUnits.add(unit);
+        }
+        refresh();
+        // A newly pinned card moves to the top, and an unpinned one may move away or out of the list
+        board.reveal(unit);
+    }
+
     /** Shows a unit's card, selected, clearing the unit filters if they hide it. */
     private void openUnit(Unit unit) {
         UnitEntry entry = data.entryFor(unit);
@@ -1351,7 +1376,6 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             state.techStatus = TechStatus.ALL;
             state.unitType = null;
             state.formation = null;
-            state.pinnedUnits.clear();
             state.unitQuery = "";
             board.setSearchText("");
         }
@@ -1504,7 +1528,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         board.resetCards();
         // The row renderers hold the plan they draw from, so they are given the new one
         peoplePage.setRenderer(new CrewRowRenderers.PersonRow(data.plan(), this::isSelected,
-              this::isTechsPage, () -> state.selectedUnit, () -> state.skill,
+              this::isTechsPage, () -> state.selectedUnit, () -> state.skill, state::rowPrimarySkillGroup,
               state::familiarityChassis));
         reviewPage.setRenderer(new CrewRowRenderers.ReviewRow(data.plan()));
         // Last, as clearing a search field refreshes the dialog, which must see the new plan

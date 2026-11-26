@@ -296,6 +296,11 @@ final class CrewRowRenderers {
         private final Supplier<Unit> skillUnit;
         /** The Skills filter's group, whose best skill the row shows, or {@code null} for none. */
         private final Supplier<SkillGroup> skillGroup;
+        /**
+         * The group whose best skill the row shows in place of gunnery and piloting, such as scouting while the list
+         * is ordered by it, or {@code null} to show gunnery and piloting.
+         */
+        private final Supplier<SkillGroup> primarySkillGroup;
         private final JLabel where = label(LINE_FONT, TEXT_MUTED);
         /** Hits and fatigue, on the second line beside where the person serves. */
         private final JLabel condition = label(LINE_FONT, TEXT_MUTED);
@@ -312,11 +317,14 @@ final class CrewRowRenderers {
          * @param skillUnit          the unit whose gunnery and piloting skills to show, or {@code null} for each
          *                           person's own combat role's
          * @param skillGroup         the group of skills to show each person's best of, or {@code null} for none
+         * @param primarySkillGroup  the group of skills to show each person's best of in place of gunnery and
+         *                           piloting, or {@code null} to show gunnery and piloting
          * @param familiarityChassis the selected unit's chassis, whose familiarity is shown first, or {@code null}
          *                           to show each person's best chassis
          */
         PersonRow(AssignmentPlan plan, Predicate<Person> isSelected, BooleanSupplier isTechView,
-              Supplier<Unit> skillUnit, Supplier<SkillGroup> skillGroup, Supplier<String> familiarityChassis) {
+              Supplier<Unit> skillUnit, Supplier<SkillGroup> skillGroup, Supplier<SkillGroup> primarySkillGroup,
+              Supplier<String> familiarityChassis) {
             // No tick box: one person is selected at a time, shown by the row's accent bar and lighter background
             super(false);
             this.plan = plan;
@@ -324,6 +332,7 @@ final class CrewRowRenderers {
             this.isTechView = isTechView;
             this.skillUnit = skillUnit;
             this.skillGroup = skillGroup;
+            this.primarySkillGroup = primarySkillGroup;
             this.familiarityChassis = familiarityChassis;
             secondLine.add(where);
             secondLine.add(Box.createHorizontalStrut(scaleForGUI(10)));
@@ -432,13 +441,17 @@ final class CrewRowRenderers {
 
         /**
          * Shows the skills that matter for the choice at hand: gunnery/piloting, for the selected unit or the person's
-         * own combat role, as the Personnel tab's aggregate combat column writes them; then their best skill in the
-         * Skills filter's group. The tooltip names each skill. On the Techs page only the filtered skill is shown.
+         * own combat role, as the Personnel tab's aggregate combat column writes them, or in their place the best
+         * skill of the group the list is ordered by, such as scouting; then their best skill in the Skills filter's
+         * group. The tooltip names each skill. On the Techs page only the filtered skill is shown.
          */
         private void showSkills(PersonEntry entry) {
             List<String> parts = new ArrayList<>();
             List<String> named = new ArrayList<>();
-            if (!isTechView.getAsBoolean()) {
+            SkillGroup primaryGroup = isTechView.getAsBoolean() ? null : primarySkillGroup.get();
+            if (primaryGroup != null) {
+                addBestInGroup(entry, primaryGroup, parts, named);
+            } else if (!isTechView.getAsBoolean()) {
                 List<String> combat = CrewAssignmentState.combatSkills(entry.person(), skillUnit.get());
                 List<String> values = new ArrayList<>();
                 for (String name : combat) {
@@ -454,17 +467,29 @@ final class CrewRowRenderers {
                 }
             }
             SkillGroup group = skillGroup.get();
-            SkillEntry best = (group == null) ? null : CrewAssignmentState.best(entry.skills(), group);
-            if (best != null) {
-                parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "row.skillGroup",
-                      getTextAt(RESOURCE_BUNDLE, "SkillGroup." + group.name()), best.value()));
-                named.add(best.name() + ' ' + best.value());
+            // The same group is shown once, even when the list is both filtered and ordered by it
+            if ((group != null) && (group != primaryGroup)) {
+                addBestInGroup(entry, group, parts, named);
             }
             skills.setVisible(!parts.isEmpty());
             skills.setText(String.join("  ·  ", parts));
             skills.setToolTipText(named.isEmpty() ? null :
                                         HudToolTip.html(getTextAt(RESOURCE_BUNDLE, "row.skills.title"),
                                               String.join(", ", named)));
+        }
+
+        /**
+         * Adds the person's best skill in a group, such as "Scouting 5", and names the skill for the tooltip. Someone
+         * with none of the group's skills adds nothing.
+         */
+        private static void addBestInGroup(PersonEntry entry, SkillGroup group, List<String> parts,
+              List<String> named) {
+            SkillEntry best = CrewAssignmentState.best(entry.skills(), group);
+            if (best != null) {
+                parts.add(getFormattedTextAt(RESOURCE_BUNDLE, "row.skillGroup",
+                      getTextAt(RESOURCE_BUNDLE, "SkillGroup." + group.name()), best.value()));
+                named.add(best.name() + ' ' + best.value());
+            }
         }
 
         /**
