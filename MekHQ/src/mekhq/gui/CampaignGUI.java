@@ -205,6 +205,9 @@ public class CampaignGUI extends JPanel {
 
     private boolean isDayAdvanceBatchInProgress;
 
+    /** The Advance Multiple Days dialog most recently opened, kept so a second one is never opened alongside it. */
+    private AdvanceDaysDialog advanceDaysDialog;
+
     /* Components for the status panel */
     private JPanel statusPanel;
     private JLabel lblFunds;
@@ -551,7 +554,7 @@ public class CampaignGUI extends JPanel {
         pnlTop.add(new CommandSummaryPanel(250, 280, getCampaign()));
         pnlTop.add(Box.createHorizontalGlue());
         AdvanceTimePanel advanceTimePanel = new AdvanceTimePanel(170, 240, getCampaign().getLocalDate(),
-              getCampaignController()::advanceDay, () -> new AdvanceDaysDialog(getFrame(), this).setVisible(true));
+              getCampaignController()::advanceDay, this::openAdvanceDaysDialog);
         pnlTop.add(createCommandGeneratorButton());
         pnlTop.add(Box.createHorizontalStrut(SMALL_GAP));
         pnlTop.add(createOracleButton());
@@ -568,6 +571,23 @@ public class CampaignGUI extends JPanel {
         btnOracle.setMinimumSize(new Dimension(side, side));
         btnOracle.setPreferredSize(new Dimension(side, side));
         btnOracle.setMaximumSize(new Dimension(side, side));
+    }
+
+    /**
+     * Opens the Advance Multiple Days dialog. If one is already showing, it is brought to the front instead, as two
+     * of these dialogs open at once could each advance the campaign independently of the other.
+     *
+     * @return the Advance Multiple Days dialog that is now showing
+     */
+    public AdvanceDaysDialog openAdvanceDaysDialog() {
+        if ((advanceDaysDialog != null) && advanceDaysDialog.isVisible()) {
+            advanceDaysDialog.toFront();
+            advanceDaysDialog.requestFocus();
+        } else {
+            advanceDaysDialog = new AdvanceDaysDialog(getFrame(), this);
+            advanceDaysDialog.setVisible(true);
+        }
+        return advanceDaysDialog;
     }
 
     /**

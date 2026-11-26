@@ -38,8 +38,6 @@ import static mekhq.gui.CommandCenterTab.addDailyReportTab;
 import java.awt.Container;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
-import java.awt.event.WindowAdapter;
-import java.awt.event.WindowEvent;
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
 import java.time.temporal.IsoFields;
@@ -380,19 +378,27 @@ public class AdvanceDaysDialog extends AbstractMHQDialogBasic {
         return panel;
     }
 
+    /**
+     * Unregisters this dialog from the event bus. This runs both when the window is closed and when Escape hides it.
+     * Unregistering is left until here, rather than done at the end of {@link #startAdvancement(ActionEvent)}, as the
+     * user may advance days again without leaving this dialog.
+     */
     @Override
-    protected void finalizeInitialization() throws Exception {
-        addWindowListener(new WindowAdapter() {
-            @Override
-            public void windowClosing(final WindowEvent evt) {
-                // We need to unregister here as unregistering in the actionPerformed method
-                // will
-                // lead to incorrect behaviour if the user tries to advance days again without
-                // exiting this dialog
-                MekHQ.unregisterHandler(this);
-            }
-        });
-        super.finalizeInitialization();
+    protected void cancelAction() {
+        MekHQ.unregisterHandler(this);
+    }
+
+    /**
+     * Closes the dialog when Escape is pressed. The base dialog only hides itself, which skips anything waiting for
+     * the dialog to close, such as the Personnel Market reopening. Disposing closes it the same way the X button does.
+     */
+    @Override
+    protected void cancelActionPerformed(final ActionEvent actionEvent) {
+        try {
+            super.cancelActionPerformed(actionEvent);
+        } finally {
+            dispose();
+        }
     }
 
     @Override
