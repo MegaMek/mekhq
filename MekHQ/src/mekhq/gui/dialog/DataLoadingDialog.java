@@ -106,6 +106,7 @@ import mekhq.campaign.roleplay.JournalRescue;
 import mekhq.campaign.roleplay.RandomOracleGenerator;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.Factions;
+import mekhq.campaign.universe.RandomFactionGenerator;
 import mekhq.campaign.universe.Systems;
 import mekhq.campaign.universe.eras.Eras;
 import mekhq.campaign.universe.factionHints.WarAndPeaceProcessor;
@@ -484,6 +485,8 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                 // AtB
                 if (campaignOptions.isUseStratCon()) {
                     campaign.initAtB(true);
+                } else {
+                    RandomFactionGenerator.getInstance().startup(campaign);
                 }
 
                 // Turnover
