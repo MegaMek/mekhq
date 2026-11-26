@@ -32,12 +32,7 @@
  */
 package mekhq.campaign.personnel.quartermaster;
 
-import static mekhq.campaign.personnel.enums.PersonnelRole.AEROSPACE_PILOT;
-import static mekhq.campaign.personnel.enums.PersonnelRole.DOCTOR;
-import static mekhq.campaign.personnel.enums.PersonnelRole.MEKWARRIOR;
-import static mekhq.campaign.personnel.enums.PersonnelRole.NONE;
-import static mekhq.campaign.personnel.enums.PersonnelRole.SOLDIER;
-import static mekhq.campaign.personnel.enums.PersonnelRole.VEHICLE_CREW_GROUND;
+import static mekhq.campaign.personnel.enums.PersonnelRole.*;
 import static mekhq.campaign.personnel.quartermaster.ArmorKitCatalog.*;
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
@@ -69,9 +64,13 @@ class ArmorKitCatalogTest {
     }
 
     private static Person personWithRole(PersonnelRole primary) {
+        return personWithRoles(primary, NONE);
+    }
+
+    private static Person personWithRoles(PersonnelRole primary, PersonnelRole secondary) {
         Person person = mock(Person.class);
         when(person.getPrimaryRole()).thenReturn(primary);
-        when(person.getSecondaryRole()).thenReturn(NONE);
+        when(person.getSecondaryRole()).thenReturn(secondary);
         return person;
     }
 
@@ -148,6 +147,11 @@ class ArmorKitCatalogTest {
         assertFalse(names.contains(DEFAULT_ARMOR_KIT_NAME));
         assertTrue(names.size() > availableNames(Category.INFANTRY).size(), "soldiers draw from more than vehicles");
     }
+
+    @Test
+    void spaceCrewGroupOffersTheSameKitsAsVehicleCrews() {
+        assertEquals(availableNames(Category.INFANTRY), availableNames(Category.SPACE_CREW));
+    }
     // endregion availableKits
 
     // region categoryFor
@@ -157,6 +161,21 @@ class ArmorKitCatalogTest {
         assertEquals(Category.AIRCRAFT, categoryFor(personWithRole(AEROSPACE_PILOT)));
         assertEquals(Category.SOLDIER, categoryFor(personWithRole(SOLDIER)));
         assertEquals(Category.INFANTRY, categoryFor(personWithRole(VEHICLE_CREW_GROUND)));
+    }
+
+    @Test
+    void largeCraftCrewsAreSpaceCrew() {
+        assertEquals(Category.SPACE_CREW, categoryFor(personWithRole(VESSEL_PILOT)));
+        assertEquals(Category.SPACE_CREW, categoryFor(personWithRole(VESSEL_GUNNER)));
+        assertEquals(Category.SPACE_CREW, categoryFor(personWithRole(VESSEL_CREW)));
+        assertEquals(Category.SPACE_CREW, categoryFor(personWithRole(VESSEL_NAVIGATOR)));
+    }
+
+    @Test
+    void vehicleAndSpaceCrewIsGroupedByPrimaryRole() {
+        assertEquals(Category.INFANTRY, categoryFor(personWithRoles(VEHICLE_CREW_GROUND, VESSEL_CREW)));
+        assertEquals(Category.SPACE_CREW, categoryFor(personWithRoles(VESSEL_CREW, VEHICLE_CREW_GROUND)));
+        assertEquals(Category.SPACE_CREW, categoryFor(personWithRoles(DOCTOR, VESSEL_CREW)));
     }
     // endregion categoryFor
 
