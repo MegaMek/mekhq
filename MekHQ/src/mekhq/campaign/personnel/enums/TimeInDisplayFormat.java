@@ -103,7 +103,7 @@ public enum TimeInDisplayFormat {
                   Math.toIntExact(ChronoUnit.MONTHS.between(initialDate, today)));
             case MONTHS_YEARS -> {
                 final Period period = Period.between(initialDate, today);
-                yield String.format(getDisplayFormat(), period.getMonths(), period.getYears());
+                yield String.format(getDisplayFormat(), period.getYears(), period.getMonths());
             }
             default -> String.format(getDisplayFormat(),
                   Math.toIntExact(ChronoUnit.YEARS.between(initialDate, today)));
