@@ -54,6 +54,7 @@ import mekhq.campaign.force.Detachment;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.UnitOrder;
 import mekhq.campaign.work.IAcquisitionWork;
@@ -308,10 +309,24 @@ public class ForceShoppingList {
             for (int x = 0; x < nl.getLength(); x++) {
                 Node wn2 = nl.item(x);
                 if (wn2.getNodeName().equalsIgnoreCase("part")) {
-                    Part p = Part.generateInstanceFromXML(wn2, version);
-                    p.setCampaign(c);
-                    if (p instanceof IAcquisitionWork) {
-                        retVal.getShoppingList().add((IAcquisitionWork) p);
+                    Part part = Part.generateInstanceFromXML(wn2, version);
+                    if (part == null) {
+                        continue;
+                    }
+
+                    // Equipment that no longer exists can't be priced or bought, so drop it rather than load a
+                    // broken shopping list item
+                    if (((part instanceof EquipmentPart equipmentPart) && (equipmentPart.getType() == null))
+                              || ((part instanceof MissingEquipmentPart missingEquipmentPart)
+                                        && (missingEquipmentPart.getType() == null))) {
+                        LOGGER.warn("Removing {} from the shopping list: could not find its equipment type",
+                              part.getName());
+                        continue;
+                    }
+
+                    part.setCampaign(c);
+                    if (part instanceof IAcquisitionWork acquisitionWork) {
+                        retVal.getShoppingList().add(acquisitionWork);
                     }
                 } else if (wn2.getNodeName().equalsIgnoreCase("unitOrder")) {
                     UnitOrder u = UnitOrder.generateInstanceFromXML(wn2, c);
