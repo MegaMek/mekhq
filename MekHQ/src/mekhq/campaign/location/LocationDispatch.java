@@ -92,12 +92,14 @@ public final class LocationDispatch {
             return true;
         }
 
-        AbstractBase anchorBase = LocationUtils.findEffectiveBase(anchor);
+        IPlace anchorPlace = LocationUtils.findEffectivePlace(anchor);
         ILocation personnelDestination;
-        if (anchorBase != null) {
-            personnelDestination = anchorBase.getBasePersonnel();
+        if ((anchorPlace instanceof AbstractBase) || (anchorPlace instanceof AcademyCampusLocation)) {
+            personnelDestination = anchorPlace.getPersonnel();
         } else if (LocationUtils.isInTransit(anchor)) {
             personnelDestination = anchor.getCurrentLocation();
+        } else if (anchorPlace != null) {
+            personnelDestination = anchorPlace.getPersonnel();
         } else {
             personnelDestination = campaign.getPlayerForce().getPersonnel();
         }

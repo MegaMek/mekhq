@@ -260,6 +260,22 @@ class LocationDispatchTest {
         }
 
         @Test
+        void anchorInAnotherDetachment_personIsMovedIntoThatDetachment() {
+            Detachment secondDetachment = new Detachment();
+            assertTrue(secondDetachment.setParent(new FixedLocation(system)));
+            Person anchor = newPerson();
+            anchor.setParent(secondDetachment.getPersonnel());
+            Person person = newPerson();
+            person.setParent(base.getBasePersonnel());
+
+            assertTrue(LocationDispatch.movePersonToLocationOf(campaign, person, anchor));
+
+            assertSame(secondDetachment.getPersonnel(), person.getParentLocation());
+            assertFalse(base.getBasePersonnel().containsKey(person.getId()));
+            assertFalse(mainForcePersonnel.containsKey(person.getId()));
+        }
+
+        @Test
         void alreadyAlongsideAnchor_personIsNotMoved() {
             Person anchor = newPerson();
             anchor.setParent(base.getBasePersonnel());
