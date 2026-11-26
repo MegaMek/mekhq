@@ -427,7 +427,9 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
 
                 if (isNewPlayerQuickstart) {
                     NewPlayerQuickstart.configure(campaign);
-                    MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+                    // Subscribers include the open campaign's GUI, which refreshes its tables; on this worker thread
+                    // that sorted them concurrently with the EDT and crashed the row sorters
+                    EventDispatch.runAndWait(() -> MekHQ.triggerEvent(new OptionsChangedEvent(campaign)));
                 } else if (!configureNewCampaign(campaign)) {
                     return null;
                 }
@@ -506,8 +508,10 @@ public class DataLoadingDialog extends AbstractMHQDialogBasic implements Propert
                     campaign.restore();
                     campaign.cleanUp();
                 }
-                // Make sure campaign options event handlers get their data
-                MekHQ.triggerEvent(new OptionsChangedEvent(campaign));
+                // Make sure campaign options event handlers get their data. Fire on the EDT: subscribers include the
+                // open campaign's GUI, which refreshes its tables; on this worker thread that sorted them concurrently
+                // with the EDT and crashed the row sorters
+                EventDispatch.runAndWait(() -> MekHQ.triggerEvent(new OptionsChangedEvent(campaign)));
                 // endregion Progress 6
 
                 // region progress 7
