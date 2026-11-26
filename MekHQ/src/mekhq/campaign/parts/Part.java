@@ -73,6 +73,7 @@ import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.AcquisitionPriceMultipliers;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.RepairCosts;
+import mekhq.campaign.io.RemovedEquipmentNames;
 import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
@@ -1001,6 +1002,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     /**
      * Fixes the saved name of a part whose name has since changed. Part names are written to the save file and read
      * back over the name the constructor sets, so without this a renamed part keeps its old name in existing saves.
+     * Parts made from equipment MegaMek has since removed are renamed after the equipment that replaced it.
      *
      * @param partName the part name read from the save file
      *
@@ -1014,7 +1016,7 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
             // CHECKSTYLE IGNORE ForbiddenWords FOR 2 LINES
             case "Mech Life Support System" -> "Mek Life Support System";
             case "ProtoMech Arm Actuator" -> "ProtoMek Arm Actuator";
-            default -> partName;
+            default -> RemovedEquipmentNames.replaceRemovedMunitionNames(partName);
         };
     }
 

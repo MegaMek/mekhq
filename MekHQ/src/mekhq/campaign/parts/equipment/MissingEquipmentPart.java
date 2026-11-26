@@ -48,6 +48,7 @@ import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.io.RemovedEquipmentNames;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.unit.Unit;
@@ -141,6 +142,7 @@ public class MissingEquipmentPart extends MissingPart {
         if (typeName == null) {
             typeName = type.getName();
         } else {
+            typeName = RemovedEquipmentNames.replaceRemovedTypeName(typeName);
             type = EquipmentType.get(typeName);
         }
 
