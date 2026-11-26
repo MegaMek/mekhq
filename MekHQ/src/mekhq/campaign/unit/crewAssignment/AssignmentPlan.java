@@ -1341,8 +1341,35 @@ public class AssignmentPlan {
     }
 
     /**
-     * Stages one person into the seat another will hold, and that other person out of the unit, as one step of
-     * history, so a single undo puts both back.
+     * Where a replacement would send the person it takes out: into the seat the newcomer leaves, when the newcomer
+     * holds a seat on another unit and the occupant could take it, so the two swap places without either being left
+     * unassigned.
+     *
+     * @param newcomer the person to bring in
+     * @param occupant the person who will hold the seat once the plan is applied
+     *
+     * @return the unit the occupant would move to, or {@code null} if a replacement would leave them unassigned
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable Unit swapUnitFor(final Person newcomer, final Person occupant) {
+        final Unit vacatedUnit = plannedUnitOf(newcomer);
+        final SeatType vacatedSeat = plannedSeatOf(newcomer);
+        if ((vacatedUnit == null) || (vacatedSeat == null) || vacatedUnit.equals(plannedUnitOf(occupant))) {
+            return null;
+        }
+        // A seat already over its size stays full after the newcomer leaves it
+        if (openSeats(vacatedUnit, vacatedSeat) < 0) {
+            return null;
+        }
+        return couldTake(occupant, vacatedUnit, vacatedSeat) ? vacatedUnit : null;
+    }
+
+    /**
+     * Stages one person into the seat another will hold, as one step of history, so a single undo puts everyone back.
+     * The person taken out moves into the seat the newcomer leaves when {@link #swapUnitFor} allows it; otherwise
+     * they are taken out of their unit.
      *
      * @param newcomer the person to bring in
      * @param occupant the person who will hold the seat once the plan is applied
@@ -1358,9 +1385,14 @@ public class AssignmentPlan {
         }
         final Unit unit = plannedUnitOf(occupant);
         final SeatType seat = plannedSeatOf(occupant);
+        final Unit swapUnit = swapUnitFor(newcomer, occupant);
+        final SeatType vacatedSeat = plannedSeatOf(newcomer);
         final List<Runnable> reverts = new ArrayList<>();
         put(occupant, null, null, reverts);
         put(newcomer, unit, seat, reverts);
+        if ((swapUnit != null) && canStage(occupant, swapUnit, vacatedSeat)) {
+            put(occupant, swapUnit, vacatedSeat, reverts);
+        }
         record(reverts);
         return true;
     }

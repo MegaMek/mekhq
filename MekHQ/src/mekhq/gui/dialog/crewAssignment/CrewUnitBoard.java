@@ -37,14 +37,13 @@ import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
-import java.awt.BorderLayout;
-import java.awt.Color;
-import java.awt.Cursor;
-import java.awt.FlowLayout;
-import java.awt.Font;
-import java.awt.Rectangle;
+import java.awt.*;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.geom.Area;
+import java.awt.geom.Line2D;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.EnumMap;
@@ -150,6 +149,9 @@ final class CrewUnitBoard extends JPanel {
 
         /** Selects a unit, or deselects it if it is the selected one. */
         void toggleUnit(Unit unit);
+
+        /** Pins a unit's card to the top of the cards, whatever the filters, or unpins it if it is pinned. */
+        void togglePin(Unit unit);
 
         void openPerson(Person person);
 
@@ -593,6 +595,8 @@ final class CrewUnitBoard extends JPanel {
         JPanel status = Hud.transparentPanel(new FlowLayout(FlowLayout.RIGHT, 0, 0));
         status.add(colored(entry.damageName(), CrewRowRenderers.damageColor(entry.damageState())));
         status.add(Box.createHorizontalStrut(scaleForGUI(12)));
+        status.add(pinButton(unit));
+        status.add(Box.createHorizontalStrut(scaleForGUI(12)));
         status.add(view);
         header.add(status, BorderLayout.EAST);
         card.add(leftAligned(header));
@@ -634,6 +638,71 @@ final class CrewUnitBoard extends JPanel {
             }
         }
         return card;
+    }
+
+    /**
+     * A pushpin that pins the unit's card to the top of the cards, whatever the filters, or unpins it: drawn in outline
+     * while the unit is not pinned, and filled in while it is.
+     */
+    private JLabel pinButton(Unit unit) {
+        boolean isPinned = state.pinnedUnits.contains(unit);
+        JLabel pin = Hud.link("", () -> actions.togglePin(unit));
+        pin.setIcon(new PinIcon(isPinned, scaleForGUI(14)));
+        String description = getFormattedTextAt(RESOURCE_BUNDLE, isPinned ? "board.unpin.toolTipText" :
+                                                                       "board.pin.toolTipText", unit.getName());
+        pin.setToolTipText(description);
+        pin.getAccessibleContext().setAccessibleName(description);
+        return pin;
+    }
+
+    /**
+     * A pushpin, tilted as if pressed into a board, painted in the colour of the component it is drawn on so it lights
+     * up on hover as a link does. Filled when pinned, an outline when not.
+     *
+     * @param isFilled {@code true} to fill the pin in
+     * @param size     the icon's width and height
+     */
+    private record PinIcon(boolean isFilled, int size) implements Icon {
+        /** How far the pin leans from upright, in degrees. */
+        private static final double TILT_DEGREES = 35.0;
+
+        @Override
+        public void paintIcon(Component component, Graphics graphics, int x, int y) {
+            Graphics2D graphics2D = (Graphics2D) graphics.create();
+            try {
+                graphics2D.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
+                graphics2D.setRenderingHint(RenderingHints.KEY_STROKE_CONTROL, RenderingHints.VALUE_STROKE_PURE);
+                graphics2D.translate(x, y);
+                graphics2D.rotate(Math.toRadians(TILT_DEGREES), size / 2.0, size / 2.0);
+                graphics2D.setColor(component.getForeground());
+                float stroke = Math.max(1.0f, size / 12.0f);
+                graphics2D.setStroke(new BasicStroke(stroke, BasicStroke.CAP_ROUND, BasicStroke.JOIN_ROUND));
+
+                // The head, the narrower shaft under it, and the wide collar the needle comes out of
+                Area body = new Area(new RoundRectangle2D.Double(size * 0.28, size * 0.04, size * 0.44, size * 0.18,
+                      size * 0.12, size * 0.12));
+                body.add(new Area(new Rectangle2D.Double(size * 0.36, size * 0.2, size * 0.28, size * 0.32)));
+                body.add(new Area(new RoundRectangle2D.Double(size * 0.16, size * 0.5, size * 0.68, size * 0.12,
+                      size * 0.1, size * 0.1)));
+                if (isFilled) {
+                    graphics2D.fill(body);
+                }
+                graphics2D.draw(body);
+                graphics2D.draw(new Line2D.Double(size * 0.5, size * 0.62, size * 0.5, size * 0.96));
+            } finally {
+                graphics2D.dispose();
+            }
+        }
+
+        @Override
+        public int getIconWidth() {
+            return size;
+        }
+
+        @Override
+        public int getIconHeight() {
+            return size;
+        }
     }
 
     private void addExtra(JPanel extras, String key, Runnable onChoose) {
@@ -811,9 +880,16 @@ final class CrewUnitBoard extends JPanel {
         }
         if ((replacer != null) && plan.canReplace(replacer, person)) {
             holder.add(Box.createHorizontalStrut(scaleForGUI(6)));
-            JLabel replace = Hud.link(text("board.replace"), () -> actions.replaceOccupant(replacer, person));
-            replace.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "board.replace.toolTipText", title,
-                  replacer.getFullTitle()));
+            // Someone coming from a seat the person here could take swaps places with them, rather than leaving them
+            // unassigned
+            Unit swapUnit = plan.swapUnitFor(replacer, person);
+            JLabel replace = Hud.link(text((swapUnit == null) ? "board.replace" : "board.swap"),
+                  () -> actions.replaceOccupant(replacer, person));
+            replace.setToolTipText((swapUnit == null) ?
+                                         getFormattedTextAt(RESOURCE_BUNDLE, "board.replace.toolTipText", title,
+                                               replacer.getFullTitle()) :
+                                         getFormattedTextAt(RESOURCE_BUNDLE, "board.swap.toolTipText", title,
+                                               replacer.getFullTitle(), swapUnit.getName()));
             holder.add(replace);
         }
         return holder;
