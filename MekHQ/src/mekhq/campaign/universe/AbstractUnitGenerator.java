@@ -60,6 +60,39 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
     private final TreeSet<Integer> gunEmplacementRatYears = new TreeSet<>();
     private final Map<Integer, Map<String, String>> gunEmplacementRatNames = new HashMap<>();
 
+    private static final long RAT_LOAD_WAIT_LIMIT_MILLISECONDS = 10000;
+    private static final long RAT_LOAD_POLL_INTERVAL_MILLISECONDS = 50;
+
+    /**
+     * Returns the shared {@link RandomUnitGenerator} once its RATs have finished loading.
+     *
+     * <p>The first call to {@link RandomUnitGenerator#getInstance()} in a session only starts loading the RATs on a
+     * background thread. Reading the RAT list straight away returns an incomplete, usually empty, list, which caused
+     * the first turret or gun emplacement force generated in each session to come out empty.</p>
+     *
+     * @return the shared {@link RandomUnitGenerator}, which may still be loading if the wait limit was reached
+     */
+    private static RandomUnitGenerator getLoadedRandomUnitGenerator() {
+        RandomUnitGenerator randomUnitGenerator = RandomUnitGenerator.getInstance();
+        long waitLimit = System.currentTimeMillis() + RAT_LOAD_WAIT_LIMIT_MILLISECONDS;
+
+        while (!randomUnitGenerator.isInitialized() && (System.currentTimeMillis() < waitLimit)) {
+            try {
+                Thread.sleep(RAT_LOAD_POLL_INTERVAL_MILLISECONDS);
+            } catch (InterruptedException interruptedException) {
+                Thread.currentThread().interrupt();
+                break;
+            }
+        }
+
+        if (!randomUnitGenerator.isInitialized()) {
+            logger.warn("RATs had not finished loading after {}ms; the available RAT list may be incomplete.",
+                  RAT_LOAD_WAIT_LIMIT_MILLISECONDS);
+        }
+
+        return randomUnitGenerator;
+    }
+
     /**
      * Worker function to initialize the mapping between a numeric quality rating level and an alphabetic one (such as
      * one used in the RATs)
@@ -80,7 +113,7 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
     /**
      * Generates a list of turrets given a skill level, quality and year
      *
-     * @param num         How many turrets to generate
+     * @param unitCount   How many turrets to generate
      * @param skill       The skill level of the turret operator
      * @param quality     The quality level of the turret
      * @param currentYear The current year
@@ -88,7 +121,7 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
      * @return List of turrets
      */
     @Override
-    public List<MekSummary> generateTurrets(int num, SkillLevel skill, int quality, int currentYear) {
+    public List<MekSummary> generateTurrets(int unitCount, SkillLevel skill, int quality, int currentYear) {
         Integer ratYear;
 
         // less dirty hack
@@ -101,8 +134,10 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
         // we can handle any number of them.
         initializeRatRatingMappings();
 
-        for (Iterator<String> rats = RandomUnitGenerator.getInstance().getRatList(); rats.hasNext(); ) {
-            String currentName = rats.next();
+        RandomUnitGenerator randomUnitGenerator = getLoadedRandomUnitGenerator();
+
+        for (Iterator<String> ratNameIterator = randomUnitGenerator.getRatList(); ratNameIterator.hasNext(); ) {
+            String currentName = ratNameIterator.next();
             if (currentName.contains("Turrets")) {
                 String turretQuality = currentName.substring(currentName.length() - 1);
                 int year = Integer.parseInt(currentName.replaceAll("\\D", ""));
@@ -135,14 +170,14 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
         // to use
         String ratName = turretRatNames.get(ratYear).get(ratRatingMappings.get(quality));
 
-        RandomUnitGenerator.getInstance().setChosenRAT(ratName);
-        return RandomUnitGenerator.getInstance().generate(num);
+        randomUnitGenerator.setChosenRAT(ratName);
+        return randomUnitGenerator.generate(unitCount);
     }
 
     /**
      * Generates a list of TO:AR Advanced Building gun emplacements given a skill level, quality and year
      *
-     * @param num         How many gun emplacements to generate
+     * @param unitCount   How many gun emplacements to generate
      * @param skill       The skill level of the gun emplacement operator
      * @param quality     The quality level of the gun emplacement
      * @param currentYear The current year
@@ -150,7 +185,7 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
      * @return List of gun emplacements
      */
     @Override
-    public List<MekSummary> generateGunEmplacements(int num, SkillLevel skill, int quality, int currentYear) {
+    public List<MekSummary> generateGunEmplacements(int unitCount, SkillLevel skill, int quality, int currentYear) {
         Integer ratYear;
 
         // Copied from turrets for the time being
@@ -164,8 +199,10 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
         // we can handle any number of them.
         initializeRatRatingMappings();
 
-        for (Iterator<String> rats = RandomUnitGenerator.getInstance().getRatList(); rats.hasNext(); ) {
-            String currentName = rats.next();
+        RandomUnitGenerator randomUnitGenerator = getLoadedRandomUnitGenerator();
+
+        for (Iterator<String> ratNameIterator = randomUnitGenerator.getRatList(); ratNameIterator.hasNext(); ) {
+            String currentName = ratNameIterator.next();
             if (currentName.contains("Gun Emplacements")) {
                 String gunEmplacementQuality = currentName.substring(currentName.length() - 1);
                 int year = Integer.parseInt(currentName.replaceAll("\\D", ""));
@@ -198,7 +235,7 @@ public abstract class AbstractUnitGenerator implements IUnitGenerator {
         // to use
         String ratName = gunEmplacementRatNames.get(ratYear).get(ratRatingMappings.get(quality));
 
-        RandomUnitGenerator.getInstance().setChosenRAT(ratName);
-        return RandomUnitGenerator.getInstance().generate(num);
+        randomUnitGenerator.setChosenRAT(ratName);
+        return randomUnitGenerator.generate(unitCount);
     }
 }
