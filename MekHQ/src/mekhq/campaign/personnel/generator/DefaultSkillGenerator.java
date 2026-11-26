@@ -52,7 +52,9 @@ import static mekhq.campaign.personnel.skills.SkillType.EXP_VETERAN;
 import static mekhq.campaign.personnel.skills.enums.SkillSubType.UTILITY_COMMAND;
 
 import java.util.ArrayList;
+import java.util.LinkedHashSet;
 import java.util.List;
+import java.util.Set;
 
 import megamek.common.compute.Compute;
 import mekhq.Utilities;
@@ -64,6 +66,7 @@ import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.Phenotype;
 import mekhq.campaign.personnel.skills.Attributes;
 import mekhq.campaign.personnel.skills.RandomSkillPreferences;
+import mekhq.campaign.personnel.skills.ScoutingSkills;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.personnel.skills.Skills;
 import mekhq.campaign.personnel.skills.TechnicianSkills;
@@ -132,9 +135,18 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
         }
 
         // roll Appraisal skill
-        if (campaignOptions.get(CampaignOption.USE_FUNCTIONAL_APPRAISAL) && (primaryRole.isAdministrator())) {
+        if (person.isAdministrator()) {
             addSkill(person, SkillType.S_APPRAISAL, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
+
+        // roll medical support skills
+        generateMedicalSupportSkills(person, expLvl, mod);
+
+        // roll vessel support skills
+        generateVesselSupportSkills(person, expLvl, mod);
+
+        // roll scouting skills
+        generateScoutingSkills(person, expLvl, mod);
 
         // roll Negotiation skill
         if (campaignOptions.get(CampaignOption.ADMINS_HAVE_NEGOTIATION) && (primaryRole.isAdministrator())) {
@@ -150,12 +162,9 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             addSkill(person, SkillType.S_ADMIN, expLvl, skillPreferences.randomizeSkill(), 0, mod);
         }
 
-        // roll supplemental tech skills (skipped when the campaign uses only the global tech skills)
-        if (person.isTechExpanded() && !campaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)) {
-            List<String> supplementalSkills = TechnicianSkills.getTechSupplementalSkills(person, false);
-            for (String skillName : supplementalSkills) {
-                addSkill(person, skillName, expLvl, skillPreferences.randomizeSkill(), 0, mod);
-            }
+        // roll tech specialization skills (skipped when the campaign uses only the global tech skills)
+        if (!campaignOptions.get(CampaignOption.USE_GLOBAL_TECH_SKILLS_ONLY)) {
+            generateTechSpecializationSkills(person, expLvl, mod);
         }
 
         // roll Infantry Gunnery Skills
@@ -201,6 +210,107 @@ public class DefaultSkillGenerator extends AbstractSkillGenerator {
             String selSkill = possibleSkills.get(randomInt(possibleSkills.size()));
             int secondLvl = generateExpLevel(skillPreferences.getSecondSkillBonus());
             addSkill(person, selSkill, secondLvl, skillPreferences.randomizeSkill(), 0);
+        }
+    }
+
+    /**
+     * Generates the specialization skills (Tech/Electronic, Tech/Mechanical, and so on) for technicians.
+     *
+     * <p>Each specialization appropriate to the person's primary or secondary tech profession that they don't
+     * already have has a one-in-two chance of being granted at the person's profession experience level.</p>
+     *
+     * @param person          the {@link Person} receiving the skills
+     * @param experienceLevel the experience level of the person's profession
+     * @param rollModifier    the modifier applied when randomizing the skill level
+     */
+    void generateTechSpecializationSkills(Person person, int experienceLevel, int rollModifier) {
+        Set<String> specializationSkills = new LinkedHashSet<>();
+        specializationSkills.addAll(TechnicianSkills.getTechSupplementalSkills(person, false));
+        specializationSkills.addAll(TechnicianSkills.getTechSupplementalSkills(person, true));
+
+        boolean isRandomizeSkill = getSkillPreferences().randomizeSkill();
+        for (String skillName : specializationSkills) {
+            if (!person.getSkills().hasSkill(skillName) && (d6(1) <= 3)) {
+                addSkill(person, skillName, experienceLevel, isRandomizeSkill, 0, rollModifier);
+            }
+        }
+    }
+
+    /**
+     * Generates the supplemental skills expected of medical staff.
+     *
+     * <p>Doctors always receive {@link SkillType#S_MEDTECH} at their profession experience level. Doctors and medics
+     * both have a chance to receive {@link SkillType#S_TECH_CYBERNETICS} at their profession experience level, rolled
+     * the same way as the optional infantry gunnery skills.</p>
+     *
+     * @param person          the {@link Person} receiving the skills
+     * @param experienceLevel the experience level of the person's profession
+     * @param rollModifier    the modifier applied when randomizing the skill level
+     */
+    void generateMedicalSupportSkills(Person person, int experienceLevel, int rollModifier) {
+        PersonnelRole primaryRole = person.getPrimaryRole();
+        PersonnelRole secondaryRole = person.getSecondaryRole();
+        if (!primaryRole.isMedicalStaff() && !secondaryRole.isMedicalStaff()) {
+            return;
+        }
+
+        boolean isRandomizeSkill = getSkillPreferences().randomizeSkill();
+        if (primaryRole.isDoctor() || secondaryRole.isDoctor()) {
+            addSkill(person, SkillType.S_MEDTECH, experienceLevel, isRandomizeSkill, 0, rollModifier);
+        }
+
+        if (!person.getSkills().hasSkill(SkillType.S_TECH_CYBERNETICS) && (d6(1) == 1)) {
+            addSkill(person, SkillType.S_TECH_CYBERNETICS, experienceLevel, isRandomizeSkill, 0, rollModifier);
+        }
+    }
+
+    /**
+     * Generates the supplemental skills expected of large vessel personnel.
+     *
+     * <p>Vessel pilots, gunners, crew, and navigators have a chance to receive
+     * {@link SkillType#S_ZERO_G_OPERATIONS} at their profession experience level, rolled the same way as the optional
+     * infantry gunnery skills.</p>
+     *
+     * @param person          the {@link Person} receiving the skills
+     * @param experienceLevel the experience level of the person's profession
+     * @param rollModifier    the modifier applied when randomizing the skill level
+     */
+    void generateVesselSupportSkills(Person person, int experienceLevel, int rollModifier) {
+        if (!person.getPrimaryRole().isVesselCrewMember() && !person.getSecondaryRole().isVesselCrewMember()) {
+            return;
+        }
+
+        if (!person.getSkills().hasSkill(SkillType.S_ZERO_G_OPERATIONS) && (d6(1) == 1)) {
+            addSkill(person,
+                  SkillType.S_ZERO_G_OPERATIONS,
+                  experienceLevel,
+                  getSkillPreferences().randomizeSkill(),
+                  0,
+                  rollModifier);
+        }
+    }
+
+    /**
+     * Generates scouting skills for combat personnel.
+     *
+     * <p>Each skill in {@link ScoutingSkills#SCOUTING_SKILLS} the person doesn't already have is rolled separately,
+     * the same way as the optional infantry gunnery skills, and granted at the person's profession experience
+     * level.</p>
+     *
+     * @param person          the {@link Person} receiving the skills
+     * @param experienceLevel the experience level of the person's profession
+     * @param rollModifier    the modifier applied when randomizing the skill level
+     */
+    void generateScoutingSkills(Person person, int experienceLevel, int rollModifier) {
+        if (!person.isCombat()) {
+            return;
+        }
+
+        boolean isRandomizeSkill = getSkillPreferences().randomizeSkill();
+        for (String skillName : ScoutingSkills.SCOUTING_SKILLS) {
+            if (!person.getSkills().hasSkill(skillName) && (d6(1) == 1)) {
+                addSkill(person, skillName, experienceLevel, isRandomizeSkill, 0, rollModifier);
+            }
         }
     }
 
