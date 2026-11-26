@@ -162,7 +162,7 @@ final class CrewAssignmentData {
         locationName = location.toString();
         plan = new AssignmentPlan(options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL),
               options.get(CampaignOption.USE_IMPLANTS), options.get(CampaignOption.TECHS_USE_ADMINISTRATION));
-        // A tech busy on a refit at this location cannot take on more units
+        // Auto-fill passes over a tech busy on a refit at this location; the player may still assign them by hand
         ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
         LocalHangar hangar = (location.getBase() == null) ? campaign.getPlayerForce().getHangar() :
                                    location.getBase().getBaseHangar();
