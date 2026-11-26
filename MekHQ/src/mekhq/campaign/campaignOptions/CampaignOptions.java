@@ -810,8 +810,13 @@ public class CampaignOptions {
         boolean useNPCArmorKits = get(CampaignOption.NPC_FACTION_ARMOR_KITS);
         boolean useMekWarriorArmorKit = !get(CampaignOption.MEKWARRIOR_DEFAULT_KIT).equals(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME);
         boolean useVehicleArmorKit = !get(CampaignOption.VEHICLE_CREW_DEFAULT_KIT).equals(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME);
+        boolean useSpaceCrewArmorKit = !get(CampaignOption.SPACE_CREW_DEFAULT_KIT).equals(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME);
         boolean useAeroArmorKit = !get(CampaignOption.AIRCRAFT_DEFAULT_KIT).equals(ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME);
         gameOptions.getOption(RPG_COMBAT_SUITS)
-              .setValue(useNPCArmorKits || useMekWarriorArmorKit || useVehicleArmorKit || useAeroArmorKit);
+              .setValue(useNPCArmorKits
+                              || useMekWarriorArmorKit
+                              || useVehicleArmorKit
+                              || useSpaceCrewArmorKit
+                              || useAeroArmorKit);
     }
 }

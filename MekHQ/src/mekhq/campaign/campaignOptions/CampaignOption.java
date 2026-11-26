@@ -357,6 +357,8 @@ public final class CampaignOption<T> {
           of(String.class, ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, "mekWarriorDefaultKit");
     public static final CampaignOption<String> VEHICLE_CREW_DEFAULT_KIT =
           of(String.class, ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, "vehicleCrewDefaultKit");
+    public static final CampaignOption<String> SPACE_CREW_DEFAULT_KIT =
+          of(String.class, ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, "spaceCrewDefaultKit");
     public static final CampaignOption<String> AIRCRAFT_DEFAULT_KIT =
           of(String.class, ArmorKitCatalog.DEFAULT_ARMOR_KIT_NAME, "aircraftDefaultKit");
     public static final CampaignOption<String> MEK_TECH_DEFAULT_TOOL_KIT =
