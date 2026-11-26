@@ -37,10 +37,12 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.ObjIntConsumer;
 
 import jakarta.annotation.Nullable;
 import megamek.logging.MMLogger;
 import mekhq.campaign.personnel.Person;
+import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Problem;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Reason;
@@ -60,7 +62,8 @@ import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TempCrewProblem;
  *     <li>Everyone changing seat, or leaving their unit, leaves their old seat, so a swap or a chain of moves never
  *     finds its seat still taken.</li>
  *     <li>Temporary crew are filled or removed. A fill was sized for the crew the unit will end up with, so it comes
- *     after the departures and before the arrivals, and never leaves the unit over strength.</li>
+ *     after the departures and before the arrivals, and never leaves the unit over strength. Temporary crew a fill
+ *     hires are added to the campaign's pool first.</li>
  *     <li>Everyone moving into a seat takes it. The seat is checked for room first; if it has none, or the unit
  *     refuses them, they are put back in the seat they left if it is still free, and otherwise left unassigned
  *     rather than overfilling it. A person taking a place temporary crew hold replaces one of them.</li>
@@ -109,7 +112,7 @@ public final class CrewAssignmentService {
     }
 
     /**
-     * Applies the plan, then empties it.
+     * Applies a plan that hires no temporary crew, then empties it.
      *
      * @param plan         the staged changes
      * @param useTransfers the campaign's transfers option: when on, a move between units is logged as one
@@ -118,10 +121,33 @@ public final class CrewAssignmentService {
      *
      * @return what was applied and what was skipped
      *
+     * @throws IllegalArgumentException if the plan hires temporary crew, before anything is applied
      * @author Illiani
      * @since 0.51.01
      */
     public static CommitReport commit(final AssignmentPlan plan, final boolean useTransfers, final LocalDate today) {
+        if (plan.tempCrewChanges().stream().anyMatch(change -> change.totalHired() > 0)) {
+            throw new IllegalArgumentException("The plan hires temporary crew, so it needs a way to hire them");
+        }
+        return commit(plan, useTransfers, today, (role, count) -> {});
+    }
+
+    /**
+     * Applies the plan, then empties it.
+     *
+     * @param plan         the staged changes
+     * @param useTransfers the campaign's transfers option: when on, a move between units is logged as one
+     *                     reassignment rather than a removal and a new assignment
+     * @param today        the campaign date, used as the recruitment date of anyone who has none yet
+     * @param hireTempCrew adds the given number of temporary crew of a role to the campaign's pool
+     *
+     * @return what was applied and what was skipped
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static CommitReport commit(final AssignmentPlan plan, final boolean useTransfers, final LocalDate today,
+          final ObjIntConsumer<PersonnelRole> hireTempCrew) {
         final List<Problem> skipped = new ArrayList<>(plan.validate());
         final Set<StagedAssignment> blocked = new HashSet<>();
         for (Problem problem : skipped) {
@@ -162,6 +188,7 @@ public final class CrewAssignmentService {
         final List<StagedTempCrew> tempCrewApplied = new ArrayList<>();
         for (StagedTempCrew change : plan.tempCrewChanges()) {
             if (!blockedTempCrewChanges.contains(change)) {
+                change.hired().forEach(hireTempCrew::accept);
                 change.after().forEach((role, count) -> change.unit().setTempCrew(role, count));
                 tempCrewApplied.add(change);
             }
