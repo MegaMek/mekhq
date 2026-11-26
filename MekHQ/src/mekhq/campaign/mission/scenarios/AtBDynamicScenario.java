@@ -679,40 +679,40 @@ public class AtBDynamicScenario extends AtBScenario {
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(final Node wn, final Version version, final Campaign campaign)
+    protected void loadFieldsFromXmlNode(final Node scenarioNode, final Version version, final Campaign campaign)
           throws ParseException {
-        NodeList nl = wn.getChildNodes();
+        NodeList childNodes = scenarioNode.getChildNodes();
 
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
+        for (int childIndex = 0; childIndex < childNodes.getLength(); childIndex++) {
+            Node childNode = childNodes.item(childIndex);
 
-            if (wn2.getNodeName().equalsIgnoreCase(ScenarioTemplate.ROOT_XML_ELEMENT_NAME)) {
-                setTemplate(ScenarioTemplate.Deserialize(wn2));
-            } else if (wn2.getNodeName().equalsIgnoreCase("effectivePlayerUnitCountMultiplier")) {
-                setEffectivePlayerUnitCountMultiplier(MathUtility.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("effectivePlayerBVMultiplier")) {
-                setEffectivePlayerBVMultiplier(MathUtility.parseDouble(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("friendlyReinforcementDelayReduction")) {
-                setFriendlyReinforcementDelayReduction(MathUtility.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("friendlyDelayedReinforcements")) {
-                String[] values = wn2.getTextContent().split(",");
+            if (childNode.getNodeName().equalsIgnoreCase(ScenarioTemplate.ROOT_XML_ELEMENT_NAME)) {
+                setTemplate(ScenarioTemplate.Deserialize(childNode));
+            } else if (childNode.getNodeName().equalsIgnoreCase("effectivePlayerUnitCountMultiplier")) {
+                setEffectivePlayerUnitCountMultiplier(MathUtility.parseDouble(childNode.getTextContent().trim()));
+            } else if (childNode.getNodeName().equalsIgnoreCase("effectivePlayerBVMultiplier")) {
+                setEffectivePlayerBVMultiplier(MathUtility.parseDouble(childNode.getTextContent().trim()));
+            } else if (childNode.getNodeName().equalsIgnoreCase("friendlyReinforcementDelayReduction")) {
+                setFriendlyReinforcementDelayReduction(MathUtility.parseInt(childNode.getTextContent().trim()));
+            } else if (childNode.getNodeName().equalsIgnoreCase("friendlyDelayedReinforcements")) {
+                String[] values = childNode.getTextContent().split(",");
                 for (String value : values) {
                     getFriendlyDelayedReinforcements().add(UUID.fromString(value));
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("Instant")) {
-                String[] values = wn2.getTextContent().split(",");
+            } else if (childNode.getNodeName().equalsIgnoreCase("friendlyInstantReinforcements")) {
+                String[] values = childNode.getTextContent().split(",");
                 for (String value : values) {
                     getFriendlyInstantReinforcements().add(UUID.fromString(value));
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("hostileReinforcementDelayReduction")) {
-                setHostileReinforcementDelayReduction(MathUtility.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("effectiveOpForSkill")) {
-                setEffectiveOpForSkill(SkillLevel.valueOf(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("effectiveOpForQuality")) {
-                setEffectiveOpForQuality(MathUtility.parseInt(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAPS_ELEMENT)) {
-                for (int snsIndex = 0; snsIndex < wn2.getChildNodes().getLength(); snsIndex++) {
-                    Node swapNode = wn2.getChildNodes().item(snsIndex);
+            } else if (childNode.getNodeName().equalsIgnoreCase("hostileReinforcementDelayReduction")) {
+                setHostileReinforcementDelayReduction(MathUtility.parseInt(childNode.getTextContent().trim()));
+            } else if (childNode.getNodeName().equalsIgnoreCase("effectiveOpForSkill")) {
+                setEffectiveOpForSkill(SkillLevel.valueOf(childNode.getTextContent().trim()));
+            } else if (childNode.getNodeName().equalsIgnoreCase("effectiveOpForQuality")) {
+                setEffectiveOpForQuality(MathUtility.parseInt(childNode.getTextContent().trim()));
+            } else if (childNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAPS_ELEMENT)) {
+                for (int swapsIndex = 0; swapsIndex < childNode.getChildNodes().getLength(); swapsIndex++) {
+                    Node swapNode = childNode.getChildNodes().item(swapsIndex);
 
                     if (swapNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_SWAP_ELEMENT)) {
                         BenchedEntityData benchedEntityData = new BenchedEntityData();
@@ -734,14 +734,14 @@ public class AtBDynamicScenario extends AtBScenario {
                         playerUnitSwaps.put(playerUnitID, benchedEntityData);
                     }
                 }
-            } else if (wn2.getNodeName().equalsIgnoreCase("finalized")) {
-                setFinalized(Boolean.parseBoolean(wn2.getTextContent().trim()));
-            } else if (wn2.getNodeName().equalsIgnoreCase("offBoardForceIDs")) {
-                loadOffBoardForceIDs(wn2.getTextContent());
+            } else if (childNode.getNodeName().equalsIgnoreCase("finalized")) {
+                setFinalized(Boolean.parseBoolean(childNode.getTextContent().trim()));
+            } else if (childNode.getNodeName().equalsIgnoreCase("offBoardForceIDs")) {
+                loadOffBoardForceIDs(childNode.getTextContent());
             }
         }
 
-        super.loadFieldsFromXmlNode(wn, version, campaign);
+        super.loadFieldsFromXmlNode(scenarioNode, version, campaign);
     }
 
     @Override
