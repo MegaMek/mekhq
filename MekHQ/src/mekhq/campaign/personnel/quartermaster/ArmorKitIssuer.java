@@ -584,6 +584,7 @@ public final class ArmorKitIssuer extends AbstractKitIssuer {
             case MEKWARRIOR -> CampaignOption.MEKWARRIOR_DEFAULT_KIT;
             case AIRCRAFT -> CampaignOption.AIRCRAFT_DEFAULT_KIT;
             case INFANTRY -> CampaignOption.VEHICLE_CREW_DEFAULT_KIT;
+            case SPACE_CREW -> CampaignOption.SPACE_CREW_DEFAULT_KIT;
             case SOLDIER -> null;
         };
     }
