@@ -56,6 +56,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.io.RemovedEquipmentNames;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -284,10 +285,16 @@ public class EquipmentPart extends Part {
         if (typeName == null) {
             typeName = type.getName();
         } else {
+            String replacementTypeName = RemovedEquipmentNames.replaceRemovedTypeName(typeName);
+            if (!replacementTypeName.equals(typeName)) {
+                typeName = replacementTypeName;
+                name = RemovedEquipmentNames.replaceRemovedMunitionNames(name);
+            }
             type = EquipmentType.get(typeName);
 
             // This conditional is to handle <50.05 warehouses
-            if (!unitTonnageMatters) { // We don't want to accidentally overwrite this state if it's meant to be true
+            // We don't want to accidentally overwrite this state if it's meant to be true
+            if (!unitTonnageMatters && (type != null)) {
                 unitTonnageMatters = type.isVariableCost();
             }
         }
