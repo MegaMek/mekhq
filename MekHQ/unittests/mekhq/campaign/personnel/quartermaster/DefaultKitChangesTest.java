@@ -76,12 +76,13 @@ class DefaultKitChangesTest {
     void snapshotCoversEveryProfessionAndEveryArmorGroupButSoldiers() {
         Map<CampaignOption<String>, String> snapshot = DefaultKitChanges.snapshot(new CampaignOptions());
 
-        assertEquals(KitProfession.values().length + 3, snapshot.size());
+        assertEquals(KitProfession.values().length + 4, snapshot.size());
         for (KitProfession profession : KitProfession.values()) {
             assertTrue(snapshot.containsKey(EquipmentKitIssuer.defaultKitOption(profession)), profession.name());
         }
         assertTrue(snapshot.containsKey(CampaignOption.MEKWARRIOR_DEFAULT_KIT));
         assertTrue(snapshot.containsKey(CampaignOption.VEHICLE_CREW_DEFAULT_KIT));
+        assertTrue(snapshot.containsKey(CampaignOption.SPACE_CREW_DEFAULT_KIT));
         assertTrue(snapshot.containsKey(CampaignOption.AIRCRAFT_DEFAULT_KIT));
         assertNull(ArmorKitIssuer.defaultKitOption(Category.SOLDIER));
     }

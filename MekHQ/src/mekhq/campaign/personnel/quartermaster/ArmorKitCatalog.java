@@ -47,12 +47,14 @@ import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 
 /**
- * Sorts the armor kits MegaMek defines into the three groups MekHQ issues from, and answers which kits a crew may be
- * given this year.
+ * Sorts the armor kits MegaMek defines into the groups MekHQ issues from, and answers which kits a crew may be given
+ * this year.
  *
  * <p>MegaMek marks a kit only by its name and its survival flags, not by who is meant to wear it, so the grouping is
  * kept here as a name set: the MekWarrior kits go to MekWarriors, the aerospace pilot kit to aerospace crews, and
- * everything else — faction infantry kits, environment suits, the tanker's smock — is issued to everyone else.</p>
+ * everything else — faction infantry kits, environment suits, the tanker's smock — is issued to everyone else. Vehicle
+ * crews and large-craft (space) crews draw from the same kit list but are separate groups, so each can have its own
+ * default.</p>
  *
  * @author Illiani
  * @since 0.51.01
@@ -90,7 +92,7 @@ public final class ArmorKitCatalog extends AbstractKitCatalog {
 
     /** The group a kit belongs to, deciding which crews may be issued it. */
     public enum Category {
-        MEKWARRIOR, AIRCRAFT, INFANTRY, SOLDIER
+        MEKWARRIOR, AIRCRAFT, INFANTRY, SPACE_CREW, SOLDIER
     }
 
     /**
@@ -169,7 +171,7 @@ public final class ArmorKitCatalog extends AbstractKitCatalog {
         return switch (category) {
             case MEKWARRIOR -> MEKWARRIOR_KITS;
             case AIRCRAFT -> AEROSPACE_KITS;
-            case INFANTRY -> VEHICLE_KITS;
+            case INFANTRY, SPACE_CREW -> VEHICLE_KITS;
             case SOLDIER -> Set.of();
         };
     }
@@ -179,7 +181,7 @@ public final class ArmorKitCatalog extends AbstractKitCatalog {
         return switch (category) {
             case MEKWARRIOR -> MEKWARRIOR_KITS.contains(kitInternalName);
             case AIRCRAFT -> AEROSPACE_KITS.contains(kitInternalName);
-            case INFANTRY -> VEHICLE_KITS.contains(kitInternalName);
+            case INFANTRY, SPACE_CREW -> VEHICLE_KITS.contains(kitInternalName);
             case SOLDIER -> !MEKWARRIOR_KITS.contains(kitInternalName) && !AEROSPACE_KITS.contains(kitInternalName);
         };
     }
@@ -260,19 +262,16 @@ public final class ArmorKitCatalog extends AbstractKitCatalog {
                      || role.isAerospaceGrouping()
                      || role.isConventionalAircraftPilot()
                      || role.isSoldier()
-                     || role.isVehicleCrewGround()
-                     || role.isVehicleCrewNaval()
-                     || role.isVehicleCrewVTOL()
-                     || role.isVesselPilot()
-                     || role.isVesselGunner()
-                     || role.isVesselCrew()
-                     || role.isVesselNavigator();
+                     || isVehicleCrewRole(role)
+                     || isSpaceCrewRole(role);
     }
 
     /**
      * The kit group this person draws from: MekWarriors (and LAM pilots) wear MekWarrior kits, aerospace and
-     * conventional fighter pilots wear aerospace kits, and everyone else — vehicle and large-craft crews — wears
-     * infantry kits. A person who is both (a LAM pilot) is treated as a MekWarrior.
+     * conventional fighter pilots wear aerospace kits, large-craft crews (vessel pilots, gunners, crew, and navigators)
+     * are space crew, and everyone else — vehicle crews — wears infantry kits. A person who is both (a LAM pilot) is
+     * treated as a MekWarrior. Someone who is both a vehicle crew member and a large-craft crew member is grouped by
+     * their primary role.
      *
      * @param person the person whose kit group is wanted
      *
@@ -297,7 +296,24 @@ public final class ArmorKitCatalog extends AbstractKitCatalog {
         if (primary.isSoldier() || secondary.isSoldier()) {
             return Category.SOLDIER;
         }
+        if (isSpaceCrewRole(primary)) {
+            return Category.SPACE_CREW;
+        }
+        if (isVehicleCrewRole(primary)) {
+            return Category.INFANTRY;
+        }
+        if (isSpaceCrewRole(secondary)) {
+            return Category.SPACE_CREW;
+        }
         return Category.INFANTRY;
+    }
+
+    private static boolean isSpaceCrewRole(PersonnelRole role) {
+        return role.isVesselPilot() || role.isVesselGunner() || role.isVesselCrew() || role.isVesselNavigator();
+    }
+
+    private static boolean isVehicleCrewRole(PersonnelRole role) {
+        return role.isVehicleCrewGround() || role.isVehicleCrewNaval() || role.isVehicleCrewVTOL();
     }
 
     /**
