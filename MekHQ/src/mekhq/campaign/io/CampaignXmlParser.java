@@ -2487,8 +2487,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Fixup any ghost kills
         cleanupGhostKills(campaign);
 
-        migrateDerivedImplantProsthetics(campaign, version);
-
         // Update the Personnel Modules
         final AbstractDivorce divorce = options.get(CampaignOption.RANDOM_DIVORCE_METHOD).getMethod(options);
         campaign.getPlayerForce().getHumanResources().setDivorce(divorce);
