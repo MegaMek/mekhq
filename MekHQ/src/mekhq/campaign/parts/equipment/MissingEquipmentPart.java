@@ -142,11 +142,7 @@ public class MissingEquipmentPart extends MissingPart {
         if (typeName == null) {
             typeName = type.getName();
         } else {
-            String replacementTypeName = RemovedEquipmentNames.replaceRemovedTypeName(typeName);
-            if (!replacementTypeName.equals(typeName)) {
-                typeName = replacementTypeName;
-                name = RemovedEquipmentNames.replaceRemovedMunitionNames(name);
-            }
+            typeName = RemovedEquipmentNames.replaceRemovedTypeName(typeName);
             type = EquipmentType.get(typeName);
         }
 
