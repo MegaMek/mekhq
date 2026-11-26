@@ -1081,14 +1081,13 @@ public class PersonnelMarketDialog extends JDialog {
      */
     private void advanceDays() {
         closeAction();
-        AdvanceDaysDialog advanceDaysDialog = new AdvanceDaysDialog(parent, campaign.getGUI());
+        AdvanceDaysDialog advanceDaysDialog = campaign.getGUI().openAdvanceDaysDialog();
         advanceDaysDialog.addWindowListener(new WindowAdapter() {
             @Override
             public void windowClosed(WindowEvent event) {
                 new PersonnelMarketDialog(market); // Open a new instance (to ensure the market is refreshed)
             }
         });
-        advanceDaysDialog.setVisible(true);
     }
 
     // endregion Actions

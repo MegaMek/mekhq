@@ -314,9 +314,9 @@ public class IssueEquipmentDialog extends JDialog {
     // endregion Command bar
 
     // region Sections
-    /** Tab order by unit type: MekWarrior, Vehicle, Aircraft, Soldiers. */
+    /** Tab order by unit type: MekWarrior, Vehicle, Aircraft, Space Crew, Soldiers. */
     private static final List<Category> TAB_ORDER = List.of(Category.MEKWARRIOR, Category.INFANTRY,
-          Category.AIRCRAFT, Category.SOLDIER);
+          Category.AIRCRAFT, Category.SPACE_CREW, Category.SOLDIER);
 
     /**
      * The armor family's group pages under a compact tab strip. Every unit-type page is offered, even with nobody of
@@ -880,6 +880,7 @@ public class IssueEquipmentDialog extends JDialog {
             case MEKWARRIOR -> AMBER;
             case AIRCRAFT -> ACCENT;
             case INFANTRY -> READY;
+            case SPACE_CREW -> ACCENT_BRIGHT;
             case SOLDIER -> TEXT_MUTED;
         };
     }

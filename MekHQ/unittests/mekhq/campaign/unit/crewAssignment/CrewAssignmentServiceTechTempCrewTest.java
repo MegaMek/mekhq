@@ -34,6 +34,7 @@ package mekhq.campaign.unit.crewAssignment;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNull;
+import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.inOrder;
 import static org.mockito.Mockito.mock;
@@ -44,6 +45,7 @@ import java.util.List;
 
 import megamek.common.units.Infantry;
 import megamek.common.units.Mek;
+import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
@@ -197,6 +199,38 @@ class CrewAssignmentServiceTechTempCrewTest {
 
         assertEquals(Reason.OUT_OF_DATE, report.tempCrewSkipped().get(0).reason());
         assertEquals(4, platoon.tempCrew.get(PersonnelRole.SOLDIER));
+    }
+
+    @Test
+    void hiredTempCrewJoinThePoolBeforeTheyBoard() {
+        Person driver = fixture.person("Driver", PersonnelRole.VEHICLE_CREW_GROUND);
+        CrewFixture.CrewUnit longTom = fixture.vehicle(mock(Tank.class), "Long Tom", 7)
+                                             .with(driver, SeatType.DRIVER)
+                                             .withTempCrew(PersonnelRole.VEHICLE_CREW_GROUND, 0);
+        plan.fillTempCrew(List.of(longTom.unit), role -> 0, role -> true);
+        Campaign campaign = mock(Campaign.class);
+
+        CommitReport report = CrewAssignmentService.commit(plan, false, TODAY, campaign::increaseTempCrewPool);
+
+        assertEquals(1, report.tempCrewApplied().size());
+        assertEquals(7, longTom.tempCrew.get(PersonnelRole.VEHICLE_CREW_GROUND));
+        InOrder order = inOrder(campaign, longTom.unit);
+        order.verify(campaign).increaseTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, 7);
+        order.verify(longTom.unit).setTempCrew(PersonnelRole.VEHICLE_CREW_GROUND, 7);
+    }
+
+    @Test
+    void aPlanThatHiresCannotBeCommittedWithoutAWayToHire() {
+        Person driver = fixture.person("Driver", PersonnelRole.VEHICLE_CREW_GROUND);
+        CrewFixture.CrewUnit longTom = fixture.vehicle(mock(Tank.class), "Long Tom", 7)
+                                             .with(driver, SeatType.DRIVER)
+                                             .withTempCrew(PersonnelRole.VEHICLE_CREW_GROUND, 0);
+        plan.fillTempCrew(List.of(longTom.unit), role -> 0, role -> true);
+
+        assertThrows(IllegalArgumentException.class, () -> CrewAssignmentService.commit(plan, false, TODAY));
+
+        assertTrue(longTom.tempCrew.isEmpty());
+        assertEquals(1, plan.tempCrewChanges().size());
     }
 
     @Test
