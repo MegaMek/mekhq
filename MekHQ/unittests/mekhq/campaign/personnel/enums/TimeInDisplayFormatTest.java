@@ -161,13 +161,13 @@ public class TimeInDisplayFormatTest {
                     LocalDate.of(3025, 1, 1), LocalDate.of(3030, 1, 1)));
 
         // Months and Years
-        assertEquals(String.format(TimeInDisplayFormat.MONTHS_YEARS.getDisplayFormat(), -1, 0),
+        assertEquals(String.format(TimeInDisplayFormat.MONTHS_YEARS.getDisplayFormat(), 0, -1),
               TimeInDisplayFormat.MONTHS_YEARS.getDisplayFormattedOutput(
                     LocalDate.of(3025, 1, 1), LocalDate.of(3024, 12, 1)));
-        assertEquals(String.format(TimeInDisplayFormat.MONTHS_YEARS.getDisplayFormat(), 2, 1),
+        assertEquals(String.format(TimeInDisplayFormat.MONTHS_YEARS.getDisplayFormat(), 1, 2),
               TimeInDisplayFormat.MONTHS_YEARS.getDisplayFormattedOutput(
                     LocalDate.of(3025, 1, 1), LocalDate.of(3026, 3, 1)));
-        assertEquals(String.format(TimeInDisplayFormat.MONTHS_YEARS.getDisplayFormat(), 0, 5),
+        assertEquals(String.format(TimeInDisplayFormat.MONTHS_YEARS.getDisplayFormat(), 5, 0),
               TimeInDisplayFormat.MONTHS_YEARS.getDisplayFormattedOutput(
                     LocalDate.of(3025, 1, 1), LocalDate.of(3030, 1, 1)));
 
