@@ -1938,6 +1938,12 @@ public class Campaign implements ITechManager {
         return new CargoStatistics(this);
     }
 
+    /**
+     * Returns the units with the main force's detachment. Units at a base or in another detachment are not included;
+     * use {@link mekhq.campaign.force.AbstractForce#allUnits()} for every detachment, or {@link #getAllUnits()} for every unit anywhere.
+     *
+     * @return the main force's units
+     */
     public Collection<Unit> getUnits() {
         return getPlayerForce().getHangar().getUnits();
     }
@@ -1955,7 +1961,8 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * Retrieves a collection of units that are not mothballed or being salvaged.
+     * Retrieves the main force's units that are not mothballed or being salvaged. Like {@link #getUnits()}, this covers
+     * only the main force's detachment.
      *
      * @return a collection of active units
      */
@@ -1969,7 +1976,7 @@ public class Campaign implements ITechManager {
     }
 
     public Unit getUnit(UUID id) {
-        Unit unit = getPlayerForce().getHangar().getUnit(id);
+        Unit unit = getPlayerForce().findUnit(id);
         if (unit != null) {
             return unit;
         }
@@ -2078,12 +2085,22 @@ public class Campaign implements ITechManager {
     }
 
     /**
-     * @return A collection of parts in the Warehouse.
+     * @return the parts in the main force's warehouse. Parts at a base or in another detachment are not included; use
+     *       {@link mekhq.campaign.force.AbstractForce#allWarehouses()} for every detachment, or {@link #getAllParts()} for every part
+     *       anywhere.
      */
     public Collection<Part> getParts() {
         return getPlayerForce().getWarehouse().getParts();
     }
 
+    /**
+     * Finds a part by number in the main force's warehouse. Part numbers repeat between warehouses, so this never
+     * searches other detachments or bases.
+     *
+     * @param id the part number
+     *
+     * @return the part, or {@code null} if the main force's warehouse has no part with that number
+     */
     public Part getPart(int id) {
         return getPlayerForce().getWarehouse().getPart(id);
     }
@@ -3617,7 +3634,8 @@ public class Campaign implements ITechManager {
                 return base.getBaseHangar();
             }
         }
-        return getPlayerForce().getHangar();
+        LocalHangar detachmentHangar = getPlayerForce().findHangarHolding(unit.getId());
+        return (detachmentHangar != null) ? detachmentHangar : getPlayerForce().getHangar();
     }
 
     public void removeScenario(final Scenario scenario) {
@@ -3749,7 +3767,7 @@ public class Campaign implements ITechManager {
         NewPersonnelMarket.ensureMarketStyle(this, campaignOptions.get(CampaignOption.PERSONNEL_MARKET_STYLE));
 
         // Cleans non-existing spouses
-        for (Person person : getPlayerForce().getPersonnel().values()) {
+        for (Person person : getPlayerForce().allPersonnel()) {
             if (person.getGenealogy().hasSpouse()) {
                 final UUID id1 = person.getGenealogy().getSpouse().getId();
                 if (getPlayerForce().getHumanResources().getPerson(id1) == null) {
@@ -3764,7 +3782,7 @@ public class Campaign implements ITechManager {
             List<UUID> orphanFormationUnitIDs = new ArrayList<>();
 
             for (UUID unitID : formation.getUnits()) {
-                if (getPlayerForce().getHangar().getUnit(unitID) == null) {
+                if (getPlayerForce().findUnit(unitID) == null) {
                     orphanFormationUnitIDs.add(unitID);
                 }
             }
@@ -4265,7 +4283,7 @@ public class Campaign implements ITechManager {
      * is turning a unit into, so that a save carries everything needed to load it on another machine.
      */
     private Set<String> collectDesignNamesOfAllUnits() {
-        List<Unit> units = new ArrayList<>(getPlayerForce().getHangar().getUnits());
+        List<Unit> units = new ArrayList<>(getPlayerForce().allUnits());
         for (PlayerBase base : getCampaignLocationManager().getPlayerBases()) {
             units.addAll(base.getBaseHangar().getUnits());
         }
@@ -6075,7 +6093,7 @@ public class Campaign implements ITechManager {
              * the unit was founded.
              */
             LocalDate founding = null;
-            for (Person person : getPlayerForce().getPersonnel().values()) {
+            for (Person person : getPlayerForce().allPersonnel()) {
                 for (LogEntry logEntry : person.getPersonalLog()) {
                     if ((founding == null) || logEntry.getDate().isBefore(founding)) {
                         founding = logEntry.getDate();
@@ -6087,7 +6105,7 @@ public class Campaign implements ITechManager {
              * date is one of the founding members. Also assume that MWs assigned to a non-Assault `Mek on the date
              * they joined came with that `Mek (which is a less certain assumption)
              */
-            for (Person person : getPlayerForce().getPersonnel().values()) {
+            for (Person person : getPlayerForce().allPersonnel()) {
                 LocalDate join = person.getPersonalLog()
                                        .stream()
                                        .filter(e -> e.getDesc().startsWith("Joined "))
@@ -6442,7 +6460,7 @@ public class Campaign implements ITechManager {
             int id1 = combatTeam.getFormationId();
             Formation formation = getPlayerForce().getFormation(id1);
             if (formation != null) {
-                for (Unit unit : formation.getAllUnitsAsUnits(getPlayerForce().getHangar(), true)) {
+                for (Unit unit : formation.getAllUnitsAsUnits(getPlayerForce(), true)) {
                     Entity entity = unit.getEntity();
                     if (entity != null) {
                         units.add(entity);

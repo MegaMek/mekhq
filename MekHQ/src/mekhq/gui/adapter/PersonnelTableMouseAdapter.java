@@ -2695,7 +2695,7 @@ public class PersonnelTableMouseAdapter extends JPopupMenuAdapter {
                                   (campaign.getGameYear() < academy.getClosureYear())) {
                             // if the academy is local, is the system still populated?
                             if ((!academy.isLocal()) ||
-                                      (campaign.getCurrentSystem().getPopulation(campaign.getLocalDate()) > 0)) {
+                                      EducationController.isLocalCampusSystemPopulated(campaign, person)) {
                                 // is the person still within the correct age band?
                                 if ((person.getAge(campaign.getLocalDate()) < academy.getAgeMax()) &&
                                           (person.getAge(campaign.getLocalDate()) >= academy.getAgeMin())) {

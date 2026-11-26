@@ -990,13 +990,25 @@ public class Skill {
      * @see #getFinalSkillValue(SkillModifierData)
      */
     public String toString(SkillModifierData skillModifierData) {
-        String display;
+        return toString(skillModifierData, 0);
+    }
 
-        if (isCountUp()) {
-            display = "+" + getFinalSkillValue(skillModifierData);
-        } else {
-            display = getFinalSkillValue(skillModifierData) + "+";
-        }
+    /**
+     * As {@link #toString(SkillModifierData)}, but the target number also includes the combat Chassis Familiarity
+     * bonus the caller has computed for this skill in the character's assigned unit. The skill level and experience
+     * label are left as they are: familiarity changes how well the character handles one chassis, not how skilled they
+     * are.
+     *
+     * @param skillModifierData the modifiers that affect this skill
+     * @param familiarityBonus  the (signed) chassis familiarity bonus for this skill; pass {@code 0} for none
+     *
+     * @return the target number followed by the skill level and experience label
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public String toString(SkillModifierData skillModifierData, int familiarityBonus) {
+        String display = getSkillTargetNumber(skillModifierData, familiarityBonus);
 
         int baseSkillLevel = level;
         int totalSkillLevel = getTotalSkillLevel(skillModifierData);
@@ -1027,6 +1039,22 @@ public class Skill {
      * @since 0.50.06
      */
     public String getTooltip(SkillModifierData skillModifierData) {
+        return getTooltip(skillModifierData, 0);
+    }
+
+    /**
+     * As {@link #getTooltip(SkillModifierData)}, but also lists the combat Chassis Familiarity bonus the caller has
+     * computed for this skill in the character's assigned unit, when there is one.
+     *
+     * @param skillModifierData the modifiers that affect this skill
+     * @param familiarityBonus  the (signed) chassis familiarity bonus for this skill; pass {@code 0} for none
+     *
+     * @return an HTML-formatted string representing the generated skill tooltip
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public String getTooltip(SkillModifierData skillModifierData, int familiarityBonus) {
         StringBuilder tooltip = new StringBuilder();
 
         String flavorText = getType().getFlavorText(false, false);
@@ -1056,6 +1084,12 @@ public class Skill {
             tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
                   "tooltip.format.injury",
                   (injuryModifier > 0 ? "+" : "") + injuryModifier));
+        }
+
+        if ((familiarityBonus != 0) && isCombatPilotingOrGunnery()) {
+            tooltip.append(getFormattedTextAt(RESOURCE_BUNDLE,
+                  "tooltip.format.chassisFamiliarity",
+                  (familiarityBonus > 0 ? "+" : "") + familiarityBonus));
         }
 
         Attributes attributes = skillModifierData.attributes();
