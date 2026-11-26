@@ -6136,9 +6136,9 @@ public class Person implements ILocatable {
      *
      * <ul>
      *     <li>
-     *         <b>Standard Averaging:</b> If {@code isAlternativeQualityAveraging} is {@code false}, the experience
-     *         level is determined by averaging the levels of all provided skills and converting the average to an
-     *         experience level using the first skill's type.
+     *         <b>Standard Averaging:</b> If {@code isAlternativeQualityAveraging} is {@code false}, each provided
+     *         skill is converted to an experience level using its own skill type's thresholds, and the experience
+     *         level is the average of those, rounded down.
      *     </li>
      *     <li>
      *         <b>Alternative Quality Averaging:</b> If {@code isAlternativeQualityAveraging} is {@code true}, the
@@ -6163,7 +6163,7 @@ public class Person implements ILocatable {
             // If we're not tracking skills for this profession, it always counts as REGULAR
             return EXP_REGULAR;
         }
-        int totalSkillLevel = 0;
+        int totalExperienceLevel = 0;
         boolean areAllEqual = true;
         Integer expectedExperienceLevel = null;
 
@@ -6182,14 +6182,16 @@ public class Person implements ILocatable {
                 return EXP_NONE;
             }
 
-            int individualSkillLevel = skill.getTotalSkillLevel(skillModifierData);
-            totalSkillLevel += individualSkillLevel;
+            // Each skill is graded against its own thresholds, as different skill types can use different level
+            // thresholds (e.g., Gunnery and Piloting). Averaging the raw skill levels and grading the result against
+            // a single skill's thresholds would misjudge the profession.
+            int individualExperienceLevel = skillType.getExperienceLevel(skill.getTotalSkillLevel(skillModifierData));
+            totalExperienceLevel += individualExperienceLevel;
 
             if (isAlternativeQualityAveraging) {
-                int expLevel = skill.getExperienceLevel(skillModifierData);
                 if (expectedExperienceLevel == null) {
-                    expectedExperienceLevel = expLevel;
-                } else if (!expectedExperienceLevel.equals(expLevel)) {
+                    expectedExperienceLevel = individualExperienceLevel;
+                } else if (!expectedExperienceLevel.equals(individualExperienceLevel)) {
                     areAllEqual = false;
                 }
             }
@@ -6199,14 +6201,7 @@ public class Person implements ILocatable {
             return expectedExperienceLevel;
         }
 
-        int averageSkillLevel = (int) floor((double) totalSkillLevel / skillNames.size());
-
-        Skill skill = getSkill(skillNames.getFirst());
-        if (skill == null) {
-            return EXP_NONE;
-        }
-
-        return skill.getType().getExperienceLevel(averageSkillLevel);
+        return (int) floor((double) totalExperienceLevel / skillNames.size());
     }
 
     /**
