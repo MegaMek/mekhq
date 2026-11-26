@@ -129,6 +129,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     private CrewAssignmentPage lastWorkPage = CrewAssignmentPage.ASSIGN;
     /** The units that pass the filters, in the order their cards are listed; the bulk actions work on these. */
     private List<UnitEntry> shownUnits = List.of();
+    /** The people listed while the list is held to a group, in list order, for the seats to take together. */
+    private List<Person> listedGroup = List.of();
 
     private final HudModeSelector<CrewAssignmentPage> modeSelector;
     private final JLabel subtitle = new JLabel();
@@ -204,13 +206,14 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     // region Opening
 
     /**
-     * Opens the dialog for the location of the given units or people. The first of the people is opened already
-     * selected, ready to be assigned; units are opened as the only cards listed, until the player clears that filter.
+     * Opens the dialog for the location of the given units or people. A single person is opened already selected,
+     * ready to be assigned; several people are opened as the only people listed, so they can be unassigned together,
+     * and units as the only cards listed, until the player clears that filter.
      *
      * @param frame    the main window
      * @param campaign the campaign
      * @param units    the units to list, possibly none, for every unit that needs crew
-     * @param people   people to open for, possibly none; the first one at this location is selected
+     * @param people   people to open for, possibly none; those at the location the dialog opens on are opened for
      *
      * @author Illiani
      * @since 0.51.01
@@ -324,12 +327,19 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     }
 
     private void preselect(Collection<Unit> units, Collection<Person> people) {
-        // Only one person is ever selected, so of several the first one listed here is
+        List<Person> peopleHere = new ArrayList<>();
         for (Person person : people) {
             if (data.entryFor(person) != null) {
-                state.selectedPerson = person;
-                break;
+                peopleHere.add(person);
             }
+        }
+        if (peopleHere.size() == 1) {
+            state.selectedPerson = peopleHere.get(0);
+        } else if (!peopleHere.isEmpty()) {
+            // Opened for a group: list only them, assigned or not, so they can be unassigned together. Only one
+            // person is ever selected, so none is, rather than one of the group standing in for the rest
+            state.pinnedPeople.addAll(peopleHere);
+            state.assignment = state.startingAssignment(state.page);
         }
         for (Unit unit : units) {
             if (data.entryFor(unit) != null) {
@@ -627,8 +637,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         List<PersonEntry> people = data.people();
         for (PersonEntry entry : people) {
             Person person = entry.person();
-            if (!state.lists(person)) {
-                // The Techs page lists only techs
+            if (!state.lists(person) || !state.isPinned(person)) {
+                // The Techs page lists only techs, and a list held to the people opened for counts only them
                 continue;
             }
             listed++;
@@ -704,6 +714,16 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         if (selected != null) {
             links.add(Hud.link(getTextAt(RESOURCE_BUNDLE, "people.clear"), this::clearSelection));
         }
+        // Taking everyone the filters leave listed out of their units at once, such as a group opened for
+        List<Person> shownPeople = shown.stream().map(PersonEntry::person).toList();
+        // A group opened for can also be seated together; the Techs page has no seats
+        listedGroup = (state.pinnedPeople.isEmpty() || isTechsPage()) ? List.of() : shownPeople;
+        if ((shownPeople.size() > 1) && hasAnythingToUnassign(shownPeople, plan)) {
+            JLabel unassignListed = Hud.link(getTextAt(RESOURCE_BUNDLE, "people.unassignListed"),
+                  () -> unassignPeople(shownPeople));
+            unassignListed.setToolTipText(getTextAt(RESOURCE_BUNDLE, "people.unassignListed.toolTipText"));
+            links.add(unassignListed);
+        }
         peoplePage.setCountLinks(links);
 
         assignmentFilter.setItems(List.of(
@@ -774,6 +794,16 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
                 chip.setToolTipText(getTextAt(RESOURCE_BUNDLE, "AssignSort." + sort.name() + ".toolTipText"));
                 chips.add(chip);
             }
+        }
+        if (!state.pinnedPeople.isEmpty()) {
+            HudChip chip = new HudChip(getFormattedTextAt(RESOURCE_BUNDLE, "people.pinned",
+                  state.pinnedPeople.size()), () -> {
+                state.pinnedPeople.clear();
+                state.assignment = state.startingAssignment(state.page);
+                refresh();
+            });
+            chip.setActive(true);
+            chips.add(chip);
         }
         peoplePage.setChips(chips);
     }
@@ -992,7 +1022,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
      */
     private void enterPage(CrewAssignmentPage page) {
         if (page.isWorkPage() && (page != lastWorkPage)) {
-            state.assignment = CrewAssignmentState.defaultAssignment(page);
+            state.assignment = state.startingAssignment(page);
             state.role = null;
             state.targetTech = false;
             lastWorkPage = page;
@@ -1038,6 +1068,18 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.seatRefused", seatName, unit.getName()), true);
         }
         refresh();
+    }
+
+    @Override
+    public void assignListedToSeat(Unit unit, SeatType seat) {
+        StageResult result = data.plan().fillSeats(listedGroup, List.of(unit), seat);
+        reportStaged(result.staged().size(), 0);
+        refresh();
+    }
+
+    @Override
+    public List<Person> listedGroup() {
+        return listedGroup;
     }
 
     @Override
@@ -1104,7 +1146,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     public void autoFill() {
         List<Person> candidates = new ArrayList<>();
         for (PersonEntry entry : data.people()) {
-            if (CrewAssignmentData.isAutoFillCandidate(entry.person())) {
+            if (CrewAssignmentData.isAutoFillCandidate(entry)) {
                 candidates.add(entry.person());
             }
         }
@@ -1169,9 +1211,24 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     /** Takes the selected person out of their unit and off every unit they maintain. */
     private void unassignSelectedPerson() {
         Person person = state.selectedPerson;
-        int staged = (person == null) ? 0 : data.plan().unassignEverything(List.of(person));
+        unassignPeople((person == null) ? List.of() : List.of(person));
+    }
+
+    /** Takes each person out of their unit and off every unit they maintain, as one step of history. */
+    private void unassignPeople(List<Person> people) {
+        int staged = people.isEmpty() ? 0 : data.plan().unassignEverything(people);
         setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.unassigned", staged), staged == 0);
         refresh();
+    }
+
+    /** @return {@code true} if any of the people crews a unit or maintains one that unassigning would change */
+    private static boolean hasAnythingToUnassign(List<Person> people, AssignmentPlan plan) {
+        for (Person person : people) {
+            if (plan.canUnassign(person) || !plan.plannedTechUnits(person).isEmpty()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     @Override
@@ -1320,6 +1377,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             state.skill = null;
             state.condition = Condition.ANY;
             state.familiarity = FamiliarityBand.ANY;
+            state.pinnedPeople.clear();
             state.peopleQuery = "";
             peoplePage.setSearchText("");
         }
@@ -1416,6 +1474,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         }
         location = item;
         state.pinnedUnits.clear();
+        state.pinnedPeople.clear();
         reload();
         setMessage("", false);
         refresh();
@@ -1424,7 +1483,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     /**
      * Reads the location again, after a commit or a change of location. The selections, the search texts and the
      * filters on type, formation, role, condition, familiarity and assignment start over. The status filters on the
-     * unit cards, and the units the dialog was opened for, are kept; a change of location clears those units itself.
+     * unit cards, and the units and people the dialog was opened for, are kept; a change of location clears those
+     * itself.
      */
     private void reload() {
         data = new CrewAssignmentData(campaign, location);
@@ -1437,7 +1497,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         state.skill = null;
         state.condition = Condition.ANY;
         state.familiarity = FamiliarityBand.ANY;
-        state.assignment = CrewAssignmentState.defaultAssignment(lastWorkPage);
+        state.assignment = state.startingAssignment(lastWorkPage);
         state.unitQuery = "";
         state.peopleQuery = "";
         shownUnits = List.of();

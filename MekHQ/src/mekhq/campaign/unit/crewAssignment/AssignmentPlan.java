@@ -311,7 +311,8 @@ public class AssignmentPlan {
     }
 
     /**
-     * @param isTechBusy says whether a tech is tied up, for example on a refit, and so cannot take on more units
+     * @param isTechBusy says whether a tech is tied up, for example on a refit. Auto-fill passes such techs over, but the
+     *                   player may still give them units by hand
      */
     public void setTechBusy(final Predicate<Person> isTechBusy) {
         this.isTechBusy = Objects.requireNonNull(isTechBusy);
@@ -570,8 +571,8 @@ public class AssignmentPlan {
 
     /**
      * Whether a tech could be staged to maintain a unit right now: the unit needs maintenance and is available, the
-     * tech can work on it, is at its location and is not tied up, the tech is not already staged to it, and their daily
-     * time would cover it.
+     * tech can work on it and is at its location, the tech is not already staged to it, and their daily time would
+     * cover it. A tech tied up on a refit may still be staged by hand; only auto-fill passes them over.
      *
      * @param tech a tech
      * @param unit the unit
@@ -580,6 +581,14 @@ public class AssignmentPlan {
      */
     public boolean canStageTech(final Person tech, final Unit unit) {
         return whyNotTech(tech, unit) == null;
+    }
+
+    /**
+     * Whether auto-fill may stage a tech to maintain a unit: {@link #canStageTech}, and the tech is not tied up, for
+     * example on a refit.
+     */
+    private boolean canAutoStageTech(final Person tech, final Unit unit) {
+        return !isTechBusy.test(tech) && canStageTech(tech, unit);
     }
 
     // endregion Reading techs
@@ -929,6 +938,7 @@ public class AssignmentPlan {
     /**
      * Gives each unit without a tech the first tech, in the order given, who can take it on, as one step of history.
      * Units that will already have a tech are left alone, so best-first techs fill units until their time runs out.
+     * Techs tied up on a refit are passed over.
      *
      * @param techs the techs, best first
      * @param units the units, in the order they should be given techs
@@ -946,8 +956,8 @@ public class AssignmentPlan {
      * Gives the units that will have no tech one each, chosen as the campaign's automatic tech assignment chooses (see
      * {@link AutomatedTechAssignments}), as one step of history. Units are offered a tech by battle value, highest
      * first; each goes to the tech with the best skill for that kind of unit, at most two units per tech, and techs
-     * who never take maintenance automatically are left out. On top of that a tech must pass {@link #canStageTech}, so
-     * their daily time still has to cover every unit they take.
+     * who never take maintenance automatically, or who are tied up on a refit, are left out. On top of that a tech must
+     * pass {@link #canStageTech}, so their daily time still has to cover every unit they take.
      *
      * @param techs the techs to choose from
      * @param units the units
@@ -974,7 +984,7 @@ public class AssignmentPlan {
 
             @Override
             public boolean canTakeOn(Person tech, Unit unit) {
-                return canStageTech(tech, unit);
+                return canAutoStageTech(tech, unit);
             }
 
             @Override
@@ -999,7 +1009,7 @@ public class AssignmentPlan {
             }
             Person chosen = null;
             for (Person tech : techs) {
-                if (canStageTech(tech, unit)) {
+                if (canAutoStageTech(tech, unit)) {
                     chosen = tech;
                     break;
                 }
@@ -1295,7 +1305,7 @@ public class AssignmentPlan {
             return Reason.UNIT_UNAVAILABLE;
         } else if (tech.equals(plannedTechOf(unit))) {
             return Reason.ALREADY_ABOARD;
-        } else if (!SeatEligibility.isAssignable(tech) || isTechBusy.test(tech)) {
+        } else if (!SeatEligibility.isAssignable(tech)) {
             return Reason.NOT_ASSIGNABLE;
         } else if (!SeatEligibility.canTech(tech, unit)) {
             return Reason.NOT_QUALIFIED;
@@ -1675,7 +1685,7 @@ public class AssignmentPlan {
             return Reason.UNIT_UNAVAILABLE;
         } else if (tech == null) {
             return null;
-        } else if (!SeatEligibility.isAssignable(tech) || isTechBusy.test(tech)) {
+        } else if (!SeatEligibility.isAssignable(tech)) {
             return Reason.NOT_ASSIGNABLE;
         } else if (!SeatEligibility.canTech(tech, unit)) {
             return Reason.NOT_QUALIFIED;

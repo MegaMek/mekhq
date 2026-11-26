@@ -97,6 +97,13 @@ class SupportCarrierReconcilerTest {
         assertNull(SupportPersonnelToTOE.sectionFor(null));
     }
 
+    @Test
+    void sectionFor_vesselCrewIsNotCarried() {
+        // Vessel crew count as techs, but they serve aboard their ship. Carrying them seated a generated DropShip's
+        // crew in a support squad as well, leaving the ship with no engineer and its crew seats reading as full.
+        assertNull(SupportPersonnelToTOE.sectionFor(PersonnelRole.VESSEL_CREW));
+    }
+
     // --- Legacy carrier identification ---
 
     @Test
@@ -141,6 +148,18 @@ class SupportCarrierReconcilerTest {
     void seatIfEligible_combatRoleIsNotSeated() {
         Campaign campaign = mock(Campaign.class);
         Person person = activePerson(PersonnelRole.MEKWARRIOR);
+
+        SupportCarrierReconciler.seatIfEligible(campaign, person);
+
+        verify(campaign, never()).getPlayerForce();
+    }
+
+    @Test
+    void seatIfEligible_newVesselCrewAreNotSeated() {
+        // A ship's crew are hired before they are put aboard, so they arrive holding no unit. They must be left for
+        // the ship rather than seated in a support squad.
+        Campaign campaign = mock(Campaign.class);
+        Person person = activePerson(PersonnelRole.VESSEL_CREW);
 
         SupportCarrierReconciler.seatIfEligible(campaign, person);
 
@@ -270,6 +289,21 @@ class SupportCarrierReconcilerTest {
         when(carrier.isCarrier()).thenReturn(true);
         Person person = activePerson(PersonnelRole.MEDIC);
         when(person.getStatus()).thenReturn(PersonnelStatus.CAMP_FOLLOWER);
+        when(person.getUnit()).thenReturn(carrier);
+
+        SupportCarrierReconciler.releaseIfIneligible(campaign, person);
+
+        verify(carrier, times(1)).remove(person, true);
+    }
+
+    @Test
+    void releaseIfIneligible_vesselCrewInACarrierLoseTheirSeat() {
+        // Saves written before vessel crew stopped being carried hold them in a Vessel Crewmember squad.
+        Campaign campaign = mock(Campaign.class);
+        Person person = activePerson(PersonnelRole.VESSEL_CREW);
+        Unit carrier = mock(Unit.class);
+        when(carrier.isCarrier()).thenReturn(true);
+        when(carrier.getCrew()).thenReturn(List.of(person));
         when(person.getUnit()).thenReturn(carrier);
 
         SupportCarrierReconciler.releaseIfIneligible(campaign, person);

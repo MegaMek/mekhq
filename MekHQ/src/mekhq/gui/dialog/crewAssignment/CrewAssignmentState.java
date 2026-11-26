@@ -236,6 +236,11 @@ final class CrewAssignmentState {
     String unitQuery = "";
     /** When not empty, only these units are listed: the ones the dialog was opened for. */
     final Set<Unit> pinnedUnits = new LinkedHashSet<>();
+    /**
+     * When not empty, only these people are listed: the ones the dialog was opened for, so a group picked on the
+     * Personnel tab can be worked on together.
+     */
+    final Set<Person> pinnedPeople = new LinkedHashSet<>();
     /** The Techs page's own status filter, in place of {@link #unitStatus}. */
     TechStatus techStatus = TechStatus.NEEDS_TECH;
     TechSort techSort = TechSort.BEST;
@@ -402,6 +407,32 @@ final class CrewAssignmentState {
     }
 
     /**
+     * @param page a page
+     *
+     * @return the Assignment filter the page starts on: everyone while the list is held to the people the dialog was
+     *       opened for, as they are wanted whether or not they crew a unit; otherwise as
+     *       {@link #defaultAssignment(CrewAssignmentPage)}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    Assignment startingAssignment(CrewAssignmentPage page) {
+        return pinnedPeople.isEmpty() ? defaultAssignment(page) : Assignment.EVERYONE;
+    }
+
+    /**
+     * @param person a person
+     *
+     * @return {@code true} if the person is one of the people the list is held to, or the list is not held to any
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    boolean isPinned(Person person) {
+        return pinnedPeople.isEmpty() || pinnedPeople.contains(person);
+    }
+
+    /**
      * Whether the people list's Role filter offers a role: the combat roles, and the tech roles (MekTech, Mechanic,
      * AeroTek and BA Tech), so techs can be found when picking someone to maintain a unit.
      *
@@ -466,7 +497,7 @@ final class CrewAssignmentState {
      */
     boolean shows(PersonEntry entry, AssignmentPlan plan) {
         Person person = entry.person();
-        if (!lists(person)) {
+        if (!lists(person) || !isPinned(person)) {
             return false;
         }
         boolean isAssigned = countsAsAssigned(person, plan);
@@ -552,7 +583,7 @@ final class CrewAssignmentState {
                 if (formation != null) {
                     active++;
                 }
-                if (assignment != defaultAssignment(page)) {
+                if (assignment != startingAssignment(page)) {
                     active++;
                 }
                 if (role != null) {
