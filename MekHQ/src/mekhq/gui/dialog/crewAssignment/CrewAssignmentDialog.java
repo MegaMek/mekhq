@@ -68,6 +68,7 @@ import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedAssignment;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.StagedTempCrew;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TechStageResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TempCrewResult;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TempCrewSkip;
 import mekhq.campaign.unit.crewAssignment.AutoFill;
 import mekhq.campaign.unit.crewAssignment.CrewAssignmentService;
 import mekhq.campaign.unit.crewAssignment.CrewAssignmentService.CommitReport;
@@ -118,6 +119,12 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     private String message = "";
     private boolean isWarning;
     private boolean closeRequested;
+    /**
+     * The units the last temporary crew fill left short because the pool ran out; the dock offers to hire the
+     * shortfall and fill them. Any new message withdraws the offer.
+     */
+    private @Nullable List<Unit> hireOfferUnits;
+    private int hireOfferCount;
     /** The page with a list and cards the player was last on, which is where a link on the Review page goes back to. */
     private CrewAssignmentPage lastWorkPage = CrewAssignmentPage.ASSIGN;
     /** The units that pass the filters, in the order their cards are listed; the bulk actions work on these. */
@@ -187,6 +194,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
 
     private final JLabel dockSummary = new JLabel();
     private final JLabel dockMessage = new JLabel();
+    private final HudButton hireTempCrewButton = new HudButton("", false, true);
     private final HudButton undoButton = new HudButton(upper("dock.undo"), false);
     private final HudConfirmButton cancelButton = new HudConfirmButton(upper("dock.cancel"),
           upper("dock.cancel.confirm"), false);
@@ -471,6 +479,11 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         text.add(dockSummary);
         text.add(Box.createHorizontalStrut(scaleForGUI(12)));
         text.add(dockMessage);
+        text.add(Box.createHorizontalStrut(scaleForGUI(10)));
+        text.add(hireTempCrewButton);
+        hireTempCrewButton.setVisible(false);
+        hireTempCrewButton.setToolTipText(getTextAt(RESOURCE_BUNDLE, "dock.hireTempCrew.toolTipText"));
+        hireTempCrewButton.addActionListener(event -> hireTempCrewAndFill());
 
         undoButton.addActionListener(event -> {
             if (data.plan().undo()) {
@@ -886,6 +899,11 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         }
         dockMessage.setText(message);
         dockMessage.setForeground(isWarning ? AMBER : TEXT_FAINT);
+        hireTempCrewButton.setVisible(hireOfferUnits != null);
+        if (hireOfferUnits != null) {
+            hireTempCrewButton.setText(getFormattedTextAt(RESOURCE_BUNDLE, "dock.hireTempCrew", hireOfferCount)
+                                             .toUpperCase(Locale.ROOT));
+        }
         modeSelector.setModeLabel(CrewAssignmentPage.REVIEW, (pending == 0) ?
                                                                CrewAssignmentPage.REVIEW.getLabel() :
                                                                getFormattedTextAt(RESOURCE_BUNDLE,
@@ -899,6 +917,7 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         this.message = text;
         this.isWarning = isWarning;
         closeRequested = false;
+        hireOfferUnits = null;
     }
 
     // endregion Refreshing
@@ -1169,16 +1188,70 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         TempCrewResult result = data.plan().fillTempCrew(units, data.tempCrewPool());
         int filled = result.staged().size();
         int added = result.staged().stream().mapToInt(StagedTempCrew::change).sum();
-        if (filled == 0) {
-            setMessage(getTextAt(RESOURCE_BUNDLE, "message.tempCrewNone"), true);
-        } else if (!result.leftOver().isEmpty() && (units.size() == 1)) {
-            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.tempCrewFilledSome", added, filled,
-                  result.leftOver().size()), true);
+        // A role the campaign uses no temporary crew for has no pool to hire into, so it is not named as running dry
+        Map<PersonnelRole, Integer> shortfalls = new EnumMap<>(PersonnelRole.class);
+        result.shortfalls().forEach((role, count) -> {
+            if (data.usesTempCrew().test(role)) {
+                shortfalls.put(role, count);
+            }
+        });
+        String rolesRunDry = describeRoles(shortfalls.keySet());
+        if ((filled == 0) && (result.skipped().size() == 1)) {
+            Map.Entry<Unit, TempCrewSkip> skip = result.skipped().entrySet().iterator().next();
+            setMessage(describeTempCrewSkip(skip.getKey(), skip.getValue()), true);
+        } else if (filled == 0) {
+            setMessage(rolesRunDry.isEmpty() ? getTextAt(RESOURCE_BUNDLE, "message.tempCrewNone") :
+                             getFormattedTextAt(RESOURCE_BUNDLE, "message.tempCrewNonePoolEmpty", rolesRunDry), true);
+        } else if (!rolesRunDry.isEmpty()) {
+            setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.tempCrewFilledPoolRanOut", added, filled,
+                  rolesRunDry), true);
         } else {
             // Across every unit shown, the units with nothing to fill are expected, not a warning
             setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.tempCrewFilled", added, filled), false);
         }
+        if (!shortfalls.isEmpty()) {
+            hireOfferUnits = List.copyOf(units);
+            hireOfferCount = shortfalls.values().stream().mapToInt(Integer::intValue).sum();
+        }
         refresh();
+    }
+
+    /** Tops up the units the last fill left short, staging the shortfall as hired into the campaign's pool. */
+    private void hireTempCrewAndFill() {
+        List<Unit> units = hireOfferUnits;
+        if (units == null) {
+            return;
+        }
+        // The pool ran dry for these units, so everything this fill adds is hired
+        TempCrewResult result = data.plan().fillTempCrew(units, data.tempCrewPool(), data.usesTempCrew());
+        int filled = result.staged().size();
+        setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.tempCrewHired", result.hired(), filled),
+              filled == 0);
+        refresh();
+    }
+
+    /**
+     * @param unit   a unit a temporary crew fill left unchanged
+     * @param reason why it was left unchanged
+     *
+     * @return what to tell the player, naming the unit and, where it helps, its temporary crew role
+     */
+    private String describeTempCrewSkip(Unit unit, TempCrewSkip reason) {
+        PersonnelRole role = unit.getDriverRole();
+        if ((reason == TempCrewSkip.POOL_EMPTY) && (role != null) && !data.usesTempCrew().test(role)) {
+            return getFormattedTextAt(RESOURCE_BUNDLE, "message.tempCrewSkip.NOT_USED", unit.getName(),
+                  role.getLabel(false));
+        }
+        String roleLabel = (role == null) ? "" : role.getLabel(false);
+        return getFormattedTextAt(RESOURCE_BUNDLE, "message.tempCrewSkip." + reason.name(), unit.getName(),
+              roleLabel);
+    }
+
+    /** @return the roles' labels joined into one list, or an empty string for none */
+    private static String describeRoles(Collection<PersonnelRole> roles) {
+        StringJoiner labels = new StringJoiner(", ");
+        roles.forEach(role -> labels.add(role.getLabel(false)));
+        return labels.toString();
     }
 
     @Override
@@ -1384,7 +1457,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         if (plan.isEmpty()) {
             return;
         }
-        CommitReport report = CrewAssignmentService.commit(plan, data.isUseTransfers(), data.today());
+        CommitReport report = CrewAssignmentService.commit(plan, data.isUseTransfers(), data.today(),
+              campaign::increaseTempCrewPool);
         if (report.skippedCount() == 0) {
             setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.committed", report.appliedCount()), false);
         } else {
