@@ -211,5 +211,29 @@ class CrewAssignmentStateSkillsTest {
         assertEquals(List.of(sensors, tracker, none), sorted(state, none, tracker, sensors));
     }
 
+    @Test
+    void scoutingOrderNeedsNoSkillsFilterAndPutsTheBestScoutFirst() {
+        PersonEntry none = mekWarrior(SkillType.S_GUN_MEK, 5, SkillType.S_PILOT_MEK, 5);
+        PersonEntry tracker = mekWarrior(SkillType.S_TRACKING, 2);
+        PersonEntry sensors = mekWarrior(SkillType.S_PERCEPTION, 1, SkillType.S_SENSOR_OPERATIONS, 4);
+        CrewAssignmentState state = new CrewAssignmentState();
+        state.assignSort = AssignSort.SCOUTING;
+
+        assertSame(AssignSort.SCOUTING, state.effectiveAssignSort());
+        assertEquals(List.of(sensors, tracker, none), sorted(state, none, tracker, sensors));
+    }
+
+    @Test
+    void rowsShowScoutingInPlaceOfGunneryAndPilotingOnlyWhileOrderedByIt() {
+        CrewAssignmentState state = new CrewAssignmentState();
+        assertNull(state.rowPrimarySkillGroup());
+
+        state.assignSort = AssignSort.SCOUTING;
+        assertSame(SkillGroup.SCOUTING, state.rowPrimarySkillGroup());
+
+        state.assignSort = AssignSort.COMBAT;
+        assertNull(state.rowPrimarySkillGroup());
+    }
+
     // endregion Orders
 }

@@ -192,11 +192,38 @@ class AssignmentPlanTechTempCrewTest {
     }
 
     @Test
-    void aBusyTechCannotTakeOnMoreUnits() {
+    void aBusyTechCanStillBeGivenAUnitByHand() {
         Person tech = fixture.tech("Tech", 480);
+        Unit unit = mek("Mek").unit;
         plan.setTechBusy(person -> person == tech);
 
-        assertFalse(plan.canStageTech(tech, mek("Mek").unit));
+        assertNull(plan.whyNotTech(tech, unit));
+        assertTrue(plan.stageTech(tech, unit));
+        assertTrue(plan.validateTechs().isEmpty());
+    }
+
+    @Test
+    void stagingTechsPassesOverABusyTech() {
+        Person busy = fixture.tech("Busy", 480);
+        Person free = fixture.tech("Free", 480);
+        Unit unit = mek("Mek").unit;
+        plan.setTechBusy(person -> person == busy);
+
+        plan.stageTechs(List.of(busy, free), List.of(unit));
+
+        assertEquals(free, plan.plannedTechOf(unit));
+    }
+
+    @Test
+    void autoFillPassesOverABusyTech() {
+        Person tech = fixture.tech("Tech", 480);
+        Unit unit = mek("Mek").unit;
+        plan.setTechBusy(person -> person == tech);
+
+        TechStageResult result = plan.autoStageTechs(List.of(tech), List.of(unit));
+
+        assertTrue(result.staged().isEmpty());
+        assertNull(plan.plannedTechOf(unit));
     }
 
     @Test
@@ -215,14 +242,6 @@ class AssignmentPlanTechTempCrewTest {
         assertEquals(Reason.ALREADY_ABOARD, plan.whyNotTech(tech, first));
         assertEquals(Reason.NO_TECH_TIME, plan.whyNotTech(tech, second));
         assertFalse(plan.canStageTech(tech, second));
-    }
-
-    @Test
-    void whyNotTechSaysABusyTechIsNotAvailable() {
-        Person tech = fixture.tech("Tech", 480);
-        plan.setTechBusy(person -> person == tech);
-
-        assertEquals(Reason.NOT_ASSIGNABLE, plan.whyNotTech(tech, mek("Mek").unit));
     }
 
     @Test

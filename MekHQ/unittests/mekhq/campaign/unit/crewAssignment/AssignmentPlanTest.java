@@ -282,6 +282,55 @@ class AssignmentPlanTest {
     }
 
     @Test
+    void aReplacementBySomeoneFromAnotherSeatSwapsTheTwoAsOneStepOfHistory() {
+        Person first = fixture.person("First", PersonnelRole.MEKWARRIOR);
+        Person second = fixture.person("Second", PersonnelRole.MEKWARRIOR);
+        Unit firstMek = fixture.soloPilotUnit(mock(Mek.class), "First Mek").with(first, SeatType.PILOT).unit;
+        Unit secondMek = fixture.soloPilotUnit(mock(Mek.class), "Second Mek").with(second, SeatType.PILOT).unit;
+
+        assertEquals(secondMek, plan.swapUnitFor(second, first));
+        assertTrue(plan.stageReplacement(second, first));
+
+        // Neither is left unassigned: each takes the other's seat
+        assertEquals(firstMek, plan.plannedUnitOf(second));
+        assertEquals(secondMek, plan.plannedUnitOf(first));
+        assertEquals(0, plan.openSeats(firstMek, SeatType.PILOT));
+        assertEquals(0, plan.openSeats(secondMek, SeatType.PILOT));
+        assertEquals(2, plan.size());
+
+        // One undo puts both of them back
+        assertTrue(plan.undo());
+        assertTrue(plan.isEmpty());
+        assertEquals(firstMek, plan.plannedUnitOf(first));
+        assertEquals(secondMek, plan.plannedUnitOf(second));
+    }
+
+    @Test
+    void someoneReplacedWhoCannotTakeTheNewcomersSeatIsLeftUnassigned() {
+        Person pilot = fixture.person("Pilot", PersonnelRole.MEKWARRIOR);
+        Person newcomer = fixture.person("Newcomer", PersonnelRole.SOLDIER, PersonnelRole.MEKWARRIOR);
+        Unit mek = fixture.soloPilotUnit(mock(Mek.class), "Mek").with(pilot, SeatType.PILOT).unit;
+        Unit squad = fixture.infantry(mock(Infantry.class), "Squad", true, 1)
+                           .with(newcomer, SeatType.SOLDIER).unit;
+
+        assertNull(plan.swapUnitFor(newcomer, pilot));
+        assertTrue(plan.stageReplacement(newcomer, pilot));
+
+        assertNull(plan.plannedUnitOf(pilot));
+        assertEquals(mek, plan.plannedUnitOf(newcomer));
+        assertEquals(1, plan.openSeats(squad, SeatType.SOLDIER));
+    }
+
+    @Test
+    void aNewcomerWithNoSeatOffersNoSwap() {
+        Person holder = fixture.person("Holder", PersonnelRole.MEKWARRIOR);
+        Person newcomer = fixture.person("Newcomer", PersonnelRole.MEKWARRIOR);
+        fixture.soloPilotUnit(mock(Mek.class), "Mek").with(holder, SeatType.PILOT);
+
+        assertNull(plan.swapUnitFor(newcomer, holder));
+    }
+
+    @Test
     void someoneUnqualifiedCannotReplaceAnyone() {
         Person holder = fixture.person("Holder", PersonnelRole.MEKWARRIOR);
         Person soldier = fixture.person("Soldier", PersonnelRole.SOLDIER);
