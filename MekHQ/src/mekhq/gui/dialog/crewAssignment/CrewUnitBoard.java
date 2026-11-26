@@ -106,6 +106,15 @@ final class CrewUnitBoard extends JPanel {
         /** Assigns the selected person to one seat on one unit. */
         void assignToSeat(Unit unit, SeatType seat);
 
+        /** Seats as many of {@link #listedGroup()} as fit in one seat on one unit, in list order. */
+        void assignListedToSeat(Unit unit, SeatType seat);
+
+        /**
+         * @return the people listed, in list order, while the list is held to the group the dialog was opened for;
+         *       empty otherwise
+         */
+        List<Person> listedGroup();
+
         /** Makes the selected tech the unit's tech, replacing any it has. */
         void assignTech(Unit unit);
 
@@ -219,6 +228,11 @@ final class CrewUnitBoard extends JPanel {
     private CrewAssignmentData data;
     private List<UnitEntry> shown = List.of();
     private Work work = new Work(Map.of(), Map.of(), 0, false, false, false, false);
+    /**
+     * The people listed that the seats' Assign buttons seat together while no one is selected; see
+     * {@link Actions#listedGroup()}.
+     */
+    private List<Person> group = List.of();
 
     CrewUnitBoard(Actions actions) {
         super(new BorderLayout());
@@ -307,6 +321,8 @@ final class CrewUnitBoard extends JPanel {
         this.data = data;
         this.shown = List.copyOf(shown);
         this.work = work;
+        // With no one selected, the group listed can be seated together; a selected person comes first
+        this.group = ((state.selectedPerson == null) && !isTechsPage()) ? actions.listedGroup() : List.of();
 
         // Narrowing or widening the list starts the cards over; "Show more" only lasts while the list stays the same
         List<Object> signature = Arrays.asList(state.page, state.unitStatus, state.techStatus, state.unitType,
@@ -387,13 +403,23 @@ final class CrewUnitBoard extends JPanel {
         }
         basket.add(leftAligned(top));
 
-        JLabel title = new JLabel((person == null) ? text("board.none") : person.getFullTitle());
+        String titleText;
+        String hintText;
+        if (person != null) {
+            titleText = person.getFullTitle();
+            hintText = person.getPrimaryRole().getLabel(false);
+        } else if (!group.isEmpty()) {
+            titleText = getFormattedTextAt(RESOURCE_BUNDLE, "board.group", group.size());
+            hintText = text("board.group.hint");
+        } else {
+            titleText = text("board.none");
+            hintText = text(isTechsPage() ? "board.none.hint.techs" : "board.none.hint");
+        }
+        JLabel title = new JLabel(titleText);
         title.setForeground(ACCENT_BRIGHT);
         title.setFont(hudFont(Font.BOLD, 1.05f, 0.02f));
         basket.add(leftAligned(title));
-        basket.add(leftAligned(Hud.hint((person == null) ?
-                                              text(isTechsPage() ? "board.none.hint.techs" : "board.none.hint") :
-                                              person.getPrimaryRole().getLabel(false))));
+        basket.add(leftAligned(Hud.hint(hintText)));
     }
 
     private void buildBulk() {
@@ -674,7 +700,7 @@ final class CrewUnitBoard extends JPanel {
 
     /**
      * Adds a seat's name and how full it is, with a button to assign the selected person to it, or the reason they
-     * cannot take it.
+     * cannot take it. With no one selected and a group listed, the button seats as many of the group as fit.
      */
     private void addSeatLine(JPanel card, Unit unit, AssignmentPlan plan, CrewCoverage.SeatCoverage seatCoverage,
           @Nullable Person person, boolean isOpen) {
@@ -691,6 +717,21 @@ final class CrewUnitBoard extends JPanel {
             } else if ((reason != Reason.ALREADY_ABOARD) && ((reason != Reason.SEAT_FULL) || isOpen)) {
                 // A full seat is plain from its count, so only an open card spells that out
                 right.add(Hud.hint(CrewRowRenderers.reasonText(reason)));
+            }
+        } else if (!group.isEmpty()) {
+            int canTake = 0;
+            for (Person member : group) {
+                if (plan.whyNotSeat(member, unit, type) == null) {
+                    canTake++;
+                }
+            }
+            int places = Math.min(canTake, plan.openSeats(unit, type));
+            if (places > 0) {
+                HudButton assignGroup = assignButton(getFormattedTextAt(RESOURCE_BUNDLE, "board.assign.group",
+                      places), () -> actions.assignListedToSeat(unit, type));
+                assignGroup.setToolTipText(getFormattedTextAt(RESOURCE_BUNDLE, "board.assign.group.toolTipText",
+                      places, seatName, canTake));
+                right.add(assignGroup);
             }
         }
 

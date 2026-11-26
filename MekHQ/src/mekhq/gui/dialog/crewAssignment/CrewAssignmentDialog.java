@@ -129,6 +129,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
     private CrewAssignmentPage lastWorkPage = CrewAssignmentPage.ASSIGN;
     /** The units that pass the filters, in the order their cards are listed; the bulk actions work on these. */
     private List<UnitEntry> shownUnits = List.of();
+    /** The people listed while the list is held to a group, in list order, for the seats to take together. */
+    private List<Person> listedGroup = List.of();
 
     private final HudModeSelector<CrewAssignmentPage> modeSelector;
     private final JLabel subtitle = new JLabel();
@@ -714,6 +716,8 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
         }
         // Taking everyone the filters leave listed out of their units at once, such as a group opened for
         List<Person> shownPeople = shown.stream().map(PersonEntry::person).toList();
+        // A group opened for can also be seated together; the Techs page has no seats
+        listedGroup = (state.pinnedPeople.isEmpty() || isTechsPage()) ? List.of() : shownPeople;
         if ((shownPeople.size() > 1) && hasAnythingToUnassign(shownPeople, plan)) {
             JLabel unassignListed = Hud.link(getTextAt(RESOURCE_BUNDLE, "people.unassignListed"),
                   () -> unassignPeople(shownPeople));
@@ -1064,6 +1068,18 @@ public class CrewAssignmentDialog extends JDialog implements CrewUnitBoard.Actio
             setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.seatRefused", seatName, unit.getName()), true);
         }
         refresh();
+    }
+
+    @Override
+    public void assignListedToSeat(Unit unit, SeatType seat) {
+        StageResult result = data.plan().fillSeats(listedGroup, List.of(unit), seat);
+        reportStaged(result.staged().size(), 0);
+        refresh();
+    }
+
+    @Override
+    public List<Person> listedGroup() {
+        return listedGroup;
     }
 
     @Override
