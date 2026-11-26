@@ -573,7 +573,7 @@ public record ForceQuartermaster(Campaign campaign) {
      */
     private static boolean isAvailableAsSpareAmmo(@Nullable Part part) {
         return (part instanceof AmmoStorage)
-                     && part.isPresent()
+                     && part.isOnHand()
                      && !part.isReservedForRefit();
     }
 

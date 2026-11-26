@@ -169,7 +169,7 @@ public class BAArmor extends Armor {
     @Override
     protected int changeAmountAvailableSingle(int amount) {
         BAArmor armor = (BAArmor) getWarehouse()
-                                        .findSparePart(part -> isSamePartType(part) && part.isPresent());
+                                        .findSparePart(part -> isSamePartType(part) && part.isOnHand());
 
         if (null != armor) {
             int amountRemaining = armor.getAmount() + amount;
@@ -194,7 +194,7 @@ public class BAArmor extends Armor {
      */
     private boolean isSameBAArmorPart(Part part) {
         return (part instanceof BAArmor armor) &&
-                     armor.isPresent() &&
+                     armor.isOnHand() &&
                      !armor.isReservedForRefit() &&
                      isClanTechBase() == part.isClanTechBase() &&
                      armor.getType() == getType();

@@ -159,7 +159,7 @@ public class ProtoMekArmor extends Armor {
     protected int changeAmountAvailableSingle(int amount) {
         ProtoMekArmor armor = (ProtoMekArmor) getWarehouse()
                                                     .findSparePart(part -> (part instanceof Armor) &&
-                                                                     part.isPresent() &&
+                                                                     part.isOnHand() &&
                                                                      Objects.equals(getRefitUnit(), part.getRefitUnit()) &&
                                                                      isSameType((Armor) part));
 
@@ -187,7 +187,7 @@ public class ProtoMekArmor extends Armor {
      */
     private boolean isSameProtoMekArmor(Part part) {
         return (part instanceof ProtoMekArmor protoMekArmor) &&
-                     protoMekArmor.isPresent() &&
+                     protoMekArmor.isOnHand() &&
                      !protoMekArmor.isReservedForRefit() &&
                      isSameType(protoMekArmor);
     }

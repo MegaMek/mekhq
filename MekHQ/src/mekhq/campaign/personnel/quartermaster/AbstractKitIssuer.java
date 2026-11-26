@@ -145,7 +145,7 @@ public abstract class AbstractKitIssuer {
                 continue;
             }
             for (Part part : warehouse.getSpareParts()) {
-                if (part.isPresent() && part.isSpare() && (part instanceof EquipmentPart equipmentPart)) {
+                if (part.isOnHand() && part.isSpare() && (part instanceof EquipmentPart equipmentPart)) {
                     counts.merge(equipmentPart.getType(), Math.max(1, part.getQuantity()), Integer::sum);
                 }
             }
@@ -269,8 +269,8 @@ public abstract class AbstractKitIssuer {
      * @return {@code true} if the part is a delivered spare of that kit
      */
     protected static boolean isKitPart(Part part, EquipmentType kit) {
-        // Only present (delivered) kits count — a part still in transit cannot be issued yet.
-        return part.isPresent()
+        // Only kits on hand count — a part still being delivered, or on its way from another place, cannot be issued yet.
+        return part.isOnHand()
                      && part.isSpare()
                      && (part instanceof EquipmentPart equipmentPart)
                      && kit.equals(equipmentPart.getType());

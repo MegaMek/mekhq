@@ -87,6 +87,7 @@ import mekhq.campaign.digitalGM.stratCon.biome.StratConBiomeManifest.MapTypeList
 import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.ObjectiveEffect.ObjectiveEffectType;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceAlignment;
@@ -599,6 +600,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
         if ((unit != null) && unit.isCarrier() && !SupportCarrierDeployment.isAllowed(this)) {
             return false;
         }
+        // Scenarios are fought by the main force, so a unit kept elsewhere or still travelling can't join one.
+        if ((unit != null) && (campaign != null) && LocationUtils.isAwayFromMainForce(unit, campaign)) {
+            return false;
+        }
         if (isBigBattle() && (getForces(campaign).getAllUnits(false).size() > 7)) {
             return false;
         } else {
@@ -637,6 +642,11 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
      */
     @Override
     public boolean canDeployUnits(Vector<Unit> units, Campaign campaign) {
+        for (Unit unit : units) {
+            if ((unit != null) && LocationUtils.isAwayFromMainForce(unit, campaign)) {
+                return false;
+            }
+        }
         if (isBigBattle()) {
             return getForces(campaign).getAllUnits(false).size() + units.size() <= 8;
         } else if (isSpecialScenario()) {
@@ -662,6 +672,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
             if (SupportCarrierDeployment.deploysNothing(c, formation, this)) {
                 return false;
             }
+            // Likewise a formation whose fighting units are all away from the main force.
+            if (formation.isAwayFromMainForce(c)) {
+                return false;
+            }
             Vector<UUID> units = formation.getAllUnits(false);
             total += units.size();
             if (isBigBattle()) {
@@ -673,6 +687,10 @@ public abstract class AtBScenario extends Scenario implements IAtBScenario {
                 Unit unit = c.getUnit(id);
                 // A carrier under this formation is left behind rather than refusing the whole formation.
                 if ((unit != null) && unit.isCarrier() && !SupportCarrierDeployment.isAllowed(this)) {
+                    continue;
+                }
+                // So is a unit away from the main force.
+                if ((unit != null) && LocationUtils.isAwayFromMainForce(unit, c)) {
                     continue;
                 }
                 if (!canDeploy(unit, c)) {

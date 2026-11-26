@@ -132,6 +132,7 @@ class EquipmentKitIssuerTest {
     private EquipmentPart kitPart() {
         EquipmentPart part = mock(EquipmentPart.class);
         when(part.isPresent()).thenReturn(true);
+        when(part.isOnHand()).thenReturn(true);
         when(part.isSpare()).thenReturn(true);
         when(part.getQuantity()).thenReturn(1);
         when(part.getType()).thenReturn(kit);
@@ -160,6 +161,7 @@ class EquipmentKitIssuerTest {
     private static EquipmentPart partOf(EquipmentType type) {
         EquipmentPart part = mock(EquipmentPart.class);
         when(part.isPresent()).thenReturn(true);
+        when(part.isOnHand()).thenReturn(true);
         when(part.isSpare()).thenReturn(true);
         when(part.getQuantity()).thenReturn(1);
         when(part.getType()).thenReturn(type);
@@ -172,6 +174,7 @@ class EquipmentKitIssuerTest {
         EquipmentPart present = kitPart();
         EquipmentPart inTransit = kitPart();
         when(inTransit.isPresent()).thenReturn(false);
+        when(inTransit.isOnHand()).thenReturn(false);
         LocalWarehouse warehouse = warehouseHolding(List.of(present, inTransit));
 
         Person person = mock(Person.class);
@@ -204,6 +207,7 @@ class EquipmentKitIssuerTest {
     void issueFromStockFailsWhenOnlyInTransitKitsAreHeld() {
         EquipmentPart inTransit = kitPart();
         when(inTransit.isPresent()).thenReturn(false);
+        when(inTransit.isOnHand()).thenReturn(false);
         LocalWarehouse warehouse = warehouseHolding(List.of(inTransit));
         Person person = personOwning(null);
         when(person.getWarehouse()).thenReturn(warehouse);

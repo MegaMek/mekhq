@@ -2510,7 +2510,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 Unit u = campaign.getUnit(uid);
                 if (null != u) {
                     u.setFormationId(f.getId());
-                    if (f.isDeployed()) {
+                    // A unit away from the main force stayed behind when its formation deployed.
+                    if (f.isDeployed() && !LocationUtils.isAwayFromMainForce(u, campaign)) {
                         u.setScenarioId(f.getScenarioId());
                     }
                 }

@@ -121,6 +121,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.contractData.ContractCommandRights;
 import mekhq.campaign.mission.contract.contractData.ContractFinanceData;
@@ -1404,7 +1405,8 @@ public class StratConRulesManager {
                     for (CombatTeam candidate : campaign.getPlayerForce().getCombatTeamsAsList(campaign)) {
                         Formation candidateFormation = candidate.getFormation(campaign);
                         if ((candidateFormation != null)
-                                  && !SupportCarrierDeployment.deploysNothing(campaign, candidateFormation, null)) {
+                                  && !SupportCarrierDeployment.deploysNothing(campaign, candidateFormation, null)
+                                  && !candidateFormation.isAwayFromMainForce(campaign)) {
                             combatTeams.add(candidate);
                         }
                     }
@@ -4065,8 +4067,10 @@ public class StratConRulesManager {
             }
 
             // A support company holds only carriers, which never deploy, so StratCon must not generate a scenario
-            // for it. It can sit in the combat-team list between a load and the next recalculation.
-            if (SupportCarrierDeployment.deploysNothing(campaign, formation, null)) {
+            // for it. It can sit in the combat-team list between a load and the next recalculation. Nor can a
+            // formation whose units are all away from the main force.
+            if (SupportCarrierDeployment.deploysNothing(campaign, formation, null)
+                      || formation.isAwayFromMainForce(campaign)) {
                 continue;
             }
 
@@ -4113,7 +4117,8 @@ public class StratConRulesManager {
                 continue;
             }
 
-            if (SupportCarrierDeployment.deploysNothing(campaign, formation, null)) {
+            if (SupportCarrierDeployment.deploysNothing(campaign, formation, null)
+                      || formation.isAwayFromMainForce(campaign)) {
                 continue;
             }
 
@@ -4194,9 +4199,10 @@ public class StratConRulesManager {
             }
 
             // A support company holds only carriers, which stay home; offering it would assign a formation that
-            // sends nothing.
+            // sends nothing. So would a formation whose units are all away from the main force.
             if (SupportCarrierDeployment.deploysNothing(campaign, force,
-                  (currentScenario == null) ? null : currentScenario.getBackingScenario())) {
+                  (currentScenario == null) ? null : currentScenario.getBackingScenario())
+                      || force.isAwayFromMainForce(campaign)) {
                 continue;
             }
 
@@ -4215,7 +4221,13 @@ public class StratConRulesManager {
                                                              campaign,
                                                              campaignState) != ReinforcementEligibilityType.NONE);
 
-            List<Unit> allUnits = force.getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(), false);
+            List<Unit> allUnits = new ArrayList<>();
+            for (Unit unit : force.getAllUnitsAsUnits(campaign.getPlayerForce().getHangar(), false)) {
+                // A unit on its way back to the main force is filed in its hangar, but stays behind until it lands.
+                if (!LocationUtils.isAwayFromMainForce(unit, campaign)) {
+                    allUnits.add(unit);
+                }
+            }
 
             // In low altitude and space scenarios we need to verify that any units that can't deploy are carried by
             // a unit that can.

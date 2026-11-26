@@ -1608,7 +1608,7 @@ public class Refit extends Part implements IAcquisitionWork {
 
         return (Armor) getWarehouse().findSparePart(part -> isSameArmorSupply(part) &&
                                                                   !part.isReservedForRefit() &&
-                                                                  part.isPresent());
+                                                                  part.isOnHand());
     }
 
     /**

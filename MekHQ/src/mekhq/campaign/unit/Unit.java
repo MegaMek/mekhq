@@ -131,6 +131,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationType;
 import mekhq.campaign.location.ILocatable;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.AssignmentLogger;
@@ -1670,6 +1671,10 @@ public class Unit implements ITechnology, ILocatable {
      */
     // TODO: Add support for advanced medical
     public @Nullable String checkDeployment() {
+        String locationProblem = checkDeploymentLocation();
+        if (locationProblem != null) {
+            return locationProblem;
+        }
         if (!isFunctional()) {
             return "unit is not functional";
         }
@@ -1701,6 +1706,34 @@ public class Unit implements ITechnology, ILocatable {
             }
         }
         return checkCrewArmorKits(entity, getCrew(), getCampaign().getCampaignOptions());
+    }
+
+    /**
+     * The location part of {@link #checkDeployment()}: scenarios are fought by the main force, so a unit may not deploy
+     * while it travels, while it is kept somewhere else, or while one of its crew is somewhere else.
+     *
+     * @return the reason the unit cannot deploy from where it is, or {@code null} if it is with the main force
+     */
+    private @Nullable String checkDeploymentLocation() {
+        IPlace unitPlace = getPlace();
+        // A unit with no place predates locations and is treated as being with the main force.
+        if (unitPlace == null) {
+            return null;
+        }
+        if (LocationUtils.isOnTheWay(this)) {
+            return getTextAt(RESOURCE_BUNDLE, "Unit.checkDeployment.inTransit");
+        }
+        if (LocationUtils.isAwayFromMainForce(this, getCampaign())) {
+            return getTextAt(RESOURCE_BUNDLE, "Unit.checkDeployment.awayFromForce");
+        }
+        for (Person crewMember : getCrew()) {
+            IPlace crewPlace = crewMember.getPlace();
+            if ((crewPlace != null) && (crewPlace != unitPlace)) {
+                return getFormattedTextAt(RESOURCE_BUNDLE, "Unit.checkDeployment.crewElsewhere",
+                      crewMember.getFullTitle());
+            }
+        }
+        return null;
     }
 
     /**

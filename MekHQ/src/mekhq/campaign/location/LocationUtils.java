@@ -36,11 +36,13 @@ import java.time.LocalDate;
 import java.util.Objects;
 
 import jakarta.annotation.Nullable;
+import mekhq.campaign.AbstractMobileLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.CurrentLocation;
 import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.base.AbstractBase;
+import mekhq.campaign.force.PlayerForce;
 import mekhq.campaign.universe.PlanetarySystem;
 
 /**
@@ -51,7 +53,8 @@ import mekhq.campaign.universe.PlanetarySystem;
  * <p>The utilities fall into two groups:</p>
  * <ul>
  *   <li><b>Co-location reasoning</b> over the {@link ILocation} tree
- *       ({@link #areSameEffectiveLocation}, {@link #findEffectiveBase}, {@link #isInTransit}).</li>
+ *       ({@link #areSameEffectiveLocation}, {@link #findEffectiveBase}, {@link #isInTransit}, {@link #isOnTheWay},
+ *       {@link #isAwayFromMainForce}).</li>
  *   <li><b>Travel computations</b> for planning a journey's route and duration
  *       ({@link #computeStartTransit}, {@link #planJumpPath}, {@link #computeJourneyDays}).</li>
  * </ul>
@@ -157,6 +160,50 @@ public final class LocationUtils {
             node = node.getParent();
         }
         return false;
+    }
+
+    /**
+     * Returns {@code true} if the item is on its way to another place: its nearest {@link IPlace} is a travel node
+     * ({@link CurrentLocation} or {@link GroundTransitLocation}) parented under a destination.
+     *
+     * <p>A dispatched unit or spare is filed in its destination's hangar or warehouse as soon as it leaves, so it
+     * shows up there while it travels. It can't be used there until it lands. Unlike {@link #isInTransit}, this is
+     * {@code false} for the main force itself when it has a jump planned, because the main force's own location is a
+     * root node, not a travel node.</p>
+     *
+     * @param item the item to inspect
+     *
+     * @return {@code true} if the item is travelling to another place
+     */
+    public static boolean isOnTheWay(@Nullable ILocation item) {
+        if (item == null) {
+            return false;
+        }
+        IPlace place = item.getPlace();
+        return (place instanceof AbstractMobileLocation travelNode) && travelNode.isParented();
+    }
+
+    /**
+     * Returns {@code true} if the item is somewhere other than with the main force: at a base, at an academy campus,
+     * or on its way somewhere, including on its way back to the main force.
+     *
+     * <p>An item with no place at all predates locations, and counts as being with the main force.</p>
+     *
+     * @param item     the item to inspect
+     * @param campaign the campaign whose main force to compare against
+     *
+     * @return {@code true} if the item is away from the main force
+     */
+    public static boolean isAwayFromMainForce(@Nullable ILocation item, Campaign campaign) {
+        if (item == null) {
+            return false;
+        }
+        IPlace place = item.getPlace();
+        if (place == null) {
+            return false;
+        }
+        PlayerForce playerForce = campaign.getPlayerForce();
+        return (playerForce != null) && (place != playerForce.getForceDetachment());
     }
 
     /**

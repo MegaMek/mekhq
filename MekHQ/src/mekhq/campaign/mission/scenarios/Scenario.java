@@ -68,6 +68,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.FormationStub;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.universe.commandGeneration.SupportCarrierDeployment;
 import mekhq.utilities.MHQXMLUtility;
@@ -940,6 +941,10 @@ public class Scenario implements IPlayerSettings {
         if ((unit != null) && unit.isCarrier() && !SupportCarrierDeployment.isAllowed(this)) {
             return false;
         }
+        // Scenarios are fought by the main force, so a unit kept elsewhere or still travelling can't join one.
+        if ((unit != null) && (campaign != null) && LocationUtils.isAwayFromMainForce(unit, campaign)) {
+            return false;
+        }
         // first check to see if this unit is a traitor unit
         for (BotForce bf : botForces) {
             if (bf.isTraitor(unit)) {
@@ -993,11 +998,19 @@ public class Scenario implements IPlayerSettings {
             if (SupportCarrierDeployment.deploysNothing(c, formation, this)) {
                 return false;
             }
+            // Likewise a formation whose fighting units are all away from the main force.
+            if (formation.isAwayFromMainForce(c)) {
+                return false;
+            }
             Vector<UUID> units = formation.getAllUnits(false);
             for (UUID id : units) {
                 Unit unit = c.getUnit(id);
                 // A carrier under this formation is left behind rather than refusing the whole formation.
                 if ((unit != null) && unit.isCarrier() && !SupportCarrierDeployment.isAllowed(this)) {
+                    continue;
+                }
+                // So is a unit away from the main force.
+                if ((unit != null) && LocationUtils.isAwayFromMainForce(unit, c)) {
                     continue;
                 }
                 if (!canDeploy(unit, c)) {

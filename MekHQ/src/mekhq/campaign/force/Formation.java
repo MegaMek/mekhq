@@ -58,6 +58,7 @@ import mekhq.campaign.icons.LayeredFormationIcon;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.campaign.icons.enums.OperationalStatus;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
@@ -293,7 +294,9 @@ public class Formation {
             sub.setScenarioId(scenarioId, campaign);
         }
         boolean carriersDeploy = SupportCarrierDeployment.isAllowed(campaign.getScenario(scenarioId));
+        boolean isDeploying = scenarioId != NO_ASSIGNED_SCENARIO;
         int stayedHome = 0;
+        int stayedAway = 0;
         for (UUID uid : getUnits()) {
             Unit unit = campaign.getUnit(uid);
             // A support carrier under this formation stays home unless the scenario is one that pulls support staff
@@ -301,19 +304,55 @@ public class Formation {
             if (null == unit) {
                 continue;
             }
-            if (carriersDeploy || !unit.isCarrier()) {
+            // Scenarios are fought by the main force, so a unit kept elsewhere or still travelling stays where it is.
+            // Undeploying always clears the unit, whatever its location.
+            if (isDeploying && LocationUtils.isAwayFromMainForce(unit, campaign)) {
+                stayedAway++;
+            } else if (carriersDeploy || !unit.isCarrier()) {
                 unit.setScenarioId(scenarioId);
             } else {
                 stayedHome++;
             }
         }
         // Every assignment path ends here, so this is where the player is told. The GUI adds a dialog on top.
-        if ((stayedHome > 0) && (scenarioId != NO_ASSIGNED_SCENARIO)) {
+        if ((stayedHome > 0) && isDeploying) {
             LOGGER.info("[SupportTeams] Assigned {} to scenario {}: {} support carrier(s) stay home", getName(), scenarioId,
                   stayedHome);
             campaign.addReport(DailyReportType.BATTLE, getFormattedTextAt("mekhq.resources.SupportPersonnelToTOE",
                   "SupportCarrierDeployment.stayHome.report", stayedHome, getName()));
         }
+        if (stayedAway > 0) {
+            LOGGER.info("[Location] Assigned {} to scenario {}: {} unit(s) away from the main force stay behind",
+                  getName(), scenarioId, stayedAway);
+            campaign.addReport(DailyReportType.BATTLE, getFormattedTextAt("mekhq.resources.Campaign",
+                  "Formation.awayUnitsStayBehind.report", stayedAway, getName()));
+        }
+    }
+
+    /**
+     * Whether every unit under this formation that could fight is away from the main force, so assigning it to a
+     * scenario would send nothing. Support carriers never deploy, so they are not counted either way.
+     *
+     * @param campaign the campaign
+     *
+     * @return {@code true} if the formation has units away from the main force and none with it that could deploy
+     *
+     * @see LocationUtils#isAwayFromMainForce
+     */
+    public boolean isAwayFromMainForce(Campaign campaign) {
+        boolean hasAwayUnit = false;
+        for (UUID unitId : getAllUnits(false)) {
+            Unit unit = campaign.getUnit(unitId);
+            if (unit == null) {
+                continue;
+            }
+            if (LocationUtils.isAwayFromMainForce(unit, campaign)) {
+                hasAwayUnit = true;
+            } else if (!SupportCarrierDeployment.staysHome(unit, null)) {
+                return false;
+            }
+        }
+        return hasAwayUnit;
     }
 
     public void setTechID(UUID tech) {
