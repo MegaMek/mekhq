@@ -161,7 +161,7 @@ class TransportShipAssignmentTest {
 
     private Campaign mockCampaignWithTransport(Unit hangarTransport) {
         Campaign campaign = mock(Campaign.class, RETURNS_DEEP_STUBS);
-        when(campaign.getPlayerForce().getHangar().getUnit(transportId)).thenReturn(hangarTransport);
+        when(campaign.getPlayerForce().findUnit(transportId)).thenReturn(hangarTransport);
         return campaign;
     }
 }

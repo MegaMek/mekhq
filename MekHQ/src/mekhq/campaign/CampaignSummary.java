@@ -177,7 +177,7 @@ public class CampaignSummary {
         baWeightCodeSum = 0;
         baWeightCount = 0;
         int squadCount = 0;
-        for (Unit unit : campaign.getPlayerForce().getHangar().getUnits()) {
+        for (Unit unit : campaign.getPlayerForce().allUnits()) {
             Entity entity = unit.getEntity();
             // Support carriers are an organisational wrapper; their occupants are ordinary support personnel
             if (unit.isCarrier() ||
@@ -263,7 +263,8 @@ public class CampaignSummary {
         }
 
         cargoCapacity = cargoCapacity * tetrisMasterMultiplier;
-        // Unit bays not needed for our units can carry cargo instead
+        // Unit bays not needed for our units can carry cargo instead. Cargo rides where the units are, so like the
+        // cargo statistics above this counts only the main force's units.
         cargoCapacity += calculateSpareBayCargoCapacity(campaign.getPlayerForce().getHangar().getUnits());
 
         cargoTons = cargoStats.getCargoTonnage(false);

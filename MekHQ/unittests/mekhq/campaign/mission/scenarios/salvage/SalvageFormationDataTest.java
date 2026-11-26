@@ -54,6 +54,7 @@ import megamek.common.equipment.MiscType;
 import megamek.common.units.Dropship;
 import megamek.common.units.Tank;
 import mekhq.campaign.Campaign;
+import mekhq.campaign.LocalHangar;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
@@ -80,7 +81,7 @@ class SalvageFormationDataTest {
         Formation formation = mock(Formation.class);
         when(formation.getFormationType()).thenReturn(formationType);
         when(formation.getTechID()).thenReturn(techId);
-        when(formation.getAllUnitsAsUnits(any(), eq(false))).thenReturn(units);
+        when(formation.getAllUnitsAsUnits(any(LocalHangar.class), eq(false))).thenReturn(units);
         return formation;
     }
 
