@@ -359,21 +359,23 @@ final class CrewRowRenderers {
 
             Unit planned = plan.plannedUnitOf(person);
             StagedAssignment change = plan.changeFor(person);
+            where.setToolTipText(null);
             if (isTechView.getAsBoolean() && person.isTech()) {
                 // On the Techs page the time left is what decides who takes the next unit, so it is spelled out
-                int units = plan.plannedTechUnits(person).size();
+                List<Unit> maintainedUnits = plan.plannedTechUnits(person);
                 int used = plan.plannedTechMinutes(person);
                 int available = plan.techMinutesAvailable(person);
-                setLink(list, index, where, getFormattedTextAt(RESOURCE_BUNDLE, "row.techLoad.free", units,
+                setLink(list, index, where, techLoadText(maintainedUnits, "row.techLoad.free",
                       Math.max(0, available - used), available), null);
+                showMaintainedUnits(maintainedUnits);
                 where.setForeground((used > available) ? DANGER : (used == available) ? AMBER : TEXT);
             } else if ((planned == null) && person.isTech()) {
-                int units = plan.plannedTechUnits(person).size();
+                List<Unit> maintainedUnits = plan.plannedTechUnits(person);
                 int used = plan.plannedTechMinutes(person);
                 int available = plan.techMinutesAvailable(person);
-                setLink(list, index, where, getFormattedTextAt(RESOURCE_BUNDLE, "row.techLoad", units, used,
-                      available), null);
-                where.setForeground((used > available) ? DANGER : (units == 0) ? TEXT_MUTED : TEXT);
+                setLink(list, index, where, techLoadText(maintainedUnits, "row.techLoad", used, available), null);
+                showMaintainedUnits(maintainedUnits);
+                where.setForeground((used > available) ? DANGER : maintainedUnits.isEmpty() ? TEXT_MUTED : TEXT);
             } else if (planned == null) {
                 setLink(list, index, where, getTextAt(RESOURCE_BUNDLE, "row.unassigned"), null);
             } else {
@@ -400,6 +402,32 @@ final class CrewRowRenderers {
             skill.setText(entry.skillLevel().toString().toUpperCase(Locale.ROOT));
             skill.setForeground(skillColor(entry.skillLevel()));
             return this;
+        }
+
+        /**
+         * @param maintainedUnits the units the tech will maintain once the staged changes are applied
+         * @param key             the resource key for a tech with any number of units but one; the key with
+         *                        {@code .single} appended names a lone unit instead of counting it
+         * @param minutes         the minutes used, or left, that the text reports
+         * @param available       the tech's minutes available each day
+         *
+         * @return the tech's load, naming the unit when there is only one
+         */
+        private static String techLoadText(List<Unit> maintainedUnits, String key, int minutes, int available) {
+            if (maintainedUnits.size() == 1) {
+                return getFormattedTextAt(RESOURCE_BUNDLE, key + ".single", maintainedUnits.get(0).getName(),
+                      minutes, available);
+            }
+            return getFormattedTextAt(RESOURCE_BUNDLE, key, maintainedUnits.size(), minutes, available);
+        }
+
+        /** Names every unit the tech maintains in the load line's tooltip, so they can be told apart from a count. */
+        private void showMaintainedUnits(List<Unit> maintainedUnits) {
+            if (maintainedUnits.isEmpty()) {
+                return;
+            }
+            where.setToolTipText(HudToolTip.html(getTextAt(RESOURCE_BUNDLE, "row.techLoad.units.title"),
+                  maintainedUnits.stream().map(Unit::getName).collect(Collectors.joining(", "))));
         }
 
         /**
