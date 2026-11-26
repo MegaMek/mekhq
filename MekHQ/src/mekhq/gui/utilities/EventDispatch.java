@@ -82,4 +82,22 @@ public final class EventDispatch {
         }
         return result.get();
     }
+
+    /**
+     * Runs a task on the Event Dispatch Thread and waits for it to finish. Runs it directly if already on that thread,
+     * so it is safe to call from anywhere. Use it to fire campaign events from a worker: their GUI subscribers handle
+     * them synchronously and touch Swing components, which must only happen on the Event Dispatch Thread.
+     *
+     * @param task the task
+     *
+     * @throws InterruptedException if the waiting thread is interrupted; its interrupt flag is set again
+     * @throws RuntimeException     whatever unchecked exception the task threw, unwrapped
+     * @throws Error                whatever error the task threw, unwrapped
+     */
+    public static void runAndWait(Runnable task) throws InterruptedException {
+        callAndWait(() -> {
+            task.run();
+            return null;
+        });
+    }
 }
