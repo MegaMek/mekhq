@@ -46,6 +46,7 @@ import java.awt.Point;
 import java.awt.event.MouseEvent;
 import java.awt.image.BufferedImage;
 import java.util.List;
+import java.util.Set;
 import javax.swing.JLabel;
 import javax.swing.JScrollPane;
 import javax.swing.JToolTip;
@@ -53,6 +54,7 @@ import javax.swing.JViewport;
 import javax.swing.SwingUtilities;
 
 import mekhq.campaign.Campaign;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.AlternateInjuries;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
 import testUtilities.MHQTestUtilities;
@@ -100,6 +102,43 @@ class PlanetViewPanelTest {
         assertEquals(new Color(7, 16, 27), tooltip.getBackground());
         assertEquals(new Color(218, 231, 235), tooltip.getForeground());
         assertTrue(tooltip.getBorder() != null);
+    }
+
+    @Test
+    void healthAdvisoryDescribesEachHazardAndItsVaccineStatus() {
+        String advisory = PlanetViewPanel.getHealthAdvisoryText(
+              List.of(AlternateInjuries.CHILDUS_FEVER, AlternateInjuries.ALARION_HANTA_VIRUS,
+                    AlternateInjuries.CHUNGALOMENINGITIS_AMARIS, AlternateInjuries.BETHOLD_SYNDROME),
+              Set.of(AlternateInjuries.CHILDUS_FEVER));
+
+        int alarionIndex = advisory.indexOf("Alarion Hanta Virus");
+        int childusIndex = advisory.indexOf("Childus Fever");
+        assertTrue(alarionIndex >= 0);
+        assertTrue(childusIndex > alarionIndex, "Hazards are listed alphabetically");
+
+        String alarionEntry = getEntry(advisory, "Alarion Hanta Virus");
+        assertTrue(alarionEntry.contains("(Disease)"));
+        assertTrue(alarionEntry.contains("Fatal"));
+        assertFalse(alarionEntry.contains("Permanent:"), "Fatal hazards do not also report permanence");
+        assertTrue(alarionEntry.contains("Withdrawal from the system"));
+
+        String childusEntry = getEntry(advisory, "Childus Fever");
+        assertTrue(childusEntry.contains("Strength"));
+        assertTrue(childusEntry.contains("Available to personnel who make planetfall"));
+
+        assertTrue(getEntry(advisory, "Chungalomeningitis").contains("(Bioweapon)"));
+
+        String betholdEntry = getEntry(advisory, "Bethold Syndrome");
+        assertTrue(betholdEntry.contains("No special effects"));
+        assertTrue(betholdEntry.contains("Permanent:"));
+
+        assertTrue(advisory.contains("href=\"GLOSSARY:CANONICAL_DISEASES\""));
+    }
+
+    private static String getEntry(String advisory, String diseaseName) {
+        int start = advisory.indexOf("<b>" + diseaseName);
+        assertTrue(start >= 0, "Missing entry for " + diseaseName);
+        return advisory.substring(start, advisory.indexOf("</p>", start));
     }
 
     @Test
