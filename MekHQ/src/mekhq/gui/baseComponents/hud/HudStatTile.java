@@ -47,6 +47,8 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Locale;
 import javax.swing.BorderFactory;
 import javax.swing.Box;
@@ -59,8 +61,8 @@ import jakarta.annotation.Nullable;
 
 /**
  * A deep-surface stat tile - a small key, a large coloured value, and a faint sub-line - matching the debrief
- * console's tiles. The value and sub-line can be updated live, and the tile can show a meter: a fill bar with an
- * optional threshold mark, for budgets such as tech time or a salvage cap.
+ * console's tiles. The value and sub-line can be updated live, and the tile can show a meter: a fill bar with
+ * optional threshold marks, for budgets such as tech time or a salvage cap.
  *
  * @author Illiani
  * @since 0.51.01
@@ -144,12 +146,41 @@ public class HudStatTile extends JPanel {
      * @since 0.51.01
      */
     public void setMeter(double fill, Color fillColor, @Nullable Double threshold) {
+        setMeterWithMarks(fill, fillColor, (threshold == null) ? List.of() : List.of(new MeterMark(threshold, AMBER)));
+    }
+
+    /**
+     * Shows the tile's meter with any number of threshold marks, each in its own colour.
+     *
+     * @param fill      how full the meter is, from 0 to 1 (values outside that range are clamped)
+     * @param fillColor the fill's colour
+     * @param marks     the threshold marks to draw, in drawing order; empty for none
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public void setMeterWithMarks(double fill, Color fillColor, List<MeterMark> marks) {
         meter.fill = Math.clamp(fill, 0.0, 1.0);
         meter.fillColor = fillColor;
-        meter.threshold = (threshold == null) ? null : Math.clamp(threshold, 0.0, 1.0);
+        List<MeterMark> clampedMarks = new ArrayList<>();
+        for (MeterMark mark : marks) {
+            clampedMarks.add(new MeterMark(Math.clamp(mark.position(), 0.0, 1.0), mark.color()));
+        }
+        meter.marks = clampedMarks;
         meter.setVisible(true);
         meter.repaint();
     }
+
+    /**
+     * A threshold mark on a tile's meter.
+     *
+     * @param position where the mark sits, from 0 to 1
+     * @param color    the mark's colour
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public record MeterMark(double position, Color color) {}
 
     /**
      * Places a control to the right of the value, such as a stepper for adjusting it.
@@ -195,12 +226,12 @@ public class HudStatTile extends JPanel {
         return new Dimension(Math.max(preferred.width, scaleForGUI(150)), preferred.height);
     }
 
-    /** A thin fill bar with an optional amber threshold mark. */
+    /** A thin fill bar with optional threshold marks. */
     private static final class Meter extends JComponent {
         private double fill;
         private Color fillColor = ACCENT;
-        /** Where the threshold mark sits (0-1), or {@code null} for no mark. */
-        private Double threshold;
+        /** The threshold marks, with positions already clamped to 0-1. */
+        private List<MeterMark> marks = List.of();
 
         private Meter() {
             Dimension size = new Dimension(Short.MAX_VALUE, scaleForGUI(10));
@@ -219,10 +250,10 @@ public class HudStatTile extends JPanel {
                 g2.fillRect(0, barTop, width, barHeight);
                 g2.setColor(fillColor);
                 g2.fillRect(0, barTop, (int) Math.round(width * fill), barHeight);
-                if (threshold != null) {
-                    int markWidth = scaleForGUI(2);
-                    int markX = Math.min(width - markWidth, (int) Math.round(width * threshold));
-                    g2.setColor(AMBER);
+                int markWidth = scaleForGUI(2);
+                for (MeterMark mark : marks) {
+                    int markX = Math.min(width - markWidth, (int) Math.round(width * mark.position()));
+                    g2.setColor(mark.color());
                     g2.fillRect(markX, 0, markWidth, getHeight());
                 }
             } finally {

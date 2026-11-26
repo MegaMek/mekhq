@@ -85,6 +85,8 @@ class PersonnelEquipmentPage {
     private MMComboBox<String> cboMekWarriorDefaultKit;
     private JLabel lblVehicleCrewDefaultKit;
     private MMComboBox<String> cboVehicleCrewDefaultKit;
+    private JLabel lblSpaceCrewDefaultKit;
+    private MMComboBox<String> cboSpaceCrewDefaultKit;
     private JLabel lblAircraftDefaultKit;
     private MMComboBox<String> cboAircraftDefaultKit;
     private JCheckBox chkNpcFactionArmorKits;
@@ -127,6 +129,7 @@ class PersonnelEquipmentPage {
 
         cboMekWarriorDefaultKit = armorKitCombo("mekWarriorDefaultKit", Category.MEKWARRIOR);
         cboVehicleCrewDefaultKit = armorKitCombo("vehicleCrewDefaultKit", Category.INFANTRY);
+        cboSpaceCrewDefaultKit = armorKitCombo("spaceCrewDefaultKit", Category.SPACE_CREW);
         cboAircraftDefaultKit = armorKitCombo("aircraftDefaultKit", Category.AIRCRAFT);
         // A technician's default goes into the slot they repair from, so only kits that count as a tool kit are offered
         List<String> technicianKits = EquipmentKitCatalog.technicianOptionKitNames();
@@ -192,6 +195,11 @@ class PersonnelEquipmentPage {
         lblVehicleCrewDefaultKit.addMouseListener(createTipPanelUpdater("VehicleCrewDefaultKit"));
         cboVehicleCrewDefaultKit.addMouseListener(createTipPanelUpdater("VehicleCrewDefaultKit"));
 
+        lblSpaceCrewDefaultKit = new CampaignOptionsLabel("SpaceCrewDefaultKit",
+              getMetadata(new Version("0.51.01.15")));
+        lblSpaceCrewDefaultKit.addMouseListener(createTipPanelUpdater("SpaceCrewDefaultKit"));
+        cboSpaceCrewDefaultKit.addMouseListener(createTipPanelUpdater("SpaceCrewDefaultKit"));
+
         lblAircraftDefaultKit = new CampaignOptionsLabel("AircraftDefaultKit", getMetadata(new Version("0.51.01.1")));
         lblAircraftDefaultKit.addMouseListener(createTipPanelUpdater("AircraftDefaultKit"));
         cboAircraftDefaultKit.addMouseListener(createTipPanelUpdater("AircraftDefaultKit"));
@@ -213,6 +221,7 @@ class PersonnelEquipmentPage {
               CONTROL_COLUMN_WIDTH);
         panel.addRow(lblMekWarriorDefaultKit, cboMekWarriorDefaultKit);
         panel.addRow(lblVehicleCrewDefaultKit, cboVehicleCrewDefaultKit);
+        panel.addRow(lblSpaceCrewDefaultKit, cboSpaceCrewDefaultKit);
         panel.addRow(lblAircraftDefaultKit, cboAircraftDefaultKit);
         panel.addCheckBox(chkNpcFactionArmorKits);
         panel.addCheckBox(chkRequireMekWarriorKitToDeploy);
@@ -418,6 +427,7 @@ class PersonnelEquipmentPage {
         chkAddDefaultKitToProcurement.setSelected(model.addDefaultKitToProcurement);
         cboMekWarriorDefaultKit.setSelectedItem(model.mekWarriorDefaultKit);
         cboVehicleCrewDefaultKit.setSelectedItem(model.vehicleCrewDefaultKit);
+        cboSpaceCrewDefaultKit.setSelectedItem(model.spaceCrewDefaultKit);
         cboAircraftDefaultKit.setSelectedItem(model.aircraftDefaultKit);
         chkNpcFactionArmorKits.setSelected(model.npcFactionArmorKits);
         chkRequireMekWarriorKitToDeploy.setSelected(model.requireMekWarriorKitToDeploy);
@@ -448,6 +458,7 @@ class PersonnelEquipmentPage {
         model.addDefaultKitToProcurement = chkAddDefaultKitToProcurement.isSelected();
         model.mekWarriorDefaultKit = cboMekWarriorDefaultKit.getSelectedItem();
         model.vehicleCrewDefaultKit = cboVehicleCrewDefaultKit.getSelectedItem();
+        model.spaceCrewDefaultKit = cboSpaceCrewDefaultKit.getSelectedItem();
         model.aircraftDefaultKit = cboAircraftDefaultKit.getSelectedItem();
         model.npcFactionArmorKits = chkNpcFactionArmorKits.isSelected();
         model.requireMekWarriorKitToDeploy = chkRequireMekWarriorKitToDeploy.isSelected();

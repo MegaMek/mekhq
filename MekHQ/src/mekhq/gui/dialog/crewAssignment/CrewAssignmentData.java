@@ -44,6 +44,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.UUID;
+import java.util.function.Predicate;
 import java.util.function.ToIntFunction;
 
 import jakarta.annotation.Nullable;
@@ -144,6 +145,7 @@ final class CrewAssignmentData {
     private final Map<UUID, PersonEntry> people = new LinkedHashMap<>();
     private final AssignmentPlan plan;
     private final ToIntFunction<PersonnelRole> tempCrewPool;
+    private final Predicate<PersonnelRole> usesTempCrew;
     private final Comparator<Person> ranking;
     private final boolean useTransfers;
     private final Familiarity familiarityMode;
@@ -168,8 +170,8 @@ final class CrewAssignmentData {
                                    location.getBase().getBaseHangar();
         plan.setTechBusy(person -> humanResources.isWorkingOnRefit(hangar, person));
         // The pool is read when a fill is staged; the plan subtracts what it has already staged from it
-        tempCrewPool = role -> humanResources.isBlobCrewEnabled(role, options) ?
-                                     humanResources.getAvailableTempCrewPool(campaign, role) : 0;
+        usesTempCrew = role -> humanResources.isBlobCrewEnabled(role, options);
+        tempCrewPool = role -> usesTempCrew.test(role) ? humanResources.getAvailableTempCrewPool(campaign, role) : 0;
 
         boolean isClan = campaign.getPlayerForce().isClanForce();
         boolean useFatigue = options.get(CampaignOption.USE_FATIGUE);
@@ -325,6 +327,11 @@ final class CrewAssignmentData {
     /** @return the campaign's free temporary crew of each role, before any staged change; 0 where it uses none */
     ToIntFunction<PersonnelRole> tempCrewPool() {
         return tempCrewPool;
+    }
+
+    /** @return whether the campaign options turn on temporary crew for each role */
+    Predicate<PersonnelRole> usesTempCrew() {
+        return usesTempCrew;
     }
 
     /** @return best first, by experience level and then name; {@link AutoFill} fills seats in this order */

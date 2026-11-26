@@ -122,6 +122,7 @@ import mekhq.campaign.mission.utilities.MissionCompletionManager;
 import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
+import mekhq.campaign.parts.PlainBarArmorSale;
 import mekhq.campaign.parts.ReservedSpares;
 import mekhq.campaign.parts.SVArmor;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -2487,8 +2488,6 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         // Fixup any ghost kills
         cleanupGhostKills(campaign);
 
-        migrateDerivedImplantProsthetics(campaign, version);
-
         // Update the Personnel Modules
         final AbstractDivorce divorce = options.get(CampaignOption.RANDOM_DIVORCE_METHOD).getMethod(options);
         campaign.getPlayerForce().getHumanResources().setDivorce(divorce);
@@ -2723,6 +2722,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Spares reserved by tasks on units that have since left the campaign are freed
         ReservedSpares.releaseOrphanedReservations(campaign);
+
+        // Spare support vehicle armor an older version kept as plain armor is sold, as nothing can use it now
+        PlainBarArmorSale.sellPlainBarArmor(campaign);
 
         LOGGER.info("[Campaign Load] Units initialized in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();
