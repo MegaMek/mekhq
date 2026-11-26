@@ -518,6 +518,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         lblIcon.getAccessibleContext().setAccessibleName("Player Camouflage");
         ImageIcon icon = getAndScaleCampaignIcon();
         lblIcon.setIcon(icon);
+        lblIcon.setHorizontalAlignment(SwingConstants.CENTER);
+        lblIcon.setAlignmentX(Component.CENTER_ALIGNMENT);
         lblIcon.setMaximumSize(new Dimension(Integer.MAX_VALUE, lblIcon.getPreferredSize().height));
 
         RoundedJButton btnGoRogue = new RoundedJButton(resourceMap.getString("btnGoRogue.text"));
@@ -557,6 +559,10 @@ public final class CommandCenterTab extends CampaignGuiTab {
 
         panFaction = new JPanel();
         panFaction.setLayout(new BoxLayout(panFaction, BoxLayout.Y_AXIS));
+
+        btnGoRogue.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnFacStanding.setAlignmentX(Component.CENTER_ALIGNMENT);
+        btnDiplomacy.setAlignmentX(Component.CENTER_ALIGNMENT);
 
         panFaction.add(lblIcon);
         panFaction.add(Box.createVerticalStrut(5));
@@ -1306,6 +1312,8 @@ public final class CommandCenterTab extends CampaignGuiTab {
         procurementListScheduler.schedule();
         ImageIcon icon = getAndScaleCampaignIcon();
         lblIcon.setIcon(icon);
+        lblIcon.setMaximumSize(new Dimension(Integer.MAX_VALUE, lblIcon.getPreferredSize().height));
+        panFaction.revalidate();
     }
 
     @Subscribe
