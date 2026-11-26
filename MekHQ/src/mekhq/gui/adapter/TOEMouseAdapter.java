@@ -32,6 +32,7 @@
  */
 package mekhq.gui.adapter;
 
+import static megamek.client.ui.WrapLayout.wordWrap;
 import static mekhq.campaign.force.CombatTeam.recalculateCombatTeams;
 import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_FALSE;
 import static mekhq.campaign.force.Formation.COMBAT_TEAM_OVERRIDE_NONE;
@@ -912,7 +913,7 @@ public class TOEMouseAdapter extends JPopupMenuAdapter {
                     }
 
                     menuItem = new JMenuItem(displayText);
-                    menuItem.setToolTipText(combatRole.getToolTipText());
+                    menuItem.setToolTipText(wordWrap(combatRole.getToolTipText()));
                     menuItem.setActionCommand(TOEMouseAdapter.COMMAND_CHANGE_ROLE_PREFERENCE +
                                                     combatRole.name() +
                                                     '|' +
