@@ -208,6 +208,21 @@ public class CampaignLocationManager {
     }
 
     /**
+     * Cancels any not-yet-dispatched travel queued for {@code traveler}, leaving it at its current (origin) location.
+     *
+     * @param traveler the person, unit, or part whose queued travel should be cancelled
+     *
+     * @return the destination the traveler had been queued for, or {@code null} if it was not queued
+     */
+    public @Nullable ILocation cancelPendingTravel(ILocation traveler) {
+        ILocation cancelledDestination = removeFromPendingTravel(traveler);
+        if (cancelledDestination != null) {
+            fireLocationChanged(traveler);
+        }
+        return cancelledDestination;
+    }
+
+    /**
      * GM override: dispatches {@code items} to {@code destination} and lands them immediately, with zero transit time.
      *
      * <p>This composes the ordinary {@link LocationDispatch#dispatchTravelers} (which starts the journey and updates
