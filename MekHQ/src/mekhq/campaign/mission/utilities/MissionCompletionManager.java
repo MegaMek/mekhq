@@ -57,6 +57,7 @@ import mekhq.campaign.events.missions.MissionCompletedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ShellContract;
@@ -435,7 +436,8 @@ public class MissionCompletionManager {
     }
 
     /**
-     * Awards mission-completion XP to all eligible active personnel.
+     * Awards mission-completion XP to all eligible active personnel. People away from the main force (at a base, or
+     * travelling) were not on the mission and get nothing.
      *
      * @param campaign        the campaign being updated
      * @param campaignOptions the campaign options controlling XP amounts
@@ -459,6 +461,10 @@ public class MissionCompletionManager {
             }
 
             if (person.isDependent()) {
+                continue;
+            }
+
+            if (LocationUtils.isAwayFromMainForce(person, campaign)) {
                 continue;
             }
 
@@ -576,7 +582,7 @@ public class MissionCompletionManager {
      * @since 0.51.01
      */
     static void undeployUnits(Campaign campaign, AbstractContract mission) {
-        for (Unit unit : campaign.getUnits()) {
+        for (Unit unit : campaign.getAllUnits()) {
             int scenarioAssignment = unit.getScenarioId();
             if (scenarioAssignment != NO_ASSIGNED_SCENARIO) {
                 Scenario scenario = campaign.getScenario(scenarioAssignment);
@@ -614,7 +620,7 @@ public class MissionCompletionManager {
         }
 
         int releasedUnits = 0;
-        for (Unit unit : campaign.getUnits()) {
+        for (Unit unit : campaign.getAllUnits()) {
             if (isDeployedToInactiveContract(campaign, unit.getScenarioId())) {
                 unit.setScenarioId(NO_ASSIGNED_SCENARIO);
                 releasedUnits++;

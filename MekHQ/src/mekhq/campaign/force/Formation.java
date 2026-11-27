@@ -1189,7 +1189,8 @@ public class Formation {
     }
 
     /**
-     * Calculates the formation's total BV, including sub formations.
+     * Calculates the formation's total BV, including sub formations. Units away from the main force don't fight with
+     * it, so they are left out, and the enemy is sized to the units that are actually there.
      *
      * @param campaign                     The working campaign. This is the campaign object that the formation belongs
      *                                     to.
@@ -1202,16 +1203,15 @@ public class Formation {
         int bvTotal = 0;
 
         for (UUID unitId : getAllUnits(false)) {
-            // no idea how this would happen, but sometimes a unit in a formations unit ID list
-            // has an invalid ID?
-            if (campaign.getUnit(unitId) == null) {
+            Unit unit = findUnitWithMainForce(campaign, unitId);
+            if (unit == null) {
                 continue;
             }
 
             if (campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE) && !formationStandardBattleValue) {
-                bvTotal += campaign.getUnit(unitId).getEntity().getGenericBattleValue();
+                bvTotal += unit.getEntity().getGenericBattleValue();
             } else {
-                bvTotal += campaign.getUnit(unitId).getEntity().calculateBattleValue();
+                bvTotal += unit.getEntity().calculateBattleValue();
             }
         }
 
@@ -1219,7 +1219,19 @@ public class Formation {
     }
 
     /**
-     * Calculates the total count of units in the given formation, including all sub formations.
+     * @return the unit, or {@code null} if it can't be found or is away from the main force
+     */
+    private static @Nullable Unit findUnitWithMainForce(Campaign campaign, UUID unitId) {
+        Unit unit = campaign.getUnit(unitId);
+        if ((unit == null) || LocationUtils.isAwayFromMainForce(unit, campaign)) {
+            return null;
+        }
+        return unit;
+    }
+
+    /**
+     * Calculates the total count of units in the given formation, including all sub formations, wherever they are.
+     * This is the formation's size on paper; use {@link #getUnitCountWithMainForce} for the units that would fight.
      *
      * @param campaign      the current campaign
      * @param isClanBidding flag to indicate whether clan bidding is being performed
@@ -1227,10 +1239,27 @@ public class Formation {
      * @return the total count of units in the formation (including sub formations)
      */
     public int getTotalUnitCount(Campaign campaign, boolean isClanBidding) {
+        return countUnits(campaign, isClanBidding, false);
+    }
+
+    /**
+     * Like {@link #getTotalUnitCount}, but leaves out units away from the main force, which don't fight with it. Used
+     * to size the enemy.
+     *
+     * @param campaign      the current campaign
+     * @param isClanBidding flag to indicate whether clan bidding is being performed
+     *
+     * @return the count of this formation's units, including sub formations, that are with the main force
+     */
+    public int getUnitCountWithMainForce(Campaign campaign, boolean isClanBidding) {
+        return countUnits(campaign, isClanBidding, true);
+    }
+
+    private int countUnits(Campaign campaign, boolean isClanBidding, boolean onlyWithMainForce) {
         int unitTotal = 0;
 
         for (Formation subFormation : getSubFormations()) {
-            unitTotal += subFormation.getTotalUnitCount(campaign, isClanBidding);
+            unitTotal += subFormation.countUnits(campaign, isClanBidding, onlyWithMainForce);
         }
 
         // If we're getting the unit count specifically for Clan Bidding, we don't want to count
@@ -1240,7 +1269,11 @@ public class Formation {
             double rollingCount = 0;
 
             for (UUID unitId : getUnits()) {
-                Entity unit = campaign.getUnit(unitId).getEntity();
+                Unit counted = onlyWithMainForce ? findUnitWithMainForce(campaign, unitId) : campaign.getUnit(unitId);
+                if (counted == null) {
+                    continue;
+                }
+                Entity unit = counted.getEntity();
 
                 if (unit.isBattleArmor()) {
                     rollingCount += 0.5;
@@ -1250,6 +1283,12 @@ public class Formation {
             }
 
             unitTotal += (int) round(rollingCount);
+        } else if (onlyWithMainForce) {
+            for (UUID unitId : getUnits()) {
+                if (findUnitWithMainForce(campaign, unitId) != null) {
+                    unitTotal++;
+                }
+            }
         } else {
             unitTotal += getUnits().size();
         }

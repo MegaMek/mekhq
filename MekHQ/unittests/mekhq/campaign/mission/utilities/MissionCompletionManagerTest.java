@@ -70,8 +70,10 @@ import mekhq.campaign.digitalGM.stratCon.StratConCampaignState;
 import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.finances.Finances;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
+import mekhq.campaign.location.IPlace;
 import mekhq.campaign.market.personnelMarket.markets.NewPersonnelMarket;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.contract.ShellContract;
@@ -262,7 +264,7 @@ public class MissionCompletionManagerTest {
             when(unit.getScenarioId()).thenReturn(7);
             when(campaign.getScenario(7)).thenReturn(scenario);
             when(scenario.getMissionId()).thenReturn(missionId);
-            when(campaign.getUnits()).thenReturn(List.of(unit));
+            when(campaign.getAllUnits()).thenReturn(List.of(unit));
 
             MissionCompletionManager.undeployUnits(campaign, mission);
 
@@ -275,7 +277,7 @@ public class MissionCompletionManagerTest {
             Campaign campaign = mock(Campaign.class);
             Unit unit = mock(Unit.class);
             when(unit.getScenarioId()).thenReturn(NO_ASSIGNED_SCENARIO);
-            when(campaign.getUnits()).thenReturn(List.of(unit));
+            when(campaign.getAllUnits()).thenReturn(List.of(unit));
 
             MissionCompletionManager.undeployUnits(campaign, mission);
 
@@ -289,7 +291,7 @@ public class MissionCompletionManagerTest {
             Unit unit = mock(Unit.class);
             when(unit.getScenarioId()).thenReturn(7);
             when(campaign.getScenario(7)).thenReturn(null);
-            when(campaign.getUnits()).thenReturn(List.of(unit));
+            when(campaign.getAllUnits()).thenReturn(List.of(unit));
 
             MissionCompletionManager.undeployUnits(campaign, mission);
 
@@ -307,7 +309,7 @@ public class MissionCompletionManagerTest {
             when(unit.getScenarioId()).thenReturn(7);
             when(campaign.getScenario(7)).thenReturn(scenario);
             when(scenario.getMissionId()).thenReturn(UUID.randomUUID());
-            when(campaign.getUnits()).thenReturn(List.of(unit));
+            when(campaign.getAllUnits()).thenReturn(List.of(unit));
 
             MissionCompletionManager.undeployUnits(campaign, mission);
 
@@ -507,6 +509,33 @@ public class MissionCompletionManagerTest {
             verify(eligible).awardXP(campaign, 4);
             verify(child, never()).awardXP(any(Campaign.class), anyInt());
             verify(dependent, never()).awardXP(any(Campaign.class), anyInt());
+        }
+
+        @Test
+        void personAwayFromTheMainForceGetsNothing() {
+            CampaignOptions campaignOptions = mock(CampaignOptions.class);
+            AbstractContract mission = mock(AbstractContract.class);
+            when(campaignOptions.get(CampaignOption.MISSION_XP_SUCCESS)).thenReturn(4);
+
+            Campaign campaign = mock(Campaign.class);
+            PlayerForce playerForce = mock(PlayerForce.class);
+            ForceHumanResources humanResources = mock(ForceHumanResources.class);
+            Detachment mainForce = mock(Detachment.class);
+            when(campaign.getPlayerForce()).thenReturn(playerForce);
+            when(playerForce.getHumanResources()).thenReturn(humanResources);
+            when(playerForce.getForceDetachment()).thenReturn(mainForce);
+            when(campaign.getLocalDate()).thenReturn(TODAY);
+
+            Person present = mock(Person.class);
+            Person atABase = mock(Person.class);
+            when(present.getPlace()).thenReturn(mainForce);
+            when(atABase.getPlace()).thenReturn(mock(IPlace.class));
+            when(humanResources.getActivePersonnel(false, false)).thenReturn(List.of(present, atABase));
+
+            MissionCompletionManager.awardMissionExperience(campaign, campaignOptions, mission, MissionStatus.SUCCESS);
+
+            verify(present).awardXP(campaign, 4);
+            verify(atABase, never()).awardXP(any(Campaign.class), anyInt());
         }
 
         @Test
@@ -724,7 +753,7 @@ public class MissionCompletionManagerTest {
             when(playerForce.getAllFormations()).thenReturn(List.of(formation));
             Unit unit = mock(Unit.class);
             when(unit.getScenarioId()).thenReturn(58);
-            when(campaign.getUnits()).thenReturn(List.of(unit));
+            when(campaign.getAllUnits()).thenReturn(List.of(unit));
 
             MissionCompletionManager.releaseCompletedContractDeployments(campaign);
 
@@ -754,7 +783,7 @@ public class MissionCompletionManagerTest {
             when(playerForce.getAllFormations()).thenReturn(List.of(formation));
             Unit unit = mock(Unit.class);
             when(unit.getScenarioId()).thenReturn(92);
-            when(campaign.getUnits()).thenReturn(List.of(unit));
+            when(campaign.getAllUnits()).thenReturn(List.of(unit));
 
             MissionCompletionManager.releaseCompletedContractDeployments(campaign);
 
@@ -775,7 +804,7 @@ public class MissionCompletionManagerTest {
             Formation undeployedFormation = mock(Formation.class);
             when(undeployedFormation.getScenarioId()).thenReturn(NO_ASSIGNED_SCENARIO);
             when(playerForce.getAllFormations()).thenReturn(List.of(formation, undeployedFormation));
-            when(campaign.getUnits()).thenReturn(new ArrayList<>());
+            when(campaign.getAllUnits()).thenReturn(new ArrayList<>());
 
             MissionCompletionManager.releaseCompletedContractDeployments(campaign);
 
@@ -1218,7 +1247,7 @@ public class MissionCompletionManagerTest {
             when(humanResources.getPrisonerDefectors()).thenReturn(new ArrayList<>());
             when(humanResources.getFriendlyPrisoners()).thenReturn(new ArrayList<>());
             when(campaign.getActiveContracts()).thenReturn(List.of(mission));
-            when(campaign.getUnits()).thenReturn(new ArrayList<>());
+            when(campaign.getAllUnits()).thenReturn(new ArrayList<>());
             when(campaign.getLocalDate()).thenReturn(TODAY);
             when(playerForce.getAllFormations()).thenReturn(new ArrayList<>());
             when(mission.getObjectiveType()).thenReturn(ContractObjectiveType.GARRISON_DUTY);

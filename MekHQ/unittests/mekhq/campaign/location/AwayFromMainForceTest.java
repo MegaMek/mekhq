@@ -32,6 +32,7 @@
  */
 package mekhq.campaign.location;
 
+import static mekhq.campaign.force.Formation.FORMATION_NONE;
 import static mekhq.campaign.force.Formation.NO_ASSIGNED_SCENARIO;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
@@ -47,8 +48,12 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.FixedLocation;
 import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.digitalGM.stratCon.gm.StratConPlayType;
+import mekhq.campaign.force.CombatTeam;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.mission.scenarios.Scenario;
+import mekhq.campaign.mission.utilities.MissionCompletionManager;
 import mekhq.campaign.parts.meks.MekSensor;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.personnel.Person;
@@ -215,6 +220,63 @@ class AwayFromMainForceTest {
         formations.add(awayLance);
 
         assertFalse(new Scenario("Battle").canDeployForces(formations, campaign));
+    }
+
+    @Test
+    void enemySizingCountsOnlyUnitsWithTheMainForce() {
+        Unit withTheForce = unitWithTheMainForce();
+        Formation lance = new Formation("Lance");
+        lance.addUnit(withTheForce.getId());
+        lance.addUnit(unitAtTheBase().getId());
+        lance.addUnit(unitOnTheWay().getId());
+        Formation lanceWithoutTheAwayUnits = new Formation("Lance Without The Away Units");
+        lanceWithoutTheAwayUnits.addUnit(withTheForce.getId());
+
+        assertEquals(lanceWithoutTheAwayUnits.getTotalBV(campaign, true), lance.getTotalBV(campaign, true));
+        assertEquals(1, lance.getUnitCountWithMainForce(campaign, false));
+        assertEquals(1, lance.getUnitCountWithMainForce(campaign, true));
+        assertEquals(3, lance.getTotalUnitCount(campaign, false), "on paper the lance keeps all its units");
+    }
+
+    @Test
+    void aCombatTeamIsWeighedWithoutItsAwayUnits() {
+        // Without StratCon only vehicles and fighters are weighed, so switch it on to weigh the Meks.
+        campaign.getCampaignOptions().set(CampaignOption.STRAT_CON_PLAY_TYPE, StratConPlayType.NORMAL);
+        Unit withTheForce = unitWithTheMainForce();
+        Formation lance = registeredLance();
+        lance.addUnit(withTheForce.getId());
+        lance.addUnit(unitAtTheBase().getId());
+
+        assertEquals(withTheForce.getEntity().getWeight(), CombatTeam.calculateTotalWeight(campaign, lance.getId()));
+    }
+
+    @Test
+    void removingAFormationReleasesItsUnitsAtABase() {
+        Unit atTheBase = unitAtTheBase();
+        Formation lance = registeredLance();
+        lance.addUnit(atTheBase.getId());
+        atTheBase.setFormationId(lance.getId());
+
+        campaign.getPlayerForce().removeFormation(lance, campaign);
+
+        assertEquals(FORMATION_NONE, atTheBase.getFormationId());
+    }
+
+    @Test
+    void cleanupOnLoadUndeploysUnitsAtABase() {
+        Unit atTheBase = unitAtTheBase();
+        atTheBase.setScenarioId(SCENARIO_ID);
+
+        MissionCompletionManager.releaseCompletedContractDeployments(campaign);
+
+        assertEquals(NO_ASSIGNED_SCENARIO, atTheBase.getScenarioId());
+    }
+
+    private Formation registeredLance() {
+        Formation lance = new Formation("Lance");
+        lance.setId(SCENARIO_ID);
+        campaign.getPlayerForce().importFormation(lance);
+        return lance;
     }
 
     @Test

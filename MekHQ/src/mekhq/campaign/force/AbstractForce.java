@@ -1019,7 +1019,8 @@ public abstract class AbstractForce {
         formationIds.remove(formationId);
         // clear formationIds of all personnel with this formation
         for (UUID unitId : formation.getUnits()) {
-            Unit unit = requireSingleDetachment().getHangar().getUnit(unitId);
+            // Units at a base still belong to the formation, so look everywhere
+            Unit unit = campaign.getUnit(unitId);
             if (null == unit) {
                 continue;
             }

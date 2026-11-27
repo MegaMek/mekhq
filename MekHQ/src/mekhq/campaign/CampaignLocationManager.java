@@ -33,6 +33,9 @@
 
 package mekhq.campaign;
 
+import static mekhq.campaign.enums.DailyReportType.GENERAL;
+import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
+
 import java.io.PrintWriter;
 import java.util.*;
 
@@ -66,6 +69,7 @@ import mekhq.utilities.MHQXMLUtility;
  */
 public class CampaignLocationManager {
     private static final MMLogger LOGGER = MMLogger.create(CampaignLocationManager.class);
+    private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
 
     private final List<AbstractLocation> locations = new ArrayList<>();
     private final Set<PlayerBase> playerBases = new LinkedHashSet<>();
@@ -379,6 +383,8 @@ public class CampaignLocationManager {
      * Dispatches all travel queued via {@link #queueTravel}, one {@link LocationDispatch} call per queued route.
      * Travelers that have left the campaign since they were queued (a removed person, a sold unit, a sold or consumed
      * part) are skipped with a warning — dispatching them would re-add them to the destination's hangar or warehouse.
+     * Travelers committed since they were queued (deployed to a scenario, or a part reserved for repair work) stay
+     * where they are, with a daily report line.
      *
      * <p>Must run at the start of a new day, before location transit is advanced, so that the departure system resolved
      * at dispatch time matches where the travelers were when the travel was queued.</p>
@@ -387,7 +393,7 @@ public class CampaignLocationManager {
      */
     public void dispatchPendingTravel(Campaign campaign) {
         for (Map.Entry<TravelRoute, List<ILocation>> entry : pendingTravel.entrySet()) {
-            List<ILocation> travelers = filterTravelersStillInCampaign(entry.getValue(), campaign);
+            List<ILocation> travelers = filterTravelersFreeToLeave(entry.getValue(), campaign);
             if (!travelers.isEmpty()) {
                 LocationDispatch.dispatchTravelers(travelers, entry.getKey().destination(), campaign);
             }
@@ -395,17 +401,53 @@ public class CampaignLocationManager {
         pendingTravel.clear();
     }
 
-    private List<ILocation> filterTravelersStillInCampaign(List<ILocation> travelers, Campaign campaign) {
+    /**
+     * Keeps the queued travelers that can still leave. Travel is queued a day ahead, so a traveler may have been
+     * committed in the meantime: a unit or person deployed to a scenario, or a part reserved for repair work. Those
+     * stay where they are and the player is told why.
+     */
+    private List<ILocation> filterTravelersFreeToLeave(List<ILocation> travelers, Campaign campaign) {
         List<ILocation> stillPresent = new ArrayList<>();
         for (ILocation traveler : travelers) {
-            if (isStillInCampaign(traveler, campaign)) {
-                stillPresent.add(traveler);
-            } else {
+            if (!isStillInCampaign(traveler, campaign)) {
                 LOGGER.warn("dispatchPendingTravel: queued {} left the campaign before dispatch — skipping",
                       traveler.getClass().getSimpleName());
+                continue;
             }
+            String stayReportKey = findStayBehindReason(traveler);
+            if (stayReportKey != null) {
+                campaign.addReport(GENERAL, getFormattedTextAt(RESOURCE_BUNDLE, stayReportKey,
+                      describeTraveler(traveler)));
+                fireLocationChanged(traveler);
+                continue;
+            }
+            stillPresent.add(traveler);
         }
         return stillPresent;
+    }
+
+    /**
+     * @return the report key explaining why {@code traveler} can no longer leave, or {@code null} if it is free to
+     *       go. Students are not checked here, because education queues their own trips to and from campus.
+     */
+    private static @Nullable String findStayBehindReason(ILocation traveler) {
+        return switch (traveler) {
+            case Unit unit -> unit.isDeployed() ? "CampaignLocationManager.deployedStaysBehind.report" : null;
+            case Person person -> person.isDeployed() ? "CampaignLocationManager.deployedStaysBehind.report" : null;
+            case Part part -> (part.isReservedForRefit() || part.isReservedForReplacement())
+                                    ? "CampaignLocationManager.reservedPartStaysBehind.report"
+                                    : null;
+            default -> null;
+        };
+    }
+
+    private static String describeTraveler(ILocation traveler) {
+        return switch (traveler) {
+            case Unit unit -> unit.getName();
+            case Person person -> person.getHyperlinkedFullTitle();
+            case Part part -> part.getName();
+            default -> traveler.toString();
+        };
     }
 
     private boolean isStillInCampaign(ILocation traveler, Campaign campaign) {

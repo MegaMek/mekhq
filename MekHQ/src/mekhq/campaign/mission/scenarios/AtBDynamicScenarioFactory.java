@@ -4250,7 +4250,7 @@ public class AtBDynamicScenarioFactory {
                 Formation formation = campaign.getPlayerForce().getFormation(forceID);
 
                 if (forceTemplate != null && forceTemplate.getContributesToUnitCount() && formation != null) {
-                    unitCount += formation.getTotalUnitCount(campaign, isClanBidding);
+                    unitCount += formation.getUnitCountWithMainForce(campaign, isClanBidding);
                 }
             }
 
@@ -4313,7 +4313,7 @@ public class AtBDynamicScenarioFactory {
 
             Formation formation = combatTeam.getFormation(campaign);
             if (formation != null) {
-                int unitsInForce = formation.getAllUnits(false).size();
+                int unitsInForce = formation.getUnitCountWithMainForce(campaign, false);
                 if (unitsInForce != 0) {
                     forceCount++;
                     unitCount += unitsInForce;
@@ -4378,7 +4378,7 @@ public class AtBDynamicScenarioFactory {
 
             Formation formation = combatTeam.getFormation(campaign);
             if (formation != null) {
-                int unitCount = formation.getAllUnits(false).size();
+                int unitCount = formation.getUnitCountWithMainForce(campaign, false);
                 if (unitCount > 0) {
                     unitCounts.add(unitCount);
                 }

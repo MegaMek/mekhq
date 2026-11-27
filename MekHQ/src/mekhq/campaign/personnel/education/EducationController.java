@@ -361,6 +361,8 @@ public class EducationController {
             AcademyCampusLocation homeSchoolCampus = campaign.getCampaignLocationManager().getOrCreateCampusUnderLocation(
                   academy.getSet(), academy.getName(), homeSchoolLocation);
             person.setParent(homeSchoolCampus.getPersonnel());
+            // A trip queued before enrolling would otherwise take the student off the campus the next day
+            campaign.getCampaignLocationManager().cancelPendingTravel(person);
         } else if (academy.isLocal()) {
             person.setEduEducationStage(EducationStage.JOURNEY_TO_CAMPUS);
             person.setEduAcademySystem(localCampusSystemId(person, campaign));
