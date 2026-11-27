@@ -2657,6 +2657,13 @@ public class Refit extends Part implements IAcquisitionWork {
         String fileName = MegaMekLabFileSaver.sanitizeFilename(unitName);
         String fileNameCampaign;
         if (designFile != null) {
+            // The new design is read back from the unit list below, so a folder the list never reads would leave the
+            // refit without its design (#11303). Refused before anything is written.
+            if (!MekSummaryCache.isInUnitListFolder(designFile)) {
+                LOGGER.warn("[Refit] {}: not saving the new design to {}, a folder the unit list does not read",
+                      unitName, designFile);
+                throw new IOException(RefitDesignFolder.describeRefitRefused(designFile));
+            }
             // The player picked this file and was asked before an existing one was replaced
             fileNameCampaign = designFile.getPath();
         } else {
