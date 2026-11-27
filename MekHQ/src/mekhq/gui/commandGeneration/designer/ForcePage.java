@@ -63,6 +63,7 @@ import jakarta.annotation.Nullable;
 import megamek.SuiteOptions;
 import megamek.client.ratgenerator.CrewDescriptor;
 import megamek.client.ratgenerator.ForceDescriptor;
+import megamek.client.ratgenerator.UnitReroller;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.Picker;
 import megamek.client.ui.dialogs.randomArmy.ForceGeneratorOptionsView.PickerChoice;
@@ -776,6 +777,7 @@ public final class ForcePage {
             toggle.addActionListener(event -> toggleIncluded(node));
             HudButton viewReadout = new HudButton(upper(text("Designer.force.viewReadout")), false, true);
             viewReadout.addActionListener(event -> showReadout(entity));
+            HudButton reroll = buildRerollButton(node);
             addRows(detail,
                   title(entity.getShortName()),
                   keyValue(text("Designer.force.readout.role"),
@@ -788,6 +790,7 @@ public final class ForcePage {
                   keyValue(text("Designer.force.readout.price"),
                         cache.price(entity, campaign.getCampaignOptions()).toAmountAndSymbolString()),
                   viewReadout,
+                  reroll,
                   toggle);
         } else {
             Tally tally = new Tally();
@@ -806,6 +809,31 @@ public final class ForcePage {
         totals.revalidate();
         detail.revalidate();
         root.repaint();
+    }
+
+    /**
+     * The button that swaps the selected unit for another drawn for the same slot. A unit that cannot be rerolled on
+     * its own still shows the button, dimmed, with the reason as its tooltip.
+     *
+     * @param node the selected unit
+     *
+     * @return the button
+     */
+    private HudButton buildRerollButton(ForceDescriptor node) {
+        HudButton reroll = new HudButton(upper(text("Designer.force.reroll")), false, true);
+        UnitReroller.Refusal refusal = UnitReroller.whyNotRerollable(node);
+        if (refusal == null) {
+            reroll.setToolTipText(text("Designer.force.reroll.tooltip"));
+            reroll.addActionListener(event -> engine.rerollUnit(node));
+        } else {
+            reroll.setArmed(false);
+            reroll.setToolTipText(text(switch (refusal) {
+                case NOT_A_UNIT -> "Designer.force.reroll.notAUnit";
+                case SHIP -> "Designer.force.reroll.ship";
+                case ONE_DESIGN_FORMATION -> "Designer.force.reroll.oneDesign";
+            }));
+        }
+        return reroll;
     }
 
     /**

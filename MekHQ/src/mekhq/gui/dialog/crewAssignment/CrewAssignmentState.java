@@ -108,14 +108,15 @@ final class CrewAssignmentState {
 
     /**
      * How the Assign page orders its people: the most experienced first; by the gunnery and piloting skills of the
-     * selected unit, or of each person's own combat role with no unit selected; or by the skill the Skills filter
-     * picks, which is only offered while that filter is set.
+     * selected unit, or of each person's own combat role with no unit selected; by their best scouting skill, which
+     * the rows then show in place of gunnery and piloting; or by the skill the Skills filter picks, which is only
+     * offered while that filter is set.
      *
      * @author Illiani
      * @since 0.51.01
      */
     enum AssignSort {
-        BEST, COMBAT, SKILL
+        BEST, COMBAT, SCOUTING, SKILL
     }
 
     /**
@@ -234,8 +235,16 @@ final class CrewAssignmentState {
     @Nullable String unitType;
     @Nullable String formation;
     String unitQuery = "";
-    /** When not empty, only these units are listed: the ones the dialog was opened for. */
+    /**
+     * The units the player has pinned: their cards are listed first, whatever the filters and the search. The units
+     * the dialog was opened for, and the units of the people it was opened for, start pinned.
+     */
     final Set<Unit> pinnedUnits = new LinkedHashSet<>();
+    /**
+     * When not empty, only these people are listed: the ones the dialog was opened for, so a group picked on the
+     * Personnel tab can be worked on together.
+     */
+    final Set<Person> pinnedPeople = new LinkedHashSet<>();
     /** The Techs page's own status filter, in place of {@link #unitStatus}. */
     TechStatus techStatus = TechStatus.NEEDS_TECH;
     TechSort techSort = TechSort.BEST;
@@ -296,17 +305,18 @@ final class CrewAssignmentState {
      * @param entry a unit
      * @param plan  the staged plan, whose changes count toward how well the unit is crewed
      *
-     * @return {@code true} if the unit should have a card
+     * @return {@code true} if the unit should have a card: it is pinned, or it passes every filter. On the Techs page
+     *       even a pinned unit needs to be one a tech can maintain, as the card there is only its tech slot.
      */
     boolean shows(UnitEntry entry, AssignmentPlan plan) {
         Unit unit = entry.unit();
+        if (pinnedUnits.contains(unit)) {
+            return (page != CrewAssignmentPage.TECHS) || SeatEligibility.takesTech(unit);
+        }
         if ((unitType != null) && !unitType.equals(entry.typeName())) {
             return false;
         }
         if ((formation != null) && !formation.equals(entry.formationName())) {
-            return false;
-        }
-        if (!pinnedUnits.isEmpty() && !pinnedUnits.contains(unit)) {
             return false;
         }
 
@@ -402,6 +412,52 @@ final class CrewAssignmentState {
     }
 
     /**
+     * @param page a page
+     *
+     * @return the Assignment filter the page starts on: everyone while the list is held to the people the dialog was
+     *       opened for, as they are wanted whether or not they crew a unit; otherwise as
+     *       {@link #defaultAssignment(CrewAssignmentPage)}
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    Assignment startingAssignment(CrewAssignmentPage page) {
+        return pinnedPeople.isEmpty() ? defaultAssignment(page) : Assignment.EVERYONE;
+    }
+
+    /**
+     * @param person a person
+     *
+     * @return {@code true} if the person is one of the people the list is held to, or the list is not held to any
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    boolean isPinned(Person person) {
+        return pinnedPeople.isEmpty() || pinnedPeople.contains(person);
+    }
+
+    /**
+     * Puts the pinned units' cards first, keeping the order the units arrived in among the pinned and among the rest.
+     *
+     * @param units the units with a card, in the order they arrived
+     *
+     * @return the same units, pinned first
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    List<UnitEntry> pinnedFirst(List<UnitEntry> units) {
+        List<UnitEntry> ordered = new ArrayList<>(units.size());
+        List<UnitEntry> unpinned = new ArrayList<>(units.size());
+        for (UnitEntry entry : units) {
+            (pinnedUnits.contains(entry.unit()) ? ordered : unpinned).add(entry);
+        }
+        ordered.addAll(unpinned);
+        return ordered;
+    }
+
+    /**
      * Whether the people list's Role filter offers a role: the combat roles, and the tech roles (MekTech, Mechanic,
      * AeroTek and BA Tech), so techs can be found when picking someone to maintain a unit.
      *
@@ -466,7 +522,7 @@ final class CrewAssignmentState {
      */
     boolean shows(PersonEntry entry, AssignmentPlan plan) {
         Person person = entry.person();
-        if (!lists(person)) {
+        if (!lists(person) || !isPinned(person)) {
             return false;
         }
         boolean isAssigned = countsAsAssigned(person, plan);
@@ -552,7 +608,7 @@ final class CrewAssignmentState {
                 if (formation != null) {
                     active++;
                 }
-                if (assignment != defaultAssignment(page)) {
+                if (assignment != startingAssignment(page)) {
                     active++;
                 }
                 if (role != null) {
@@ -811,15 +867,37 @@ final class CrewAssignmentState {
      * @since 0.51.01
      */
     @Nullable Comparator<PersonEntry> assignOrder() {
-        SkillGroup group = skill;
         return switch (effectiveAssignSort()) {
             case BEST -> null;
             case COMBAT -> Comparator.comparingInt((PersonEntry entry) -> combatScore(entry, selectedUnit)).reversed();
-            case SKILL -> Comparator.comparingInt((PersonEntry entry) -> {
-                SkillEntry best = (group == null) ? null : best(entry.skills(), group);
-                return (best == null) ? Integer.MIN_VALUE : best.level();
-            }).reversed();
+            case SCOUTING -> bestInGroupFirst(SkillGroup.SCOUTING);
+            case SKILL -> bestInGroupFirst(skill);
         };
+    }
+
+    /**
+     * @param group a group of skills, or {@code null} for none
+     *
+     * @return an order putting the people with the highest level in the group's best skill first, and anyone with none
+     *       of its skills last
+     */
+    private static Comparator<PersonEntry> bestInGroupFirst(@Nullable SkillGroup group) {
+        return Comparator.comparingInt((PersonEntry entry) -> {
+            SkillEntry best = (group == null) ? null : best(entry.skills(), group);
+            return (best == null) ? Integer.MIN_VALUE : best.level();
+        }).reversed();
+    }
+
+    /**
+     * The skill group the rows show in place of gunnery and piloting: scouting while the list is ordered by it.
+     *
+     * @return the group, or {@code null} to show gunnery and piloting
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    @Nullable SkillGroup rowPrimarySkillGroup() {
+        return (effectiveAssignSort() == AssignSort.SCOUTING) ? SkillGroup.SCOUTING : null;
     }
 
     // endregion Skills

@@ -59,7 +59,7 @@ import mekhq.campaign.personnel.quartermaster.EquipmentKitCatalog.KitProfession;
 public final class DefaultKitChanges {
     /** The armor-kit groups that carry a default kit option. Soldiers have none. */
     private static final List<Category> ARMOR_GROUPS = List.of(Category.MEKWARRIOR, Category.INFANTRY,
-          Category.AIRCRAFT);
+          Category.SPACE_CREW, Category.AIRCRAFT);
 
     /**
      * One changed default: an equipment-kit profession ({@code profession} set) or an armor-kit group

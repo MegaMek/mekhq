@@ -113,11 +113,26 @@ public class AssignmentPlan {
      * @param unit   the unit
      * @param before each role's temporary crew now, for the roles that change
      * @param after  each role's temporary crew once the change is applied, for the same roles
+     * @param hired  for each role, how many of the temporary crew the change adds are hired into the campaign's pool
+     *               when it is applied, because the pool had too few free; never more than the change adds of that
+     *               role, so taking the change back never leaves the pool short
      */
-    public record StagedTempCrew(Unit unit, Map<PersonnelRole, Integer> before, Map<PersonnelRole, Integer> after) {
+    public record StagedTempCrew(Unit unit, Map<PersonnelRole, Integer> before, Map<PersonnelRole, Integer> after,
+          Map<PersonnelRole, Integer> hired) {
         public StagedTempCrew {
             before = Map.copyOf(before);
             after = Map.copyOf(after);
+            hired = Map.copyOf(hired);
+        }
+
+        /** A change that hires no one into the pool. */
+        public StagedTempCrew(Unit unit, Map<PersonnelRole, Integer> before, Map<PersonnelRole, Integer> after) {
+            this(unit, before, after, Map.of());
+        }
+
+        /** @return how many temporary crew the change hires into the campaign's pool, across every role */
+        public int totalHired() {
+            return hired.values().stream().mapToInt(Integer::intValue).sum();
         }
 
         /** @return how many temporary crew the change adds, negative if it removes them */
@@ -164,15 +179,44 @@ public class AssignmentPlan {
     /**
      * What a temporary crew fill or removal did.
      *
-     * @param staged   the changes it made
-     * @param leftOver the units it could not change: a fill needs a real crew member aboard and temporary crew in the
-     *                 pool, and a removal needs temporary crew to remove
+     * @param staged     the changes it made
+     * @param skipped    the units it could not change, in the order given, each with why
+     * @param shortfalls for each role, how many more temporary crew the units needed than the pool had free and the
+     *                   fill was allowed to hire; empty when every unit it could fill was filled, and always for a
+     *                   removal
+     * @param hired      how many temporary crew it staged hiring into the campaign's pool, across every role
      */
-    public record TempCrewResult(List<StagedTempCrew> staged, List<Unit> leftOver) {
+    public record TempCrewResult(List<StagedTempCrew> staged, Map<Unit, TempCrewSkip> skipped,
+          Map<PersonnelRole, Integer> shortfalls, int hired) {
         public TempCrewResult {
             staged = List.copyOf(staged);
-            leftOver = List.copyOf(leftOver);
+            skipped = Collections.unmodifiableMap(new LinkedHashMap<>(skipped));
+            shortfalls = shortfalls.isEmpty() ? Map.of() : Collections.unmodifiableMap(new EnumMap<>(shortfalls));
         }
+
+        /** @return the units it could not change, in the order given */
+        public List<Unit> leftOver() {
+            return List.copyOf(skipped.keySet());
+        }
+    }
+
+    /** Why a temporary crew fill or removal left a unit unchanged. */
+    public enum TempCrewSkip {
+        /** The unit is deployed, refitting, mothballed or not present. */
+        UNIT_UNAVAILABLE,
+        /** The unit has no crew role temporary crew could fill. */
+        NO_TEMP_CREW_ROLE,
+        /** No real crew member will be aboard to lead the temporary crew. */
+        NO_REAL_CREW,
+        /** Real people and temporary crew already fill every place on the unit. */
+        ALREADY_FULL,
+        /**
+         * The campaign's pool has no free temporary crew of the unit's role, and the fill could not hire more: every one
+         * is already aboard a unit, or the campaign does not use temporary crew for that role.
+         */
+        POOL_EMPTY,
+        /** The unit has no temporary crew to remove. */
+        NO_TEMP_CREW
     }
 
     /**
@@ -267,7 +311,8 @@ public class AssignmentPlan {
     }
 
     /**
-     * @param isTechBusy says whether a tech is tied up, for example on a refit, and so cannot take on more units
+     * @param isTechBusy says whether a tech is tied up, for example on a refit. Auto-fill passes such techs over, but the
+     *                   player may still give them units by hand
      */
     public void setTechBusy(final Predicate<Person> isTechBusy) {
         this.isTechBusy = Objects.requireNonNull(isTechBusy);
@@ -526,8 +571,8 @@ public class AssignmentPlan {
 
     /**
      * Whether a tech could be staged to maintain a unit right now: the unit needs maintenance and is available, the
-     * tech can work on it, is at its location and is not tied up, the tech is not already staged to it, and their daily
-     * time would cover it.
+     * tech can work on it and is at its location, the tech is not already staged to it, and their daily time would
+     * cover it. A tech tied up on a refit may still be staged by hand; only auto-fill passes them over.
      *
      * @param tech a tech
      * @param unit the unit
@@ -536,6 +581,14 @@ public class AssignmentPlan {
      */
     public boolean canStageTech(final Person tech, final Unit unit) {
         return whyNotTech(tech, unit) == null;
+    }
+
+    /**
+     * Whether auto-fill may stage a tech to maintain a unit: {@link #canStageTech}, and the tech is not tied up, for
+     * example on a refit.
+     */
+    private boolean canAutoStageTech(final Person tech, final Unit unit) {
+        return !isTechBusy.test(tech) && canStageTech(tech, unit);
     }
 
     // endregion Reading techs
@@ -586,6 +639,7 @@ public class AssignmentPlan {
     public int plannedTempCrewPool(final PersonnelRole role, final ToIntFunction<PersonnelRole> availablePool) {
         int pool = availablePool.applyAsInt(role);
         for (StagedTempCrew change : tempCrewChanges.values()) {
+            pool += change.hired().getOrDefault(role, 0);
             pool -= change.after().getOrDefault(role, 0) - change.before().getOrDefault(role, 0);
         }
         return pool;
@@ -884,6 +938,7 @@ public class AssignmentPlan {
     /**
      * Gives each unit without a tech the first tech, in the order given, who can take it on, as one step of history.
      * Units that will already have a tech are left alone, so best-first techs fill units until their time runs out.
+     * Techs tied up on a refit are passed over.
      *
      * @param techs the techs, best first
      * @param units the units, in the order they should be given techs
@@ -901,8 +956,8 @@ public class AssignmentPlan {
      * Gives the units that will have no tech one each, chosen as the campaign's automatic tech assignment chooses (see
      * {@link AutomatedTechAssignments}), as one step of history. Units are offered a tech by battle value, highest
      * first; each goes to the tech with the best skill for that kind of unit, at most two units per tech, and techs
-     * who never take maintenance automatically are left out. On top of that a tech must pass {@link #canStageTech}, so
-     * their daily time still has to cover every unit they take.
+     * who never take maintenance automatically, or who are tied up on a refit, are left out. On top of that a tech must
+     * pass {@link #canStageTech}, so their daily time still has to cover every unit they take.
      *
      * @param techs the techs to choose from
      * @param units the units
@@ -929,7 +984,7 @@ public class AssignmentPlan {
 
             @Override
             public boolean canTakeOn(Person tech, Unit unit) {
-                return canStageTech(tech, unit);
+                return canAutoStageTech(tech, unit);
             }
 
             @Override
@@ -954,7 +1009,7 @@ public class AssignmentPlan {
             }
             Person chosen = null;
             for (Person tech : techs) {
-                if (canStageTech(tech, unit)) {
+                if (canAutoStageTech(tech, unit)) {
                     chosen = tech;
                     break;
                 }
@@ -1054,36 +1109,76 @@ public class AssignmentPlan {
      * @param availablePool the campaign's free temporary crew of each role, before any staged change; 0 for a role
      *                      the campaign does not use temporary crew for
      *
-     * @return what was staged, and the units that could not be filled
+     * @return what was staged, the units that could not be filled and why, and how short each role's pool ran
      */
     public TempCrewResult fillTempCrew(final List<Unit> units, final ToIntFunction<PersonnelRole> availablePool) {
+        return fillTempCrew(units, availablePool, role -> false);
+    }
+
+    /**
+     * Stages filling each unit with temporary crew of its driver role, up to full strength, as one step of history.
+     * Where the campaign's pool has too few free, the shortfall of each role {@code hireWhenShort} accepts is staged
+     * as hired into the pool, so every unit that can take temporary crew is filled; the hires are made when the plan
+     * is applied.
+     *
+     * @param units         the units
+     * @param availablePool the campaign's free temporary crew of each role, before any staged change; 0 for a role
+     *                      the campaign does not use temporary crew for
+     * @param hireWhenShort the roles whose shortfall may be hired; only roles the campaign uses temporary crew for
+     *
+     * @return what was staged, the units that could not be filled and why, how short each role's pool still ran, and
+     *       how many were hired
+     */
+    public TempCrewResult fillTempCrew(final List<Unit> units, final ToIntFunction<PersonnelRole> availablePool,
+          final Predicate<PersonnelRole> hireWhenShort) {
         final List<Runnable> reverts = new ArrayList<>();
         final List<StagedTempCrew> staged = new ArrayList<>();
-        final List<Unit> leftOver = new ArrayList<>();
+        final Map<Unit, TempCrewSkip> skipped = new LinkedHashMap<>();
+        final Map<PersonnelRole, Integer> shortfalls = new EnumMap<>(PersonnelRole.class);
+        int hiredTotal = 0;
         for (Unit unit : units) {
             final PersonnelRole role = unit.getDriverRole();
             final int realCrew = plannedRealCrew(unit);
-            if (!unit.isAvailable() || (role == null) || (realCrew == 0)) {
-                leftOver.add(unit);
+            if (!unit.isAvailable()) {
+                skipped.put(unit, TempCrewSkip.UNIT_UNAVAILABLE);
+                continue;
+            } else if (role == null) {
+                skipped.put(unit, TempCrewSkip.NO_TEMP_CREW_ROLE);
+                continue;
+            } else if (realCrew == 0) {
+                skipped.put(unit, TempCrewSkip.NO_REAL_CREW);
                 continue;
             }
             final int current = plannedTempCrew(unit, role);
             final int otherTemp = plannedTotalTempCrew(unit) - current;
             final int wanted = Math.max(0, unit.getFullCrewSize() - realCrew - otherTemp);
-            final int added = Math.min(wanted - current, plannedTempCrewPool(role, availablePool));
+            final int needed = wanted - current;
+            if (needed <= 0) {
+                skipped.put(unit, TempCrewSkip.ALREADY_FULL);
+                continue;
+            }
+            final int fromPool = Math.min(needed, Math.max(0, plannedTempCrewPool(role, availablePool)));
+            final int shortfall = needed - fromPool;
+            final int hired = ((shortfall > 0) && hireWhenShort.test(role)) ? shortfall : 0;
+            if (shortfall > hired) {
+                shortfalls.merge(role, shortfall - hired, Integer::sum);
+            }
+            final int added = fromPool + hired;
             if (added <= 0) {
-                leftOver.add(unit);
+                skipped.put(unit, TempCrewSkip.POOL_EMPTY);
                 continue;
             }
             final Map<PersonnelRole, Integer> after = new EnumMap<>(PersonnelRole.class);
             after.put(role, current + added);
-            final StagedTempCrew change = putTempCrew(unit, after, reverts);
+            final StagedTempCrew change = putTempCrew(unit, after, (hired > 0) ? Map.of(role, hired) : Map.of(),
+                  reverts);
             if (change != null) {
                 staged.add(change);
+                hiredTotal += hired;
             }
         }
         record(reverts);
-        return new TempCrewResult(staged, leftOver);
+        return new TempCrewResult(staged, skipped, shortfalls, hiredTotal);
     }
 
     /**
@@ -1091,15 +1186,18 @@ public class AssignmentPlan {
      *
      * @param units the units
      *
-     * @return what was staged, and the units with no temporary crew to remove
+     * @return what was staged, and the units with no temporary crew to remove and why
      */
     public TempCrewResult removeTempCrew(final List<Unit> units) {
         final List<Runnable> reverts = new ArrayList<>();
         final List<StagedTempCrew> staged = new ArrayList<>();
-        final List<Unit> leftOver = new ArrayList<>();
+        final Map<Unit, TempCrewSkip> skipped = new LinkedHashMap<>();
         for (Unit unit : units) {
-            if (!unit.isAvailable() || (plannedTotalTempCrew(unit) == 0)) {
-                leftOver.add(unit);
+            if (!unit.isAvailable()) {
+                skipped.put(unit, TempCrewSkip.UNIT_UNAVAILABLE);
+                continue;
+            } else if (plannedTotalTempCrew(unit) == 0) {
+                skipped.put(unit, TempCrewSkip.NO_TEMP_CREW);
                 continue;
             }
             final Map<PersonnelRole, Integer> after = new EnumMap<>(PersonnelRole.class);
@@ -1108,13 +1206,13 @@ public class AssignmentPlan {
                     after.put(role, 0);
                 }
             }
-            final StagedTempCrew change = putTempCrew(unit, after, reverts);
+            final StagedTempCrew change = putTempCrew(unit, after, Map.of(), reverts);
             if (change != null) {
                 staged.add(change);
             }
         }
         record(reverts);
-        return new TempCrewResult(staged, leftOver);
+        return new TempCrewResult(staged, skipped, Map.of(), 0);
     }
 
     /**
@@ -1207,7 +1305,7 @@ public class AssignmentPlan {
             return Reason.UNIT_UNAVAILABLE;
         } else if (tech.equals(plannedTechOf(unit))) {
             return Reason.ALREADY_ABOARD;
-        } else if (!SeatEligibility.isAssignable(tech) || isTechBusy.test(tech)) {
+        } else if (!SeatEligibility.isAssignable(tech)) {
             return Reason.NOT_ASSIGNABLE;
         } else if (!SeatEligibility.canTech(tech, unit)) {
             return Reason.NOT_QUALIFIED;
@@ -1243,8 +1341,35 @@ public class AssignmentPlan {
     }
 
     /**
-     * Stages one person into the seat another will hold, and that other person out of the unit, as one step of
-     * history, so a single undo puts both back.
+     * Where a replacement would send the person it takes out: into the seat the newcomer leaves, when the newcomer
+     * holds a seat on another unit and the occupant could take it, so the two swap places without either being left
+     * unassigned.
+     *
+     * @param newcomer the person to bring in
+     * @param occupant the person who will hold the seat once the plan is applied
+     *
+     * @return the unit the occupant would move to, or {@code null} if a replacement would leave them unassigned
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public @Nullable Unit swapUnitFor(final Person newcomer, final Person occupant) {
+        final Unit vacatedUnit = plannedUnitOf(newcomer);
+        final SeatType vacatedSeat = plannedSeatOf(newcomer);
+        if ((vacatedUnit == null) || (vacatedSeat == null) || vacatedUnit.equals(plannedUnitOf(occupant))) {
+            return null;
+        }
+        // A seat already over its size stays full after the newcomer leaves it
+        if (openSeats(vacatedUnit, vacatedSeat) < 0) {
+            return null;
+        }
+        return couldTake(occupant, vacatedUnit, vacatedSeat) ? vacatedUnit : null;
+    }
+
+    /**
+     * Stages one person into the seat another will hold, as one step of history, so a single undo puts everyone back.
+     * The person taken out moves into the seat the newcomer leaves when {@link #swapUnitFor} allows it; otherwise
+     * they are taken out of their unit.
      *
      * @param newcomer the person to bring in
      * @param occupant the person who will hold the seat once the plan is applied
@@ -1260,9 +1385,14 @@ public class AssignmentPlan {
         }
         final Unit unit = plannedUnitOf(occupant);
         final SeatType seat = plannedSeatOf(occupant);
+        final Unit swapUnit = swapUnitFor(newcomer, occupant);
+        final SeatType vacatedSeat = plannedSeatOf(newcomer);
         final List<Runnable> reverts = new ArrayList<>();
         put(occupant, null, null, reverts);
         put(newcomer, unit, seat, reverts);
+        if ((swapUnit != null) && canStage(occupant, swapUnit, vacatedSeat)) {
+            put(occupant, swapUnit, vacatedSeat, reverts);
+        }
         record(reverts);
         return true;
     }
@@ -1419,12 +1549,15 @@ public class AssignmentPlan {
 
     /**
      * Records a unit's temporary crew of some roles, replacing any temporary crew change it already had for those
-     * roles.
+     * roles. Hires the unit's change already held are kept, as are {@code newHires}, but never more of a role than the
+     * change adds of it.
+     *
+     * @param newHires for each role, how many more of the temporary crew this adds are hired into the pool
      *
      * @return the new change, or {@code null} if the unit's temporary crew end up as they are now
      */
     private @Nullable StagedTempCrew putTempCrew(final Unit unit, final Map<PersonnelRole, Integer> counts,
-          final List<Runnable> reverts) {
+          final Map<PersonnelRole, Integer> newHires, final List<Runnable> reverts) {
         final StagedTempCrew before = tempCrewChanges.get(unit.getId());
         final Map<PersonnelRole, Integer> fromCounts = new EnumMap<>(PersonnelRole.class);
         final Map<PersonnelRole, Integer> toCounts = new EnumMap<>(PersonnelRole.class);
@@ -1439,7 +1572,18 @@ public class AssignmentPlan {
         toCounts.entrySet().removeIf(entry -> entry.getValue().equals(fromCounts.get(entry.getKey())));
         fromCounts.keySet().retainAll(toCounts.keySet());
 
-        final StagedTempCrew after = toCounts.isEmpty() ? null : new StagedTempCrew(unit, fromCounts, toCounts);
+        // Hires made for earlier fills stay, but only for temporary crew the unit still gains
+        final Map<PersonnelRole, Integer> hired = new EnumMap<>(PersonnelRole.class);
+        if (before != null) {
+            hired.putAll(before.hired());
+        }
+        newHires.forEach((role, count) -> hired.merge(role, count, Integer::sum));
+        hired.replaceAll((role, count) -> Math.min(count,
+              Math.max(0, toCounts.getOrDefault(role, 0) - fromCounts.getOrDefault(role, 0))));
+        hired.values().removeIf(count -> count <= 0);
+
+        final StagedTempCrew after = toCounts.isEmpty() ? null :
+                                           new StagedTempCrew(unit, fromCounts, toCounts, hired);
         if (after != null) {
             tempCrewChanges.put(unit.getId(), after);
         } else {
@@ -1573,7 +1717,7 @@ public class AssignmentPlan {
             return Reason.UNIT_UNAVAILABLE;
         } else if (tech == null) {
             return null;
-        } else if (!SeatEligibility.isAssignable(tech) || isTechBusy.test(tech)) {
+        } else if (!SeatEligibility.isAssignable(tech)) {
             return Reason.NOT_ASSIGNABLE;
         } else if (!SeatEligibility.canTech(tech, unit)) {
             return Reason.NOT_QUALIFIED;

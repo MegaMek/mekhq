@@ -1236,8 +1236,7 @@ public class SalvageRecoveryConsole extends JDialog {
     }
 
     private static double wreckWeight(TestUnit wreck) {
-        Entity entity = wreck.getEntity();
-        return (entity == null) ? 0.0 : entity.getWeight();
+        return CamOpsSalvageUtilities.getSalvageWeight(wreck.getEntity());
     }
 
     /** @return {@code true} if the player can pay for every wreck they are buying */

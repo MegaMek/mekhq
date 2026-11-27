@@ -45,6 +45,7 @@ import java.util.function.ToIntFunction;
 
 import megamek.common.units.Infantry;
 import megamek.common.units.Mek;
+import megamek.common.units.Tank;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.unit.Unit;
@@ -52,6 +53,7 @@ import mekhq.campaign.unit.crewAssignment.AssignmentPlan.AssignResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.Reason;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TechStageResult;
 import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TempCrewResult;
+import mekhq.campaign.unit.crewAssignment.AssignmentPlan.TempCrewSkip;
 import org.junit.jupiter.api.Test;
 
 /** Unassigning, tech changes and temporary crew changes in an {@link AssignmentPlan}. */
@@ -64,7 +66,19 @@ class AssignmentPlanTechTempCrewTest {
     }
 
     private static ToIntFunction<PersonnelRole> pool(int soldiers) {
-        return role -> (role == PersonnelRole.SOLDIER) ? soldiers : 0;
+        return pool(PersonnelRole.SOLDIER, soldiers);
+    }
+
+    private static ToIntFunction<PersonnelRole> pool(PersonnelRole poolRole, int count) {
+        return role -> (role == poolRole) ? count : 0;
+    }
+
+    /** A tracked vehicle needing eight crew, like a Mobile Long Tom, with one real driver aboard. */
+    private Unit longTomWithOneDriver() {
+        Person driver = fixture.person("Driver", PersonnelRole.VEHICLE_CREW_GROUND);
+        return fixture.vehicle(mock(Tank.class), "Long Tom", 7)
+                     .with(driver, SeatType.DRIVER)
+                     .withTempCrew(PersonnelRole.VEHICLE_CREW_GROUND, 0).unit;
     }
 
     // region Unassigning
@@ -178,11 +192,38 @@ class AssignmentPlanTechTempCrewTest {
     }
 
     @Test
-    void aBusyTechCannotTakeOnMoreUnits() {
+    void aBusyTechCanStillBeGivenAUnitByHand() {
         Person tech = fixture.tech("Tech", 480);
+        Unit unit = mek("Mek").unit;
         plan.setTechBusy(person -> person == tech);
 
-        assertFalse(plan.canStageTech(tech, mek("Mek").unit));
+        assertNull(plan.whyNotTech(tech, unit));
+        assertTrue(plan.stageTech(tech, unit));
+        assertTrue(plan.validateTechs().isEmpty());
+    }
+
+    @Test
+    void stagingTechsPassesOverABusyTech() {
+        Person busy = fixture.tech("Busy", 480);
+        Person free = fixture.tech("Free", 480);
+        Unit unit = mek("Mek").unit;
+        plan.setTechBusy(person -> person == busy);
+
+        plan.stageTechs(List.of(busy, free), List.of(unit));
+
+        assertEquals(free, plan.plannedTechOf(unit));
+    }
+
+    @Test
+    void autoFillPassesOverABusyTech() {
+        Person tech = fixture.tech("Tech", 480);
+        Unit unit = mek("Mek").unit;
+        plan.setTechBusy(person -> person == tech);
+
+        TechStageResult result = plan.autoStageTechs(List.of(tech), List.of(unit));
+
+        assertTrue(result.staged().isEmpty());
+        assertNull(plan.plannedTechOf(unit));
     }
 
     @Test
@@ -201,14 +242,6 @@ class AssignmentPlanTechTempCrewTest {
         assertEquals(Reason.ALREADY_ABOARD, plan.whyNotTech(tech, first));
         assertEquals(Reason.NO_TECH_TIME, plan.whyNotTech(tech, second));
         assertFalse(plan.canStageTech(tech, second));
-    }
-
-    @Test
-    void whyNotTechSaysABusyTechIsNotAvailable() {
-        Person tech = fixture.tech("Tech", 480);
-        plan.setTechBusy(person -> person == tech);
-
-        assertEquals(Reason.NOT_ASSIGNABLE, plan.whyNotTech(tech, mek("Mek").unit));
     }
 
     @Test
@@ -369,6 +402,7 @@ class AssignmentPlanTechTempCrewTest {
         assertEquals(9, plan.plannedTempCrew(platoonA, PersonnelRole.SOLDIER));
         assertEquals(3, plan.plannedTempCrew(platoonB, PersonnelRole.SOLDIER));
         assertTrue(result.leftOver().isEmpty());
+        assertEquals(Map.of(PersonnelRole.SOLDIER, 6), result.shortfalls());
         assertEquals(0, plan.plannedTempCrewPool(PersonnelRole.SOLDIER, pool(12)));
     }
 
@@ -380,7 +414,134 @@ class AssignmentPlanTechTempCrewTest {
         TempCrewResult result = plan.fillTempCrew(List.of(empty), pool(20));
 
         assertEquals(List.of(empty), result.leftOver());
+        assertEquals(Map.of(empty, TempCrewSkip.NO_REAL_CREW), result.skipped());
         assertTrue(plan.isEmpty());
+    }
+
+    @Test
+    void aVehicleWithOneRealCrewMemberIsFilledToFullStrength() {
+        Unit longTom = longTomWithOneDriver();
+
+        TempCrewResult result = plan.fillTempCrew(List.of(longTom), pool(PersonnelRole.VEHICLE_CREW_GROUND, 20));
+
+        assertEquals(1, result.staged().size());
+        assertTrue(result.skipped().isEmpty());
+        assertTrue(result.shortfalls().isEmpty());
+        assertEquals(7, plan.plannedTempCrew(longTom, PersonnelRole.VEHICLE_CREW_GROUND));
+    }
+
+    @Test
+    void aFillFromAnEmptyPoolBlamesThePoolNotTheRealCrew() {
+        Unit longTom = longTomWithOneDriver();
+
+        TempCrewResult result = plan.fillTempCrew(List.of(longTom), pool(PersonnelRole.VEHICLE_CREW_GROUND, 0));
+
+        assertEquals(Map.of(longTom, TempCrewSkip.POOL_EMPTY), result.skipped());
+        assertEquals(Map.of(PersonnelRole.VEHICLE_CREW_GROUND, 7), result.shortfalls());
+        assertTrue(plan.isEmpty());
+    }
+
+    @Test
+    void aFillAllowedToHireTakesWhatThePoolHasAndHiresTheRest() {
+        Unit longTom = longTomWithOneDriver();
+        ToIntFunction<PersonnelRole> pool = pool(PersonnelRole.VEHICLE_CREW_GROUND, 3);
+
+        TempCrewResult result = plan.fillTempCrew(List.of(longTom), pool,
+              role -> role == PersonnelRole.VEHICLE_CREW_GROUND);
+
+        assertEquals(7, plan.plannedTempCrew(longTom, PersonnelRole.VEHICLE_CREW_GROUND));
+        assertEquals(4, result.hired());
+        assertEquals(Map.of(PersonnelRole.VEHICLE_CREW_GROUND, 4), result.staged().get(0).hired());
+        assertTrue(result.shortfalls().isEmpty());
+        assertEquals(0, plan.plannedTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, pool));
+    }
+
+    @Test
+    void hiringAfterAShortFillTopsUpWhatThePoolCouldNotCover() {
+        Unit longTom = longTomWithOneDriver();
+        ToIntFunction<PersonnelRole> pool = pool(PersonnelRole.VEHICLE_CREW_GROUND, 3);
+        TempCrewResult shortFill = plan.fillTempCrew(List.of(longTom), pool);
+        assertEquals(Map.of(PersonnelRole.VEHICLE_CREW_GROUND, 4), shortFill.shortfalls());
+
+        TempCrewResult hireFill = plan.fillTempCrew(List.of(longTom), pool, role -> true);
+
+        assertEquals(4, hireFill.hired());
+        assertEquals(7, plan.plannedTempCrew(longTom, PersonnelRole.VEHICLE_CREW_GROUND));
+        assertEquals(Map.of(PersonnelRole.VEHICLE_CREW_GROUND, 4), plan.tempCrewChanges().get(0).hired());
+        assertEquals(0, plan.plannedTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, pool));
+    }
+
+    @Test
+    void undoingTheHireLeavesTheShortFill() {
+        Unit longTom = longTomWithOneDriver();
+        ToIntFunction<PersonnelRole> pool = pool(PersonnelRole.VEHICLE_CREW_GROUND, 3);
+        plan.fillTempCrew(List.of(longTom), pool);
+        plan.fillTempCrew(List.of(longTom), pool, role -> true);
+
+        assertTrue(plan.undo());
+
+        assertEquals(3, plan.plannedTempCrew(longTom, PersonnelRole.VEHICLE_CREW_GROUND));
+        assertEquals(0, plan.tempCrewChanges().get(0).totalHired());
+        assertEquals(0, plan.plannedTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, pool));
+    }
+
+    @Test
+    void takingBackAHiringFillReturnsThePoolToWhereItWas() {
+        Unit longTom = longTomWithOneDriver();
+        ToIntFunction<PersonnelRole> pool = pool(PersonnelRole.VEHICLE_CREW_GROUND, 3);
+        plan.fillTempCrew(List.of(longTom), pool, role -> true);
+
+        assertTrue(plan.removeTempCrewChange(longTom, pool));
+
+        assertTrue(plan.tempCrewChanges().isEmpty());
+        assertEquals(3, plan.plannedTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, pool));
+    }
+
+    @Test
+    void removingTempCrewAfterAHiringFillDropsTheHire() {
+        Unit longTom = longTomWithOneDriver();
+        ToIntFunction<PersonnelRole> pool = pool(PersonnelRole.VEHICLE_CREW_GROUND, 3);
+        plan.fillTempCrew(List.of(longTom), pool, role -> true);
+
+        plan.removeTempCrew(List.of(longTom));
+
+        assertTrue(plan.tempCrewChanges().isEmpty());
+        assertEquals(3, plan.plannedTempCrewPool(PersonnelRole.VEHICLE_CREW_GROUND, pool));
+    }
+
+    @Test
+    void aRoleThatMayNotBeHiredIsLeftShort() {
+        Unit longTom = longTomWithOneDriver();
+
+        TempCrewResult result = plan.fillTempCrew(List.of(longTom), pool(PersonnelRole.VEHICLE_CREW_GROUND, 0),
+              role -> role == PersonnelRole.SOLDIER);
+
+        assertEquals(0, result.hired());
+        assertEquals(Map.of(longTom, TempCrewSkip.POOL_EMPTY), result.skipped());
+        assertEquals(Map.of(PersonnelRole.VEHICLE_CREW_GROUND, 7), result.shortfalls());
+    }
+
+    @Test
+    void aUnitAlreadyAtFullStrengthIsSkippedAsFull() {
+        Person soldier = fixture.person("Soldier", PersonnelRole.SOLDIER);
+        Unit platoon = fixture.infantry(mock(Infantry.class), "Platoon", true, 10)
+                             .with(soldier, SeatType.SOLDIER)
+                             .withTempCrew(PersonnelRole.SOLDIER, 9).unit;
+
+        TempCrewResult result = plan.fillTempCrew(List.of(platoon), pool(20));
+
+        assertEquals(Map.of(platoon, TempCrewSkip.ALREADY_FULL), result.skipped());
+        assertTrue(result.shortfalls().isEmpty());
+    }
+
+    @Test
+    void anUnavailableUnitIsSkippedAsUnavailable() {
+        Unit longTom = longTomWithOneDriver();
+        when(longTom.isAvailable()).thenReturn(false);
+
+        TempCrewResult result = plan.fillTempCrew(List.of(longTom), pool(PersonnelRole.VEHICLE_CREW_GROUND, 20));
+
+        assertEquals(Map.of(longTom, TempCrewSkip.UNIT_UNAVAILABLE), result.skipped());
     }
 
     @Test
@@ -406,6 +567,17 @@ class AssignmentPlanTechTempCrewTest {
         assertEquals(-7, result.staged().get(0).change());
         assertEquals(0, plan.plannedTotalTempCrew(platoon));
         assertEquals(7, plan.plannedTempCrewPool(PersonnelRole.SOLDIER, pool(0)));
+    }
+
+    @Test
+    void removingFromAUnitWithNoTempCrewSkipsIt() {
+        Unit platoon = fixture.infantry(mock(Infantry.class), "Platoon", true, 10)
+                             .withTempCrew(PersonnelRole.SOLDIER, 0).unit;
+
+        TempCrewResult result = plan.removeTempCrew(List.of(platoon));
+
+        assertEquals(Map.of(platoon, TempCrewSkip.NO_TEMP_CREW), result.skipped());
+        assertTrue(plan.isEmpty());
     }
 
     @Test

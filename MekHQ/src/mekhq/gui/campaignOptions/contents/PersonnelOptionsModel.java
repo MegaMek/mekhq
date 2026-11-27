@@ -142,6 +142,7 @@ class PersonnelOptionsModel {
     int chassisFamiliaritySpeed;
     String mekWarriorDefaultKit;
     String vehicleCrewDefaultKit;
+    String spaceCrewDefaultKit;
     String aircraftDefaultKit;
     boolean addDefaultKitToProcurement;
     boolean npcFactionArmorKits;
@@ -255,6 +256,7 @@ class PersonnelOptionsModel {
         chassisFamiliaritySpeed = options.get(CampaignOption.CHASSIS_FAMILIARITY_SPEED);
         mekWarriorDefaultKit = options.get(CampaignOption.MEKWARRIOR_DEFAULT_KIT);
         vehicleCrewDefaultKit = options.get(CampaignOption.VEHICLE_CREW_DEFAULT_KIT);
+        spaceCrewDefaultKit = options.get(CampaignOption.SPACE_CREW_DEFAULT_KIT);
         aircraftDefaultKit = options.get(CampaignOption.AIRCRAFT_DEFAULT_KIT);
         addDefaultKitToProcurement = options.get(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT);
         npcFactionArmorKits = options.get(CampaignOption.NPC_FACTION_ARMOR_KITS);
@@ -373,6 +375,7 @@ class PersonnelOptionsModel {
         options.set(CampaignOption.CHASSIS_FAMILIARITY_SPEED, chassisFamiliaritySpeed);
         options.set(CampaignOption.MEKWARRIOR_DEFAULT_KIT, mekWarriorDefaultKit);
         options.set(CampaignOption.VEHICLE_CREW_DEFAULT_KIT, vehicleCrewDefaultKit);
+        options.set(CampaignOption.SPACE_CREW_DEFAULT_KIT, spaceCrewDefaultKit);
         options.set(CampaignOption.AIRCRAFT_DEFAULT_KIT, aircraftDefaultKit);
         options.set(CampaignOption.ADD_DEFAULT_KIT_TO_PROCUREMENT, addDefaultKitToProcurement);
         options.set(CampaignOption.NPC_FACTION_ARMOR_KITS, npcFactionArmorKits);

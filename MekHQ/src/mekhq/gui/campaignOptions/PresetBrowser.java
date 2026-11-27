@@ -55,7 +55,9 @@ import java.util.List;
 import java.util.Locale;
 import java.util.function.Consumer;
 import javax.swing.*;
+import javax.swing.text.html.HTMLDocument;
 import javax.swing.text.html.HTMLEditorKit;
+import javax.swing.text.html.StyleSheet;
 
 import jakarta.annotation.Nullable;
 import mekhq.CampaignPreset;
@@ -348,13 +350,19 @@ public class PresetBrowser extends JPanel {
         pane.setOpaque(false);
         HTMLEditorKit kit = new HTMLEditorKit();
         pane.setEditorKit(kit);
+        // Add rules to this document's own style sheet. HTMLEditorKit.getStyleSheet() returns the default style sheet
+        // shared by every HTML label and pane in the application, so rules added there (such as the HUD text colour
+        // for <b>) would leak into the rest of the GUI and clash with the light theme.
+        HTMLDocument document = (HTMLDocument) kit.createDefaultDocument();
+        StyleSheet styleSheet = document.getStyleSheet();
         Font font = hudFont(Font.PLAIN, 0.95f, 0.0f);
-        kit.getStyleSheet().addRule("body { color: " + hex(TEXT_MUTED) + "; font-family: '" + font.getFamily()
-                                          + "'; font-size: " + font.getSize() + "pt; margin: 0; }");
-        kit.getStyleSheet().addRule("h1, h2, h3 { color: " + hex(TEXT) + "; font-size: " + (font.getSize() + 1)
-                                          + "pt; margin-top: 10px; margin-bottom: 2px; }");
-        kit.getStyleSheet().addRule("b { color: " + hex(TEXT) + "; }");
-        kit.getStyleSheet().addRule("ul { margin-top: 2px; margin-left: 16px; }");
+        styleSheet.addRule("body { color: " + hex(TEXT_MUTED) + "; font-family: '" + font.getFamily()
+                                 + "'; font-size: " + font.getSize() + "pt; margin: 0; }");
+        styleSheet.addRule("h1, h2, h3 { color: " + hex(TEXT) + "; font-size: " + (font.getSize() + 1)
+                                 + "pt; margin-top: 10px; margin-bottom: 2px; }");
+        styleSheet.addRule("b { color: " + hex(TEXT) + "; }");
+        styleSheet.addRule("ul { margin-top: 2px; margin-left: 16px; }");
+        pane.setDocument(document);
         pane.setText("<html><body>" + html + "</body></html>");
         pane.setCaretPosition(0);
         return pane;
