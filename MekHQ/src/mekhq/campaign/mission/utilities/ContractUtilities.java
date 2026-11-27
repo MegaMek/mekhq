@@ -281,6 +281,23 @@ public class ContractUtilities {
         return cachedJumpPath;
     }
 
+    /**
+     * Whether reaching the contract's target from {@code currentLocation} takes no jumps - the force is already in the
+     * target system (most often on the target world itself), or no route can be measured. Such a contract involves no
+     * interstellar travel, so it earns no transport pay and its transport term has nothing to negotiate.
+     *
+     * @param campaign         the campaign
+     * @param abstractContract the contract being travelled to
+     * @param currentLocation  the force's location
+     *
+     * @return {@code true} when no jumps lie between the force and the contract's target
+     */
+    public static boolean isWithoutJumpsToTarget(Campaign campaign, AbstractContract abstractContract,
+          AbstractLocation currentLocation) {
+        JumpPath jumpPath = getJumpPath(campaign, abstractContract, currentLocation);
+        return (jumpPath == null) || (jumpPath.getJumps() == 0);
+    }
+
     private static JumpPath refreshJumpPath(Campaign campaign, AbstractContract abstractContract,
           PlanetarySystem currentSystem, PlanetarySystem targetSystem, @Nullable Planet targetPlanet,
           @Nullable Planet originPlanet) {

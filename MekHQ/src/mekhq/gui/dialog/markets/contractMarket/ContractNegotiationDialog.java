@@ -83,6 +83,7 @@ import mekhq.campaign.mission.contract.utilities.ActiveNegotiationMath;
 import mekhq.campaign.mission.contract.utilities.ContractCharacteristics;
 import mekhq.campaign.mission.contract.utilities.NegotiationStepMath;
 import mekhq.campaign.mission.contract.utilities.NegotiationStepMath.Term;
+import mekhq.campaign.mission.utilities.ContractUtilities;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.PersonnelOptions;
 import mekhq.campaign.personnel.skills.ActionCheckResult;
@@ -137,6 +138,8 @@ public class ContractNegotiationDialog extends JDialog {
     private final transient Campaign campaign;
     private final transient AbstractContract contract;
     private final transient AbstractLocation currentLocation;
+    /** Whether the contract needs no jumps to reach, so there is no transport to pay for or negotiate. */
+    private final boolean isWithoutTravel;
     private transient NonNegotiableTermsData nonNegotiableTerms;
 
     private final int scale;
@@ -225,6 +228,7 @@ public class ContractNegotiationDialog extends JDialog {
 
         CampaignOptions campaignOptions = campaign.getCampaignOptions();
         this.currentLocation = campaign.getPlayerForce().getForceDetachment().getCurrentLocation();
+        this.isWithoutTravel = ContractUtilities.isWithoutJumpsToTarget(campaign, contract, currentLocation);
 
         this.scale = max(1, contract.getScale());
         if (contract.getPlayerNegotiator() == null) {
@@ -1026,10 +1030,14 @@ public class ContractNegotiationDialog extends JDialog {
      * these are dictated outright by a pirate raid: command rights and salvage on every pirate raid, plus support and
      * transport on a self-directed (non-covert) raid (a secretly-bankrolled covert raid leaves those to its hidden
      * sponsor). A contract fought with simulated damage (such as Cadre Duty) also fixes salvage, as its battles leave
-     * nothing behind to salvage.
+     * nothing behind to salvage. A contract that needs no jumps to reach (such as one on the world the force already
+     * stands on) fixes transport, as there is no journey to pay for.
      */
     private boolean isPermanentlyLocked(Clause clause) {
         if (clause == Clause.SALVAGE && contract.usesSpecialRule(SIMULATED_DAMAGE)) {
+            return true;
+        }
+        if (clause == Clause.TRANSPORT && isWithoutTravel) {
             return true;
         }
         if (!isPirateContract()) {
@@ -1837,8 +1845,10 @@ public class ContractNegotiationDialog extends JDialog {
                       BorderFactory.createLineBorder(fixed ? BORDER : AMBER, scaleForGUI(1)),
                       BorderFactory.createEmptyBorder(scaleForGUI(4), scaleForGUI(7), scaleForGUI(4),
                             scaleForGUI(7))));
-                lockBadge.setToolTipText(fixed ? Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE,
-                      "negotiate.contractMarket.locked.permanent.tooltip")) : null);
+                String fixedTooltipKey = (clause == Clause.TRANSPORT && isWithoutTravel)
+                                               ? "negotiate.contractMarket.locked.noTravel.tooltip"
+                                               : "negotiate.contractMarket.locked.permanent.tooltip";
+                lockBadge.setToolTipText(fixed ? Hud.wrapToolTip(getTextAt(RESOURCE_BUNDLE, fixedTooltipKey)) : null);
                 controls.add(lockBadge);
             } else {
                 String lowerReason = lowerBlockReason(clause);
