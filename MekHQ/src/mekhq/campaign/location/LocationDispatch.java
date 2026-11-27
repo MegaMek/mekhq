@@ -334,6 +334,9 @@ public final class LocationDispatch {
                 UnitPartsTransfer.moveUnitParts(campaign, unit, arrivalWarehouse);
             }
         });
+
+        // A unit sent without its carrier, or a carrier sent without its cargo, leaves that cargo behind
+        TransportLinksAcrossPlaces.release(campaign, units);
     }
 
     /**
