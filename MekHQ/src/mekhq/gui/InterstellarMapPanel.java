@@ -3915,11 +3915,13 @@ public class InterstellarMapPanel extends JPanel {
         mapLegendDialog = dialog;
 
         dialog.pack();
-        Rectangle availableBounds = getMapLegendDialogBounds(owner);
+        // The map panel is hidden while the planetary system view is displayed, so fall back to the component that
+        // opened the dialog for screen placement
+        Component relativeTo = mapPanel.isShowing() ? mapPanel : invoker;
+        Rectangle availableBounds = getMapLegendDialogBounds(owner, relativeTo);
         Dimension packedSize = dialog.getSize();
         dialog.setSize(Math.min(packedSize.width, availableBounds.width),
               Math.min(packedSize.height, availableBounds.height));
-        Component relativeTo = mapPanel.isShowing() ? mapPanel : owner;
         dialog.setLocationRelativeTo(relativeTo);
         constrainToBounds(dialog, availableBounds);
         dialog.setVisible(true);
@@ -3947,8 +3949,8 @@ public class InterstellarMapPanel extends JPanel {
         });
     }
 
-    private Rectangle getMapLegendDialogBounds(@Nullable Window owner) {
-        Rectangle bounds = getUsableScreenBounds(mapPanel);
+    private static Rectangle getMapLegendDialogBounds(@Nullable Window owner, Component screenReference) {
+        Rectangle bounds = getUsableScreenBounds(screenReference);
         if ((owner != null) && owner.isShowing()) {
             Rectangle ownerBounds = bounds.intersection(owner.getBounds());
             if (!ownerBounds.isEmpty()) {
@@ -3980,6 +3982,12 @@ public class InterstellarMapPanel extends JPanel {
 
     private static Rectangle getUsableScreenBounds(Component component) {
         GraphicsConfiguration configuration = component.getGraphicsConfiguration();
+        if (configuration == null) {
+            // Components that are not part of a displayed hierarchy have no graphics configuration
+            configuration = GraphicsEnvironment.getLocalGraphicsEnvironment()
+                  .getDefaultScreenDevice()
+                  .getDefaultConfiguration();
+        }
         Rectangle usableScreen = new Rectangle(configuration.getBounds());
         Insets screenInsets = Toolkit.getDefaultToolkit().getScreenInsets(configuration);
         usableScreen.x += screenInsets.left;

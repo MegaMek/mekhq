@@ -221,8 +221,8 @@ public enum Familiarity {
      *
      * <p>Normally this happens on the first of each month. While the campaign is on an offensive contract, or on a
      * defensive contract that isn't peaceful between raids, it happens every Monday instead. Each unit gains Familiarity
-     * as if it had returned from a scenario, following all the usual restrictions (eligible chassis, single-unit techs,
-     * trait modifiers, and the mode's cap).</p>
+     * as if it had returned from a scenario, following all the usual rules (eligible chassis, techs splitting their gain
+     * across their assigned units, trait modifiers, and the mode's cap).</p>
      *
      * @param campaign the current campaign
      * @param today    the date being processed
@@ -299,7 +299,7 @@ public enum Familiarity {
 
         Person unitTech = unit.getTech();
         if (unitTech != null) {
-            gateMultipleTechAssignments(campaign, mode, unitTech, chassis, cap, familiarityGain);
+            addTechFamiliarity(campaign, mode, unitTech, chassis, cap, familiarityGain);
         }
     }
 
@@ -337,12 +337,25 @@ public enum Familiarity {
         addFamiliarity(campaign, mode, person, unitEntity.getChassis(), cap, gainType.rollFamiliarity(speed));
     }
 
-    private static void gateMultipleTechAssignments(Campaign campaign, Familiarity mode, Person unitTech,
-          String chassis, int cap, int familiarityGain) {
-        boolean singleUnitAssignment = unitTech.getTechUnits().size() == 1;
-        if (singleUnitAssignment) {
-            addFamiliarity(campaign, mode, unitTech, chassis, cap, familiarityGain);
-        }
+    /**
+     * Awards a unit's tech their share of the crew's familiarity gain. A tech's attention is split across every unit
+     * they maintain, so the gain is divided by the number of units they're assigned to.
+     *
+     * @param campaign        the current campaign
+     * @param mode            the active familiarity mode
+     * @param unitTech        the tech assigned to the unit
+     * @param chassis         the base chassis name
+     * @param cap             the maximum familiarity this gain may raise the tech to
+     * @param familiarityGain the crew's gain, before division and per-character trait modifiers
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static void addTechFamiliarity(Campaign campaign, Familiarity mode, Person unitTech, String chassis,
+          int cap, int familiarityGain) {
+        int techUnitCount = Math.max(1, unitTech.getTechUnits().size());
+        double shareOfGain = 1.0 / techUnitCount;
+        addFamiliarity(campaign, mode, unitTech, chassis, cap, familiarityGain, shareOfGain);
     }
 
     /**
@@ -363,6 +376,19 @@ public enum Familiarity {
      */
     private static void addFamiliarity(Campaign campaign, Familiarity mode, Person crew, String chassis, int cap,
           int familiarityGain) {
+        addFamiliarity(campaign, mode, crew, chassis, cap, familiarityGain, 1.0);
+    }
+
+    /**
+     * As {@link #addFamiliarity(Campaign, Familiarity, Person, String, int, int)}, but scales the gain by
+     * {@code shareOfGain} first. The share and any trait multiplier are combined before rounding, so the result is
+     * rounded only once.
+     *
+     * @param shareOfGain the fraction of {@code familiarityGain} this character receives (for example, a tech assigned
+     *                    to three units receives a third)
+     */
+    private static void addFamiliarity(Campaign campaign, Familiarity mode, Person crew, String chassis, int cap,
+          int familiarityGain, double shareOfGain) {
         PersonnelOptions options = crew.getOptions();
         boolean hasIronBond = options.booleanOption(FAMILIARITY_IRON_BOND);
         boolean isEmotionallyUnavailable = options.booleanOption(FAMILIARITY_EMOTIONALLY_UNAVAILABLE);
@@ -378,7 +404,7 @@ public enum Familiarity {
             multiplier = 0.0;
         }
 
-        familiarityGain = (int) Math.round(familiarityGain * multiplier);
+        familiarityGain = (int) Math.round(familiarityGain * multiplier * shareOfGain);
 
         boolean alreadyCapped = currentFamiliarity == cap;
         crew.addChassisFamiliarity(chassis, familiarityGain, cap);
