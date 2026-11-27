@@ -873,18 +873,18 @@ public final class CampaignOption<T> {
     public static final CampaignOption<Double> MIXED_TECH_UNIT_PRICE_MULTIPLIER =
           of(Double.class, 1.0, "mixedTechUnitPriceMultiplier");
     public static final CampaignOption<Double> CLAN_TECH_INVASION_PRICE_MULTIPLIER =
-          of(Double.class, 1.0, "clanTechInvasionPriceMultiplier");
+          of(Double.class, 5.0, "clanTechInvasionPriceMultiplier");
     public static final CampaignOption<Double> CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER =
-          of(Double.class, 1.0, "clanTechPostInvasionPriceMultiplier");
+          of(Double.class, 4.0, "clanTechPostInvasionPriceMultiplier");
     public static final CampaignOption<Double> SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER =
-          of(Double.class, 1.0, "successionWarsAdvancedTechPriceMultiplier");
+          of(Double.class, 5.0, "successionWarsAdvancedTechPriceMultiplier");
     public static final CampaignOption<Double> TECH_RATING_E_PRICE_MULTIPLIER =
-          of(Double.class, 1.0, "techRatingEPriceMultiplier");
+          of(Double.class, 1.1, "techRatingEPriceMultiplier");
     public static final CampaignOption<Double> TECH_RATING_F_PRICE_MULTIPLIER =
-          of(Double.class, 1.0, "techRatingFPriceMultiplier");
+          of(Double.class, 1.25, "techRatingFPriceMultiplier");
     /** Unofficial: the acquisition multipliers also apply when buying and selling parts, not only units. */
     public static final CampaignOption<Boolean> APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS =
-          of(Boolean.class, false, "applyAcquisitionMultipliersToParts");
+          of(Boolean.class, true, "applyAcquisitionMultipliersToParts");
     public static final CampaignOption<Double> DAMAGED_PARTS_VALUE_MULTIPLIER =
           of(Double.class, 0.33, "damagedPartsValueMultiplier");
     public static final CampaignOption<Double> UNREPAIRABLE_PARTS_VALUE_MULTIPLIER =
@@ -1049,8 +1049,6 @@ public final class CampaignOption<T> {
           of(Boolean.class, true, "variableContractLength");
     public static final CampaignOption<Boolean> USE_DYNAMIC_DIFFICULTY =
           of(Boolean.class, false, "useDynamicDifficulty");
-    public static final CampaignOption<Boolean> USE_BOLSTER_CONTRACT_SKILL =
-          of(Boolean.class, false, "useBolsterContractSkill");
     public static final CampaignOption<Boolean> CONTRACT_MARKET_REPORT_REFRESH =
           of(Boolean.class, true, "contractMarketReportRefresh");
     public static final CampaignOption<Integer> CONTRACT_MAX_SALVAGE_PERCENTAGE =

@@ -41,6 +41,8 @@ import mekhq.campaign.enums.DragoonRating;
 import mekhq.campaign.mission.contract.contractGeneration.ChaosEmployerForceRating.ForceRating;
 import mekhq.campaign.universe.Faction;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.CsvSource;
 
 class ChaosEmployerForceRatingTest {
     /** A year past the early-Renaissance recovery window, so era degradation is zero. */
@@ -104,17 +106,48 @@ class ChaosEmployerForceRatingTest {
         assertEquals(0, ChaosEmployerForceRating.eraDelta(clan(), 3038));
     }
 
-    // --- playerScalingDelta ---
+    // --- scaleEnemySkillToPlayer ---
+
+    /** One level per full two levels between the enemy and the player, toward the player. */
+    @ParameterizedTest
+    @CsvSource({
+          // Within one level: unchanged
+          "REGULAR, REGULAR, REGULAR",
+          "GREEN, REGULAR, GREEN",
+          "VETERAN, REGULAR, VETERAN",
+          // Enemy below the player: raised
+          "GREEN, VETERAN, REGULAR",
+          "ULTRA_GREEN, VETERAN, GREEN",
+          "ULTRA_GREEN, ELITE, REGULAR",
+          "ULTRA_GREEN, LEGENDARY, VETERAN",
+          // Enemy above the player: lowered
+          "ELITE, REGULAR, VETERAN",
+          "HEROIC, REGULAR, ELITE",
+          "LEGENDARY, GREEN, ELITE",
+          "LEGENDARY, ULTRA_GREEN, VETERAN"
+    })
+    void scaleEnemySkillToPlayerMovesOneLevelPerTwoLevelGap(SkillLevel enemySkill, SkillLevel playerSkill,
+          SkillLevel expected) {
+        assertEquals(expected, ChaosEmployerForceRating.scaleEnemySkillToPlayer(enemySkill, playerSkill));
+    }
 
     @Test
-    void playerScalingDeltaFavorsWeakPlayerAlliesAndWeakensEnemies() {
-        // Employer/ally side: weaker player -> stronger allies (positive).
-        assertEquals(0, ChaosEmployerForceRating.playerScalingDelta(true, SkillLevel.REGULAR));
-        assertEquals(1, ChaosEmployerForceRating.playerScalingDelta(true, SkillLevel.GREEN));
-        assertEquals(-2, ChaosEmployerForceRating.playerScalingDelta(true, SkillLevel.ELITE));
-        // Enemy side: weaker player -> weaker enemies (mirror image).
-        assertEquals(-1, ChaosEmployerForceRating.playerScalingDelta(false, SkillLevel.GREEN));
-        assertEquals(2, ChaosEmployerForceRating.playerScalingDelta(false, SkillLevel.ELITE));
+    void resolveSkillScalesTheEnemyToThePlayer() {
+        // Regular enemy against an Elite player: two levels below, so one level up
+        assertEquals(SkillLevel.VETERAN, ChaosEmployerForceRating.resolveSkill(majorHouse(), false, false,
+              RENAISSANCE_END_YEAR, ContractImportance.STANDARD, true, SkillLevel.ELITE));
+    }
+
+    @Test
+    void resolveSkillDoesNotScaleTheEmployer() {
+        assertEquals(SkillLevel.REGULAR, ChaosEmployerForceRating.resolveSkill(majorHouse(), false, true,
+              RENAISSANCE_END_YEAR, ContractImportance.STANDARD, true, SkillLevel.LEGENDARY));
+    }
+
+    @Test
+    void resolveSkillDoesNotScaleTheEnemyWithDynamicDifficultyOff() {
+        assertEquals(SkillLevel.REGULAR, ChaosEmployerForceRating.resolveSkill(majorHouse(), false, false,
+              RENAISSANCE_END_YEAR, ContractImportance.STANDARD, false, SkillLevel.LEGENDARY));
     }
 
     // --- resolveSkill ---
@@ -146,10 +179,10 @@ class ChaosEmployerForceRatingTest {
 
     @Test
     void resolveSkillClampsClansToAtLeastVeteran() {
-        // Clan +2, MINOR -1, employer-side scaling against a Legendary player (3-7 = -4): net -3 would land below
-        // Veteran, but the Clan floor pins it at Veteran.
-        SkillLevel skill = ChaosEmployerForceRating.resolveSkill(clan(), false, true, RENAISSANCE_END_YEAR,
-              ContractImportance.MINOR, true, SkillLevel.LEGENDARY);
+        // Clan +2 and MINOR -1 make a Veteran enemy; three levels above an Ultra-Green player it would drop to
+        // Regular, but the Clan floor pins it at Veteran.
+        SkillLevel skill = ChaosEmployerForceRating.resolveSkill(clan(), false, false, RENAISSANCE_END_YEAR,
+              ContractImportance.MINOR, true, SkillLevel.ULTRA_GREEN);
         assertEquals(SkillLevel.VETERAN, skill);
     }
 
