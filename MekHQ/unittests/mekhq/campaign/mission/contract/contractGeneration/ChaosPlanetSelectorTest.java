@@ -207,13 +207,6 @@ class ChaosPlanetSelectorTest {
               TEST_DATE));
     }
 
-    @Test
-    void planetWeightKeepsUninhabitedBodiesAtTheFloorForPirateHunts() {
-        // Uninhabited bodies have no strategic value, but must not outweigh the inhabited backwaters.
-        assertEquals(ChaosPlanetSelector.UNINHABITED_WORLD_WEIGHT,
-              ChaosPlanetSelector.planetWeight(planetWithStrategicValue(0), ChaosObjectiveType.PIRATE_HUNT, TEST_DATE));
-    }
-
     // --- selectTargetPlanet ---
 
     @Test
@@ -228,15 +221,29 @@ class ChaosPlanetSelectorTest {
               ChaosPlanetSelector.selectTargetPlanet(List.of(only), null, ChaosObjectiveType.RAID, TEST_DATE));
     }
 
-    @Test
-    void selectTargetPlanetNeverPicksAnUninhabitedWorldForAHighValueObjectiveWhenAnInhabitedOneExists() {
-        Planet prize = planetWithStrategicValue(ChaosPlanetStrategicValue.MAX_STRATEGIC_VALUE); // inhabited
+    @ParameterizedTest
+    @CsvSource({ "INVASION", "GARRISON", "RAID", "GUERILLA_OPERATION", "PIRATE_HUNT", "PIRATE_RAID", "EXPEDITION",
+                 "CADRE_DUTY" })
+    void selectTargetPlanetNeverPicksAnUninhabitedWorldWhenAnInhabitedOneExists(
+          final ChaosObjectiveType objectiveType) {
+        Planet prize = inhabitedPlanetWithStrategicValue(8);
         Planet uninhabited = planetWithStrategicValue(0); // no population
 
         for (int i = 0; i < 500; i++) {
-            assertSame(prize, ChaosPlanetSelector.selectTargetPlanet(List.of(prize, uninhabited), null,
-                        ChaosObjectiveType.INVASION, TEST_DATE),
-                  "An invasion must never be situated on the uninhabited body when an inhabited world is available");
+            assertSame(prize, ChaosPlanetSelector.selectTargetPlanet(List.of(prize, uninhabited), uninhabited,
+                        objectiveType, TEST_DATE),
+                  "A contract must never be situated on an uninhabited body when an inhabited world is available");
+        }
+    }
+
+    @Test
+    void selectTargetPlanetPicksThePrimaryWhenNoWorldIsInhabited() {
+        Planet primary = planetWithPopulation(null);
+        Planet otherRock = planetWithPopulation(null);
+
+        for (int i = 0; i < 100; i++) {
+            assertSame(primary, ChaosPlanetSelector.selectTargetPlanet(List.of(otherRock, primary), primary,
+                  ChaosObjectiveType.PIRATE_HUNT, TEST_DATE));
         }
     }
 
@@ -250,69 +257,85 @@ class ChaosPlanetSelectorTest {
     }
 
     @ParameterizedTest
-    @CsvSource({ "INVASION", "GARRISON", "RAID", "GUERILLA_OPERATION", "PIRATE_RAID", "EXPEDITION", "CADRE_DUTY" })
+    @CsvSource({ "INVASION", "GARRISON", "RAID", "GUERILLA_OPERATION", "PIRATE_HUNT", "PIRATE_RAID", "EXPEDITION",
+                 "CADRE_DUTY" })
     void eligiblePlanetsKeepsOnlyInhabitedWorldsWhenOneExists(final ChaosObjectiveType objectiveType) {
         Planet inhabited = planetWithPopulation(1_000L);
         Planet uninhabited = planetWithPopulation(null);
 
         assertEquals(List.of(inhabited),
-              List.copyOf(ChaosPlanetSelector.eligiblePlanets(objectiveType, List.of(inhabited, uninhabited), null,
+              List.copyOf(ChaosPlanetSelector.eligiblePlanets(List.of(inhabited, uninhabited), uninhabited,
                     TEST_DATE)));
     }
 
     @Test
-    void eligiblePlanetsFallsBackToUninhabitedGroundWhenNoWorldIsInhabited() {
-        Planet uninhabitedA = planetWithPopulation(null);
-        Planet uninhabitedB = planetOfType(PlanetaryType.DWARF_TERRESTRIAL, 0L);
-        Planet gasGiant = planetOfType(PlanetaryType.GAS_GIANT, null);
+    void eligiblePlanetsKeepsEveryInhabitedWorld() {
+        Planet inhabitedA = planetWithPopulation(1_000L);
+        Planet inhabitedB = planetWithPopulation(5_000_000L);
+        Planet uninhabited = planetWithPopulation(0L);
 
-        assertEquals(List.of(uninhabitedA, uninhabitedB),
-              List.copyOf(ChaosPlanetSelector.eligiblePlanets(ChaosObjectiveType.INVASION,
-                    List.of(uninhabitedA, gasGiant, uninhabitedB), gasGiant, TEST_DATE)));
-    }
-
-    @Test
-    void eligiblePlanetsKeepsUninhabitedGroundForAPirateHunt() {
-        Planet inhabited = planetWithPopulation(1_000L);
-        Planet uninhabited = planetWithPopulation(null);
-
-        assertEquals(List.of(inhabited, uninhabited),
-              List.copyOf(ChaosPlanetSelector.eligiblePlanets(ChaosObjectiveType.PIRATE_HUNT,
-                    List.of(inhabited, uninhabited), null, TEST_DATE)));
+        assertEquals(List.of(inhabitedA, inhabitedB),
+              List.copyOf(ChaosPlanetSelector.eligiblePlanets(List.of(inhabitedA, uninhabited, inhabitedB), null,
+                    TEST_DATE)));
     }
 
     @ParameterizedTest
-    @CsvSource({ "INVASION", "PIRATE_HUNT", "PIRATE_RAID", "EXPEDITION" })
-    void eligiblePlanetsNeverIncludesUninhabitedBodiesWithoutGround(final ChaosObjectiveType objectiveType) {
-        Planet ground = planetWithPopulation(null);
-        List<Planet> candidates = List.of(ground,
-              planetOfType(PlanetaryType.GAS_GIANT, null),
-              planetOfType(PlanetaryType.ICE_GIANT, null),
-              planetOfType(PlanetaryType.ASTEROID_BELT, null),
-              planetOfType(PlanetaryType.GIANT_TERRESTRIAL, null));
-
-        assertEquals(List.of(ground),
-              List.copyOf(ChaosPlanetSelector.eligiblePlanets(objectiveType, candidates, null, TEST_DATE)));
-    }
-
-    @Test
-    void eligiblePlanetsKeepsAnInhabitedHabitatWhateverItsType() {
-        // Canon settlements such as habitats in asteroid belts remain valid targets.
-        Planet habitat = planetOfType(PlanetaryType.ASTEROID_BELT, 50_000L);
+    @CsvSource({ "TERRESTRIAL", "DWARF_TERRESTRIAL", "GIANT_TERRESTRIAL" })
+    void eligiblePlanetsKeepsInhabitedTerrestrialPlanetsOfEverySize(final PlanetaryType planetType) {
+        Planet inhabited = planetOfType(planetType, 50_000L);
         Planet barrenRock = planetWithPopulation(null);
 
-        assertEquals(List.of(habitat),
-              List.copyOf(ChaosPlanetSelector.eligiblePlanets(ChaosObjectiveType.GARRISON,
-                    List.of(habitat, barrenRock), null, TEST_DATE)));
+        assertEquals(List.of(inhabited),
+              List.copyOf(ChaosPlanetSelector.eligiblePlanets(List.of(inhabited, barrenRock), barrenRock, TEST_DATE)));
+    }
+
+    @ParameterizedTest
+    @CsvSource({ "ASTEROID_BELT", "ICE_GIANT", "GAS_GIANT" })
+    void eligiblePlanetsSkipsInhabitedNonTerrestrialBodies(final PlanetaryType planetType) {
+        Planet habitat = planetOfType(planetType, 50_000L);
+        Planet inhabitedWorld = planetWithPopulation(1_000L);
+
+        assertEquals(List.of(inhabitedWorld),
+              List.copyOf(ChaosPlanetSelector.eligiblePlanets(List.of(habitat, inhabitedWorld), habitat, TEST_DATE)));
     }
 
     @Test
-    void eligiblePlanetsFallsBackToThePrimaryWhenNoBodyHasGround() {
-        Planet primary = planetOfType(PlanetaryType.GAS_GIANT, null);
-        Planet belt = planetOfType(PlanetaryType.ASTEROID_BELT, null);
+    void eligiblePlanetsFallsBackToThePrimaryWhenOnlyANonTerrestrialBodyIsInhabited() {
+        Planet primary = planetWithPopulation(null);
+        Planet habitat = planetOfType(PlanetaryType.ASTEROID_BELT, 50_000L);
 
         assertEquals(List.of(primary),
-              List.copyOf(ChaosPlanetSelector.eligiblePlanets(ChaosObjectiveType.PIRATE_HUNT,
-                    List.of(belt, primary), primary, TEST_DATE)));
+              List.copyOf(ChaosPlanetSelector.eligiblePlanets(List.of(habitat, primary), primary, TEST_DATE)));
+    }
+
+    @Test
+    void isTerrestrialPlanetByType() {
+        assertTrue(ChaosPlanetSelector.isTerrestrialPlanet(planetOfType(PlanetaryType.TERRESTRIAL, null)));
+        assertTrue(ChaosPlanetSelector.isTerrestrialPlanet(planetOfType(PlanetaryType.DWARF_TERRESTRIAL, null)));
+        assertTrue(ChaosPlanetSelector.isTerrestrialPlanet(planetOfType(PlanetaryType.GIANT_TERRESTRIAL, null)));
+        assertFalse(ChaosPlanetSelector.isTerrestrialPlanet(planetOfType(PlanetaryType.ASTEROID_BELT, null)));
+        assertFalse(ChaosPlanetSelector.isTerrestrialPlanet(planetOfType(PlanetaryType.ICE_GIANT, null)));
+        assertFalse(ChaosPlanetSelector.isTerrestrialPlanet(planetOfType(PlanetaryType.GAS_GIANT, null)));
+    }
+
+    @Test
+    void eligiblePlanetsFallsBackToThePrimaryWhenNoWorldIsInhabited() {
+        Planet primary = planetOfType(PlanetaryType.GAS_GIANT, null);
+        Planet uninhabitedRock = planetWithPopulation(null);
+        Planet belt = planetOfType(PlanetaryType.ASTEROID_BELT, 0L);
+
+        assertEquals(List.of(primary),
+              List.copyOf(ChaosPlanetSelector.eligiblePlanets(List.of(uninhabitedRock, belt, primary), primary,
+                    TEST_DATE)));
+    }
+
+    @Test
+    void eligiblePlanetsReturnsEveryCandidateWhenNoWorldIsInhabitedAndThePrimaryIsUnknown() {
+        Planet uninhabitedA = planetWithPopulation(null);
+        Planet uninhabitedB = planetWithPopulation(0L);
+
+        assertEquals(List.of(uninhabitedA, uninhabitedB),
+              List.copyOf(ChaosPlanetSelector.eligiblePlanets(List.of(uninhabitedA, uninhabitedB), null,
+                    TEST_DATE)));
     }
 }
