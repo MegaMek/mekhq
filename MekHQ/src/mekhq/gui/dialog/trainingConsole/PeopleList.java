@@ -68,7 +68,7 @@ import mekhq.gui.dialog.trainingConsole.TrainingRoster.PersonEntry;
 
 /**
  * The Training Console's people list: a search field, a count line, sortable column headers, and one row per person
- * with five columns: name, role, formation, experience and available XP.
+ * with six columns: name, role, formation, unit, experience and available XP.
  *
  * <p>The list keeps no selection of its own. A click or Space on a row is reported to the console, which keeps the
  * selection and redraws. Only the rows on screen are drawn, so the list holds thousands of people without slowing
@@ -80,8 +80,8 @@ import mekhq.gui.dialog.trainingConsole.TrainingRoster.PersonEntry;
 final class PeopleList extends JPanel {
     private static final String RESOURCE_BUNDLE = TrainingConsole.RESOURCE_BUNDLE;
     private static final int ROW_HEIGHT = 32;
-    /** How the columns share the width: name, role, formation, experience, XP. */
-    private static final double[] COLUMN_WEIGHTS = { 0.3, 0.19, 0.3, 0.13, 0.08 };
+    /** How the columns share the width: name, role, formation, unit, experience, XP. */
+    private static final double[] COLUMN_WEIGHTS = { 0.23, 0.16, 0.23, 0.2, 0.11, 0.07 };
 
     /** Reports a click or Space on a row. */
     @FunctionalInterface
@@ -290,7 +290,7 @@ final class PeopleList extends JPanel {
             }
         });
         header.add(selectedHeader, constraints(0, 0));
-        Sort[] columns = { Sort.NAME, Sort.ROLE, Sort.FORMATION, Sort.EXPERIENCE, Sort.XP };
+        Sort[] columns = { Sort.NAME, Sort.ROLE, Sort.FORMATION, Sort.UNIT, Sort.EXPERIENCE, Sort.XP };
         for (int index = 0; index < columns.length; index++) {
             Sort column = columns[index];
             String text = getTextAt(RESOURCE_BUNDLE, "people.column." + column.name()).toUpperCase(Locale.ROOT);
@@ -363,7 +363,7 @@ final class PeopleList extends JPanel {
         component.setMinimumSize(new Dimension(0, height));
     }
 
-    /** A person row: the selection box, then name, role, formation, experience and available XP. */
+    /** A person row: the selection box, then name, role, formation, unit, experience and available XP. */
     private static final class PersonRowRenderer extends JPanel implements ListCellRenderer<PersonEntry> {
         private static final Font NAME_FONT = hudFont(Font.BOLD, 0.92f, 0.0f);
         private static final Font CELL_FONT = hudFont(Font.PLAIN, 0.86f, 0.0f);
@@ -375,6 +375,7 @@ final class PeopleList extends JPanel {
         private final JLabel name = cell(NAME_FONT, TEXT);
         private final JLabel role = cell(CELL_FONT, TEXT_MUTED);
         private final JLabel formation = cell(CELL_FONT, TEXT_MUTED);
+        private final JLabel unit = cell(CELL_FONT, TEXT_MUTED);
         private final JLabel experience = cell(CELL_FONT, TEXT);
         private final JLabel xp = cell(CELL_FONT, TEXT);
         /** The two row borders, made once rather than on every paint: a selected row's, and anyone else's. */
@@ -390,7 +391,7 @@ final class PeopleList extends JPanel {
             setOpaque(true);
             checkBox.setOpaque(false);
             add(checkBox, constraints(0, 0));
-            JLabel[] cells = { name, role, formation, experience, xp };
+            JLabel[] cells = { name, role, formation, unit, experience, xp };
             for (int index = 0; index < cells.length; index++) {
                 fixWidth(cells[index]);
                 add(cells[index], constraints(index + 1, COLUMN_WEIGHTS[index]));
@@ -430,6 +431,9 @@ final class PeopleList extends JPanel {
                                     entry.formationName());
             formation.setForeground(entry.formationName().isEmpty() ? TEXT_FAINT : TEXT_MUTED);
             formation.setToolTipText(entry.formationName().isEmpty() ? null : entry.formationName());
+            unit.setText(entry.unitName().isEmpty() ? getTextAt(RESOURCE_BUNDLE, "people.noUnit") : entry.unitName());
+            unit.setForeground(entry.unitName().isEmpty() ? TEXT_FAINT : TEXT_MUTED);
+            unit.setToolTipText(entry.unitName().isEmpty() ? null : entry.unitName());
 
             int pending = pendingCount.apply(person);
             String level = entry.skillLevel().toString();
