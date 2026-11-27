@@ -1,0 +1,134 @@
+# Files in testresources that share a name with an mm-data file, from before the
+# checkTestResourcesForMmDataCopies build check (MegaMek/megamek#9289). Each one is a copy that can fall
+# out of date. Move its tests to testUtilities.CanonUnits, delete the copy, and remove its line here.
+# Nothing may be added to this list.
+data/mekfiles/Aquarius Escort.blk
+data/mekfiles/Batu E.blk
+data/mekfiles/Batu Prime.blk
+data/mekfiles/Buster BC XV-M-B HaulerMech MOD.mtf
+data/mekfiles/Caravan Heavy Transport.blk
+data/mekfiles/Champion CHP-3P.mtf
+data/mekfiles/Commonwealth Light Cruiser Block I.blk
+data/mekfiles/Crockett CRK-5003-0.mtf
+data/mekfiles/Crusader CRD-7M.mtf
+data/mekfiles/Dasher (Fire Moth) Prime.mtf
+data/mekfiles/Doloire DLR-OC.mtf
+data/mekfiles/Elemental BA [Laser] (Sqd3).blk
+data/mekfiles/Enforcer III ENF-6M.mtf
+data/mekfiles/Epona Pursuit Tank A.blk
+data/mekfiles/Epona Pursuit Tank Prime.blk
+data/mekfiles/Field Gun Platoon (AFFS) (Motorized UAC5 3067+).blk
+data/mekfiles/Flashman FLS-7K.mtf
+data/mekfiles/Foot Platoon (DCMS) (Laser 2620+).blk
+data/mekfiles/Foot Platoon (DCMS) (MG 2620+).blk
+data/mekfiles/Griffin GRF-1E Sparky.mtf
+data/mekfiles/Hammerhands HMH-5D.mtf
+data/mekfiles/Hatchetman HCT-6D.mtf
+data/mekfiles/Heimdall Ground Monitor Tank B.blk
+data/mekfiles/Heimdall Ground Monitor Tank Prime.blk
+data/mekfiles/Hoshiryokou Tug Boat.blk
+data/mekfiles/Hoverbike (Laser).blk
+data/mekfiles/Hoverbike (MG).blk
+data/mekfiles/IS Standard BA [Laser] (Sqd4).blk
+data/mekfiles/Invader Jumpship (2631).blk
+data/mekfiles/Leopard (2537).blk
+data/mekfiles/Locust LCT-1V.mtf
+data/mekfiles/Osiris OSR-5D.mtf
+data/mekfiles/Parash 3.mtf
+data/mekfiles/Parash.mtf
+data/mekfiles/Potemkin Troop Cruiser (2875).blk
+data/mekfiles/Prime Mover.blk
+data/mekfiles/Quickdraw QKD-8X.mtf
+data/mekfiles/Rifleman RFL-9T.mtf
+data/mekfiles/Shadow Hawk SHD-2H.mtf
+data/mekfiles/Shadow Hawk SHD-5D.mtf
+data/mekfiles/Shadow Hawk SHD-7CS.mtf
+data/mekfiles/Spartan SPT-N1.mtf
+data/mekfiles/Stalker STK-4N.mtf
+data/mekfiles/Trike.blk
+data/mekfiles/Vedette Medium Tank.blk
+data/mekfiles/Victor VTR-9S.mtf
+data/mekfiles/Vulcan VT-7T.mtf
+data/mekfiles/Wasp WSP-1.mtf
+data/mekfiles/Zeus ZEU-6A.mtf
+data/randomEvents/PrisonerMajorEventData.yml
+data/randomEvents/PrisonerMinorEventData.yml
+data/scenariotemplates/Ambush the Column.json
+data/scenariotemplates/Annihilation.json
+data/scenariotemplates/Assassination.json
+data/scenariotemplates/Base Defense.json
+data/scenariotemplates/Breakout.json
+data/scenariotemplates/Breakthrough.json
+data/scenariotemplates/Close Air Support.json
+data/scenariotemplates/Combat Drop.json
+data/scenariotemplates/Convoy Escort.json
+data/scenariotemplates/Convoy Hijack.json
+data/scenariotemplates/Convoy Interdiction.json
+data/scenariotemplates/Covert Strike.json
+data/scenariotemplates/Crowd Control.json
+data/scenariotemplates/Decapitation Strike.json
+data/scenariotemplates/Decoy Engagement.json
+data/scenariotemplates/Decoy Interception.json
+data/scenariotemplates/Diversion Engagement.json
+data/scenariotemplates/Emergency Convoy Defense - Player - Low-Atmosphere.json
+data/scenariotemplates/Emergency Convoy Defense - Player - VTOL.json
+data/scenariotemplates/Emergency Convoy Defense - Player.json
+data/scenariotemplates/Emergency Convoy Defense.json
+data/scenariotemplates/Engagement.json
+data/scenariotemplates/Enveloped.json
+data/scenariotemplates/Escalation.json
+data/scenariotemplates/Gauntlet Run.json
+data/scenariotemplates/Hold Until Relief.json
+data/scenariotemplates/Hostile Facility.json
+data/scenariotemplates/Intercept Engagement.json
+data/scenariotemplates/Intercept the Escapees.json
+data/scenariotemplates/Interception Defense.json
+data/scenariotemplates/Last Stand.json
+data/scenariotemplates/Low-Atmosphere Reinforcements Intercepted.json
+data/scenariotemplates/Meeting Engagement.json
+data/scenariotemplates/Minor Engagement.json
+data/scenariotemplates/Mole Hunt.json
+data/scenariotemplates/Official Challenge.json
+data/scenariotemplates/Prisoner Liberation.json
+data/scenariotemplates/Recon Evasion.json
+data/scenariotemplates/Reinforcements Intercepted.json
+data/scenariotemplates/Relief Column.json
+data/scenariotemplates/Rolling Thunder.json
+data/scenariotemplates/Screening Action.json
+data/scenariotemplates/Space Reinforcements Intercepted.json
+data/scenariotemplates/Tactical Withdrawal.json
+data/stratconbiomedefinitions/HydrologyProfiles.yaml
+data/stratconbiomedefinitions/OrogenyProfiles.yaml
+data/stratconbiomedefinitions/SectorShapeProfiles.yaml
+data/stratconbiomedefinitions/StratConBiomeManifest.json
+data/stratconbiomedefinitions/UrbanProfiles.yaml
+data/stratconfacilities/AirBase.json
+data/stratconfacilities/ArtilleryBase.json
+data/stratconfacilities/BaseOfOperations.json
+data/stratconfacilities/CommsCenter.json
+data/stratconfacilities/DataCenter.json
+data/stratconfacilities/EarlyWarningSystem.json
+data/stratconfacilities/FieldFortifications.json
+data/stratconfacilities/IndustrialFacility.json
+data/stratconfacilities/JammingStation.json
+data/stratconfacilities/MekBase.json
+data/stratconfacilities/MilitiaBarracks.json
+data/stratconfacilities/OrbitalDefense.json
+data/stratconfacilities/SensorPost.json
+data/stratconfacilities/SpacePort.json
+data/stratconfacilities/SupplyDepot.json
+data/stratconfacilities/TankBase.json
+data/stratconfacilities/facilitymanifest.json
+data/stratconpointsofinterest/pointofinterestmanifest.json
+data/universe/factionDiplomacy_test/3026-3030_fourthSuccessionWar.yml
+data/universe/factionStandingUltimatums/AMARIS_COUP.json
+data/universe/factionStandingUltimatums/CLAN_WOLF_SPLIT.json
+data/universe/factionStandingUltimatums/COMSTAR_SCHISM.json
+data/universe/factionStandingUltimatums/ESPINOSA_COUP.json
+data/universe/factionStandingUltimatums/EXODUS.json
+data/universe/factionStandingUltimatums/FED_COM_CIVIL_WAR.json
+data/universe/factionStandingUltimatums/RASALHAGUE_INDEPENDENCE.json
+data/universe/factionStandingUltimatums/ST_IVES_SPLIT.json
+data/universe/factionStandingUltimatums/ultimatummanifest.json
+data/universe/planetary_systems/canon_systems/Galatea.yml
+data/universe/planetary_systems/canon_systems/Skye.yml
