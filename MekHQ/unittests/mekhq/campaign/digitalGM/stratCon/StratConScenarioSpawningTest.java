@@ -368,9 +368,9 @@ class StratConScenarioSpawningTest {
     }
 
     @Test
-    void withoutSupportPointsInScaleEveryThreePointsOfScaleBringOneEssentialScenario() {
-        // Scale 7.8 counted without support points is Scale 2.6 counted with them
-        AbstractContract contract = contract(ContractObjectiveType.PLANETARY_ASSAULT, 7.8);
+    void withoutSupportPointsInScaleEveryTwoPointsOfScaleBringOneEssentialScenario() {
+        // Scale 5.2 counted without support points is Scale 2.6 counted with them
+        AbstractContract contract = contract(ContractObjectiveType.PLANETARY_ASSAULT, 5.2);
 
         assertEquals(List.of(3, 3, 3, 3),
               AbstractContractGeneration.rollScenarioSchedule(campaign(false), contract, 4));
@@ -378,7 +378,7 @@ class StratConScenarioSpawningTest {
 
     @Test
     void anAcceptedContractCountsItsScaleAsItWasCountedWhenAccepted() {
-        AbstractContract contract = contract(ContractObjectiveType.PLANETARY_ASSAULT, 7.8);
+        AbstractContract contract = contract(ContractObjectiveType.PLANETARY_ASSAULT, 5.2);
         StratConCampaignState campaignState = new StratConCampaignState();
         campaignState.setSupportPointsFactoredIntoScale(false);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
@@ -390,8 +390,8 @@ class StratConScenarioSpawningTest {
     }
 
     @ParameterizedTest
-    @CsvSource({ "6.0, true, 6.0", "6.0, false, 2.0", "0.0, false, 0.0" })
-    void spawnScaleCountsThreePointsAsOneWithoutSupportPoints(double exactScale,
+    @CsvSource({ "6.0, true, 6.0", "6.0, false, 3.0", "0.0, false, 0.0" })
+    void spawnScaleCountsTwoPointsAsOneWithoutSupportPoints(double exactScale,
           boolean isFactorSupportPointsIntoScale, double expected) {
         assertEquals(expected, StratConSpawnRates.getSpawnScale(exactScale, isFactorSupportPointsIntoScale), 0.0001);
     }

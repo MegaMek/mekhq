@@ -75,7 +75,7 @@ class StratConDataCacheSchedulingTest {
     private static final String DEFINITION_TYPE_ID = "UnitTestSchedulingDefinitionType";
     private static final int LENGTH_IN_MONTHS = 3;
     private static final int SCALE = 3;
-    /** How many special points of interest the contract gets: three a month per point of Scale. */
+    /** How many special points of interest the contract gets: two a month per point of Scale. */
     private static final int NAV_POINT_COUNT = StratConSpawnRates.NAV_POINTS_PER_SCALE * SCALE * LENGTH_IN_MONTHS;
 
     private static AbstractContract contract(ContractObjectiveType objectiveType, int trackCount) {
@@ -133,7 +133,7 @@ class StratConDataCacheSchedulingTest {
     }
 
     @Test
-    void threeComeEachMonthPerPointOfScale() {
+    void twoComeEachMonthPerPointOfScale() {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.ESPIONAGE, 1), true);
 
@@ -153,8 +153,8 @@ class StratConDataCacheSchedulingTest {
         AbstractContract contract = contract(ContractObjectiveType.ESPIONAGE, 1);
         when(contract.getExactScale()).thenReturn(1.4);
 
-        // 3 x 1.4 = 4.2, rounded to 4 a month
-        assertEquals(4 * LENGTH_IN_MONTHS, schedule(contract, true).size());
+        // 2 x 1.4 = 2.8, rounded to 3 a month
+        assertEquals(3 * LENGTH_IN_MONTHS, schedule(contract, true).size());
     }
 
     @Test
@@ -211,7 +211,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.GUERRILLA_WARFARE, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(VULNERABLE_INFRASTRUCTURE.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
@@ -236,7 +236,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.MOLE_HUNTING, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(POTENTIAL_LEAD.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
@@ -261,7 +261,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.OBSERVATION_RAID, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(LOOKOUT_POINT.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
@@ -286,7 +286,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.RELIEF_DUTY, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(BELEAGUERED_FORCES.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
@@ -429,7 +429,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.EXTRACTION_RAID, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(VIP.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
@@ -445,7 +445,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.PIRATE_RAID, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(StratConPlunderTargetBehavior.TYPE_ID, pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
@@ -461,7 +461,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.TERRORISM, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(StratConCivilianInfrastructureBehavior.TYPE_ID, pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
@@ -477,7 +477,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.SABOTAGE, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(StratConSabotageTargetBehavior.TYPE_ID, pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
@@ -493,7 +493,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.RIOT_DUTY, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(StratConCivilDisobedienceBehavior.TYPE_ID, pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
@@ -526,7 +526,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.RETAINER, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(StratConScheduledParadeBehavior.TYPE_ID, pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
@@ -547,7 +547,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.PLANETARY_ASSAULT, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(STRATEGIC_POSITION.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
@@ -568,7 +568,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.SECURITY_DUTY, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(SECURITY_REVIEW.getTypeId(), pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());
@@ -589,7 +589,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.DIVERSIONARY_RAID, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(StratConHighProfileTargetBehavior.TYPE_ID, pointOfInterest.getTypeId());
             assertFalse(pointOfInterest.isStrategicObjective(), "a Diversionary Raid's objective is its Escalation");
@@ -622,7 +622,7 @@ class StratConDataCacheSchedulingTest {
         List<StratConScheduledPointOfInterest> scheduled =
               schedule(contract(ContractObjectiveType.CADRE_DUTY, 1), true);
 
-        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: three a month per point of scale");
+        assertEquals(NAV_POINT_COUNT, scheduled.size(), "as many as data caches: two a month per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertEquals(StratConTrainingManeuversBehavior.TYPE_ID, pointOfInterest.getTypeId());
             assertTrue(pointOfInterest.isStrategicObjective());

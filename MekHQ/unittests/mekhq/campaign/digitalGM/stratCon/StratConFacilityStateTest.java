@@ -529,10 +529,10 @@ class StratConFacilityStateTest {
         }
 
         @Test
-        void scaleIsDividedByThreeWhenSupportPointsAreNotInScale() {
-            assertEquals(FacilityTier.OUTPOST, StratConContractInitializer.getFacilityTier(8, false, false));
-            assertEquals(FacilityTier.BASE, StratConContractInitializer.getFacilityTier(9, false, false));
-            assertEquals(FacilityTier.STRONGHOLD, StratConContractInitializer.getFacilityTier(18, false, false));
+        void scaleIsHalvedWhenSupportPointsAreNotInScale() {
+            assertEquals(FacilityTier.OUTPOST, StratConContractInitializer.getFacilityTier(5, false, false));
+            assertEquals(FacilityTier.BASE, StratConContractInitializer.getFacilityTier(6, false, false));
+            assertEquals(FacilityTier.STRONGHOLD, StratConContractInitializer.getFacilityTier(12, false, false));
         }
 
         @Test

@@ -77,11 +77,11 @@ class StratConScenarioTempoTest {
     }
 
     @Test
-    void withoutSupportPointsOneFacilityPerThreePointsOfScaleRoundedDown() {
-        assertEquals(0, StratConContractInitializer.getNonObjectiveFacilityCount(2, false, 0));
+    void withoutSupportPointsOneFacilityPerTwoPointsOfScaleRoundedDown() {
+        assertEquals(0, StratConContractInitializer.getNonObjectiveFacilityCount(1, false, 0));
+        assertEquals(1, StratConContractInitializer.getNonObjectiveFacilityCount(2, false, 0));
         assertEquals(1, StratConContractInitializer.getNonObjectiveFacilityCount(3, false, 0));
-        assertEquals(1, StratConContractInitializer.getNonObjectiveFacilityCount(5, false, 0));
-        assertEquals(2, StratConContractInitializer.getNonObjectiveFacilityCount(6, false, 0));
+        assertEquals(2, StratConContractInitializer.getNonObjectiveFacilityCount(4, false, 0));
     }
 
     @Test
@@ -96,15 +96,15 @@ class StratConScenarioTempoTest {
     }
 
     @Test
-    void supportPointsInScalePlaceOneObjectiveFacilityPerThreePointsOfScale() {
-        assertEquals(1, StratConContractInitializer.getObjectiveFacilityCount(5, true));
-        assertEquals(2, StratConContractInitializer.getObjectiveFacilityCount(6, true));
+    void supportPointsInScalePlaceOneObjectiveFacilityPerTwoPointsOfScale() {
+        assertEquals(1, StratConContractInitializer.getObjectiveFacilityCount(3, true));
+        assertEquals(2, StratConContractInitializer.getObjectiveFacilityCount(4, true));
     }
 
     @Test
-    void withoutSupportPointsOneObjectiveFacilityPerNinePointsOfScale() {
-        assertEquals(1, StratConContractInitializer.getObjectiveFacilityCount(17, false));
-        assertEquals(2, StratConContractInitializer.getObjectiveFacilityCount(18, false));
+    void withoutSupportPointsOneObjectiveFacilityPerFourPointsOfScale() {
+        assertEquals(1, StratConContractInitializer.getObjectiveFacilityCount(7, false));
+        assertEquals(2, StratConContractInitializer.getObjectiveFacilityCount(8, false));
     }
 
     @Test
