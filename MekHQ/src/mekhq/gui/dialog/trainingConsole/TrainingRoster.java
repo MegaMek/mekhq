@@ -48,6 +48,7 @@ import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
+import mekhq.campaign.unit.Unit;
 
 /**
  * Everyone the Training Console can train, read once when it opens or after a commit: every active person, prisoners
@@ -66,13 +67,15 @@ final class TrainingRoster {
      * @param role          their primary role
      * @param roleName      their primary role's name
      * @param formationName the formation their unit is in, or an empty string
+     * @param unitName      the unit they crew, or an empty string
      * @param skillLevel    their experience level
      * @param isOfficer     {@code true} if their rank is an officer rank
      * @param isPrisoner    {@code true} if they are a prisoner
      * @param search        what the search field matches against, in lower case
      */
     record PersonEntry(Person person, String name, String title, PersonnelRole role, String roleName,
-          String formationName, SkillLevel skillLevel, boolean isOfficer, boolean isPrisoner, String search) {}
+          String formationName, String unitName, SkillLevel skillLevel, boolean isOfficer, boolean isPrisoner,
+          String search) {}
 
     private final List<PersonEntry> entries = new ArrayList<>();
     private final Map<UUID, PersonEntry> byId = new HashMap<>();
@@ -89,13 +92,15 @@ final class TrainingRoster {
             String roleName = role.getLabel(isClan);
             Formation formation = campaign.getPlayerForce().getFormationFor(person);
             String formationName = (formation == null) ? "" : formation.getFullName();
+            Unit unit = person.getUnit();
+            String unitName = (unit == null) ? "" : unit.getName();
             SkillLevel level = person.getSkillLevel(options, isClan, today, false, true);
             boolean isOfficer = person.getRank().isOfficer();
             boolean isPrisoner = person.getPrisonerStatus().isCurrentPrisoner();
             String title = person.getFullTitle();
-            String search = (title + ' ' + roleName + ' ' + formationName).toLowerCase(Locale.ROOT);
+            String search = (title + ' ' + roleName + ' ' + formationName + ' ' + unitName).toLowerCase(Locale.ROOT);
             PersonEntry entry = new PersonEntry(person, person.getFullName(), title, role, roleName, formationName,
-                  level, isOfficer, isPrisoner, search);
+                  unitName, level, isOfficer, isPrisoner, search);
             entries.add(entry);
             byId.put(person.getId(), entry);
         }
