@@ -62,6 +62,11 @@ import megamek.common.bays.Bay;
 import megamek.common.bays.SmallCraftBay;
 import megamek.common.equipment.Mounted;
 import megamek.common.icons.Camouflage;
+import megamek.common.loaders.BLKFile;
+import megamek.common.loaders.BLKInfantryFile;
+import megamek.common.loaders.EntityLoadingException;
+import megamek.common.loaders.EntitySavingException;
+import megamek.common.units.ConvInfantry;
 import megamek.common.units.Entity;
 import megamek.common.units.IAero;
 import megamek.common.units.Mek;
@@ -122,6 +127,60 @@ public class CamOpsSalvageUtilities {
         }
 
         return entity instanceof Tank tank && !tank.isTrailer();
+    }
+
+    /**
+     * Calculates how much a wreck weighs for the purposes of carrying or dragging it during salvage operations.
+     *
+     * <p>Conventional infantry normally weigh only as much as their surviving troopers, so a wiped-out platoon would
+     * weigh nothing. A wreck is recovered as a whole unit, so infantry that have taken casualties use their
+     * full-strength weight instead.</p>
+     *
+     * @param entity the wreck's entity, or {@code null}
+     *
+     * @return the wreck's salvage weight, in tons; {@code 0.0} if there is no entity
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static double getSalvageWeight(@Nullable Entity entity) {
+        if (entity == null) {
+            return 0.0;
+        }
+
+        if (entity instanceof ConvInfantry infantry) {
+            boolean hasCasualties = infantry.getInternal(ConvInfantry.LOC_INFANTRY) <
+                                          infantry.getOInternal(ConvInfantry.LOC_INFANTRY);
+            if (hasCasualties) {
+                return getFullStrengthWeight(infantry);
+            }
+        }
+
+        return entity.getWeight();
+    }
+
+    /**
+     * Calculates the weight of conventional infantry at full strength, counting every original trooper and field
+     * weapon whether or not they survived.
+     *
+     * <p>Infantry weight is calculated from the surviving troopers, so this rebuilds a fresh, undamaged copy of the
+     * unit from its design and weighs that instead.</p>
+     *
+     * @param infantry the infantry to weigh
+     *
+     * @return the full-strength weight, in tons; the current weight if the unit can't be rebuilt
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    private static double getFullStrengthWeight(ConvInfantry infantry) {
+        try {
+            Entity undamagedInfantry = new BLKInfantryFile(BLKFile.getBlock(infantry)).getEntity();
+            return undamagedInfantry.getWeight();
+        } catch (EntitySavingException | EntityLoadingException exception) {
+            LOGGER.error("Could not rebuild {} to find its full-strength weight", infantry.getDisplayName(), exception);
+            return infantry.getWeight();
+        }
     }
 
     /**

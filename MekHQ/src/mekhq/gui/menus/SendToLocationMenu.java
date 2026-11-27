@@ -32,6 +32,7 @@
  */
 package mekhq.gui.menus;
 
+import static mekhq.campaign.CampaignLocationManager.IS_BASE_TRAVEL_ENABLED;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
 import java.util.Collections;
@@ -63,6 +64,9 @@ import mekhq.gui.dialog.BaseSettingsDialog;
  * a folder separator.</p>
  *
  * <p>A "New Base..." item at the bottom opens {@link BaseSettingsDialog}.</p>
+ *
+ * <p>While {@link mekhq.campaign.CampaignLocationManager#IS_BASE_TRAVEL_ENABLED} is {@code false}, only the Main
+ * Force entry is offered, followed by a disabled line explaining that bases are turned off.</p>
  *
  * <p>The caller provides a {@code dispatcher} callback that is invoked with the chosen
  * destination — this class contains no dispatch logic itself and can therefore be reused for
@@ -135,6 +139,15 @@ public class SendToLocationMenu extends JScrollableMenu {
             JMenuItem mainForce = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "label.mainForce.text"));
             mainForce.addActionListener(e -> dispatcher.accept(campaign.getPlayerForce().getForceDetachment()));
             add(mainForce);
+        }
+
+        if (!IS_BASE_TRAVEL_ENABLED) {
+            // Bases are turned off for now: only the way home stays open, and the player is told why
+            JMenuItem basesOff = new JMenuItem(getTextAt(RESOURCE_BUNDLE, "menuItem.basesDisabled.text"));
+            basesOff.setToolTipText(getTextAt(RESOURCE_BUNDLE, "menuItem.basesDisabled.tooltip"));
+            basesOff.setEnabled(false);
+            add(basesOff);
+            return;
         }
 
         // One entry per player base, nested by display type

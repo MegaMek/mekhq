@@ -168,9 +168,6 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
 
     public class PersonnelRenderer extends MHQTableModel.Renderer {
 
-        private static final ComponentColors DEFAULT_COLORS =
-              new ComponentColors(UIManager.getColor("Table.foreground"), UIManager.getColor("Table.background"));
-
         private final List<ColorReason> personalStateFlags = new ArrayList<>();
         private final Map<Portrait, ImageIcon> portraitCache = new WeakHashMap<>();
         private final Map<Long, ImageIcon> entityImageCache = new WeakHashMap<>();
@@ -202,8 +199,14 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
                     MekHqTableCellRenderer.setupTigerStripes(this, table, rowIndex);
                 } else {
                     ComponentColors cellColors = populatePersonalStateFlags(person, personalStateFlags);
-                    setForeground(cellColors.foreground());
-                    setBackground(cellColors.background());
+                    if (cellColors == null) {
+                        // Looked up on every render, not cached, so the rows follow a theme change
+                        setForeground(UIManager.getColor("Table.foreground"));
+                        setBackground(UIManager.getColor("Table.background"));
+                    } else {
+                        setForeground(cellColors.foreground());
+                        setBackground(cellColors.background());
+                    }
                 }
             }
             setToolTipText(column.getToolTipText(person, personalStateFlags));
@@ -213,11 +216,11 @@ public class PersonnelTableModel extends MHQTableModel<Person, PersonnelTableMod
 
         /**
          * Populates a list with personal state flags. Selects a color for the most important state.
+         *
+         * @return the colors for the most important state, or {@code null} if the default table colors should be used
          */
-        private ComponentColors populatePersonalStateFlags(Person person, List<ColorReason> colorReasons) {
-            ComponentColors cellColors = PersonnelStateColors.getStateColors(campaign, person, colorReasons,
-                  techJobs.getJobs(person));
-            return (cellColors == null) ? DEFAULT_COLORS : cellColors;
+        private @Nullable ComponentColors populatePersonalStateFlags(Person person, List<ColorReason> colorReasons) {
+            return PersonnelStateColors.getStateColors(campaign, person, colorReasons, techJobs.getJobs(person));
         }
 
         private ImageIcon getImage(Person person, PersonnelTableModelColumn personnelColumn) {
