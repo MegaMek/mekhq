@@ -718,10 +718,32 @@ public final class Hud {
      * @since 0.51.01
      */
     public static JLabel portrait(@Nullable Person person, int size) {
+        return portrait(person, size, true);
+    }
+
+    /**
+     * A square, framed portrait of a person, or a blank frame of the same size when there is no one to show. With
+     * {@code useOriginFactionBackup}, a person without a portrait of their own shows their origin faction's logo;
+     * without it they show the default silhouette instead, so a contact whose allegiance is meant to stay hidden (a
+     * covert operation's negotiator) does not give it away. Either fallback is recoloured with {@link #tinted} in the
+     * bright accent colour.
+     *
+     * @param person                 the person, or {@code null}
+     * @param size                   the scaled edge length
+     * @param useOriginFactionBackup {@code true} to fall back on the person's origin faction logo, {@code false} to
+     *                               fall back on the default silhouette
+     *
+     * @return the portrait
+     *
+     * @author Illiani
+     * @since 0.51.01
+     */
+    public static JLabel portrait(@Nullable Person person, int size, boolean useOriginFactionBackup) {
         Icon icon = null;
         if (person != null) {
-            ImageIcon portrait = person.getPortraitImageIconWithFallback(true);
-            if (portrait != null) {
+            ImageIcon portrait = person.getPortraitImageIconWithFallback(useOriginFactionBackup);
+            // An absent portrait (or a missing logo) comes back as an empty icon, with no image to scale.
+            if (portrait != null && portrait.getImage() != null && portrait.getIconWidth() > 0) {
                 ImageIcon scaled = new ImageIcon(portrait.getImage().getScaledInstance(size, size, Image.SCALE_SMOOTH));
                 icon = person.hasDefaultPortrait() ? tinted(scaled, ACCENT_BRIGHT) : scaled;
             }
