@@ -1682,14 +1682,16 @@ public class FactionStandings {
     }
 
     /**
-     * Sorts the provided list of missions, ordering contract missions before non-contract missions. If both missions
-     * are contracts, they are ordered by their start dates.
+     * Sorts the provided list of missions chronologically by their start dates.
      *
-     * <p>This ensures contracts are prioritized chronologically, while other missions retain their relative order.</p>
+     * <p>Missions without a start date (for example, contracts that were never started) are placed at the end, in
+     * their original relative order. This matches how {@link #updateCampaignForPastMissions} treats such missions as
+     * belonging to the current year.</p>
      *
      * @param missions the list of missions to sort in-place
      */
     private static void sortMissionsBasedOnStartDateAndClass(List<AbstractContract> missions) {
-        missions.sort(Comparator.comparing(AbstractContract::getStartDate));
+        missions.sort(Comparator.comparing(AbstractContract::getStartDate,
+              Comparator.nullsLast(Comparator.naturalOrder())));
     }
 }
