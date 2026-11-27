@@ -44,6 +44,7 @@ import megamek.common.equipment.Engine;
 import megamek.common.units.Aero;
 import megamek.common.units.Tank;
 import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.equipment.AmmoBin;
@@ -66,7 +67,14 @@ class UnitPeacetimeCostTest {
     void beforeEach() {
         scenario = PartsScenario.create();
         // Quirks are covered by SparePartsQuirkMultiplierTest
-        scenario.getCampaign().getCampaignOptions().set(CampaignOption.USE_QUIRKS, false);
+        CampaignOptions campaignOptions = scenario.getCampaign().getCampaignOptions();
+        campaignOptions.set(CampaignOption.USE_QUIRKS, false);
+        // Acquisition multipliers are covered by sparePartsPayTheUnitsAcquisitionMultiplier
+        campaignOptions.set(CampaignOption.CLAN_TECH_INVASION_PRICE_MULTIPLIER, 1.0);
+        campaignOptions.set(CampaignOption.CLAN_TECH_POST_INVASION_PRICE_MULTIPLIER, 1.0);
+        campaignOptions.set(CampaignOption.SUCCESSION_WARS_ADVANCED_TECH_PRICE_MULTIPLIER, 1.0);
+        campaignOptions.set(CampaignOption.TECH_RATING_E_PRICE_MULTIPLIER, 1.0);
+        campaignOptions.set(CampaignOption.TECH_RATING_F_PRICE_MULTIPLIER, 1.0);
     }
 
     private static void assertMoney(double expected, Money actual) {

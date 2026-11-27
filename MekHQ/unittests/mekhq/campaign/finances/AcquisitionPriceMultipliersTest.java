@@ -33,6 +33,7 @@
 package mekhq.campaign.finances;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
@@ -99,11 +100,14 @@ class AcquisitionPriceMultipliersTest {
               TechRating.F), DELTA);
     }
 
-    /** Every multiplier defaults to ×1, so existing campaigns are priced as before. */
+    /** The defaults are the Campaign Operations multipliers: ×5 for Clan tech in 3060 and ×1.25 for tech rating F. */
     @Test
-    void defaultsLeavePricesUnchanged() {
-        assertEquals(1.0, AcquisitionPriceMultipliers.getMultiplier(new CampaignOptions(), innerSphere, 3060, true,
+    void defaultsMatchCampaignOperations() {
+        CampaignOptions defaultOptions = new CampaignOptions();
+
+        assertEquals(5.25, AcquisitionPriceMultipliers.getMultiplier(defaultOptions, innerSphere, 3060, true,
               TechRating.F), DELTA);
+        assertTrue(defaultOptions.get(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS));
     }
 
     @Nested
@@ -264,7 +268,8 @@ class AcquisitionPriceMultipliersTest {
 
         /** Parts only pay the multipliers when the unofficial option is on. */
         @Test
-        void partsAreNotSurchargedByDefault() {
+        void partsAreNotSurchargedWhenDisabled() {
+            campaignOptions.set(CampaignOption.APPLY_ACQUISITION_MULTIPLIERS_TO_PARTS, false);
             Part part = mock(Part.class);
             when(part.getTechBase()).thenReturn(TechBase.CLAN);
             when(part.getTechRating()).thenReturn(TechRating.F);

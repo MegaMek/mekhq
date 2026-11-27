@@ -60,16 +60,17 @@ public final class RefitKitPricing {
 
     /**
      * Prices every component the refit must buy: a new part for each missing part, a bin's worth of ammunition for
-     * each new ammo bin, and the armor the new design needs.
+     * each new ammo bin, and the armor the new design needs. New parts and ammunition use their purchase cost, so the
+     * campaign's acquisition price multipliers apply to them just as they do in {@link Refit}.
      */
     public static Money componentPrice(Refit refit) {
         Money price = Money.zero();
         for (Part part : refit.getShoppingList()) {
             if (part instanceof MissingPart missingPart) {
-                price = price.plus(missingPart.getNewPart().getActualValue());
+                price = price.plus(missingPart.getNewPart().getPurchaseCost());
             } else if (part instanceof AmmoBin ammoBin) {
                 price = price.plus(new AmmoStorage(0, ammoBin.getType(), ammoBin.getFullShots(), refit.getCampaign())
-                                         .getActualValue());
+                                         .getPurchaseCost());
             } else {
                 price = price.plus(part.getActualValue());
             }
