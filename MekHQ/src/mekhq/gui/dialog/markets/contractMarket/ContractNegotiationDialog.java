@@ -633,7 +633,7 @@ public class ContractNegotiationDialog extends JDialog {
             content.add(leftAligned(MarketHud.wrappedText(getTextAt(RESOURCE_BUNDLE,
                   "negotiate.contractMarket.negotiator.player.empty"), TEXT_FAINT, Font.PLAIN, 0.84f)));
         } else {
-            content.add(leftAligned(personSummary(negotiator)));
+            content.add(leftAligned(personSummary(negotiator, true)));
             List<JComponent> traits = traitRows(negotiator);
             if (!traits.isEmpty()) {
                 content.add(Box.createVerticalStrut(scaleForGUI(8)));
@@ -675,7 +675,8 @@ public class ContractNegotiationDialog extends JDialog {
             return;
         }
         JPanel content = Hud.column();
-        content.add(leftAligned(personSummary(employerNegotiator)));
+        // A covert operation's negotiator works for the hidden employer, so their faction logo would unmask it.
+        content.add(leftAligned(personSummary(employerNegotiator, !contract.isCovertOperation())));
         if (activeNegotiators) {
             content.add(Box.createVerticalStrut(scaleForGUI(10)));
             content.add(leftAligned(renegotiationOdds(employerNegotiator)));
@@ -736,12 +737,19 @@ public class ContractNegotiationDialog extends JDialog {
         return Math.round(chance * 100);
     }
 
-    /** A person's portrait beside their name and Negotiation skill (and Edge, when the campaign uses it). */
-    private JPanel personSummary(Person person) {
+    /**
+     * A person's portrait beside their name and Negotiation skill (and Edge, when the campaign uses it).
+     *
+     * @param person                 the person to summarize
+     * @param useOriginFactionBackup {@code true} to show their origin faction's logo when they have no portrait of
+     *                               their own; {@code false} for a covert employer's negotiator, whose logo would give
+     *                               the hidden employer away
+     */
+    private JPanel personSummary(Person person, boolean useOriginFactionBackup) {
         JPanel summary = Hud.transparentPanel(new BorderLayout(scaleForGUI(10), 0));
         JLabel portrait = Hud.portrait(null, scaleForGUI(PORTRAIT_SIZE));
         portrait.setIcon(portraits.computeIfAbsent(person,
-              key -> Hud.portrait(key, scaleForGUI(PORTRAIT_SIZE)).getIcon()));
+              key -> Hud.portrait(key, scaleForGUI(PORTRAIT_SIZE), useOriginFactionBackup).getIcon()));
         summary.add(Hud.topAligned(portrait), BorderLayout.WEST);
         JPanel text = Hud.column();
         JLabel name = new JLabel(person.getFullTitle());

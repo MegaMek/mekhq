@@ -580,7 +580,10 @@ public class ContractDossierPanel extends JPanel {
         JPanel briefing = Hud.transparentPanel(new BorderLayout(scaleForGUI(14), 0));
 
         JPanel portraitHolder = Hud.transparentPanel(new BorderLayout());
-        portraitHolder.add(Hud.portrait(negotiator, scaleForGUI(PORTRAIT_SIZE)), BorderLayout.NORTH);
+        // A covert operation's negotiator works for the hidden employer (a false flag keeps the real employer's
+        // negotiator behind its front), so their faction logo would unmask it: they fall back on the silhouette.
+        portraitHolder.add(Hud.portrait(negotiator, scaleForGUI(PORTRAIT_SIZE), !contract.isCovertOperation()),
+              BorderLayout.NORTH);
         briefing.add(portraitHolder, BorderLayout.WEST);
 
         JPanel text = Hud.column();
