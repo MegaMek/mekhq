@@ -51,7 +51,7 @@ import org.junit.jupiter.api.Test;
 
 /**
  * Tests {@link StratConCombatBonusProjection}: Essential scenarios pay from their known schedule, replacing Nav Points
- * pay three a month per point of Scale, an Objective Raid's target intelligence is capped by Scale, and a contract type
+ * pay two a month per point of Scale, an Objective Raid's target intelligence is capped by Scale, and a contract type
  * with no Essential scenarios of its own pays nothing.
  */
 class StratConCombatBonusProjectionTest {
@@ -102,12 +102,12 @@ class StratConCombatBonusProjectionTest {
     }
 
     @Test
-    void navPointsReplacingEssentialScenariosPayThreeAMonthPerPointOfScale() {
-        // Espionage's data caches replace its Essential scenarios: 3 x Scale 4 x 6 months
+    void navPointsReplacingEssentialScenariosPayTwoAMonthPerPointOfScale() {
+        // Espionage's data caches replace its Essential scenarios: 2 x Scale 4 x 6 months
         StratConCombatBonusProjection projection = StratConCombatBonusProjection.project(campaign,
               contract(ContractObjectiveType.ESPIONAGE));
 
-        assertEquals(72.0, projection.bonusCount(), DELTA);
+        assertEquals(48.0, projection.bonusCount(), DELTA);
         assertTrue(projection.isFromNavPoint());
     }
 
@@ -156,8 +156,8 @@ class StratConCombatBonusProjectionTest {
     }
 
     @Test
-    void navPointContractsSpreadCombatPayOverThreeBonusesAMonthPerPointOfScale() {
-        assertEquals(12, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions,
+    void navPointContractsSpreadCombatPayOverTwoBonusesAMonthPerPointOfScale() {
+        assertEquals(8, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions,
               contract(ContractObjectiveType.ESPIONAGE)));
     }
 
@@ -177,7 +177,7 @@ class StratConCombatBonusProjectionTest {
 
     /**
      * Nav Points and Essential scenarios are rounded separately, so at a fractional Scale the Nav Points are not always
-     * exactly three times as many. Combat pay is spread across the bonuses a contract actually brings, so each contract
+     * exactly twice as many. Combat pay is spread across the bonuses a contract actually brings, so each contract
      * still pays its whole monthly combat pay.
      */
     @Test
@@ -187,22 +187,22 @@ class StratConCombatBonusProjectionTest {
         AbstractContract essentialContract = contract(ContractObjectiveType.PLANETARY_ASSAULT);
         when(essentialContract.getExactScale()).thenReturn(1.4);
 
-        // 3 x 1.4 = 4.2 Nav Points a month, rounded to 4; 1.4 Essential scenarios, rounded to 1
+        // 2 x 1.4 = 2.8 Nav Points a month, rounded to 3; 1.4 Essential scenarios, rounded to 1
         double navPointsPerMonth = StratConCombatBonusProjection.project(campaign, navPointContract).bonusCount() / 6;
-        assertEquals(4, navPointsPerMonth, DELTA);
-        assertEquals(4, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions, navPointContract));
+        assertEquals(3, navPointsPerMonth, DELTA);
+        assertEquals(3, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions, navPointContract));
         assertEquals(1, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions, essentialContract));
     }
 
     @Test
-    void withoutSupportPointsInScaleEveryThreePointsOfScaleCountAsOne() {
+    void withoutSupportPointsInScaleEveryTwoPointsOfScaleCountAsOne() {
         campaignOptions.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, false);
         AbstractContract contract = contract(ContractObjectiveType.ESPIONAGE);
-        when(contract.getExactScale()).thenReturn(12.0);
+        when(contract.getExactScale()).thenReturn(8.0);
 
-        // Scale 12 counts as 4: 3 x 4 Nav Points a month, over 6 months
-        assertEquals(12, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions, contract));
-        assertEquals(72.0, StratConCombatBonusProjection.project(campaign, contract).bonusCount(), DELTA);
+        // Scale 8 counts as 4: 2 x 4 Nav Points a month, over 6 months
+        assertEquals(8, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions, contract));
+        assertEquals(48.0, StratConCombatBonusProjection.project(campaign, contract).bonusCount(), DELTA);
     }
 
     @Test
@@ -212,7 +212,7 @@ class StratConCombatBonusProjectionTest {
         campaignState.setSupportPointsFactoredIntoScale(false);
         when(contract.getStratConCampaignState()).thenReturn(campaignState);
 
-        // The option is on now, but the contract's Scale 4 was counted without support points: it counts as 4 / 3
-        assertEquals(1, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions, contract));
+        // The option is on now, but the contract's Scale 4 was counted without support points: it counts as 4 / 2
+        assertEquals(2, StratConCombatBonusProjection.getMonthlyCombatBonusCount(campaignOptions, contract));
     }
 }

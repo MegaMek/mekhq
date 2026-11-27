@@ -177,7 +177,7 @@ class StratConTargetIntelligenceTest {
 
     @Test
     void onlyOnePieceOfIntelligencePerPointOfScaleLeadsToAFacility() {
-        // Three a month per point of Scale: 3 x Scale 3 x 3 months, twenty-seven in all.
+        // Two a month per point of Scale: 2 x Scale 3 x 3 months, eighteen in all.
         when(contract.getExactScale()).thenReturn(3.0);
         StratConCampaignState scheduleState = new StratConCampaignState();
 
@@ -194,7 +194,7 @@ class StratConTargetIntelligenceTest {
         }
 
         List<StratConScheduledPointOfInterest> scheduled = scheduleState.getScheduledPointsOfInterest();
-        assertEquals(27, scheduled.size());
+        assertEquals(18, scheduled.size());
         assertEquals(3, countFacilityLeads(scheduled), "one lead per point of scale");
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertFalse(pointOfInterest.isStrategicObjective());
