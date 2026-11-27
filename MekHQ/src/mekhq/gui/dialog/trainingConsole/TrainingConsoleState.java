@@ -58,6 +58,7 @@ final class TrainingConsoleState {
         NAME,
         ROLE,
         FORMATION,
+        UNIT,
         EXPERIENCE,
         XP
     }
