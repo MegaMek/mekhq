@@ -65,6 +65,7 @@ import java.util.Map;
 import java.util.Map.Entry;
 import java.util.UUID;
 import java.util.function.Consumer;
+import java.util.function.Function;
 
 import jakarta.annotation.Nullable;
 import megamek.Version;
@@ -77,6 +78,7 @@ import megamek.common.enums.TechBase;
 import megamek.common.equipment.MiscType;
 import megamek.common.equipment.Mounted;
 import megamek.common.icons.Camouflage;
+import megamek.common.loaders.MekSummary;
 import megamek.common.loaders.MekSummaryCache;
 import megamek.common.options.IOption;
 import megamek.common.options.OptionsConstants;
@@ -1831,6 +1833,25 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                                    "mekfiles" +
                                    File.separator +
                                    "customs"; // TODO : Remove inline file path
+        return processCustom(retVal, wn, sCustomsDir, MekSummaryCache.getInstance()::getMek);
+    }
+
+    /**
+     * Processes a custom unit in a campaign, writing it to the campaign's customs folder unless the unit list already
+     * has a design with that name. The player may have saved the design anywhere the unit list reads, such as
+     * {@code data/mekfiles}, and a second copy would list the design twice (issue #11307).
+     *
+     * @param retVal           The {@see Campaign} being parsed.
+     * @param wn               The current XML element representing a custom unit.
+     * @param sCustomsDir      The customs folder; the campaign's own folder sits inside it, named for the player's
+     *                         force.
+     * @param findLoadedDesign Finds the design the unit list already has under a name, or returns {@code null} if it
+     *                         has none.
+     *
+     * @return A value indicating whether a new custom unit file was added to disk.
+     */
+    static boolean processCustom(Campaign retVal, Node wn, String sCustomsDir,
+          Function<String, MekSummary> findLoadedDesign) {
         String sCustomsDirCampaign = sCustomsDir + File.separator + retVal.getPlayerForce().getName();
         File customsDir = new File(sCustomsDir);
         if (!customsDir.exists()) {
@@ -1893,6 +1914,14 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
             // TODO : get a hash or something to validate and overwrite if we updated this
             if ((new File(fileName)).exists() || (new File(fileNameCampaign)).exists()) {
+                return false;
+            }
+
+            // The design may be saved in another folder the unit list reads
+            MekSummary loadedDesign = findLoadedDesign.apply(name);
+            if (loadedDesign != null) {
+                LOGGER.trace("[CustomUnit] {} is already loaded from {}; not writing a copy", name,
+                      loadedDesign.getSourceFile());
                 return false;
             }
 
