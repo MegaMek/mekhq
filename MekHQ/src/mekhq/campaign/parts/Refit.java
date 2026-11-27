@@ -3435,7 +3435,13 @@ public class Refit extends Part implements IAcquisitionWork {
 
             Part p = Part.generateInstanceFromXML(wn2, version);
             if (p != null) {
+                // The part goes back on the unit being refitted, whose old design would give it another weight. The
+                // new design may not be read yet, so the saved weight is kept.
+                double savedWeight = p.getTonnage();
                 p.setUnit(u);
+                if ((p instanceof MissingEquipmentPart missingEquipmentPart) && missingEquipmentPart.isWeightMatters()) {
+                    missingEquipmentPart.setEquipTonnage(savedWeight);
+                }
                 retVal.shoppingList.add(p);
             } else {
                 LOGGER.error((u != null) ?
