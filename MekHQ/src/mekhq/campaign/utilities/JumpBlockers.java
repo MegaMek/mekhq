@@ -34,9 +34,11 @@ package mekhq.campaign.utilities;
 
 import static megamek.common.units.Jumpship.DRIVE_CORE_NONE;
 import static mekhq.MHQConstants.CONFIRMATION_ABANDON_UNITS;
+import static mekhq.campaign.CampaignLocationManager.IS_BASE_TRAVEL_ENABLED;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
 import static mekhq.utilities.MHQInternationalization.getTextAt;
 
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
@@ -196,6 +198,12 @@ public class JumpBlockers {
         final int abandonUnits = 3;
         final int leaveAtNewBase = 4;
 
+        // "Leave at new base" is the last button, so dropping it while bases are turned off leaves the other indices
+        List<String> buttons = new ArrayList<>(List.of(buttonCancel, buttonGM, buttonSell, buttonAbandon));
+        if (IS_BASE_TRAVEL_ENABLED) {
+            buttons.add(buttonLeaveAtNewBase);
+        }
+
         int choiceIndex = cancelJumpChoiceIndex;
         boolean wasOverallConfirmed = false;
         while (!wasOverallConfirmed) {
@@ -206,7 +214,7 @@ public class JumpBlockers {
                               campaign.getLocalDate()),
                   null,
                   centerMessage,
-                  List.of(buttonCancel, buttonGM, buttonSell, buttonAbandon, buttonLeaveAtNewBase),
+                  buttons,
                   bottomMessage,
                   null,
                   true,
