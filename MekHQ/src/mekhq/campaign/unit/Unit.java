@@ -6221,6 +6221,13 @@ public class Unit implements ITechnology, ILocatable {
                 ((Tank) entity).setCommanderHit(commander.getTotalInjurySeverity() > 0);
             }
             crew.setMissing(false, 0);
+
+            // A solo pilot takes their current injuries into battle as crew hits. Crew.resetGameState() has just
+            // cleared the hits left over from the last battle, so this must run whatever the ability, Edge and
+            // implant options are, or an injured pilot would fight unhurt (and a healed one stay hurt).
+            if (usesSoloPilot()) {
+                crew.setHits(commander.getTotalInjurySeverity(), 0);
+            }
         }
     }
 
@@ -6541,12 +6548,10 @@ public class Unit implements ITechnology, ILocatable {
             }
             entity.getCrew().setOptions(cdrOptions);
 
-            if (usesSoloPilot()) {
-                if (!commander.getStatus().isActive()) {
-                    entity.getCrew().setMissing(true, 0);
-                    return;
-                }
-                entity.getCrew().setHits(commander.getTotalInjurySeverity(), 0);
+            // Crew hits for solo pilots are set in updateCrew(), whatever the ability options are
+            if (usesSoloPilot() && !commander.getStatus().isActive()) {
+                entity.getCrew().setMissing(true, 0);
+                return;
             }
 
             // Assign edge points to spacecraft and vehicle crews and infantry units. This overwrites the Edge value
