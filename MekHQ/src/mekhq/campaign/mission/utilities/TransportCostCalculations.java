@@ -1026,19 +1026,28 @@ public class TransportCostCalculations {
      * <p>If the account lacks sufficient funds, returns a formatted message indicating payment failure. If the
      * transaction succeeds, returns an empty string.</p>
      *
-     * @param finances      The {@link Finances} object to debit the jump cost from.
-     * @param jumpPath      The {@link JumpPath} representing the journey, used to construct the report.
-     * @param today         The current {@link LocalDate}, used to date the transaction and report.
-     * @param journeyCost   The {@link Money} amount required for the jump.
-     * @param currentSystem The {@link PlanetarySystem} where the journey begins.
+     * <p>When {@code isPayForTransport} is {@code false} the campaign is not paying for transport, so nothing is
+     * debited and the journey always goes ahead (an empty string is returned) regardless of available funds.</p>
      *
-     * @return An HTML-formatted report string if payment failed, or an empty string if the transaction succeeded.
+     * @param finances          The {@link Finances} object to debit the jump cost from.
+     * @param jumpPath          The {@link JumpPath} representing the journey, used to construct the report.
+     * @param today             The current {@link LocalDate}, used to date the transaction and report.
+     * @param journeyCost       The {@link Money} amount required for the jump.
+     * @param currentSystem     The {@link PlanetarySystem} where the journey begins.
+     * @param isPayForTransport Whether the campaign's 'Pay for Transport' option is enabled.
+     *
+     * @return An HTML-formatted report string if payment failed, or an empty string if the transaction succeeded or
+     *       no payment was required.
      *
      * @author Illiani
      * @since 50.10
      */
     public static String performJumpTransaction(Finances finances, JumpPath jumpPath, LocalDate today,
-          Money journeyCost, PlanetarySystem currentSystem) {
+          Money journeyCost, PlanetarySystem currentSystem, boolean isPayForTransport) {
+        if (!isPayForTransport) {
+            return "";
+        }
+
         String jumpReport = getFormattedTextAt(RESOURCE_BUNDLE, "TransportCostCalculations.transactionReport",
               currentSystem.getName(today), jumpPath.getLastSystem().getName(today));
         if (!finances.debit(TransactionType.TRANSPORTATION, today, journeyCost, jumpReport)) {
