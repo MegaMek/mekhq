@@ -34,6 +34,7 @@ package mekhq.gui.view;
 
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveBioweapons;
 import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllActiveDiseases;
+import static mekhq.campaign.personnel.medical.advancedMedicalAlternate.CanonicalDiseaseType.getAllSystemSpecificDiseasesWithCures;
 
 import java.awt.*;
 import java.awt.event.MouseEvent;
@@ -42,10 +43,10 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
+import java.util.Comparator;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
-import java.util.StringJoiner;
 import javax.swing.*;
 import javax.swing.text.DefaultCaret;
 import javax.swing.text.html.HTMLDocument;
@@ -57,6 +58,8 @@ import megamek.client.ui.util.UIUtil;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.personnel.InjuryType;
 import mekhq.campaign.personnel.education.Academy;
+import mekhq.campaign.personnel.medical.BodyLocation;
+import mekhq.campaign.personnel.medical.advancedMedicalAlternate.InjuryEffect;
 import mekhq.campaign.universe.Faction;
 import mekhq.campaign.universe.LandMass;
 import mekhq.campaign.universe.Planet;
@@ -67,6 +70,7 @@ import mekhq.campaign.universe.enums.CapitalType;
 import mekhq.campaign.universe.enums.PlanetaryType;
 import mekhq.gui.baseComponents.JScrollablePanel;
 import mekhq.gui.baseComponents.SourceableValueLabel;
+import mekhq.gui.dialog.glossary.GlossaryConsole;
 import mekhq.gui.utilities.MarkdownRenderer;
 import mekhq.utilities.MHQInternationalization;
 
@@ -165,6 +169,9 @@ public class PlanetViewPanel extends JScrollablePanel {
         Set<InjuryType> activeDiseases = getActiveDiseases();
         add(createHeader(planet));
         add(createOperationalSummary(planet, activeDiseases));
+        if (!activeDiseases.isEmpty()) {
+            add(getHealthAdvisoryPanel(activeDiseases));
+        }
 
         if (planet != null) {
             add(getWorldProfilePanel(planet));
@@ -172,7 +179,7 @@ public class PlanetViewPanel extends JScrollablePanel {
             if (environmentPanel.hasContent()) {
                 add(environmentPanel);
             }
-            add(getInfrastructurePanel(planet, activeDiseases));
+            add(getInfrastructurePanel(planet));
             if (planet.getDescription() != null) {
                 add(getReferencePanel(planet));
             }
@@ -473,7 +480,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         return section;
     }
 
-    private DossierSection getInfrastructurePanel(Planet planet, Set<InjuryType> activeDiseases) {
+    private DossierSection getInfrastructurePanel(Planet planet) {
         DossierSection section = createDossierSection("section.infrastructure.text");
         LocalDate currentDate = campaign.getLocalDate();
 
@@ -523,12 +530,6 @@ public class PlanetViewPanel extends JScrollablePanel {
             section.addStackedRow("lblAcademies.text", txtAcademies);
         }
 
-        // Noteworthy Diseases
-        if (!activeDiseases.isEmpty()) {
-            JTextPane txtDiseases = createHtmlTextPane(getDiseaseText(activeDiseases));
-            section.addStackedRow("lblDiseases.text", txtDiseases);
-        }
-
         // SIC codes
         if (null != planet.getSourcedSocioIndustrial(currentDate)) {
             SocioIndustrialData sid = planet.getSocioIndustrial(currentDate);
@@ -572,12 +573,78 @@ public class PlanetViewPanel extends JScrollablePanel {
         return planet.getHiringHallLevel(campaign.getLocalDate()).getLabel();
     }
 
-    private static String getDiseaseText(Set<InjuryType> activeDiseases) {
-        StringJoiner diseaseJoiner = new StringJoiner(", ");
-        for (InjuryType disease : activeDiseases) {
-            diseaseJoiner.add(disease.getSimpleName());
+    private DossierSection getHealthAdvisoryPanel(Set<InjuryType> activeDiseases) {
+        DossierSection section = createDossierSection("section.healthAdvisory.text", DOSSIER_WARNING);
+        Set<InjuryType> diseasesWithVaccines = getAllSystemSpecificDiseasesWithCures(system.getId(),
+              campaign.getLocalDate(), true);
+        JTextPane txtHealthAdvisory = createHtmlTextPane(getHealthAdvisoryText(activeDiseases,
+              diseasesWithVaccines));
+        txtHealthAdvisory.addHyperlinkListener(hyperlinkEvent ->
+              GlossaryConsole.handleGlossaryHyperlinkClick(SwingUtilities.getWindowAncestor(this),
+                    hyperlinkEvent));
+        section.addFullWidth(txtHealthAdvisory);
+        return section;
+    }
+
+    /**
+     * Builds the Health Advisory write-up: for each active disease or bioweapon in the system, what it is, what it
+     * does to infected personnel, whether it is permanent, and whether a vaccine is available on planetfall.
+     *
+     * @param activeDiseases       the diseases and bioweapons currently active in the system
+     * @param diseasesWithVaccines the active diseases and bioweapons that personnel can be vaccinated against
+     *
+     * @return the advisory as HTML body content
+     */
+    static String getHealthAdvisoryText(Collection<InjuryType> activeDiseases,
+          Set<InjuryType> diseasesWithVaccines) {
+        List<InjuryType> sortedDiseases = new ArrayList<>(activeDiseases);
+        sortedDiseases.sort(Comparator.comparing(InjuryType::getSimpleName));
+
+        String warningColor = toHexColor(DOSSIER_WARNING);
+        String mutedColor = toHexColor(DOSSIER_MUTED_TEXT);
+        StringBuilder advisory = new StringBuilder();
+        for (InjuryType disease : sortedDiseases) {
+            boolean isBioweapon = disease.getSubType().isBioweaponDisease();
+            boolean isFatal = disease.impliesDead(BodyLocation.INTERNAL);
+
+            String typeLabel = getText(isBioweapon ? "healthAdvisory.type.bioweapon" : "healthAdvisory.type.disease");
+            advisory.append("<p><b>").append(disease.getSimpleName()).append("</b> ")
+                  .append(colorize(typeLabel, mutedColor));
+
+            String effects;
+            if (isFatal) {
+                effects = colorize(getText("healthAdvisory.effects.fatal"), warningColor);
+            } else {
+                effects = InjuryEffect.getTooltip(List.of(disease.getInjuryEffect()));
+                if (effects.isBlank()) {
+                    effects = getText("healthAdvisory.effects.none");
+                }
+            }
+            advisory.append("<br>").append(format("healthAdvisory.effects", effects));
+
+            if (disease.isPermanent() && !isFatal) {
+                advisory.append("<br>").append(getText("healthAdvisory.permanent"));
+            }
+
+            String vaccineStatus = diseasesWithVaccines.contains(disease)
+                                         ? getText("healthAdvisory.vaccine.available")
+                                         : colorize(getText("healthAdvisory.vaccine.none"), warningColor);
+            advisory.append("<br>").append(format("healthAdvisory.vaccine", vaccineStatus)).append("</p>");
         }
-        return diseaseJoiner.toString();
+        advisory.append("<p>").append(getText("healthAdvisory.exposure")).append("</p>");
+        return advisory.toString();
+    }
+
+    private static String colorize(String text, String hexColor) {
+        return "<span style=\"color: " + hexColor + "\">" + text + "</span>";
+    }
+
+    private static String toHexColor(Color color) {
+        return String.format("#%02X%02X%02X", color.getRed(), color.getGreen(), color.getBlue());
+    }
+
+    private static String getText(String key) {
+        return MHQInternationalization.getTextAt(RESOURCE_BUNDLE, key);
     }
 
     private JTextPane createHtmlTextPane(String text) {
@@ -619,6 +686,10 @@ public class PlanetViewPanel extends JScrollablePanel {
     }
 
     private DossierSection createDossierSection(String headingKey) {
+        return createDossierSection(headingKey, DOSSIER_ACCENT);
+    }
+
+    private DossierSection createDossierSection(String headingKey, Color headingColor) {
         DossierSection section = new DossierSection();
         long revealDelay = SECTION_REVEAL_INITIAL_DELAY_NS +
                                  (detailRevealIndex++ * SECTION_REVEAL_STAGGER_NS);
@@ -626,7 +697,9 @@ public class PlanetViewPanel extends JScrollablePanel {
 
         GridBagConstraints constraints = createFullWidthConstraints(0);
         constraints.insets = new Insets(0, 0, UIUtil.scaleForGUI(6), 0);
-        section.add(createSectionHeading(headingKey), constraints);
+        JLabel heading = createSectionHeading(headingKey);
+        heading.setForeground(headingColor);
+        section.add(heading, constraints);
         return section;
     }
 
@@ -701,7 +774,7 @@ public class PlanetViewPanel extends JScrollablePanel {
         return constraints;
     }
 
-    private String format(String key, Object... arguments) {
+    private static String format(String key, Object... arguments) {
         return MHQInternationalization.getFormattedTextAt(RESOURCE_BUNDLE, key, arguments);
     }
 
