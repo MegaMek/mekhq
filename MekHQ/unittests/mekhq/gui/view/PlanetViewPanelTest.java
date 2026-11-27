@@ -117,12 +117,13 @@ class PlanetViewPanelTest {
         assertTrue(childusIndex > alarionIndex, "Hazards are listed alphabetically");
 
         String alarionEntry = getEntry(advisory, "Alarion Hanta Virus");
-        assertTrue(alarionEntry.contains("(Disease)"));
+        assertTrue(alarionEntry.contains("(Bioweapon)"));
         assertTrue(alarionEntry.contains("Fatal"));
         assertFalse(alarionEntry.contains("Permanent:"), "Fatal hazards do not also report permanence");
         assertTrue(alarionEntry.contains("Withdrawal from the system"));
 
         String childusEntry = getEntry(advisory, "Childus Fever");
+        assertTrue(childusEntry.contains("(Disease)"));
         assertTrue(childusEntry.contains("Strength"));
         assertTrue(childusEntry.contains("Available to personnel who make planetfall"));
 
