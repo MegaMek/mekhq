@@ -90,6 +90,10 @@ public class AtBDynamicScenario extends AtBScenario {
     private static final String PLAYER_UNIT_SWAP_ID_ELEMENT = "UnitID";
     private static final String PLAYER_UNIT_SWAP_TEMPLATE_ELEMENT = "Template";
     private static final String PLAYER_UNIT_SWAP_ENTITY_ELEMENT = "entity";
+    private static final String PLAYER_UNIT_TEMPLATES_ELEMENT = "playerUnitTemplates";
+    private static final String PLAYER_UNIT_TEMPLATE_ELEMENT = "playerUnitTemplate";
+    private static final String PLAYER_UNIT_TEMPLATE_UNIT_ID_ELEMENT = "unitId";
+    private static final String PLAYER_UNIT_TEMPLATE_NAME_ELEMENT = "templateName";
 
     private ScenarioTemplate template; // the template that is being used to generate this scenario
 
@@ -667,6 +671,7 @@ public class AtBDynamicScenario extends AtBScenario {
 
                 MHQXMLUtility.writeSimpleXMLCloseTag(pw, --indent, PLAYER_UNIT_SWAPS_ELEMENT);
             }
+            writePlayerUnitTemplates(pw, indent);
             MHQXMLUtility.writeSimpleXMLTag(pw, indent, "finalized", isFinalized());
 
             if (!offBoardForceIDs.isEmpty()) {
@@ -678,10 +683,98 @@ public class AtBDynamicScenario extends AtBScenario {
         super.writeToXMLEnd(pw, indent);
     }
 
+    /**
+     * Writes the template each individually deployed unit is linked to. Individual units (auxiliary/leadership,
+     * utility, and hand-assigned units) rejoin the scenario on load without a template, unlike formations, which are
+     * re-linked by {@link #addForces(int)}. Without this they lose their deployment zone and arrival turn on reload.
+     */
+    private void writePlayerUnitTemplates(final PrintWriter printWriter, int indent) {
+        List<Map.Entry<UUID, ScenarioForceTemplate>> linkedUnits = new ArrayList<>();
+        for (Map.Entry<UUID, ScenarioForceTemplate> entry : playerUnitTemplates.entrySet()) {
+            if ((entry.getValue() != null) && containsPlayerUnit(entry.getKey())) {
+                linkedUnits.add(entry);
+            }
+        }
+
+        if (linkedUnits.isEmpty()) {
+            return;
+        }
+
+        MHQXMLUtility.writeSimpleXMLOpenTag(printWriter, indent++, PLAYER_UNIT_TEMPLATES_ELEMENT);
+        for (Map.Entry<UUID, ScenarioForceTemplate> entry : linkedUnits) {
+            MHQXMLUtility.writeSimpleXMLOpenTag(printWriter, indent++, PLAYER_UNIT_TEMPLATE_ELEMENT);
+            MHQXMLUtility.writeSimpleXMLTag(printWriter, indent, PLAYER_UNIT_TEMPLATE_UNIT_ID_ELEMENT, entry.getKey());
+            MHQXMLUtility.writeSimpleXMLTag(printWriter,
+                  indent,
+                  PLAYER_UNIT_TEMPLATE_NAME_ELEMENT,
+                  entry.getValue().getForceName());
+            MHQXMLUtility.writeSimpleXMLCloseTag(printWriter, --indent, PLAYER_UNIT_TEMPLATE_ELEMENT);
+        }
+        MHQXMLUtility.writeSimpleXMLCloseTag(printWriter, --indent, PLAYER_UNIT_TEMPLATES_ELEMENT);
+    }
+
+    /**
+     * Reads the unit-to-template names written by {@link #writePlayerUnitTemplates(PrintWriter, int)}.
+     *
+     * @param templatesNode      the {@value #PLAYER_UNIT_TEMPLATES_ELEMENT} node
+     * @param savedTemplateNames receives each unit ID and the name of the template it was linked to
+     */
+    private void loadPlayerUnitTemplateNames(Node templatesNode, Map<UUID, String> savedTemplateNames) {
+        NodeList templateNodes = templatesNode.getChildNodes();
+        for (int templateIndex = 0; templateIndex < templateNodes.getLength(); templateIndex++) {
+            Node templateNode = templateNodes.item(templateIndex);
+            if (!templateNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_TEMPLATE_ELEMENT)) {
+                continue;
+            }
+
+            UUID unitId = null;
+            String templateName = null;
+            NodeList fieldNodes = templateNode.getChildNodes();
+            for (int fieldIndex = 0; fieldIndex < fieldNodes.getLength(); fieldIndex++) {
+                Node fieldNode = fieldNodes.item(fieldIndex);
+                if (fieldNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_TEMPLATE_UNIT_ID_ELEMENT)) {
+                    try {
+                        unitId = UUID.fromString(fieldNode.getTextContent().trim());
+                    } catch (IllegalArgumentException exception) {
+                        logger.warn("Skipping unreadable unit ID '{}' in the unit templates of scenario {}",
+                              fieldNode.getTextContent().trim(), getName());
+                    }
+                } else if (fieldNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_TEMPLATE_NAME_ELEMENT)) {
+                    templateName = fieldNode.getTextContent().trim();
+                }
+            }
+
+            if ((unitId != null) && !StringUtils.isBlank(templateName)) {
+                savedTemplateNames.put(unitId, templateName);
+            }
+        }
+    }
+
+    /**
+     * Re-links each individually deployed unit to its saved template. Runs once the whole scenario node has been read,
+     * so the scenario template is in place whatever order the elements were written in.
+     */
+    private void restorePlayerUnitTemplates(Map<UUID, String> savedTemplateNames) {
+        if (savedTemplateNames.isEmpty() || (getTemplate() == null)) {
+            return;
+        }
+
+        for (Map.Entry<UUID, String> entry : savedTemplateNames.entrySet()) {
+            ScenarioForceTemplate forceTemplate = getTemplate().getScenarioForces().get(entry.getValue());
+            if (forceTemplate == null) {
+                logger.warn("Unit {} in scenario {} was linked to template '{}', which the scenario no longer has",
+                      entry.getKey(), getName(), entry.getValue());
+                continue;
+            }
+            playerUnitTemplates.put(entry.getKey(), forceTemplate);
+        }
+    }
+
     @Override
     protected void loadFieldsFromXmlNode(final Node scenarioNode, final Version version, final Campaign campaign)
           throws ParseException {
         NodeList childNodes = scenarioNode.getChildNodes();
+        Map<UUID, String> savedUnitTemplateNames = new HashMap<>();
 
         for (int childIndex = 0; childIndex < childNodes.getLength(); childIndex++) {
             Node childNode = childNodes.item(childIndex);
@@ -734,12 +827,16 @@ public class AtBDynamicScenario extends AtBScenario {
                         playerUnitSwaps.put(playerUnitID, benchedEntityData);
                     }
                 }
+            } else if (childNode.getNodeName().equalsIgnoreCase(PLAYER_UNIT_TEMPLATES_ELEMENT)) {
+                loadPlayerUnitTemplateNames(childNode, savedUnitTemplateNames);
             } else if (childNode.getNodeName().equalsIgnoreCase("finalized")) {
                 setFinalized(Boolean.parseBoolean(childNode.getTextContent().trim()));
             } else if (childNode.getNodeName().equalsIgnoreCase("offBoardForceIDs")) {
                 loadOffBoardForceIDs(childNode.getTextContent());
             }
         }
+
+        restorePlayerUnitTemplates(savedUnitTemplateNames);
 
         super.loadFieldsFromXmlNode(scenarioNode, version, campaign);
     }
