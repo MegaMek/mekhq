@@ -40,7 +40,8 @@ import mekhq.gui.preferences.PreferenceFlags;
 
 /**
  * The Training Console's per-player settings: whether each page's guide has been seen, whether guides open by
- * themselves on a page's first visit, and whether the filter rail is shown.
+ * themselves on a page's first visit, whether the filter rail is shown, and whether the selection is cleared after
+ * staging or committing.
  *
  * <p>They are stored in MekHQ's preferences file ({@code mmconf/mhq.preferences}), under this class's node, so they
  * follow the MekHQ install rather than a campaign.</p>
@@ -52,6 +53,7 @@ final class TrainingConsolePreferences {
     static final String GUIDE_AUTO_OPEN = "guideAutoOpen";
     static final String GUIDE_SEEN_PREFIX = "guideSeen.";
     static final String RAIL_VISIBLE = "railVisible";
+    static final String CLEAR_SELECTION_AFTER_STAGING = "clearSelectionAfterStaging";
 
     private static TrainingConsolePreferences instance;
 
@@ -62,6 +64,8 @@ final class TrainingConsolePreferences {
         flags.register(GUIDE_AUTO_OPEN, true);
         // The rail starts open, so players know the filters are there
         flags.register(RAIL_VISIBLE, true);
+        // Off by default, so the console keeps working as it always has until the player asks otherwise
+        flags.register(CLEAR_SELECTION_AFTER_STAGING, false);
         for (TrainingConsolePage page : TrainingConsolePage.values()) {
             flags.register(seenKey(page), false);
         }
@@ -101,5 +105,13 @@ final class TrainingConsolePreferences {
 
     void setRailVisible(final boolean visible) {
         flags.set(RAIL_VISIBLE, visible);
+    }
+
+    boolean isClearSelectionAfterStaging() {
+        return flags.get(CLEAR_SELECTION_AFTER_STAGING);
+    }
+
+    void setClearSelectionAfterStaging(final boolean clearSelection) {
+        flags.set(CLEAR_SELECTION_AFTER_STAGING, clearSelection);
     }
 }
