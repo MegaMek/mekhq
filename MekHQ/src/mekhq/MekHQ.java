@@ -764,6 +764,7 @@ public class MekHQ implements GameListener {
             LOGGER.error(ex, "gameVictory()");
         } finally {
             gameThread.requestStop();
+            gameThread = null;
         }
     }
 
