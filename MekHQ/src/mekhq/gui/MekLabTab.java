@@ -38,6 +38,7 @@ import java.awt.GridBagConstraints;
 import java.awt.GridBagLayout;
 import java.awt.Insets;
 import java.io.File;
+import java.util.List;
 import java.util.ResourceBundle;
 import javax.swing.*;
 import javax.swing.filechooser.FileNameExtensionFilter;
@@ -101,15 +102,21 @@ import megameklab.ui.util.RefreshListener;
 import megameklab.util.CConfig;
 import megameklab.util.HeatGenerationEstimate;
 import megameklab.util.UnitUtil;
+import mekhq.campaign.Campaign;
 import mekhq.campaign.events.OptionsChangedEvent;
 import mekhq.campaign.parts.Refit;
+import mekhq.campaign.parts.RefitDesignFolder;
+import mekhq.campaign.personnel.Person;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.WorkTimeEstimate;
+import mekhq.gui.baseComponents.immersiveDialogs.ImmersiveDialogSimple;
 import mekhq.gui.enums.MHQTabType;
 import mekhq.utilities.ReportingUtilities;
 
 public class MekLabTab extends CampaignGuiTab {
     private static final MMLogger LOGGER = MMLogger.create(MekLabTab.class);
+    /** The button in the unusable design folder dialog that reopens the save dialog */
+    private static final int DESIGN_FOLDER_CHOOSE_AGAIN = 1;
     protected final ResourceBundle resources = ResourceBundle.getBundle("mekhq.resources.MekLabTab");
 
     CampaignGUI campaignGUI;
@@ -188,6 +195,37 @@ public class MekLabTab extends CampaignGuiTab {
      */
     public @Nullable File chooseDesignFile(Entity entity) {
         startSaveDialogsInUserDirectory();
+        File chosen = askForDesignFile(entity);
+        // The refit looks the design up in the unit list, so a folder the list never reads cannot be used (#11303)
+        while ((chosen != null) && !MekSummaryCache.isInUnitListFolder(chosen)) {
+            LOGGER.info("[RefitDesignFolder] {} is not in a folder the unit list reads; asking for another folder",
+                  chosen);
+            if (!isChoosingAnotherFolder(RefitDesignFolder.describeRefitRefused(chosen))) {
+                return null;
+            }
+            chosen = askForDesignFile(entity);
+        }
+        if (chosen == null) {
+            return null;
+        }
+        if (chosen.exists()) {
+            int response = JOptionPane.showConfirmDialog(getFrame(),
+                  String.format(resources.getString("dialog.overwrite.text"), chosen.getName()),
+                  resources.getString("dialog.overwrite.title"), JOptionPane.YES_NO_OPTION,
+                  JOptionPane.WARNING_MESSAGE);
+            if (response != JOptionPane.YES_OPTION) {
+                return null;
+            }
+        }
+        return chosen;
+    }
+
+    /**
+     * Shows the save dialog once.
+     *
+     * @return the chosen file with the extension the design needs, or {@code null} if the player cancelled
+     */
+    private @Nullable File askForDesignFile(Entity entity) {
         String extension = (entity instanceof Mek) ? "mtf" : "blk";
         MMLFileChooser chooser = new MMLFileChooser();
         chooser.setDialogTitle(resources.getString("dialog.saveAs.title"));
@@ -202,16 +240,47 @@ public class MekLabTab extends CampaignGuiTab {
         if (!chosen.getName().toLowerCase().endsWith('.' + extension)) {
             chosen = new File(chosen.getParentFile(), chosen.getName() + '.' + extension);
         }
-        if (chosen.exists()) {
-            int response = JOptionPane.showConfirmDialog(getFrame(),
-                  String.format(resources.getString("dialog.overwrite.text"), chosen.getName()),
-                  resources.getString("dialog.overwrite.title"), JOptionPane.YES_NO_OPTION,
-                  JOptionPane.WARNING_MESSAGE);
-            if (response != JOptionPane.YES_OPTION) {
-                return null;
-            }
-        }
         return chosen;
+    }
+
+    /**
+     * Tells the player why the chosen folder cannot be used and asks whether to choose another.
+     *
+     * @param reason why the folder cannot be used, and where the design can go instead
+     *
+     * @return {@code true} if the player wants to choose another folder, {@code false} if they cancelled
+     */
+    private boolean isChoosingAnotherFolder(String reason) {
+        // Cancel stays first, so closing with X cancels, but choosing again has focus
+        List<String> buttons = List.of(resources.getString("dialog.designFolder.cancel"),
+              resources.getString("dialog.designFolder.chooseAgain"));
+        ImmersiveDialogSimple dialog = new ImmersiveDialogSimple(campaignGUI.getCampaign(), getLogisticsSpeaker(),
+              null, reason, buttons, null, null, false, DESIGN_FOLDER_CHOOSE_AGAIN);
+        return dialog.getDialogChoice() == DESIGN_FOLDER_CHOOSE_AGAIN;
+    }
+
+    /**
+     * Warns the player that a design saved with "Save For Later" went to a folder the unit list does not read, so it
+     * will not be offered for refits. The file is kept: the player may want a copy there.
+     *
+     * @param savedFile where the design was saved, or {@code null} if it was not saved
+     */
+    private void warnIfSavedOutsideUnitFolders(@Nullable String savedFile) {
+        if ((savedFile == null) || MekSummaryCache.isInUnitListFolder(new File(savedFile))) {
+            return;
+        }
+        LOGGER.info("[RefitDesignFolder] Saved for later to {}, a folder the unit list does not read", savedFile);
+        new ImmersiveDialogSimple(campaignGUI.getCampaign(), getLogisticsSpeaker(), null,
+              RefitDesignFolder.describeSavedOutsideUnitFolders(new File(savedFile)),
+              List.of(resources.getString("dialog.designFolder.understood")), null, null, false);
+    }
+
+    private @Nullable Person getLogisticsSpeaker() {
+        Campaign campaign = campaignGUI.getCampaign();
+        return campaign.getPlayerForce()
+                     .getHumanResources()
+                     .getSeniorAdminPerson(campaign.getCampaignOptions(), campaign.getPlayerForce().isClanForce(),
+                           campaign.getLocalDate());
     }
 
     @Override
@@ -229,9 +298,10 @@ public class MekLabTab extends CampaignGuiTab {
             Entity entity = labPanel.getEntity();
             UnitUtil.compactCriticalSlots(entity);
             labPanel.refreshAll(); // The crits may have moved
-            createFileSaver().saveUnitAs(this.getFrame(), entity);
+            String savedFile = createFileSaver().saveUnitAs(this.getFrame(), entity);
             // Refresh unit cache so newly-saved file is available for refits.
             MekSummaryCache.refreshUnitData(false);
+            warnIfSavedOutsideUnitFolders(savedFile);
         });
 
         JButton btnClear = new JButton("Clear Changes");
