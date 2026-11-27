@@ -1626,7 +1626,7 @@ public class CustomizePersonDialog extends JDialog implements DialogOptionListen
     /**
      * Cache-bypassing point-in-time owner lookup with to-the-victor citizenship semantics.
      *
-     * <p>{@link Planet#getFactionSet(LocalDate)} routes through {@code Planet.CurrentEvents}, a
+     * <p>{@link Planet#getFactionSet(LocalDate)} routes through {@code CurrentEvents}, a
      * stateful per-planet event-stream cache that can return stale-forward state when warmed at a later date and
      * queried at an earlier one (observed during #8934 testing — New Avalon at 3047-09-25 returning 3067-12-31's
      * {@code DIS} marker because the cache had already advanced for a campaign-date render). We walk
