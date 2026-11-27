@@ -156,6 +156,25 @@ public class MissingEquipmentPart extends MissingPart {
         return equipTonnage;
     }
 
+    /**
+     * Sets the weight of the equipment this part is missing. For equipment whose weight matters, this is the weight the
+     * replacement has to have.
+     *
+     * @param weight the weight in tons
+     */
+    public void setEquipTonnage(double weight) {
+        equipTonnage = weight;
+    }
+
+    /**
+     * @return {@code true} if only a part of this part's weight can replace it
+     *
+     * @see EquipmentPart#isWeightMatters(EquipmentType)
+     */
+    public boolean isWeightMatters() {
+        return EquipmentPart.isWeightMatters(type);
+    }
+
     @Override
     public void writeToXML(final PrintWriter pw, int indent) {
         indent = writeToXMLBegin(pw, indent);
