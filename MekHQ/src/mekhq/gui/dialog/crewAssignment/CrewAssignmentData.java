@@ -127,6 +127,8 @@ final class CrewAssignmentData {
 
     /** How many chassis a person row names when listing what the person is familiar with. */
     static final int MAX_FAMILIAR_CHASSIS = 5;
+    /** The effective fatigue at which auto-fill passes someone over: where fatigue starts to cost them. */
+    static final int AUTO_FILL_FATIGUE_LIMIT = 5;
 
     /**
      * A person and what the dialog shows about them.
@@ -164,7 +166,7 @@ final class CrewAssignmentData {
         locationName = location.toString();
         plan = new AssignmentPlan(options.get(CampaignOption.USE_ALTERNATIVE_ADVANCED_MEDICAL),
               options.get(CampaignOption.USE_IMPLANTS), options.get(CampaignOption.TECHS_USE_ADMINISTRATION));
-        // A tech busy on a refit at this location cannot take on more units
+        // Auto-fill passes over a tech busy on a refit at this location; the player may still assign them by hand
         ForceHumanResources humanResources = campaign.getPlayerForce().getHumanResources();
         LocalHangar hangar = (location.getBase() == null) ? campaign.getPlayerForce().getHangar() :
                                    location.getBase().getBaseHangar();
@@ -223,17 +225,24 @@ final class CrewAssignmentData {
 
     /**
      * Whether auto-fill may choose someone. Only combat personnel and techs are chosen, so auto-fill never takes a
-     * doctor, administrator or other staff member away from their duties; the player places them by hand.
+     * doctor, administrator or other staff member away from their duties; the player places them by hand. Nor does it
+     * choose anyone wounded, pregnant or worn out, so taking them off a unit is not undone by the next auto-fill; the
+     * player can still place them by hand.
      *
-     * @param person a listed person
+     * @param entry a listed person
      *
      * @return {@code true} if auto-fill may choose the person
      *
      * @author Illiani
      * @since 0.51.01
      */
-    static boolean isAutoFillCandidate(Person person) {
-        return person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat() || person.isTech();
+    static boolean isAutoFillCandidate(PersonEntry entry) {
+        Person person = entry.person();
+        boolean isEligibleRole = person.getPrimaryRole().isCombat() || person.getSecondaryRole().isCombat()
+                                       || person.isTech();
+        boolean isFit = (entry.hits() == 0) && !person.isPregnant();
+        boolean isRested = (entry.fatigue() == null) || (entry.fatigue() < AUTO_FILL_FATIGUE_LIMIT);
+        return isEligibleRole && isFit && isRested;
     }
 
     private static PersonEntry describe(Campaign campaign, Person person, SkillLevel level, boolean useFatigue,

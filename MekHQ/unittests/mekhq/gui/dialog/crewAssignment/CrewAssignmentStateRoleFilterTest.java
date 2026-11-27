@@ -37,9 +37,14 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 
+import java.util.List;
+import java.util.Map;
+
+import megamek.common.enums.SkillLevel;
 import mekhq.campaign.personnel.Person;
 import mekhq.campaign.personnel.enums.PersonnelRole;
 import mekhq.campaign.personnel.enums.PersonnelStatus;
+import mekhq.gui.dialog.crewAssignment.CrewAssignmentData.PersonEntry;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.RoleGroup;
 import mekhq.gui.dialog.crewAssignment.CrewAssignmentState.SingleRole;
 import org.junit.jupiter.api.Test;
@@ -107,7 +112,8 @@ class CrewAssignmentStateRoleFilterTest {
     void otherProfessionsAreListedButNotAutoFilled() {
         Person doctor = person(PersonnelStatus.ACTIVE, PersonnelRole.DOCTOR, PersonnelRole.NONE);
         assertTrue(CrewAssignmentData.isShown(doctor));
-        assertFalse(CrewAssignmentData.isAutoFillCandidate(doctor));
+        assertFalse(CrewAssignmentData.isAutoFillCandidate(new PersonEntry(doctor, SkillLevel.REGULAR, List.of(),
+              Map.of(), 0, null, "", CrewAssignmentData.FamiliarityEntry.NONE)));
     }
 
     @Test
