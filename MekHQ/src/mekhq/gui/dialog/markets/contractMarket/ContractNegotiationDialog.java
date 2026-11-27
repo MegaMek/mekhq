@@ -36,6 +36,7 @@ import static java.lang.Math.max;
 import static megamek.client.ui.util.UIUtil.scaleForGUI;
 import static mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MAXIMUM_STEP_VALUE;
 import static mekhq.campaign.mission.contract.contractData.ChaosContractStepsTable.CHAOS_CONTRACT_MINIMUM_STEP_VALUE;
+import static mekhq.campaign.mission.contract.contractData.ChaosObjectiveSpecialRules.SIMULATED_DAMAGE;
 import static mekhq.campaign.personnel.skills.enums.MarginOfSuccess.DISASTROUS;
 import static mekhq.gui.baseComponents.hud.HudStyle.*;
 import static mekhq.utilities.MHQInternationalization.getFormattedTextAt;
@@ -1016,9 +1017,13 @@ public class ContractNegotiationDialog extends JDialog {
      * waived. Unlike an ordinary employer's non-negotiable lock - which the "exception" active negotiation can waive -
      * these are dictated outright by a pirate raid: command rights and salvage on every pirate raid, plus support and
      * transport on a self-directed (non-covert) raid (a secretly-bankrolled covert raid leaves those to its hidden
-     * sponsor).
+     * sponsor). A contract fought with simulated damage (such as Cadre Duty) also fixes salvage, as its battles leave
+     * nothing behind to salvage.
      */
     private boolean isPermanentlyLocked(Clause clause) {
+        if (clause == Clause.SALVAGE && contract.usesSpecialRule(SIMULATED_DAMAGE)) {
+            return true;
+        }
         if (!isPirateContract()) {
             return false;
         }
@@ -1307,7 +1312,8 @@ public class ContractNegotiationDialog extends JDialog {
         for (int move = 0; move < count; move++) {
             List<Clause> eligible = new ArrayList<>();
             for (Clause clause : Clause.values()) {
-                // A permanently-locked term (a pirate raid's dictated terms) can never be waived or toggled.
+                // A permanently-locked term (a pirate raid's dictated terms, or salvage on a simulated-damage
+                // contract) can never be waived or toggled.
                 if (!isPermanentlyLocked(clause) && (nonNegotiableTerms.isLocked(clause.term) == waive)) {
                     eligible.add(clause);
                 }
