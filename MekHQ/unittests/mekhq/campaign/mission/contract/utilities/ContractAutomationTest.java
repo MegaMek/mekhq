@@ -40,6 +40,7 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.anyBoolean;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.ArgumentMatchers.anyList;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.doReturn;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
@@ -62,6 +63,8 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.LocalHangar;
+import mekhq.campaign.campaignOptions.CampaignOption;
+import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.force.Detachment;
 import mekhq.campaign.force.Formation;
 import mekhq.campaign.force.PlayerForce;
@@ -606,12 +609,16 @@ class ContractAutomationTest {
 
         /**
          * Runs {@link ContractAutomation#performContractStart} with travel requested along a jump path, the journey
-         * charge failing or succeeding as given, and returns the jump path that was offered.
+         * charge failing or succeeding as given, and returns the jump path that was offered. Also verifies that the
+         * campaign's 'Pay for Transport' option is passed through to the journey charge.
          */
-        private static JumpPath startWithTravel(Fixture f, boolean chargeSucceeds) {
+        private static JumpPath startWithTravel(Fixture f, boolean chargeSucceeds, boolean isPayForTransport) {
             JumpPath jumpPath = mock(JumpPath.class);
             when(f.campaign().getGUI()).thenReturn(mock(CampaignGUI.class));
             when(f.campaign().getTransportCostCalculation(anyInt())).thenReturn(mock(TransportCostCalculations.class));
+            CampaignOptions campaignOptions = mock(CampaignOptions.class);
+            when(campaignOptions.get(CampaignOption.PAY_FOR_TRANSPORT)).thenReturn(isPayForTransport);
+            when(f.campaign().getCampaignOptions()).thenReturn(campaignOptions);
 
             try (MockedStatic<MekHQ> ignoredMekHQ = mockStatic(MekHQ.class);
                   MockedStatic<ContractUtilities> utilities = mockStatic(ContractUtilities.class);
@@ -622,9 +629,12 @@ class ContractAutomationTest {
                       .thenReturn(10);
                 jumpBlockers.when(() -> JumpBlockers.areAllUnitsJumpCapable(any())).thenReturn(true);
                 transport.when(() -> TransportCostCalculations.performJumpTransaction(any(), any(), any(), any(),
-                      any())).thenReturn(chargeSucceeds ? "" : "You cannot afford to make the jump!");
+                      any(), anyBoolean())).thenReturn(chargeSucceeds ? "" : "You cannot afford to make the jump!");
 
                 ContractAutomation.performContractStart(f.campaign(), f.contract(), false, true);
+
+                transport.verify(() -> TransportCostCalculations.performJumpTransaction(any(), any(), any(), any(),
+                      any(), eq(isPayForTransport)));
             }
             return jumpPath;
         }
@@ -633,7 +643,7 @@ class ContractAutomationTest {
         void doesNotDepartWhenTheJourneyCannotBeAfforded() {
             Fixture f = fixture(false);
 
-            startWithTravel(f, false);
+            startWithTravel(f, false, true);
 
             // The force stays put rather than travelling for free...
             verify(f.detachment().getCurrentLocation(), never()).setJumpPath(any());
@@ -645,7 +655,17 @@ class ContractAutomationTest {
         void departsOnceTheJourneyIsPaidFor() {
             Fixture f = fixture(false);
 
-            JumpPath jumpPath = startWithTravel(f, true);
+            JumpPath jumpPath = startWithTravel(f, true, true);
+
+            verify(f.detachment().getCurrentLocation()).setJumpPath(jumpPath);
+        }
+
+        @Test
+        void departsWhenPayForTransportIsDisabled() {
+            Fixture f = fixture(false);
+
+            // With 'Pay for Transport' disabled the journey is free, so the (real) charge returns no failure report.
+            JumpPath jumpPath = startWithTravel(f, true, false);
 
             verify(f.detachment().getCurrentLocation()).setJumpPath(jumpPath);
         }
