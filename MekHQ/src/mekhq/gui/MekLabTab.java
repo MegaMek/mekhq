@@ -400,6 +400,7 @@ public class MekLabTab extends CampaignGuiTab {
             LOGGER.error("", ex);
             return;
         }
+        entity.putInLab();
         entity.setYear(unit.getCampaign().getGameYear());
         UnitUtil.updateLoadedUnit(entity);
         entity.setModel(entity.getModel() + " Mk II");
@@ -487,6 +488,7 @@ public class MekLabTab extends CampaignGuiTab {
             LOGGER.error("", ex);
             return;
         }
+        entity.putInLab();
         entity.setYear(unit.getCampaign().getGameYear());
         UnitUtil.updateLoadedUnit(entity);
         removeAll();
