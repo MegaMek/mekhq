@@ -153,8 +153,8 @@ class StratConDataCacheSchedulingTest {
         AbstractContract contract = contract(ContractObjectiveType.ESPIONAGE, 1);
         when(contract.getExactScale()).thenReturn(1.4);
 
-        // 3 x 1.4 = 4.2, rounded to 4 a month
-        assertEquals(4 * LENGTH_IN_MONTHS, schedule(contract, true).size());
+        // 2 x 1.4 = 2.8, rounded to 3 a month
+        assertEquals(3 * LENGTH_IN_MONTHS, schedule(contract, true).size());
     }
 
     @Test
