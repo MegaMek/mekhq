@@ -34,10 +34,16 @@ package mekhq.campaign.parts;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertNotEquals;
+import static org.junit.jupiter.api.Assertions.assertNotNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 
+import java.io.ByteArrayInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
+import megamek.Version;
 import megamek.common.equipment.EquipmentType;
 import megamek.common.exceptions.LocationFullException;
 import megamek.common.units.Entity;
@@ -47,9 +53,11 @@ import mekhq.campaign.parts.equipment.EquipmentPart;
 import mekhq.campaign.parts.equipment.MissingEquipmentPart;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.work.IAcquisitionWork;
+import mekhq.utilities.MHQXMLUtility;
 import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
+import org.w3c.dom.Document;
 import testUtilities.parts.PartsScenario;
 import testUtilities.parts.UnitFixture;
 
@@ -150,5 +158,61 @@ class RefitWeightMattersTest {
 
         assertEquals(List.of(), targetingComputersToBuy(refit),
               "The targeting computer on its way is the one the refit needs, so it does not ask for another");
+    }
+
+    @Test
+    void aBegunRefitStillNeedsTheNewDesignsWeightAfterAReload() throws Exception {
+        Refit refit = new Refit(locust, locustWithATargetingComputer(), true, false, false);
+        refit.begin();
+
+        Refit reloaded = writeAndReadBack(refit);
+
+        List<MissingEquipmentPart> toBuy = targetingComputersToBuy(reloaded);
+        assertEquals(1, toBuy.size(), reloaded.getShoppingList().toString());
+        assertEquals(2.0, toBuy.get(0).getTonnage(), "The old design would make it a 1 ton targeting computer");
+    }
+
+    @Test
+    void aTargetingComputerOrderedAheadAtTheOldDesignsWeightIsRepaired() throws LocationFullException {
+        EquipmentType targetingComputer = EquipmentType.get(TARGETING_COMPUTER);
+        EquipmentPart deliveredAtTheOldWeight = new EquipmentPart(20, targetingComputer, -1, 1.0, campaign);
+        deliveredAtTheOldWeight.setEquipTonnage(0.0);
+        deliveredAtTheOldWeight.setOrderedAheadForUnitId(locust.getId());
+        campaign.getQuartermaster().addPart(deliveredAtTheOldWeight, 0, true);
+        MissingEquipmentPart orderedAtTheOldWeight = new MissingEquipmentPart(20, targetingComputer, -1, campaign, 0.0,
+              1.0, false);
+        orderedAtTheOldWeight.setOrderedAheadForUnitId(locust.getId());
+        campaign.getPlayerForce().getShoppingList().addShoppingItem(orderedAtTheOldWeight, 1, campaign);
+        EquipmentPart plainSpare = new EquipmentPart(20, targetingComputer, -1, 1.0, campaign);
+        plainSpare.setEquipTonnage(0.0);
+        campaign.getQuartermaster().addPart(plainSpare, 0, true);
+        List<Part> orderedAhead = RefitPartOrders.findOrderedAheadFor(campaign, locust);
+        assertEquals(2, orderedAhead.size(), orderedAhead.toString());
+
+        int repairedCount = RefitOrderedWeightRepair.repair(locust, orderedAhead,
+              new Refit(locust, locustWithATargetingComputer(), true, false, false));
+
+        assertEquals(2, repairedCount);
+        for (Part part : orderedAhead) {
+            assertEquals(2.0, part.getTonnage(), part.getName());
+        }
+        assertEquals(0.0, plainSpare.getTonnage(), "A spare not ordered for the refit keeps its weight");
+    }
+
+    /**
+     * Writes the refit out and reads it back the way a campaign save does.
+     */
+    private Refit writeAndReadBack(Refit refit) throws Exception {
+        StringWriter xmlText = new StringWriter();
+        try (PrintWriter xmlWriter = new PrintWriter(xmlText)) {
+            refit.writeToXML(xmlWriter, 0);
+        }
+        Document document = MHQXMLUtility.newSafeDocumentBuilder()
+                                  .parse(new ByteArrayInputStream(xmlText.toString()
+                                                                        .getBytes(StandardCharsets.UTF_8)));
+        Refit reloaded = Refit.generateInstanceFromXML(document.getDocumentElement(), new Version(), campaign, locust,
+              true);
+        assertNotNull(reloaded);
+        return reloaded;
     }
 }
