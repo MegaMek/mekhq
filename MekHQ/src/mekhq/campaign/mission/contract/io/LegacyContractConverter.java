@@ -459,7 +459,7 @@ public final class LegacyContractConverter {
             }
         }
 
-        for (final Unit unit : campaign.getUnits()) {
+        for (final Unit unit : campaign.getAllUnits()) {
             if (unit.isDeployed()) {
                 unit.undeploy();
             }

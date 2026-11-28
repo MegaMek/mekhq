@@ -164,7 +164,7 @@ public class MissingBattleArmorSuit extends MissingPart {
             if (!spare.isSpare() || !isAcceptableReplacement(spare, false)) {
                 continue;
             }
-            if (spare.isPresent()) {
+            if (spare.isOnHand()) {
                 suitsOnHand += spare.getTotalQuantity();
             } else {
                 suitsInTransit += spare.getTotalQuantity();

@@ -796,7 +796,7 @@ public class Armor extends Part implements IAcquisitionWork {
     protected int changeAmountAvailableSingle(int amount) {
         Armor armor = (Armor) getWarehouse()
                                     .findSparePart(part -> (part instanceof Armor) &&
-                                                                 part.isPresent() &&
+                                                                 part.isOnHand() &&
                                                                  Objects.equals(getRefitUnit(), part.getRefitUnit()) &&
                                                                  isSameType((Armor) part));
 
@@ -822,6 +822,6 @@ public class Armor extends Part implements IAcquisitionWork {
      * @return true if the two parts are the same, at least as far as {@link Armor#getAmountAvailable} is concerned
      */
     private boolean isSameArmorPart(Part part) {
-        return (part instanceof Armor armor) && armor.isPresent() && !armor.isReservedForRefit() && isSameType(armor);
+        return (part instanceof Armor armor) && armor.isOnHand() && !armor.isReservedForRefit() && isSameType(armor);
     }
 }

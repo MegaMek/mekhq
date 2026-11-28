@@ -216,7 +216,7 @@ public class SVArmor extends Armor {
     protected int changeAmountAvailableSingle(int amount) {
         SVArmor armor = (SVArmor) getWarehouse()
                                         .findSparePart(part -> isSamePartType(part) &&
-                                                                     part.isPresent() &&
+                                                                     part.isOnHand() &&
                                                                      Objects.equals(getRefitUnit(),
                                                                            part.getRefitUnit()));
 
@@ -269,7 +269,7 @@ public class SVArmor extends Armor {
      */
     private boolean isSameSVArmorPart(Part part) {
         return (part instanceof SVArmor armor) &&
-                     armor.isPresent() &&
+                     armor.isOnHand() &&
                      !armor.isReservedForRefit() &&
                      isClanTechBase() == part.isClanTechBase() &&
                      isSamePartType(armor);

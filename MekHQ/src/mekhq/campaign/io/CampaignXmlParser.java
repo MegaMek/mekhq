@@ -110,6 +110,7 @@ import mekhq.campaign.location.AcademyCampusLocation;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.LocationNode;
 import mekhq.campaign.location.LocationUtils;
+import mekhq.campaign.location.TransportLinksAcrossPlaces;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.market.RequestedStockLevels;
 import mekhq.campaign.mission.contract.AbstractContract;
@@ -805,6 +806,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         if (!result.succeeded()) {
             LOGGER.warn(result.getMessage());
         }
+
+        for (CampaignTransportType campaignTransportType : CampaignTransportType.values()) {
+            if (unit.hasTransportedUnits(campaignTransportType)) {
+                campaign.updateTransportInTransports(campaignTransportType, unit);
+            }
+        }
     }
 
     private static void processPlayerBaseNodes(Campaign campaign, Node wn, Version version) {
@@ -830,7 +837,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                         }
                     }
                     base.drainPendingBaseWarehouseParts();
-                    base.drainPendingBaseHangarUnits();
+                    // The base's units are already in its hangar; they still need registering like the main force's
+                    for (Unit unit : base.drainPendingBaseHangarUnits()) {
+                        campaign.registerPlacedUnit(unit);
+                    }
                 }
             }
         }
@@ -2511,7 +2521,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
                 Unit u = campaign.getUnit(uid);
                 if (null != u) {
                     u.setFormationId(f.getId());
-                    if (f.isDeployed()) {
+                    // A unit away from the main force stayed behind when its formation deployed.
+                    if (f.isDeployed() && !LocationUtils.isAwayFromMainForce(u, campaign)) {
                         u.setScenarioId(f.getScenarioId());
                     }
                 }
@@ -2652,7 +2663,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             resolveRolePerformability(person, campaign);
         }
 
-        campaign.getPlayerForce().allUnits().forEach(unit -> {
+        // Units kept at a base need their C3 ids and crews put right too
+        for (Unit unit : campaign.getAllUnits()) {
             // Some units have been incorrectly assigned a null C3UUID as a string. This
             // should
             // correct that by setting a new C3UUID
@@ -2665,7 +2677,7 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
             // This needs to be down here so that it can factor in any changes made to personnel prior to this point.
             unit.resetPilotAndEntity();
-        });
+        }
         campaign.getPlayerForce().refreshNetworks(campaign.getGame());
 
         LOGGER.info("[Campaign Load] C3 networks refreshed in {}ms", System.currentTimeMillis() - timestamp);
@@ -2677,11 +2689,12 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
         }
 
         // ok, once we are sure that campaign has been set for all units, we can
-        // now go through and initializeParts and run diagnostics
+        // now go through and initializeParts and run diagnostics. Units kept at a base are checked the same way.
         List<Unit> removeUnits = new ArrayList<>();
-        campaign.getPlayerForce().allUnits().forEach(unit -> {
+        for (Unit unit : campaign.getAllUnits()) {
             // just in case parts are missing (i.e. because they weren't tracked
-            // in previous versions)
+            // in previous versions). Must be true so that any parts initializeParts creates are registered with the
+            // quartermaster and assigned real ids. Otherwise, they'll break on the next load.
             unit.initializeParts(true);
             unit.runDiagnostic(false);
             if (!unit.isRepairable()) {
@@ -2698,24 +2711,10 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
             for (String report : reports) {
                 campaign.addReport(GENERAL, report);
             }
-        });
+        }
 
         for (Unit unit : removeUnits) {
             campaign.removeUnit(unit.getId());
-        }
-
-        for (PlayerBase base : campaign.getCampaignLocationManager().getPlayerBases()) {
-            base.getBaseHangar().forEachUnit(unit -> {
-                // Must be true so that any parts initializeParts creates are registered with the quartermaster and
-                // assigned real ids. Otherwise, they'll break on the next load.
-                unit.initializeParts(true);
-                unit.runDiagnostic(false);
-
-                List<String> reports = unit.checkForOverCrewing();
-                for (String report : reports) {
-                    campaign.addReport(GENERAL, report);
-                }
-            });
         }
 
         // Units an older version left with duplicate or scattered parts, at a base or after a move, are put right
@@ -2896,6 +2895,8 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         migrateLegacyEducationTravel(campaign);
         reconnectPersonsToTravelLocations(campaign);
+        // Older versions kept transport links between units at different places; now everyone is placed, release them
+        TransportLinksAcrossPlaces.release(campaign, campaign.getAllUnits());
         relinkLegacyMissions(campaign, legacyMissionIdMap, pendingMissionRelinks);
         resolvePlayerNegotiators(campaign);
         // Settle the remaining balance of any legacy contracts closed out on load; deferred to here so the force is

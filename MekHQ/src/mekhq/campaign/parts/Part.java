@@ -78,6 +78,7 @@ import mekhq.campaign.location.ILocatable;
 import mekhq.campaign.location.ILocation;
 import mekhq.campaign.location.IPlace;
 import mekhq.campaign.location.LocationNode;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.mission.contract.utilities.ContractRepairLocation;
 import mekhq.campaign.parts.PartLinkResolver.LinkKind;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -784,7 +785,19 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
     public boolean isSamePartTypeAndStatus(Part part) {
         // A part ordered ahead for a refit stays in its own stack, so it keeps saying which refit it is for
         boolean isOrderedAheadForTheSameRefit = Objects.equals(orderedAheadForUnitId, part.orderedAheadForUnitId);
-        return isSamePartType(part) && isSameStatus(part) && isOrderedAheadForTheSameRefit;
+        return isSamePartType(part) && isSameStatus(part) && isOrderedAheadForTheSameRefit && isOnTheSameTrip(part);
+    }
+
+    /**
+     * A spare on its way to another place only stacks with spares on the same trip, so a new spare never vanishes into
+     * a travelling stack, and a travelling spare never merges into the stock at hand.
+     */
+    private boolean isOnTheSameTrip(Part otherPart) {
+        boolean isOnTheWay = LocationUtils.isOnTheWay(this);
+        if (isOnTheWay != LocationUtils.isOnTheWay(otherPart)) {
+            return false;
+        }
+        return !isOnTheWay || (getPlace() == otherPart.getPlace());
     }
 
     public abstract boolean isSamePartType(Part part);
@@ -1855,6 +1868,17 @@ public abstract class Part implements IPartWork, ITechnology, ILocatable {
      */
     public boolean isPresent() {
         return daysToArrival == 0;
+    }
+
+    /**
+     * Gets a value indicating whether the part is on hand where it is kept: delivered, and not on its way to another
+     * place. A spare sent to another place is filed in that place's warehouse while it travels, but can't be used
+     * there until it lands.
+     *
+     * @see LocationUtils#isOnTheWay
+     */
+    public boolean isOnHand() {
+        return isPresent() && !LocationUtils.isOnTheWay(this);
     }
 
     @Override

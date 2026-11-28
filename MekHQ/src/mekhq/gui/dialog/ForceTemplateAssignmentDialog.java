@@ -55,6 +55,7 @@ import megamek.common.ui.FastJScrollPane;
 import mekhq.MekHQ;
 import mekhq.campaign.events.DeploymentChangedEvent;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.mission.scenarios.AtBDynamicScenario;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate;
 import mekhq.campaign.mission.scenarios.ScenarioForceTemplate.ForceGenerationMethod;
@@ -249,8 +250,10 @@ public class ForceTemplateAssignmentDialog extends JDialog {
               currentScenario);
         for (UUID uid : formation.getAllUnits(true)) {
             Unit u = campaignGUI.getCampaign().getUnit(uid);
-            // Carriers were left home by setScenarioId above; do not assign them here either.
-            if ((null != u) && !SupportCarrierDeployment.staysHome(u, currentScenario)) {
+            // Carriers were left home by setScenarioId above, and so were units away from the main force; do not
+            // assign them here either.
+            if ((null != u) && !SupportCarrierDeployment.staysHome(u, currentScenario)
+                      && !LocationUtils.isAwayFromMainForce(u, campaignGUI.getCampaign())) {
                 u.setScenarioId(currentScenario.getId());
                 // If your force includes transports with units assigned,
                 // prompt the player to also deploy any units transported by this one

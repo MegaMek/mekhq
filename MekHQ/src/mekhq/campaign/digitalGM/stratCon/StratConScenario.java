@@ -768,7 +768,7 @@ public class StratConScenario implements IStratConDisplayable {
                 }
             }
 
-            for (Unit unit : campaign.getUnits()) {
+            for (Unit unit : campaign.getAllUnits()) {
                 if (unit.getScenarioId() == backingScenarioId) {
                     backingScenario.removeUnit(unit.getId());
                     unit.undeploy();

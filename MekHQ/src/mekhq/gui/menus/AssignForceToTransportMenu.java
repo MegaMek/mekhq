@@ -44,6 +44,7 @@ import mekhq.campaign.Campaign;
 import mekhq.campaign.enums.CampaignTransportType;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.force.Formation;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.unit.Unit;
 import mekhq.campaign.unit.enums.TransporterType;
 import mekhq.campaign.utilities.CampaignTransportUtilities;
@@ -135,6 +136,7 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
                   transporterType,
                   requiredTransportCapacity);
             transports.removeIf(transport -> transport.getFormationId() == Formation.FORMATION_NONE);
+            transports.removeIf(transport -> !isAtThePlaceOfEveryUnit(transport, units));
             transports = filterTransports(transports, units);
 
             if (!transports.isEmpty()) {
@@ -229,6 +231,24 @@ public abstract class AssignForceToTransportMenu extends JScrollableMenu {
      */
     protected Set<Unit> filterTransports(final Set<Unit> transports, final Set<Unit> units) {
         return transports;
+    }
+
+    /**
+     * A unit can only be loaded onto, or towed by, a transport at the same place, so a transport elsewhere is not
+     * offered.
+     *
+     * @param transport the transport on offer
+     * @param units     the units being assigned to it
+     *
+     * @return {@code true} if the transport is at the same place as every unit
+     */
+    static boolean isAtThePlaceOfEveryUnit(Unit transport, Set<Unit> units) {
+        for (Unit unit : units) {
+            if (!LocationUtils.areSameEffectiveLocation(transport, unit)) {
+                return false;
+            }
+        }
+        return true;
     }
 
     /**

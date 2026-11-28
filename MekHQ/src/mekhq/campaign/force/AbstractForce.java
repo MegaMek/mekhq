@@ -75,6 +75,7 @@ import mekhq.campaign.finances.Money;
 import mekhq.campaign.finances.enums.TransactionType;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.UnitIcon;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.market.ForceShoppingList;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.rentals.ContractRentalType;
@@ -966,7 +967,10 @@ public abstract class AbstractForce {
 
         if (null != formation) {
             unit.setFormationId(id);
-            unit.setScenarioId(formation.getScenarioId());
+            // A unit away from the main force doesn't join its new formation's scenario.
+            unit.setScenarioId(LocationUtils.isAwayFromMainForce(unit, campaign) ?
+                                     NO_ASSIGNED_SCENARIO :
+                                     formation.getScenarioId());
             if (null != formation.getTechID()) {
                 final UUID id1 = formation.getTechID();
                 Person formationTech = campaign.getPlayerForce().getHumanResources().getPerson(id1);
@@ -1015,7 +1019,8 @@ public abstract class AbstractForce {
         formationIds.remove(formationId);
         // clear formationIds of all personnel with this formation
         for (UUID unitId : formation.getUnits()) {
-            Unit unit = requireSingleDetachment().getHangar().getUnit(unitId);
+            // Units at a base still belong to the formation, so look everywhere
+            Unit unit = campaign.getUnit(unitId);
             if (null == unit) {
                 continue;
             }

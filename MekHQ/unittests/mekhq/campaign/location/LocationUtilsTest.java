@@ -50,6 +50,7 @@ import mekhq.campaign.FixedLocation;
 import mekhq.campaign.GroundTransitLocation;
 import mekhq.campaign.JumpPath;
 import mekhq.campaign.base.PlayerBase;
+import mekhq.campaign.force.Detachment;
 import mekhq.campaign.universe.PlanetarySystem;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Nested;
@@ -240,6 +241,99 @@ public class LocationUtilsTest {
 
             assertTrue(LocationUtils.areSameEffectiveLocation(
                   base.getBaseHangar(), base.getBaseWarehouse()));
+        }
+    }
+
+    // ---- effective places: detachments and academy campuses ----------------
+
+    @Nested
+    class EffectivePlaces {
+        private Detachment mainForce;
+
+        @BeforeEach
+        void setUp() {
+            mainForce = new Detachment();
+            assertTrue(mainForce.setParent(new FixedLocation(mock(PlanetarySystem.class))));
+        }
+
+        private AcademyCampusLocation remoteCampus() {
+            AcademyCampusLocation campus = new AcademyCampusLocation("Set", "Academy");
+            LocationNode.LocationManager.setLocation(campus, new FixedLocation(mock(PlanetarySystem.class)));
+            return campus;
+        }
+
+        @Test
+        void detachmentItem_isAtTheDetachment() {
+            assertSame(mainForce, LocationUtils.findEffectivePlace(mainForce.getPersonnel()));
+        }
+
+        @Test
+        void baseItem_isAtTheBase() {
+            assertSame(base, LocationUtils.findEffectivePlace(base.getBaseHangar()));
+        }
+
+        @Test
+        void remoteStudent_isAtTheCampus() {
+            AcademyCampusLocation campus = remoteCampus();
+            assertSame(campus, LocationUtils.findEffectivePlace(campus.getPersonnel()));
+        }
+
+        @Test
+        void homeSchooledStudent_isWithTheirDetachment() {
+            AcademyCampusLocation homeSchool = new AcademyCampusLocation("Set", "Home School");
+            LocationNode.LocationManager.setLocation(homeSchool, mainForce);
+            assertSame(mainForce, LocationUtils.findEffectivePlace(homeSchool.getPersonnel()));
+        }
+
+        @Test
+        void remoteStudent_isNotWithTheMainForce() {
+            assertFalse(LocationUtils.areSameEffectiveLocation(remoteCampus().getPersonnel(),
+                  mainForce.getPersonnel()));
+        }
+
+        @Test
+        void remoteStudent_isNotWithAnUnplacedItem() {
+            assertFalse(LocationUtils.areSameEffectiveLocation(remoteCampus().getPersonnel(), fixed));
+        }
+
+        @Test
+        void studentsAtTheSameRemoteCampus_areTogether() {
+            AcademyCampusLocation campus = remoteCampus();
+            assertTrue(LocationUtils.areSameEffectiveLocation(campus.getPersonnel(), campus));
+        }
+
+        @Test
+        void studentsAtDifferentRemoteCampuses_areApart() {
+            assertFalse(LocationUtils.areSameEffectiveLocation(remoteCampus().getPersonnel(),
+                  remoteCampus().getPersonnel()));
+        }
+
+        @Test
+        void homeSchooledStudent_isWithTheirDetachment_andNotWithABase() {
+            AcademyCampusLocation homeSchool = new AcademyCampusLocation("Set", "Home School");
+            LocationNode.LocationManager.setLocation(homeSchool, mainForce);
+            assertTrue(LocationUtils.areSameEffectiveLocation(homeSchool.getPersonnel(), mainForce.getHangar()));
+            assertFalse(LocationUtils.areSameEffectiveLocation(homeSchool.getPersonnel(), base.getBaseHangar()));
+        }
+
+        @Test
+        void homeSchooledStudentAtABase_isWithTheBase() {
+            AcademyCampusLocation homeSchool = new AcademyCampusLocation("Set", "Home School");
+            LocationNode.LocationManager.setLocation(homeSchool, base);
+            assertTrue(LocationUtils.areSameEffectiveLocation(homeSchool.getPersonnel(), base.getBaseHangar()));
+        }
+
+        @Test
+        void twoDetachments_areApart() {
+            Detachment secondDetachment = new Detachment();
+            assertTrue(secondDetachment.setParent(new FixedLocation(mock(PlanetarySystem.class))));
+            assertFalse(LocationUtils.areSameEffectiveLocation(mainForce.getHangar(), secondDetachment.getHangar()));
+        }
+
+        @Test
+        void unplacedItem_countsAsWithADetachment() {
+            assertTrue(LocationUtils.areSameEffectiveLocation(fixed, mainForce.getHangar()));
+            assertTrue(LocationUtils.areSameEffectiveLocation(mainForce.getHangar(), fixed));
         }
     }
 

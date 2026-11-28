@@ -117,9 +117,10 @@ public interface IPlace extends ILocation {
     /**
      * Returns a {@link PartInventory} counting spare parts that match {@code part} in this place's warehouse.
      *
-     * <p>Supply counts present spares; transit counts non-present spares, noting when the first and last of them
-     * arrive. The ordered count is zero here; {@link mekhq.campaign.Campaign#getPartInventory} wraps this result to
-     * add the main force's shopping-list orders.</p>
+     * <p>Supply counts spares on hand; transit counts spares still being delivered or on their way from another place,
+     * noting when the first and last deliveries arrive. The ordered count is zero here;
+     * {@link mekhq.campaign.Campaign#getPartInventory} wraps this result to add the main force's shopping-list
+     * orders.</p>
      */
     default PartInventory getPartInventory(Part part) {
         PartInventory inventory = new PartInventory();
@@ -134,11 +135,14 @@ public interface IPlace extends ILocation {
                 continue;
             }
             if (part.isSamePartType(warehousePart)) {
-                if (warehousePart.isPresent()) {
+                if (warehousePart.isOnHand()) {
                     localSupplyCount += warehousePart.getTotalQuantity();
                 } else {
                     countInTransit += warehousePart.getTotalQuantity();
-                    inventory.recordArrival(warehousePart.getDaysToArrival());
+                    // A spare on its way from another place has no delivery countdown to report
+                    if (!warehousePart.isPresent()) {
+                        inventory.recordArrival(warehousePart.getDaysToArrival());
+                    }
                 }
             }
         }

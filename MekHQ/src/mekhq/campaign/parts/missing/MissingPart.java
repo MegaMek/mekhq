@@ -269,7 +269,7 @@ public abstract class MissingPart extends Part implements IAcquisitionWork, IFab
         return !(part.isReservedForRefit() ||
                        part.isBeingWorkedOn() ||
                        part.isReservedForReplacement() ||
-                       !part.isPresent() ||
+                       !part.isOnHand() ||
                        part.hasParentPart());
     }
 

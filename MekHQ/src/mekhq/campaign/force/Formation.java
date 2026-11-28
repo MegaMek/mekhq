@@ -58,6 +58,7 @@ import mekhq.campaign.icons.LayeredFormationIcon;
 import mekhq.campaign.icons.StandardFormationIcon;
 import mekhq.campaign.icons.enums.LayeredFormationIconLayer;
 import mekhq.campaign.icons.enums.OperationalStatus;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.log.AssignmentLogger;
 import mekhq.campaign.mission.scenarios.Scenario;
 import mekhq.campaign.mission.scenarios.salvage.AbstractSalvage;
@@ -293,7 +294,9 @@ public class Formation {
             sub.setScenarioId(scenarioId, campaign);
         }
         boolean carriersDeploy = SupportCarrierDeployment.isAllowed(campaign.getScenario(scenarioId));
+        boolean isDeploying = scenarioId != NO_ASSIGNED_SCENARIO;
         int stayedHome = 0;
+        int stayedAway = 0;
         for (UUID uid : getUnits()) {
             Unit unit = campaign.getUnit(uid);
             // A support carrier under this formation stays home unless the scenario is one that pulls support staff
@@ -301,19 +304,55 @@ public class Formation {
             if (null == unit) {
                 continue;
             }
-            if (carriersDeploy || !unit.isCarrier()) {
+            // Scenarios are fought by the main force, so a unit kept elsewhere or still travelling stays where it is.
+            // Undeploying always clears the unit, whatever its location.
+            if (isDeploying && LocationUtils.isAwayFromMainForce(unit, campaign)) {
+                stayedAway++;
+            } else if (carriersDeploy || !unit.isCarrier()) {
                 unit.setScenarioId(scenarioId);
             } else {
                 stayedHome++;
             }
         }
         // Every assignment path ends here, so this is where the player is told. The GUI adds a dialog on top.
-        if ((stayedHome > 0) && (scenarioId != NO_ASSIGNED_SCENARIO)) {
+        if ((stayedHome > 0) && isDeploying) {
             LOGGER.info("[SupportTeams] Assigned {} to scenario {}: {} support carrier(s) stay home", getName(), scenarioId,
                   stayedHome);
             campaign.addReport(DailyReportType.BATTLE, getFormattedTextAt("mekhq.resources.SupportPersonnelToTOE",
                   "SupportCarrierDeployment.stayHome.report", stayedHome, getName()));
         }
+        if (stayedAway > 0) {
+            LOGGER.info("[Location] Assigned {} to scenario {}: {} unit(s) away from the main force stay behind",
+                  getName(), scenarioId, stayedAway);
+            campaign.addReport(DailyReportType.BATTLE, getFormattedTextAt("mekhq.resources.Campaign",
+                  "Formation.awayUnitsStayBehind.report", stayedAway, getName()));
+        }
+    }
+
+    /**
+     * Whether every unit under this formation that could fight is away from the main force, so assigning it to a
+     * scenario would send nothing. Support carriers never deploy, so they are not counted either way.
+     *
+     * @param campaign the campaign
+     *
+     * @return {@code true} if the formation has units away from the main force and none with it that could deploy
+     *
+     * @see LocationUtils#isAwayFromMainForce
+     */
+    public boolean isAwayFromMainForce(Campaign campaign) {
+        boolean hasAwayUnit = false;
+        for (UUID unitId : getAllUnits(false)) {
+            Unit unit = campaign.getUnit(unitId);
+            if (unit == null) {
+                continue;
+            }
+            if (LocationUtils.isAwayFromMainForce(unit, campaign)) {
+                hasAwayUnit = true;
+            } else if (!SupportCarrierDeployment.staysHome(unit, null)) {
+                return false;
+            }
+        }
+        return hasAwayUnit;
     }
 
     public void setTechID(UUID tech) {
@@ -1150,7 +1189,8 @@ public class Formation {
     }
 
     /**
-     * Calculates the formation's total BV, including sub formations.
+     * Calculates the formation's total BV, including sub formations. Units away from the main force don't fight with
+     * it, so they are left out, and the enemy is sized to the units that are actually there.
      *
      * @param campaign                     The working campaign. This is the campaign object that the formation belongs
      *                                     to.
@@ -1163,16 +1203,15 @@ public class Formation {
         int bvTotal = 0;
 
         for (UUID unitId : getAllUnits(false)) {
-            // no idea how this would happen, but sometimes a unit in a formations unit ID list
-            // has an invalid ID?
-            if (campaign.getUnit(unitId) == null) {
+            Unit unit = findUnitWithMainForce(campaign, unitId);
+            if (unit == null) {
                 continue;
             }
 
             if (campaign.getCampaignOptions().get(CampaignOption.USE_GENERIC_BATTLE_VALUE) && !formationStandardBattleValue) {
-                bvTotal += campaign.getUnit(unitId).getEntity().getGenericBattleValue();
+                bvTotal += unit.getEntity().getGenericBattleValue();
             } else {
-                bvTotal += campaign.getUnit(unitId).getEntity().calculateBattleValue();
+                bvTotal += unit.getEntity().calculateBattleValue();
             }
         }
 
@@ -1180,7 +1219,19 @@ public class Formation {
     }
 
     /**
-     * Calculates the total count of units in the given formation, including all sub formations.
+     * @return the unit, or {@code null} if it can't be found or is away from the main force
+     */
+    private static @Nullable Unit findUnitWithMainForce(Campaign campaign, UUID unitId) {
+        Unit unit = campaign.getUnit(unitId);
+        if ((unit == null) || LocationUtils.isAwayFromMainForce(unit, campaign)) {
+            return null;
+        }
+        return unit;
+    }
+
+    /**
+     * Calculates the total count of units in the given formation, including all sub formations, wherever they are.
+     * This is the formation's size on paper; use {@link #getUnitCountWithMainForce} for the units that would fight.
      *
      * @param campaign      the current campaign
      * @param isClanBidding flag to indicate whether clan bidding is being performed
@@ -1188,10 +1239,27 @@ public class Formation {
      * @return the total count of units in the formation (including sub formations)
      */
     public int getTotalUnitCount(Campaign campaign, boolean isClanBidding) {
+        return countUnits(campaign, isClanBidding, false);
+    }
+
+    /**
+     * Like {@link #getTotalUnitCount}, but leaves out units away from the main force, which don't fight with it. Used
+     * to size the enemy.
+     *
+     * @param campaign      the current campaign
+     * @param isClanBidding flag to indicate whether clan bidding is being performed
+     *
+     * @return the count of this formation's units, including sub formations, that are with the main force
+     */
+    public int getUnitCountWithMainForce(Campaign campaign, boolean isClanBidding) {
+        return countUnits(campaign, isClanBidding, true);
+    }
+
+    private int countUnits(Campaign campaign, boolean isClanBidding, boolean onlyWithMainForce) {
         int unitTotal = 0;
 
         for (Formation subFormation : getSubFormations()) {
-            unitTotal += subFormation.getTotalUnitCount(campaign, isClanBidding);
+            unitTotal += subFormation.countUnits(campaign, isClanBidding, onlyWithMainForce);
         }
 
         // If we're getting the unit count specifically for Clan Bidding, we don't want to count
@@ -1201,7 +1269,11 @@ public class Formation {
             double rollingCount = 0;
 
             for (UUID unitId : getUnits()) {
-                Entity unit = campaign.getUnit(unitId).getEntity();
+                Unit counted = onlyWithMainForce ? findUnitWithMainForce(campaign, unitId) : campaign.getUnit(unitId);
+                if (counted == null) {
+                    continue;
+                }
+                Entity unit = counted.getEntity();
 
                 if (unit.isBattleArmor()) {
                     rollingCount += 0.5;
@@ -1211,6 +1283,12 @@ public class Formation {
             }
 
             unitTotal += (int) round(rollingCount);
+        } else if (onlyWithMainForce) {
+            for (UUID unitId : getUnits()) {
+                if (findUnitWithMainForce(campaign, unitId) != null) {
+                    unitTotal++;
+                }
+            }
         } else {
             unitTotal += getUnits().size();
         }

@@ -170,7 +170,7 @@ public class TransportAssignment implements ITransportAssignment {
     @Override
     public void fixReferences(Campaign campaign, Unit unit) {
         if (getTransport() instanceof Unit.UnitRef) {
-            Unit transport = campaign.getPlayerForce().findUnit(getTransport().getId());
+            Unit transport = campaign.getUnit(getTransport().getId());
             if (transport != null) {
                 if (hasTransportedLocation()) {
                     setTransport(transport);

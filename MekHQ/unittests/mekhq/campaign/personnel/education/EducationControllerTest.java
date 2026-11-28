@@ -55,6 +55,7 @@ import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import java.util.UUID;
 
 import mekhq.campaign.Campaign;
@@ -842,6 +843,40 @@ class EducationControllerTest {
             EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
 
             assertNull(person.getEduOriginBaseId());
+        }
+
+        private PlayerBase placeAtRealBase(Person person) {
+            PlayerBase base = new PlayerBase(new FixedLocation(mock(PlanetarySystem.class)));
+            assertTrue(person.setParent(base.getPersonnel()), "student should attach to the base personnel");
+            return base;
+        }
+
+        @Test
+        void homeSchool_atRegisteredBase_studiesAtThatBase() {
+            Academy academy = buildAcademy(true, false);
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
+            Person person = buildStudentPerson();
+            PlayerBase base = placeAtRealBase(person);
+            when(campaign.getCampaignLocationManager().getPlayerBases()).thenReturn(Set.of(base));
+
+            EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
+
+            verify(campaign.getCampaignLocationManager()).getOrCreateCampusUnderLocation(ACADEMY_SET, ACADEMY_NAME,
+                  base);
+        }
+
+        @Test
+        void homeSchool_atUnregisteredBase_studiesWithMainForce() {
+            Academy academy = buildAcademy(true, false);
+            when(campaign.getPlayerForce().getName()).thenReturn("TestCampaign");
+            Person person = buildStudentPerson();
+            placeAtRealBase(person);
+            when(campaign.getCampaignLocationManager().getPlayerBases()).thenReturn(Set.of());
+
+            EducationController.enrollPerson(campaign, person, academy, null, "MERC", 0);
+
+            verify(campaign.getCampaignLocationManager()).getOrCreateCampusUnderLocation(ACADEMY_SET, ACADEMY_NAME,
+                  campaign.getPlayerForce().getForceDetachment());
         }
 
         private Person addSpouse(Person person, PersonnelStatus status) {

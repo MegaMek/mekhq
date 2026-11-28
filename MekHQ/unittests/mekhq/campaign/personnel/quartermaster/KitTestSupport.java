@@ -146,6 +146,7 @@ public final class KitTestSupport {
     public static EquipmentPart partOf(EquipmentType type) {
         EquipmentPart part = mock(EquipmentPart.class);
         when(part.isPresent()).thenReturn(true);
+        when(part.isOnHand()).thenReturn(true);
         when(part.isSpare()).thenReturn(true);
         when(part.getQuantity()).thenReturn(1);
         when(part.getType()).thenReturn(type);

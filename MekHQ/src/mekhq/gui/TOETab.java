@@ -296,6 +296,7 @@ public final class TOETab extends CampaignGuiTab {
                                                  .filter(force -> force != null && !force.isDeployed())
                                                  .filter(force -> !SupportCarrierDeployment.deploysNothing(campaign,
                                                        force, selectedScenario))
+                                                 .filter(force -> !force.isAwayFromMainForce(campaign))
                                                  .sorted(Comparator.comparing(Formation::getFullName))
                                                  .toList();
 

@@ -1310,6 +1310,20 @@ public class Campaign implements ITechManager {
 
         getPlayerForce().getHangar().addUnit(unit);
 
+        registerPlacedUnit(unit);
+    }
+
+    /**
+     * Registers a unit that already sits in a hangar with the rest of the campaign: its name is checked for
+     * duplicates, its entity gets an id and joins the game, its transport space is set up, and a transport that is not
+     * mothballed joins the campaign's transporter maps. {@link #importUnit(Unit)} does this for a unit joining the main
+     * force; a load does it for the units its bases keep.
+     *
+     * @param unit the unit, already in the hangar of the main force or of a base
+     */
+    public void registerPlacedUnit(Unit unit) {
+        Objects.requireNonNull(unit);
+
         checkDuplicateNamesDuringAdd(unit.getEntity());
 
         // Assign an entity ID to our new unit
@@ -1329,7 +1343,6 @@ public class Campaign implements ITechManager {
                 }
             }
         }
-
     }
 
     /**
@@ -1949,13 +1962,15 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Travel nodes are registered locations that also hang under the place they travel to, so a set keeps anything in
+     * transit from being counted twice.
+     *
      * @return All player's units in {@code campaign}, not just the ones located with the main force.
      */
     public Collection<Unit> getAllUnits() {
-        List<Unit> units = new ArrayList<>();
+        Set<Unit> units = new LinkedHashSet<>();
         for (AbstractLocation location : getCampaignLocationManager().getLocations()) {
-            Set<Unit> found = location.fetchUnitsAtLocation();
-            units.addAll(found);
+            units.addAll(location.fetchUnitsAtLocation());
         }
         return units;
     }
@@ -2106,13 +2121,14 @@ public class Campaign implements ITechManager {
     }
 
     /**
+     * Like {@link #getAllUnits()}, a set keeps spares in transit from being counted twice.
+     *
      * @return All player's parts in {@code campaign}, not just the ones located with the main force.
      */
     public Collection<Part> getAllParts() {
-        List<Part> parts = new ArrayList<>();
+        Set<Part> parts = new LinkedHashSet<>();
         for (AbstractLocation location : getCampaignLocationManager().getLocations()) {
-            Set<Part> found = location.fetchPartsAtLocation();
-            parts.addAll(found);
+            parts.addAll(location.fetchPartsAtLocation());
         }
         return parts;
     }
@@ -3694,7 +3710,8 @@ public class Campaign implements ITechManager {
         List<Part> partsToRemove = new ArrayList<>();
         Set<Unit> unitsToCheck = new HashSet<>();
 
-        for (Part part : getParts()) {
+        // Bases keep units and parts too, and theirs need restoring as much as the main force's
+        for (Part part : getAllParts()) {
             if (part instanceof EquipmentPart) {
                 ((EquipmentPart) part).restore();
                 if (null == ((EquipmentPart) part).getType()) {
@@ -3714,10 +3731,11 @@ public class Campaign implements ITechManager {
             if (remove.getUnit() != null) {
                 unitsToCheck.add(remove.getUnit());
             }
+            // The main warehouse hands a part kept at a base over to that base's warehouse
             getPlayerForce().getWarehouse().removePart(remove);
         }
 
-        for (Unit unit : getUnits()) {
+        for (Unit unit : getAllUnits()) {
             if (null != unit.getEntity()) {
                 unit.getEntity().setOwner(player);
                 unit.getEntity().setGame(game);
@@ -3773,7 +3791,8 @@ public class Campaign implements ITechManager {
             List<UUID> orphanFormationUnitIDs = new ArrayList<>();
 
             for (UUID unitID : formation.getUnits()) {
-                if (getPlayerForce().findUnit(unitID) == null) {
+                // A unit kept at a base still belongs to its formation, so look in every hangar
+                if (getUnit(unitID) == null) {
                     orphanFormationUnitIDs.add(unitID);
                 }
             }
@@ -3790,7 +3809,7 @@ public class Campaign implements ITechManager {
         }
 
         // clean up units that are assigned to non-existing scenarios
-        for (Unit unit : this.getUnits()) {
+        for (Unit unit : getAllUnits()) {
             int scenarioId = unit.getScenarioId();
             if ((scenarioId != Scenario.S_DEFAULT_ID) && (getScenario(scenarioId) == null)) {
                 unit.setScenarioId(Scenario.S_DEFAULT_ID);

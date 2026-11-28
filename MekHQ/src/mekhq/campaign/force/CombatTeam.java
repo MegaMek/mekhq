@@ -61,6 +61,7 @@ import mekhq.MekHQ;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOptions;
 import mekhq.campaign.events.OrganizationChangedEvent;
+import mekhq.campaign.location.LocationUtils;
 import mekhq.campaign.mission.contract.AbstractContract;
 import mekhq.campaign.mission.scenarios.AtBScenario;
 import mekhq.campaign.mission.utilities.CombatRole;
@@ -230,7 +231,8 @@ public class CombatTeam {
     }
 
     /**
-     * Worker function that calculates the total weight of a formation with the given ID
+     * Worker function that calculates the total weight of a formation with the given ID. Units away from the main
+     * force don't fight with it, so they are not weighed.
      *
      * @param campaign    Campaign in which the formation resides
      * @param formationId Formation for which to calculate weight
@@ -243,6 +245,9 @@ public class CombatTeam {
         for (UUID id : campaign.getPlayerForce().getFormation(formationId).getUnits()) {
             try {
                 Unit unit = campaign.getUnit(id);
+                if (LocationUtils.isAwayFromMainForce(unit, campaign)) {
+                    continue;
+                }
                 Entity entity = unit.getEntity();
                 long entityType = entity.getEntityType();
 

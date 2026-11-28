@@ -36,7 +36,9 @@ import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertNull;
 import static org.junit.jupiter.api.Assertions.assertTrue;
+import static org.mockito.ArgumentMatchers.anyString;
 import static org.mockito.ArgumentMatchers.argThat;
+import static org.mockito.ArgumentMatchers.eq;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.mockStatic;
 import static org.mockito.Mockito.never;
@@ -49,6 +51,7 @@ import java.util.Set;
 import java.util.UUID;
 
 import mekhq.MekHQ;
+import mekhq.campaign.enums.DailyReportType;
 import mekhq.campaign.events.parts.PartChangedEvent;
 import mekhq.campaign.events.persons.PersonChangedEvent;
 import mekhq.campaign.events.units.UnitChangedEvent;
@@ -121,6 +124,73 @@ class CampaignLocationManagerTest {
             dispatch.verify(() -> LocationDispatch.dispatchTravelers(List.of(unit), destination, campaign));
         }
         assertFalse(manager.isQueuedForTravel(unit));
+    }
+
+    @Test
+    void dispatchPendingTravel_keepsCommittedTravelersBehindAndSendsTheRest() {
+        CampaignLocationManager manager = new CampaignLocationManager();
+        Campaign campaign = mockCampaign();
+        Unit deployedUnit = unitInCampaign(campaign);
+        when(deployedUnit.isDeployed()).thenReturn(true);
+        Unit freeUnit = unitInCampaign(campaign);
+        ILocation destination = mock(ILocation.class);
+
+        manager.queueTravel(List.of(deployedUnit, freeUnit), destination);
+
+        try (MockedStatic<LocationDispatch> dispatch = mockStatic(LocationDispatch.class)) {
+            manager.dispatchPendingTravel(campaign);
+            dispatch.verify(() -> LocationDispatch.dispatchTravelers(List.of(freeUnit), destination, campaign));
+        }
+        verify(campaign).addReport(eq(DailyReportType.GENERAL), anyString());
+        assertFalse(manager.isQueuedForTravel(deployedUnit), "the cancelled trip is not kept for another day");
+    }
+
+    @Test
+    void dispatchPendingTravel_keepsDeployedPersonBehind() {
+        CampaignLocationManager manager = new CampaignLocationManager();
+        Campaign campaign = mockCampaign();
+        Person person = mock(Person.class);
+        when(person.getId()).thenReturn(UUID.randomUUID());
+        when(person.isDeployed()).thenReturn(true);
+        ILocation destination = mock(ILocation.class);
+
+        manager.queueTravel(List.of(person), destination);
+
+        try (MockedStatic<LocationDispatch> dispatch = mockStatic(LocationDispatch.class)) {
+            manager.dispatchPendingTravel(campaign);
+            dispatch.verifyNoInteractions();
+        }
+        verify(campaign).addReport(eq(DailyReportType.GENERAL), anyString());
+    }
+
+    @Test
+    void dispatchPendingTravel_keepsReservedPartBehind() {
+        CampaignLocationManager manager = new CampaignLocationManager();
+        Campaign campaign = mockCampaign();
+        Part part = mock(Part.class);
+        UUID partId = UUID.randomUUID();
+        when(part.getUniqueId()).thenReturn(partId);
+        when(part.isReservedForReplacement()).thenReturn(true);
+        LocalWarehouse warehouse = mock(LocalWarehouse.class);
+        when(warehouse.getPart(partId)).thenReturn(part);
+        when(campaign.getPlayerForce().allWarehouses()).thenReturn(List.of(warehouse));
+        ILocation destination = mock(ILocation.class);
+
+        manager.queueTravel(List.of(part), destination);
+
+        try (MockedStatic<LocationDispatch> dispatch = mockStatic(LocationDispatch.class)) {
+            manager.dispatchPendingTravel(campaign);
+            dispatch.verifyNoInteractions();
+        }
+        verify(campaign).addReport(eq(DailyReportType.GENERAL), anyString());
+    }
+
+    private static Unit unitInCampaign(Campaign campaign) {
+        Unit unit = mock(Unit.class);
+        UUID unitId = UUID.randomUUID();
+        when(unit.getId()).thenReturn(unitId);
+        when(campaign.getUnit(unitId)).thenReturn(unit);
+        return unit;
     }
 
     @Test
