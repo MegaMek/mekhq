@@ -105,7 +105,6 @@ class ContractMarketPage {
     private JCheckBox chkEnableSalvageFlagByDefault;
     private JCheckBox chkUseClanSalvageClause;
     private JCheckBox chkUseDynamicDifficulty;
-    private JCheckBox chkUseBolsterContractSkill;
     private JCheckBox chkUseChaosScaleSupportPointConversion;
     private JCheckBox chkUseContractFactionModifiers;
     private JCheckBox chkUseIntelObfuscation;
@@ -285,10 +284,6 @@ class ContractMarketPage {
         chkUseDynamicDifficulty
               .addMouseListener(createTipPanelUpdater("UseDynamicDifficulty"));
 
-        chkUseBolsterContractSkill = new CampaignOptionsCheckBox("UseBolsterContractSkill",
-              getMetadata(new Version("0.50.10"), CUSTOM_SYSTEM));
-        chkUseBolsterContractSkill.addMouseListener(createTipPanelUpdater("UseBolsterContractSkill"));
-
         chkUseChaosScaleSupportPointConversion = new CampaignOptionsCheckBox("UseChaosScaleSupportPointConversion",
               getMetadata(new Version("0.51.01.1")));
         chkUseChaosScaleSupportPointConversion.addMouseListener(
@@ -358,7 +353,6 @@ class ContractMarketPage {
               chkEnableSalvageFlagByDefault,
               chkUseClanSalvageClause,
               chkUseDynamicDifficulty,
-                chkUseBolsterContractSkill,
               chkUseChaosScaleSupportPointConversion,
               chkUseContractFactionModifiers,
               chkUseIntelObfuscation,
@@ -724,7 +718,6 @@ class ContractMarketPage {
         chkEnableSalvageFlagByDefault.setSelected(model.enableSalvageFlagByDefault);
         chkUseClanSalvageClause.setSelected(model.useClanSalvageClause);
         chkUseDynamicDifficulty.setSelected(model.useDynamicDifficulty);
-        chkUseBolsterContractSkill.setSelected(model.useBolsterContractSkill);
         chkUseChaosScaleSupportPointConversion.setSelected(model.useChaosScaleSupportPointConversion);
         chkUseContractFactionModifiers.setSelected(model.useContractFactionModifiers);
         chkUseIntelObfuscation.setSelected(model.useIntelObfuscation);
@@ -788,7 +781,6 @@ class ContractMarketPage {
         model.enableSalvageFlagByDefault = chkEnableSalvageFlagByDefault.isSelected();
         model.useClanSalvageClause = chkUseClanSalvageClause.isSelected();
         model.useDynamicDifficulty = chkUseDynamicDifficulty.isSelected();
-        model.useBolsterContractSkill = chkUseBolsterContractSkill.isSelected();
         model.useChaosScaleSupportPointConversion = chkUseChaosScaleSupportPointConversion.isSelected();
         model.useContractFactionModifiers = chkUseContractFactionModifiers.isSelected();
         model.useIntelObfuscation = chkUseIntelObfuscation.isSelected();

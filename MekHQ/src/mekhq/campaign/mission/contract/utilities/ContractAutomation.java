@@ -52,6 +52,7 @@ import mekhq.campaign.AbstractLocation;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.ForceHumanResources;
 import mekhq.campaign.JumpPath;
+import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.events.units.UnitChangedEvent;
 import mekhq.campaign.finances.Money;
 import mekhq.campaign.force.Detachment;
@@ -137,13 +138,16 @@ public class ContractAutomation {
         String targetSystem = (targetPlanetarySystem == null) ?
                                     contract.getTargetSystemName(campaign.getLocalDate()) :
                                     targetPlanetarySystem.getHyperlinkedName(campaign.getLocalDate());
-        // performJumpTransaction returns an empty string when the charge succeeded. The force only departs once the
-        // journey is paid for; otherwise the player is left to make the trip themselves, as when travel is not chosen.
+        // performJumpTransaction returns an empty string when the charge succeeded, or when 'Pay for Transport' is
+        // disabled and no charge is made. The force only departs once the journey is paid for (or free); otherwise the
+        // player is left to make the trip themselves, as when travel is not chosen.
+        boolean isPayForTransport = campaign.getCampaignOptions().get(CampaignOption.PAY_FOR_TRANSPORT);
         String jumpReport = TransportCostCalculations.performJumpTransaction(playerForce.getFinances(),
               jumpPath,
               campaign.getLocalDate(),
               cost,
-              campaign.getCurrentSystem());
+              campaign.getCurrentSystem(),
+              isPayForTransport);
         if (jumpReport.isBlank()) {
             currentLocation.setJumpPath(jumpPath);
             campaign.getUnits().forEach(unit -> unit.setSite(Unit.SITE_FACILITY_BASIC));

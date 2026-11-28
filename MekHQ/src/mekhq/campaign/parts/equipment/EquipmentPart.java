@@ -56,6 +56,7 @@ import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.campaignOptions.CampaignOption;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.io.RemovedEquipmentNames;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.personnel.skills.SkillType;
 import mekhq.campaign.unit.Unit;
@@ -138,9 +139,10 @@ public class EquipmentPart extends Part {
         this(tonnage, et, equipNum, size, false, c);
     }
 
-    public EquipmentPart(int tonnage, EquipmentType et, int equipNum, double size, boolean omniPodded, Campaign c) {
-        super(tonnage, omniPodded, c);
-        this.type = et;
+    public EquipmentPart(int tonnage, EquipmentType equipmentType, int equipmentNumber, double size,
+          boolean omniPodded, Campaign campaign) {
+        super(tonnage, omniPodded, campaign);
+        this.type = equipmentType;
         if (null != type) {
             this.name = type.getName(size);
             this.typeName = type.getInternalName();
@@ -150,14 +152,14 @@ public class EquipmentPart extends Part {
             }
         }
 
-        this.equipmentNum = equipNum;
+        this.equipmentNum = equipmentNumber;
         this.size = size;
 
         if (null != type) {
             try {
-                equipTonnage = type.getTonnage(null, size);
-            } catch (NullPointerException ex) {
-                LOGGER.error("", ex);
+                equipTonnage = getWeightWithoutUnit(type, size);
+            } catch (NullPointerException exception) {
+                LOGGER.error("", exception);
             }
         }
     }
@@ -284,10 +286,12 @@ public class EquipmentPart extends Part {
         if (typeName == null) {
             typeName = type.getName();
         } else {
+            typeName = RemovedEquipmentNames.replaceRemovedTypeName(typeName);
             type = EquipmentType.get(typeName);
 
             // This conditional is to handle <50.05 warehouses
-            if (!unitTonnageMatters) { // We don't want to accidentally overwrite this state if it's meant to be true
+            // We don't want to accidentally overwrite this state if it's meant to be true
+            if (!unitTonnageMatters && (type != null)) {
                 unitTonnageMatters = type.isVariableCost();
             }
         }
@@ -330,28 +334,44 @@ public class EquipmentPart extends Part {
     }
 
     @Override
-    protected void loadFieldsFromXmlNode(Node wn) {
-        NodeList nl = wn.getChildNodes();
+    protected void loadFieldsFromXmlNode(Node partNode) {
+        NodeList childNodes = partNode.getChildNodes();
 
-        for (int x = 0; x < nl.getLength(); x++) {
-            Node wn2 = nl.item(x);
-            if (wn2.getNodeName().equalsIgnoreCase("equipmentNum")) {
-                equipmentNum = Integer.parseInt(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("typeName")) {
-                typeName = wn2.getTextContent();
-            } else if (wn2.getNodeName().equalsIgnoreCase("size")) {
-                size = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("equipTonnage")) {
-                equipTonnage = Double.parseDouble(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("directionalMountLocked")) {
-                directionalMountLocked = Boolean.parseBoolean(wn2.getTextContent());
-            } else if (wn2.getNodeName().equalsIgnoreCase("autocannonHit")) {
-                autocannonHit = Boolean.parseBoolean(wn2.getTextContent());
+        for (int index = 0; index < childNodes.getLength(); index++) {
+            Node childNode = childNodes.item(index);
+            if (childNode.getNodeName().equalsIgnoreCase("equipmentNum")) {
+                equipmentNum = Integer.parseInt(childNode.getTextContent());
+            } else if (childNode.getNodeName().equalsIgnoreCase("typeName")) {
+                typeName = childNode.getTextContent();
+            } else if (childNode.getNodeName().equalsIgnoreCase("size")) {
+                size = Double.parseDouble(childNode.getTextContent());
+            } else if (childNode.getNodeName().equalsIgnoreCase("equipTonnage")) {
+                equipTonnage = Double.parseDouble(childNode.getTextContent());
+            } else if (childNode.getNodeName().equalsIgnoreCase("directionalMountLocked")) {
+                directionalMountLocked = Boolean.parseBoolean(childNode.getTextContent());
+            } else if (childNode.getNodeName().equalsIgnoreCase("autocannonHit")) {
+                autocannonHit = Boolean.parseBoolean(childNode.getTextContent());
             } else {
-                loadArmoringFromXmlNode(wn2);
+                loadArmoringFromXmlNode(childNode);
             }
         }
         restore();
+        repairUnknownWeight();
+    }
+
+    /**
+     * Gives a spare saved without a weight the weight its size gives it. Spares made without a unit, such as MASH
+     * Equipment bought from the parts store, used to be saved with no weight, so no unit would take them.
+     */
+    private void repairUnknownWeight() {
+        if ((type == null) || (equipTonnage != EquipmentType.TONNAGE_VARIABLE)) {
+            return;
+        }
+        double weight = getWeightWithoutUnit(type, size);
+        if (weight != EquipmentType.TONNAGE_VARIABLE) {
+            LOGGER.info("[WeightMatters] {} was saved without a weight; it weighs {} tons", getName(), weight);
+            equipTonnage = weight;
+        }
     }
 
     @Override
@@ -870,6 +890,51 @@ public class EquipmentPart extends Part {
             LOGGER.debug("I don't know how much {} costs.", name);
         }
         return varCost;
+    }
+
+    /**
+     * Weight matters for equipment whose type does not fix its weight, such as a targeting computer, whose weight
+     * follows the weapons of the unit it is built for, or MASH Equipment, whose weight follows its number of theaters.
+     * A part of such equipment is made for one weight: a unit needing it takes only a part of that weight, and an order
+     * for it has to be for that weight.
+     *
+     * @param type the equipment type, or {@code null}
+     *
+     * @return {@code true} if a part of this equipment is only interchangeable with parts of the same weight
+     */
+    public static boolean isWeightMatters(@Nullable EquipmentType type) {
+        return (type != null) && type.isVariableTonnage();
+    }
+
+    /**
+     * @return {@code true} if this part is only interchangeable with parts of the same weight
+     *
+     * @see #isWeightMatters(EquipmentType)
+     */
+    public boolean isWeightMatters() {
+        return isWeightMatters(type);
+    }
+
+    /**
+     * Works out the weight of equipment that is not on a unit. Equipment whose weight follows only its size, such as
+     * MASH Equipment, has a weight even without a unit, though MegaMek only works it out for equipment on a unit.
+     *
+     * @param type the equipment type
+     * @param size the equipment's size
+     *
+     * @return the weight in tons, or {@link EquipmentType#TONNAGE_VARIABLE} if only a unit can give the weight
+     */
+    public static double getWeightWithoutUnit(EquipmentType type, double size) {
+        if (isWeightMatters(type) && (type instanceof MiscType)) {
+            // These follow MiscType.getTonnage, which leaves out these formulas when it has no unit
+            if (type.hasFlag(MiscType.F_MASH)) {
+                // The core component weighs 3.5 tons with its first theater; each further theater weighs a ton
+                return 2.5 + size;
+            } else if (type.hasFlag(MiscType.F_DRONE_CARRIER_CONTROL)) {
+                return 2 + (size * 0.5);
+            }
+        }
+        return type.getTonnage(null, size);
     }
 
     /*

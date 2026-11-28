@@ -124,6 +124,7 @@ import mekhq.campaign.parts.AmmoStorage;
 import mekhq.campaign.parts.EnginePart;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.PlainBarArmorSale;
+import mekhq.campaign.parts.RefitOrderedWeightRepair;
 import mekhq.campaign.parts.ReservedSpares;
 import mekhq.campaign.parts.SVArmor;
 import mekhq.campaign.parts.enums.PartQuality;
@@ -2724,6 +2725,9 @@ public record CampaignXmlParser(InputStream is, MekHQ app) {
 
         // Spare support vehicle armor an older version kept as plain armor is sold, as nothing can use it now
         PlainBarArmorSale.sellPlainBarArmor(campaign);
+
+        // Parts an older version ordered ahead for a refit at the old design's weight get the new design's weight
+        RefitOrderedWeightRepair.repair(campaign);
 
         LOGGER.info("[Campaign Load] Units initialized in {}ms", System.currentTimeMillis() - timestamp);
         timestamp = System.currentTimeMillis();

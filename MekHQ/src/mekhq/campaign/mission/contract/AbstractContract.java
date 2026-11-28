@@ -85,7 +85,7 @@ public abstract class AbstractContract {
      * Support points negotiable per required combat team at the start of a contract. Sole definition of the rule - read
      * it through {@link #getMaximumSupportPoints()} rather than recomputing it.
      */
-    public static final int INITIAL_SUPPORT_POINTS_PER_COMBAT_TEAM = 3;
+    public static final int INITIAL_SUPPORT_POINTS_PER_COMBAT_TEAM = 2;
     /** The share of each monthly payment owed to shareholding personnel when the share system is enabled. */
     public static final int DEFAULT_SHARES_PERCENT = 30;
 

@@ -468,14 +468,15 @@ public abstract class AbstractContractGeneration {
 
     /**
      * Determines which planet within a target system a contract is fought over, the way generation does: a weighted
-     * random draw over the system's worlds by strategic value, in the direction the contract's objective sets. Exposed
-     * as public so the GM contract editor's "Automatic" planet option follows the same rule.
+     * random draw over the system's populated terrestrial planets by strategic value, in the direction the contract's
+     * objective sets, falling back to the system's primary planet when there are none. Exposed as public so the GM
+     * contract editor's "Automatic" planet option follows the same rule.
      *
      * @param contract     the contract whose objective sets the weighting direction
      * @param targetSystem the already-chosen target system, or {@code null}
      * @param currentDate  the date the worlds are read for
      *
-     * @return the automatically chosen planet, or {@code null} when there is no system or it has no eligible worlds
+     * @return the automatically chosen planet, or {@code null} when there is no system or it has no planets
      */
     public static @Nullable Planet determineTargetPlanet(AbstractContract contract,
           @Nullable PlanetarySystem targetSystem, LocalDate currentDate) {
@@ -616,13 +617,6 @@ public abstract class AbstractContractGeneration {
         // rating - equipment, factions, everything else - is left as generated.
         SkillLevel employerSkill = provingGround ? SkillLevel.VETERAN : employerRating.forceSkill();
         SkillLevel enemySkill = provingGround ? SkillLevel.GREEN : enemyRating.forceSkill();
-
-        // "Bolster Contract Skill": an unofficial option that makes both allied and enemy forces one level tougher than
-        // the random tables give, to offset how skilled MekHQ crews get. Proving-ground (pity) contracts stay easy.
-        if (!provingGround && campaignOptions.get(CampaignOption.USE_BOLSTER_CONTRACT_SKILL)) {
-            employerSkill = SkillLevel.changeByDelta(employerSkill, 1);
-            enemySkill = SkillLevel.changeByDelta(enemySkill, 1);
-        }
 
         EmployerData updatedEmployerData = new EmployerData(employerData,
               employerSkill,

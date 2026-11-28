@@ -32,6 +32,7 @@
  */
 package mekhq.gui;
 
+import static mekhq.campaign.CampaignLocationManager.IS_BASE_TRAVEL_ENABLED;
 import static mekhq.utilities.MHQInternationalization.getFormattedText;
 import static mekhq.utilities.MHQInternationalization.getText;
 
@@ -420,10 +421,14 @@ public class LocationsTab extends CampaignGuiTab {
                         return;
                     }
                     JPopupMenu menu = new JPopupMenu();
-                    JMenuItem configItem = new JMenuItem(
-                          getText("LocationsTab.menu.configureBase"));
-                    configItem.addActionListener(ev -> openBaseConfig(base));
-                    menu.add(configItem);
+                    // Saving a base's settings moves it under a new root the campaign never registers, which cuts
+                    // the base off from new-day processing until reload. Keep it hidden while bases are turned off.
+                    if (IS_BASE_TRAVEL_ENABLED) {
+                        JMenuItem configItem = new JMenuItem(
+                              getText("LocationsTab.menu.configureBase"));
+                        configItem.addActionListener(ev -> openBaseConfig(base));
+                        menu.add(configItem);
+                    }
                     JMenuItem deleteItem = new JMenuItem(
                           getText("LocationsTab.menu.deleteBase"));
                     deleteItem.addActionListener(ev -> deleteBase(base));

@@ -171,6 +171,8 @@ public class TrainingConsole extends JDialog {
           RAIL_WRAP));
     private final HudCheckBox hideExcluded = new HudCheckBox(wordWrap(getTextAt(RESOURCE_BUNDLE, "rail.hideExcluded"),
           RAIL_WRAP));
+    private final HudCheckBox clearSelectionAfterStaging = new HudCheckBox(wordWrap(getTextAt(RESOURCE_BUNDLE,
+          "rail.clearSelectionAfterStaging"), RAIL_WRAP));
 
     // Center
     private final CardLayout centerCards = new CardLayout();
@@ -401,6 +403,17 @@ public class TrainingConsole extends JDialog {
             refreshList();
         });
         hideExcluded.setToolTipText(getTextAt(RESOURCE_BUNDLE, "rail.hideExcluded.toolTipText"));
+
+        column.add(Box.createVerticalStrut(scaleForGUI(12)));
+        column.add(leftAligned(Hud.sectionHeading(getTextAt(RESOURCE_BUNDLE, "rail.selection"))));
+        clearSelectionAfterStaging.setAlignmentX(Component.LEFT_ALIGNMENT);
+        clearSelectionAfterStaging.setToolTipText(getTextAt(RESOURCE_BUNDLE,
+              "rail.clearSelectionAfterStaging.toolTipText"));
+        TrainingConsolePreferences preferences = TrainingConsolePreferences.getInstance();
+        clearSelectionAfterStaging.setSelected(preferences.isClearSelectionAfterStaging());
+        clearSelectionAfterStaging.addActionListener(event -> preferences.setClearSelectionAfterStaging(
+              clearSelectionAfterStaging.isSelected()));
+        column.add(clearSelectionAfterStaging);
         column.setBorder(BorderFactory.createEmptyBorder(scaleForGUI(12), scaleForGUI(12), scaleForGUI(12),
               scaleForGUI(12)));
 
@@ -602,6 +615,7 @@ public class TrainingConsole extends JDialog {
             case NAME -> Comparator.comparing(PersonEntry::name);
             case ROLE -> Comparator.comparing(PersonEntry::roleName);
             case FORMATION -> Comparator.comparing(PersonEntry::formationName);
+            case UNIT -> Comparator.comparing(PersonEntry::unitName);
             case EXPERIENCE -> Comparator.comparing(PersonEntry::skillLevel);
             case XP -> Comparator.comparingInt((PersonEntry entry) -> plan.availableXpOf(entry.person()));
         };
@@ -1057,6 +1071,7 @@ public class TrainingConsole extends JDialog {
         int people = result.step().peopleCount();
         String staged = getFormattedTextAt(RESOURCE_BUNDLE, "message.staged", label, people,
               formatCount(result.step().xp()));
+        clearSelectionIfAsked();
         if (result.refusedCount() > 0) {
             setMessage(getFormattedTextAt(RESOURCE_BUNDLE, "message.stagedSome", staged, refusalSummary(result)),
                   true);
@@ -1108,8 +1123,24 @@ public class TrainingConsole extends JDialog {
         plan = newPlan();
         state.selected.removeIf(person -> roster.entryFor(person) == null);
         selectionChanged();
+        clearSelectionIfAsked();
         state.openStep = null;
         setMessage(text, report.skipped() > 0);
+    }
+
+    /**
+     * Clears the selection after a purchase is staged or the plan is committed, if the player has asked for that, so
+     * the next person can be picked without first unpicking the last. A list sorted by XP moves people once they
+     * spend it, which otherwise leaves them to be found again. The caller redraws.
+     */
+    private void clearSelectionIfAsked() {
+        if (!clearSelectionAfterStaging.isSelected() || state.selected.isEmpty()) {
+            return;
+        }
+        state.selected.clear();
+        lastRowIndex = -1;
+        selectionBeforeToggle = null;
+        selectionChanged();
     }
 
     /** Closes, unless purchases are staged: then the first request warns, and a second one discards them. */

@@ -312,7 +312,7 @@ class StratConPointOfInterestObjectiveTest {
         StratConContractInitializer.schedulePointsOfInterest(contract, definition, campaignState, true);
 
         List<StratConScheduledPointOfInterest> scheduled = campaignState.getScheduledPointsOfInterest();
-        assertEquals(10, scheduled.size(), "one objective, plus three ordinary ones a month at Scale 1");
+        assertEquals(7, scheduled.size(), "one objective, plus two ordinary ones a month at Scale 1");
         assertEquals(1, countStrategicObjectives(scheduled));
         for (StratConScheduledPointOfInterest pointOfInterest : scheduled) {
             assertNotNull(pointOfInterest.getSpawnDate());

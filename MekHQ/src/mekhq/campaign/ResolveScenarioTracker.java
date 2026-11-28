@@ -1638,8 +1638,10 @@ public class ResolveScenarioTracker {
             if (entity instanceof Infantry) {
                 entity.applyDamage();
                 int strength = ((Infantry) entity).getShootingStrength();
-                // Include blob crew in total crew count for casualty calculation
-                int totalCrewSize = unit.getTotalCrewSize();
+                // The generated opposition crew is never assigned to the unit, so unit.getTotalCrewSize() would be
+                // zero here and no casualties would ever be rolled. Count the generated crew directly, plus any blob
+                // crew the unit carries.
+                int totalCrewSize = crew.size() + unit.getTotalTempCrew();
                 casualties = totalCrewSize - strength;
             }
 

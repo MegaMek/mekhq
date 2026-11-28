@@ -76,7 +76,7 @@ public final class StratConSpawnRates {
     /** Essential scenarios a month, per point of Scale. */
     public static final int ESSENTIAL_SCENARIOS_PER_SCALE = 1;
     /** Nav Points a month, per point of Scale. */
-    public static final int NAV_POINTS_PER_SCALE = 3;
+    public static final int NAV_POINTS_PER_SCALE = 2;
     /** Enemy engineers a month, per point of Scale. */
     public static final int ENGINEERS_PER_SCALE = 1;
     /** Facility attacks a month, per point of Scale. */
@@ -88,7 +88,7 @@ public final class StratConSpawnRates {
      * How many points of a contract's Scale count as one when battlefield support points are not factored into Scale,
      * which makes for larger Scales; also used to size facilities (see {@link StratConContractInitializer}).
      */
-    public static final int SUPPORT_POINT_SCALE_RATIO = 3;
+    public static final int SUPPORT_POINT_SCALE_RATIO = 2;
 
     private StratConSpawnRates() {}
 

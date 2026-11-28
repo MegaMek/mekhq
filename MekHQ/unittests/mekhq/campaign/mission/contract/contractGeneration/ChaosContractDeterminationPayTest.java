@@ -519,22 +519,22 @@ class ChaosContractDeterminationPayTest {
         }
 
         @Test
-        void navPointBonusesPayAThirdOfAnEssentialScenarios() {
+        void navPointBonusesPayHalfOfAnEssentialScenarios() {
             campaignOptions.set(CampaignOption.CONTRACTS_USE_SPECIAL_MECHANICS, true);
             AbstractContract contract = contract(3, 1.0);
-            // Espionage's data caches replace its Essential scenarios and come three times as often
+            // Espionage's data caches replace its Essential scenarios and come twice as often
             when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.ESPIONAGE);
 
-            // 1500, spread across 3 x 3 = 9 Nav Points a month: 167 (rounded)
-            assertEquals(Money.of(167), payScheme.getCombatPay(campaign, contract));
+            // 1500, spread across 2 x 3 = 6 Nav Points a month: 250
+            assertEquals(Money.of(250), payScheme.getCombatPay(campaign, contract));
         }
 
         @Test
-        void withoutSupportPointsInScaleEveryThreePointsOfScaleBringOneEssentialScenario() {
+        void withoutSupportPointsInScaleEveryTwoPointsOfScaleBringOneEssentialScenario() {
             campaignOptions.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, false);
 
-            // 3000, spread across the 2 Essential scenarios a month that Scale 6 brings counted this way
-            assertEquals(Money.of(1_500), payScheme.getCombatPay(campaign, contract(6, 1.0)));
+            // 3000, spread across the 3 Essential scenarios a month that Scale 6 brings counted this way
+            assertEquals(Money.of(1_000), payScheme.getCombatPay(campaign, contract(6, 1.0)));
         }
 
         @Test
@@ -676,9 +676,9 @@ class ChaosContractDeterminationPayTest {
             AbstractContract contract = contract(1.4, 1.0);
             when(contract.getObjectiveType()).thenReturn(ContractObjectiveType.ESPIONAGE);
 
-            // 700 a month, spread across the 4 Nav Points (3 x 1.4 = 4.2, rounded) the contract brings each month - as
+            // 700 a month, spread across the 3 Nav Points (2 x 1.4 = 2.8, rounded) the contract brings each month - as
             // an Essential scenario contract's 700 is spread across its 1
-            assertEquals(Money.of(175), payScheme.getCombatPay(campaign, contract));
+            assertEquals(Money.of(233), payScheme.getCombatPay(campaign, contract));
             assertEquals(Money.of(700), payScheme.getCombatPay(campaign, contract(1.4, 1.0)));
         }
 

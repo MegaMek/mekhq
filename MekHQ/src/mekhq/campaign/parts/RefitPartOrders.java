@@ -408,6 +408,16 @@ public final class RefitPartOrders {
     }
 
     /**
+     * @return everything ordered ahead for the unit's refit: orders still on the procurement list, then parts on their
+     *       way or in the warehouse
+     */
+    static List<Part> findOrderedAheadFor(Campaign campaign, Unit unit) {
+        UUID unitId = unit.getId();
+        return streamOrdersAndParts(campaign, unit).filter(part -> unitId.equals(part.getOrderedAheadForUnitId()))
+                     .toList();
+    }
+
+    /**
      * Clears the labels on everything ordered ahead for the unit's refit, and the unit's Pending Refit mark. Called
      * when the refit begins and claims the parts, or when the player forgets the pending refit. The parts and orders
      * themselves stay, as ordinary spares.

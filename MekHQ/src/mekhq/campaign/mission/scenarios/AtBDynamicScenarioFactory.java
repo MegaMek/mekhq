@@ -5399,10 +5399,17 @@ public class AtBDynamicScenarioFactory {
             ScenarioForceTemplate forceTemplate = scenario.getPlayerUnitTemplates().get(unitID);
             Entity entity = campaign.getUnit(unitID).getEntity();
 
+            if (entity.getDeployRound() <= 0) {
+                continue;
+            }
+
             if (forceTemplate != null) {
-                if (entity.getDeployRound() > 0) {
-                    entity.setStartingPos(forceTemplate.getActualDeploymentZone());
-                }
+                entity.setStartingPos(forceTemplate.getActualDeploymentZone());
+            } else {
+                // Saves written before unit templates were persisted lose the link on reload. Without an explicit
+                // zone the unit inherits the player's zone, which can read "Any" by the time a late-arriving unit
+                // deploys even though the lobby showed the primary zone. Pin it to the primary force's zone instead.
+                entity.setStartingPos(scenario.getStartingPos());
             }
         }
     }

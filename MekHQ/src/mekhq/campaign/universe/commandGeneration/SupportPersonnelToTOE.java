@@ -155,12 +155,20 @@ public final class SupportPersonnelToTOE {
      * <p>This is the single definition of "is this person support staff", shared by generation and by the carrier
      * reconciler so the two can never disagree about who belongs in the TOE.</p>
      *
+     * <p>Vessel crew are not support staff even though {@link PersonnelRole#isTech()} counts them: they serve aboard
+     * their ship and maintain it from there. Carrying them left a newly crewed DropShip's crew seated in a support
+     * squad as well, so the ship found nobody aboard to act as its engineer while its crew seats still read as
+     * full.</p>
+     *
      * @param role the role to classify; may be {@code null}
      *
      * @return the section that carries this role, or {@code null} if the role is not carried
      */
     public static @Nullable SupportSection sectionFor(@Nullable PersonnelRole role) {
         if (role == null) {
+            return null;
+        }
+        if (role.isVesselCrew()) {
             return null;
         }
         if (role.isTech() || role.isAstech()) {

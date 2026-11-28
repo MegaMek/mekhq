@@ -53,9 +53,12 @@ import mekhq.campaign.universe.Faction;
  *   <li><b>Era</b> &mdash; the Succession Wars degrade Inner Sphere skill and equipment (see {@link #eraDelta}).</li>
  *   <li><b>Contract importance</b> &mdash; the synthesized stake of the engagement, which is where the objective and
  *       the target world enter (see {@link ContractImportance}).</li>
- *   <li><b>Role and player scaling</b> &mdash; a small edge to the attacker, and, when the campaign opts into it, an
- *       adjustment that eases contracts for less-skilled players (see {@link #playerScalingDelta}).</li>
+ *   <li><b>Role</b> &mdash; a small edge to the attacker.</li>
  * </ul>
+ *
+ * <p>When the campaign opts into dynamic difficulty, the enemy's skill is then pulled toward the player's: one level
+ * for every two levels between them (see {@link #scaleEnemySkillToPlayer}). The employer (ally) side is not
+ * scaled.</p>
  *
  * <p>The same engine rates both sides of a contract: the employer (ally) side and the enemy side each call it with
  * their own faction and role. It is deterministic in its inputs so callers can apply their own variance if desired.</p>
@@ -69,6 +72,9 @@ public final class ChaosEmployerForceRating {
     public record ForceRating(SkillLevel forceSkill, int equipmentRating) {
     }
 
+    /** How many skill levels the enemy must be from the player for each level of dynamic difficulty adjustment. */
+    private static final int DYNAMIC_DIFFICULTY_LEVELS_PER_STEP = 2;
+
     private ChaosEmployerForceRating() {
     }
 
@@ -77,11 +83,12 @@ public final class ChaosEmployerForceRating {
      *
      * @param faction        the side's faction
      * @param isAttacker     whether this side is the attacker (the attacker fields a slightly better force)
-     * @param isEmployerSide whether this side is the player's employer/ally (as opposed to the enemy); only affects the
-     *                       direction of player scaling
+     * @param isEmployerSide whether this side is the player's employer/ally (as opposed to the enemy); only the enemy
+     *                       is scaled by dynamic difficulty
      * @param year           the contract year, for era-based degradation
      * @param importance     the synthesized importance of the contract
-     * @param scaleToPlayer  whether to scale difficulty toward the player's skill (a campaign option)
+     * @param scaleToPlayer  whether to scale the enemy's skill toward the player's (the dynamic difficulty campaign
+     *                       option)
      * @param averageSkill   the player's average skill, used only when {@code scaleToPlayer} is {@code true}
      *
      * @return the committed force's skill and equipment rating
@@ -104,16 +111,24 @@ public final class ChaosEmployerForceRating {
         int delta = factionDelta(faction)
                           + importance.getForceQualityModifier()
                           + eraDelta(faction, year)
-                          + (isAttacker ? 1 : 0)
-                          + (scaleToPlayer ? playerScalingDelta(isEmployerSide, averageSkill) : 0);
+                          + (isAttacker ? 1 : 0);
 
-        SkillLevel skill = SkillLevel.changeByDelta(REGULAR, delta);
+        SkillLevel skill = applyClanFloor(faction, SkillLevel.changeByDelta(REGULAR, delta));
 
-        // Clans never field truly raw troops: floor their crews at Veteran regardless of the other modifiers.
-        if (faction.isClan() && (skill.getExperienceLevel() < VETERAN.getExperienceLevel())) {
-            skill = VETERAN;
+        if (scaleToPlayer && !isEmployerSide) {
+            skill = applyClanFloor(faction, scaleEnemySkillToPlayer(skill, averageSkill));
         }
 
+        return skill;
+    }
+
+    /**
+     * Clans never field truly raw troops: floors their crews at Veteran regardless of the other modifiers.
+     */
+    private static SkillLevel applyClanFloor(final Faction faction, final SkillLevel skill) {
+        if (faction.isClan() && (skill.getExperienceLevel() < VETERAN.getExperienceLevel())) {
+            return VETERAN;
+        }
         return skill;
     }
 
@@ -177,11 +192,22 @@ public final class ChaosEmployerForceRating {
     }
 
     /**
-     * The difficulty-smoothing adjustment applied when a campaign opts into scaling contract forces toward the player's
-     * skill. A weaker-than-Regular player gets stronger allies and weaker enemies; a stronger player, the reverse.
+     * The dynamic difficulty adjustment: pulls the enemy's skill toward the player's by one level for every full two
+     * levels between them. An enemy two or three levels below the player gains one level, four or five levels below
+     * gains two, and so on; an enemy the same distance above the player loses levels the same way. An enemy within one
+     * level of the player is left alone.
+     *
+     * @param enemySkill  the enemy's skill before the adjustment
+     * @param playerSkill the player's average skill
+     *
+     * @return the adjusted enemy skill
+     *
+     * @author Illiani
+     * @since 0.51.01
      */
-    static int playerScalingDelta(final boolean isEmployerSide, final SkillLevel averageSkill) {
-        int difference = REGULAR.getExperienceLevel() - averageSkill.getExperienceLevel();
-        return isEmployerSide ? difference : -difference;
+    static SkillLevel scaleEnemySkillToPlayer(final SkillLevel enemySkill, final SkillLevel playerSkill) {
+        int levelsBelowPlayer = playerSkill.getExperienceLevel() - enemySkill.getExperienceLevel();
+        // Integer division rounds toward zero, so the same rule covers enemies above the player (negative difference)
+        return SkillLevel.changeByDelta(enemySkill, levelsBelowPlayer / DYNAMIC_DIFFICULTY_LEVELS_PER_STEP);
     }
 }

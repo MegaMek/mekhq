@@ -1812,7 +1812,9 @@ public class Refit extends Part implements IAcquisitionWork {
             type = ((AmmoBin) newPart).getType();
         }
         String partName = newPart.getName();
+        double weightOnNewDesign = newPart.getTonnage();
         newPart.setUnit(oldUnit);
+        keepWeightOnNewDesign(newPart, weightOnNewDesign);
 
         if (isOmniRefit && newPart.isOmniPoddable()) {
             classGrader.gradeOmniPodWork(partName, getLocationName(newEntity, location));
@@ -1829,6 +1831,25 @@ public class Refit extends Part implements IAcquisitionWork {
             classGrader.gradeAddedComponent(partName, locationName, isMarked(locationHadPartsRemoved, location),
                   RefitClassGrader.spansLocations(type, mounted));
         }
+    }
+
+    /**
+     * Keeps the weight the new design gives a part whose weight matters, once the part is back on the unit being
+     * refitted. Equipment such as a targeting computer takes its weight from the unit it is on, so the old design would
+     * give it another weight, and Order Parts and the refit would order and look for a part of the wrong weight.
+     *
+     * @param newPart           a part the new design adds
+     * @param weightOnNewDesign its weight on the new design
+     */
+    private void keepWeightOnNewDesign(Part newPart, double weightOnNewDesign) {
+        if (!(newPart instanceof MissingEquipmentPart missingEquipmentPart) || !missingEquipmentPart.isWeightMatters()) {
+            return;
+        }
+        if (missingEquipmentPart.getTonnage() != weightOnNewDesign) {
+            LOGGER.debug("[WeightMatters] {}: {} weighs {} tons on the new design, not the {} tons the old design gives",
+                  getDesc(), missingEquipmentPart.getName(), weightOnNewDesign, missingEquipmentPart.getTonnage());
+        }
+        missingEquipmentPart.setEquipTonnage(weightOnNewDesign);
     }
 
     /**
@@ -2657,6 +2678,13 @@ public class Refit extends Part implements IAcquisitionWork {
         String fileName = MegaMekLabFileSaver.sanitizeFilename(unitName);
         String fileNameCampaign;
         if (designFile != null) {
+            // The new design is read back from the unit list below, so a folder the list never reads would leave the
+            // refit without its design (#11303). Refused before anything is written.
+            if (!MekSummaryCache.isInUnitListFolder(designFile)) {
+                LOGGER.warn("[Refit] {}: not saving the new design to {}, a folder the unit list does not read",
+                      unitName, designFile);
+                throw new IOException(RefitDesignFolder.describeRefitRefused(designFile));
+            }
             // The player picked this file and was asked before an existing one was replaced
             fileNameCampaign = designFile.getPath();
         } else {
@@ -3407,7 +3435,13 @@ public class Refit extends Part implements IAcquisitionWork {
 
             Part p = Part.generateInstanceFromXML(wn2, version);
             if (p != null) {
+                // The part goes back on the unit being refitted, whose old design would give it another weight. The
+                // new design may not be read yet, so the saved weight is kept.
+                double savedWeight = p.getTonnage();
                 p.setUnit(u);
+                if ((p instanceof MissingEquipmentPart missingEquipmentPart) && missingEquipmentPart.isWeightMatters()) {
+                    missingEquipmentPart.setEquipTonnage(savedWeight);
+                }
                 retVal.shoppingList.add(p);
             } else {
                 LOGGER.error((u != null) ?

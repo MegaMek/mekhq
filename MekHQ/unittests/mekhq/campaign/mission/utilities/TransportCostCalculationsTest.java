@@ -1597,9 +1597,35 @@ public class TransportCostCalculationsTest {
               mockJumpPath,
               any(LocalDate.class),
               Money.of(100),
-              mockCurrentPlanetarySystem);
+              mockCurrentPlanetarySystem,
+              true);
 
         assertFalse(report.isBlank(), "Journey cost doesn't exceeds available funds");
+    }
+
+    @Test
+    public void testPerformJumpTransaction_payForTransportDisabled_unableToAffordJourney() {
+        Finances finances = new Finances();
+
+        PlanetarySystem mockCurrentPlanetarySystem = mock(PlanetarySystem.class);
+        when(mockCurrentPlanetarySystem.getName(any(LocalDate.class))).thenReturn("Test");
+
+        PlanetarySystem mockDestinationPlanetarySystem = mock(PlanetarySystem.class);
+        when(mockDestinationPlanetarySystem.getName(any(LocalDate.class))).thenReturn("Test");
+
+        JumpPath mockJumpPath = mock(JumpPath.class);
+        when(mockJumpPath.getLastSystem()).thenReturn(mockDestinationPlanetarySystem);
+
+        String report = TransportCostCalculations.performJumpTransaction(finances,
+              mockJumpPath,
+              today,
+              Money.of(100),
+              mockCurrentPlanetarySystem,
+              false);
+
+        assertTrue(report.isBlank(), "Journey should not be blocked when 'Pay for Transport' is disabled");
+        assertTrue(finances.getTransactions().isEmpty(),
+              "No transaction should be recorded when 'Pay for Transport' is disabled");
     }
 
     @Test
@@ -1620,7 +1646,8 @@ public class TransportCostCalculationsTest {
               mockJumpPath,
               today,
               Money.of(1),
-              mockCurrentPlanetarySystem);
+              mockCurrentPlanetarySystem,
+              true);
 
         assertTrue(report.isBlank(), "Journey cost exceeds available funds");
     }

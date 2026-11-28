@@ -69,7 +69,6 @@ class MarketsOptionsModel {
     boolean enableSalvageFlagByDefault;
     boolean useClanSalvageClause;
     boolean useDynamicDifficulty;
-    boolean useBolsterContractSkill;
     boolean useChaosScaleSupportPointConversion;
     boolean useContractFactionModifiers;
     boolean useIntelObfuscation;
@@ -134,7 +133,6 @@ class MarketsOptionsModel {
         enableSalvageFlagByDefault = options.get(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT);
         useClanSalvageClause = options.get(CampaignOption.USE_CLAN_SALVAGE_CLAUSE);
         useDynamicDifficulty = options.get(CampaignOption.USE_DYNAMIC_DIFFICULTY);
-        useBolsterContractSkill = options.get(CampaignOption.USE_BOLSTER_CONTRACT_SKILL);
         useChaosScaleSupportPointConversion = options.get(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION);
         useContractFactionModifiers = options.get(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS);
         useIntelObfuscation = options.get(CampaignOption.USE_INTEL_OBFUSCATION);
@@ -207,7 +205,6 @@ class MarketsOptionsModel {
         options.set(CampaignOption.IS_ENABLE_SALVAGE_FLAG_BY_DEFAULT, enableSalvageFlagByDefault);
         options.set(CampaignOption.USE_CLAN_SALVAGE_CLAUSE, useClanSalvageClause);
         options.set(CampaignOption.USE_DYNAMIC_DIFFICULTY, useDynamicDifficulty);
-        options.set(CampaignOption.USE_BOLSTER_CONTRACT_SKILL, useBolsterContractSkill);
         options.set(CampaignOption.USE_CHAOS_SCALE_SUPPORT_POINT_CONVERSION, useChaosScaleSupportPointConversion);
         options.set(CampaignOption.USE_CONTRACT_FACTION_MODIFIERS, useContractFactionModifiers);
         options.set(CampaignOption.USE_INTEL_OBFUSCATION, useIntelObfuscation);

@@ -1241,7 +1241,7 @@ public class StratConContractInitializer {
 
     /**
      * Works out the tier of a facility placed for a contract. Scale is first normalized, as for the facility share:
-     * taken as it is when battlefield support points are factored into scale, and divided by three otherwise. Up to
+     * taken as it is when battlefield support points are factored into scale, and halved otherwise. Up to
      * {@value #OUTPOST_SCALE_LIMIT} gives an Outpost, up to {@value #BASE_SCALE_LIMIT} a Base, and above that a
      * Stronghold. An objective facility is one tier larger, up to a Stronghold.
      *
@@ -1271,8 +1271,8 @@ public class StratConContractInitializer {
         return isObjective ? tier.next() : tier;
     }
 
-    /** Objective facilities are three times as scarce as the contract's whole share of facilities. */
-    static final int OBJECTIVE_FACILITY_SCALE_DIVISOR = 3;
+    /** Objective facilities are twice as scarce as the contract's whole share of facilities. */
+    static final int OBJECTIVE_FACILITY_SCALE_DIVISOR = 2;
 
     /**
      * @param objectiveType a strategic objective type
@@ -1289,8 +1289,8 @@ public class StratConContractInitializer {
     }
 
     /**
-     * Works out how many facilities a facility objective with a scaled count places: one per three points of scale
-     * when battlefield support points are factored into scale, and one per nine points otherwise, rounded down. As for
+     * Works out how many facilities a facility objective with a scaled count places: one per two points of scale
+     * when battlefield support points are factored into scale, and one per four points otherwise, rounded down. As for
      * every other scaled objective, it never drops below one.
      *
      * @param scale                          the contract's scale
@@ -1312,7 +1312,7 @@ public class StratConContractInitializer {
     /**
      * Works out how many non-objective facilities a contract places. The contract's share of facilities is one per
      * point of scale when battlefield support points are factored into scale, since that makes for smaller scales, and
-     * one per three points otherwise, rounded down. Objective facilities owned by the same side count against that
+     * one per two points otherwise, rounded down. Objective facilities owned by the same side count against that
      * share; non-objective facilities only fill what they leave over.
      *
      * @param scale                          the contract's scale

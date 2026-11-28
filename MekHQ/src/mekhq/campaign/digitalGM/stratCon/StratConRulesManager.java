@@ -208,8 +208,7 @@ public class StratConRulesManager {
         REGULAR,
 
         /**
-         * The Combat Team's deployment orders are "Frontline" or "Auxiliary". We pay a support point and make an
-         * enhanced roll
+         * The Combat Team's deployment orders are "Maneuver". We pay a support point and make an enhanced roll
          */
         AUXILIARY
     }
@@ -2695,7 +2694,7 @@ public class StratConRulesManager {
         // Make the roll
         int roll = d6(2);
 
-        // If the formation is set to Maneuver or Auxiliary, use the highest of two rolls
+        // If the formation is set to Maneuver, use the highest of two rolls
         String maneuverRoleReport = "";
         if (reinforcementType == AUXILIARY) {
             int secondRoll = d6(2);
@@ -4206,11 +4205,10 @@ public class StratConRulesManager {
                 continue;
             }
 
-            if (formation.getRole().isReserve()) {
-                continue;
-            }
-
-            if (formation.getRole().isAuxiliary() && !reinforcements) {
+            // Reserve and Auxiliary Combat Teams are never deployed as formations, either as the primary force or as
+            // reinforcements. Auxiliary teams only supply individual Leadership units.
+            CombatRole combatRole = formation.getRole();
+            if (combatRole.isReserve() || combatRole.isAuxiliary()) {
                 continue;
             }
 
@@ -4393,7 +4391,7 @@ public class StratConRulesManager {
             }
 
             // Validate the force associated with the unit
-            if (!isForceEligible(unit, campaign, currentScenario)) {
+            if (!isForceEligible(unit, campaign, currentScenario, false)) {
                 continue;
             }
 
@@ -4443,15 +4441,21 @@ public class StratConRulesManager {
      *   <li>The force is not null.</li>
      *   <li>The force has not already been deployed.</li>
      *   <li>The force is part of a combat team.</li>
-     *   <li>The combat team is not assigned a reserve role.</li>
+     *   <li>The combat team is not assigned a reserve role, or, when {@code auxiliaryOnly} is set, is assigned the
+     *   Auxiliary role.</li>
+     *   <li>The combat team is assigned to the same contract as the scenario.</li>
      * </ul>
      *
-     * @param unit     The {@code Unit} whose associated force is being validated.
-     * @param campaign The {@code Campaign} object used to retrieve information about the force.
+     * @param unit            The {@code Unit} whose associated force is being validated.
+     * @param campaign        The {@code Campaign} object used to retrieve information about the force.
+     * @param currentScenario The scenario the unit would deploy to.
+     * @param auxiliaryOnly   {@code true} to accept only Auxiliary combat teams (leadership units); {@code false} to
+     *                        accept any combat team that is not in Reserve.
      *
      * @return {@code true} if the associated force is eligible; {@code false} otherwise.
      */
-    private static boolean isForceEligible(Unit unit, Campaign campaign, StratConScenario currentScenario) {
+    private static boolean isForceEligible(Unit unit, Campaign campaign, StratConScenario currentScenario,
+          boolean auxiliaryOnly) {
         int forceId = unit.getFormationId();
         Formation formation = campaign.getPlayerForce().getFormation(forceId);
 
@@ -4469,7 +4473,8 @@ public class StratConRulesManager {
             return false;
         }
 
-        if (combatTeam.getRole().isReserve()) {
+        CombatRole combatRole = combatTeam.getRole();
+        if (auxiliaryOnly ? !combatRole.isAuxiliary() : combatRole.isReserve()) {
             return false;
         }
 
@@ -4522,6 +4527,7 @@ public class StratConRulesManager {
      *   <li>The unit matches the general unit type of the primary force in the scenario.</li>
      *   <li>The unit's battle value is within the computed budget.</li>
      *   <li>The unit and its associated force are valid for deployment.</li>
+     *   <li>The unit belongs to an Auxiliary combat team on the scenario's contract.</li>
      * </ul>
      *
      * @param campaign        The campaign instance holding the units and forces involved.
@@ -4589,7 +4595,7 @@ public class StratConRulesManager {
             }
 
             // Validate the force associated with the unit
-            if (!isForceEligible(unit, campaign, currentScenario)) {
+            if (!isForceEligible(unit, campaign, currentScenario, true)) {
                 continue;
             }
 
@@ -4756,7 +4762,7 @@ public class StratConRulesManager {
             }
 
             if (campaignState.getSupportPoints() > 0 || campaign.isGM()) {
-                if (formation.getRole().isManeuver() || formation.getRole().isAuxiliary()) {
+                if (formation.getRole().isManeuver()) {
                     return AUXILIARY;
                 } else {
                     return ReinforcementEligibilityType.REGULAR;

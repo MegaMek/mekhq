@@ -48,6 +48,7 @@ import megamek.common.weapons.infantry.InfantryWeapon;
 import megamek.logging.MMLogger;
 import mekhq.campaign.Campaign;
 import mekhq.campaign.finances.Money;
+import mekhq.campaign.io.RemovedEquipmentNames;
 import mekhq.campaign.parts.Part;
 import mekhq.campaign.parts.missing.MissingPart;
 import mekhq.campaign.unit.Unit;
@@ -141,6 +142,7 @@ public class MissingEquipmentPart extends MissingPart {
         if (typeName == null) {
             typeName = type.getName();
         } else {
+            typeName = RemovedEquipmentNames.replaceRemovedTypeName(typeName);
             type = EquipmentType.get(typeName);
         }
 
@@ -152,6 +154,25 @@ public class MissingEquipmentPart extends MissingPart {
     @Override
     public double getTonnage() {
         return equipTonnage;
+    }
+
+    /**
+     * Sets the weight of the equipment this part is missing. For equipment whose weight matters, this is the weight the
+     * replacement has to have.
+     *
+     * @param weight the weight in tons
+     */
+    public void setEquipTonnage(double weight) {
+        equipTonnage = weight;
+    }
+
+    /**
+     * @return {@code true} if only a part of this part's weight can replace it
+     *
+     * @see EquipmentPart#isWeightMatters(EquipmentType)
+     */
+    public boolean isWeightMatters() {
+        return EquipmentPart.isWeightMatters(type);
     }
 
     @Override

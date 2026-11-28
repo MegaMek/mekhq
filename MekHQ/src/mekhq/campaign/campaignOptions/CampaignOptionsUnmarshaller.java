@@ -168,6 +168,9 @@ public class CampaignOptionsUnmarshaller {
             // a relief force against a quarter of sieges.
             case "enemyFacilityActivity" -> {
             }
+            // Removed option: allied and enemy contract forces always use the skill the random tables give.
+            case "useBolsterContractSkill" -> {
+            }
             default -> LOGGER.warn("Potentially unexpected entry in campaign options: {}", nodeName);
         }
     }

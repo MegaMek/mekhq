@@ -71,6 +71,16 @@ public class CampaignLocationManager {
     private static final MMLogger LOGGER = MMLogger.create(CampaignLocationManager.class);
     private static final String RESOURCE_BUNDLE = "mekhq.resources.Campaign";
 
+    /**
+     * Whether players may create new bases and send people, units and parts to them.
+     *
+     * <p>Turned off while known base bugs are fixed, because some of them can damage a campaign. Existing bases keep
+     * working, and anything at a base can still be sent back to the Main Force. Set to {@code true} to restore the
+     * "Send To" base entries, the "New Base..." entry, the jump blocker's "Leave at new base" choice and base
+     * configuration.</p>
+     */
+    public static final boolean IS_BASE_TRAVEL_ENABLED = false;
+
     private final List<AbstractLocation> locations = new ArrayList<>();
     private final Set<PlayerBase> playerBases = new LinkedHashSet<>();
     /**
